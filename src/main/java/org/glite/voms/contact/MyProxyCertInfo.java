@@ -25,17 +25,16 @@
  *********************************************************************/
 package org.glite.voms.contact;
 
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Object;
-import java.io.IOException;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERSequence;
 
 public class MyProxyCertInfo implements DEREncodable {
 
@@ -67,6 +66,8 @@ public class MyProxyCertInfo implements DEREncodable {
     private void setFromSeq(ASN1Sequence seq) {
         if (seq.size() == 1) {
             // Only one element.  Must be a ProxyPolicy
+        	
+        	 
             this.pathLen = -1;
             this.policy = new ProxyPolicy((ASN1Sequence)(seq.getObjectAt(0)));
         }

@@ -199,7 +199,7 @@ public class UserCredentials {
             KeyStore ks = KeyStore.getInstance( "PKCS12", "BC" );
             stream = new FileInputStream(pkcs12File);
             ks.load(stream, keyPassword.toCharArray());
-            Enumeration aliases = ks.aliases();
+            Enumeration<String> aliases = ks.aliases();
 
             if (!aliases.hasMoreElements())
                 throw new VOMSException("No aliases found inside pkcs12 certificate!");

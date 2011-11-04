@@ -64,14 +64,14 @@ public class VOMSESFileParser {
 
     private static final String splitSyntax = "\\x22[^\\x22]\\x22";
 
-    private static final List vomsesPaths;
+    private static final List<File> vomsesPaths;
 
     static {
 
         String gliteLoc = System.getProperty( "GLITE_LOCATION", null );
         String vomsesLoc = System.getProperty( "VOMSES_LOCATION", null );
 
-        List list = new ArrayList();
+        List<File> list = new ArrayList<File>();
 
         File defaultLocFile = new File( File.separator + "etc"
                 + File.separator + "vomses" );
@@ -116,9 +116,6 @@ public class VOMSESFileParser {
 
         File vomsVomses = new File( System.getProperty( "user.home" )
                 + File.separator + ".voms" + File.separator + "vomses" );
-
-	log.debug("Tried file: "+ vomsVomses.getAbsolutePath());
-	log.debug("file exists ? "+ vomsVomses.exists());
 
         if ( vomsVomses.exists() ) {
 
@@ -238,7 +235,7 @@ public class VOMSESFileParser {
      */
     public VOMSServerMap buildServerMap() throws IOException {
 
-        Iterator i = vomsesPaths.iterator();
+        Iterator<File> i = vomsesPaths.iterator();
 
         if ( log.isDebugEnabled() ) {
 

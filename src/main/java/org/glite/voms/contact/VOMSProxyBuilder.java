@@ -155,7 +155,7 @@ public class VOMSProxyBuilder {
     public static AttributeCertificate buildAC(byte[] acBytes){
 
         ByteArrayInputStream bai = new ByteArrayInputStream(acBytes);
-        AttributeCertificate ac;
+        
 
         try {
             return AttributeCertificate.getInstance( bai );
