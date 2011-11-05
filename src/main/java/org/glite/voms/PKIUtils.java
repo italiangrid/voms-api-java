@@ -537,7 +537,7 @@ public class PKIUtils {
 
 
         if (keyUsage != null && !keyUsage[keyCertSign]) {
-            logger.error("keyUsage extension present, but CertSign bit not active.");
+            logger.debug("keyUsage extension present, but CertSign bit not active.");
             return false;
         }
 

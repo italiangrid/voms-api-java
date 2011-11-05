@@ -63,29 +63,37 @@ public class MyProxyCertInfo implements DEREncodable {
         return policy;
     }
 
-    private void setFromSeq(ASN1Sequence seq) {
-        if (seq.size() == 1) {
-            // Only one element.  Must be a ProxyPolicy
-        	
-        	 
-            this.pathLen = -1;
-            this.policy = new ProxyPolicy((ASN1Sequence)(seq.getObjectAt(0)));
-        }
-        else {
-            // Two elements.  Which one is the first?
-            DEREncodable obj = seq.getObjectAt(0);
-            if (obj instanceof DERInteger) {
-                this.pathLen = ((DERInteger)obj).getValue().intValue();
-                this.policy  = new ProxyPolicy((ASN1Sequence)(seq.getObjectAt(0)));
-                this.version = VOMSProxyBuilder.GT3_PROXY;
-            }
-            else {
-                this.policy  = new ProxyPolicy((ASN1Sequence)(seq.getObjectAt(0)));
-                this.pathLen = ((DERInteger)obj).getValue().intValue();
-                this.version = VOMSProxyBuilder.GT4_PROXY;
-            }
-        }
-    }
+    /*
+     * ProxyCertInfo ::= SEQUENCE {
+        pCPathLenConstraint   INTEGER (0..MAX) OPTIONAL,
+        proxyPolicy           ProxyPolicy }
+
+
+   		ProxyPolicy ::= SEQUENCE {
+        policyLanguage        OBJECT IDENTIFIER,
+        policy          OCTET STRING OPTIONAL }
+     */
+	private void setFromSeq(ASN1Sequence seq) {
+		
+		if (seq.size() == 1){
+			
+			this.version = VOMSProxyBuilder.GT3_PROXY;
+			this.policy = new ProxyPolicy(seq);
+			this.pathLen = -1;
+			
+			
+		}else{
+			
+			this.version = VOMSProxyBuilder.GT4_PROXY;
+			
+			// First element is pCPathLenConstraint
+			this.pathLen = ((DERInteger)seq.getObjectAt(0)).getValue().intValue();
+			this.policy = new ProxyPolicy((ASN1Sequence)seq.getObjectAt(1));
+			
+		}
+
+	}
+	
     public MyProxyCertInfo(ASN1Sequence seq) {
         setFromSeq(seq);
     }

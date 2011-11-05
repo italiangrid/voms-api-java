@@ -484,9 +484,15 @@ public class PKIVerifier {
 
         MyProxyCertInfo pci = new MyProxyCertInfo(payload);
 
-        logger.info("Constraint: " + pci.getPathLenConstraint() + 
-                    "   Size: " + chainSize + "   Current: " + posInChain);
         if (pci.getPathLenConstraint() != -1 && (pci.getPathLenConstraint() < chainSize - posInChain)) {
+        	logger.error("ProxyCertInfo pathlen constraint violation.");
+        	if (logger.isDebugEnabled()){
+        		
+        		String debugString = String.format("pathLenConstraint: %d, certificateChainSize: %d, positionInChain: %d", pci.getPathLenConstraint(),
+        				chainSize, posInChain);
+        		logger.debug(debugString);
+        	}
+        	
             return false;
         }
 
@@ -523,7 +529,7 @@ public class PKIVerifier {
         // First, build the certification path
         certStack.push( certs[0] );
 
-        logger.info( "Certificate verification: Verifying certificate '"
+        logger.debug( "Starting certificate verification for '"
                 + certs[0].getSubjectDN().getName() + "'" );
 
         X509Certificate currentCert = certs[0];
@@ -999,6 +1005,7 @@ public class PKIVerifier {
                             }
                             else {
                                 logger.error( "CRL for CA '"+issuer.getSubjectDN().toString()+"' has expired!" );
+                                return true;
                             }
                         }
                     }

@@ -254,7 +254,7 @@ public class PKIStore implements VOMSTrustStore {
             }
         }
 
-        logger.info("Initializing "+ ((type == TYPE_VOMSDIR) ? "VOMS": "CA") + " certificate store from directory: "+dir);
+        logger.debug("Initializing "+ ((type == TYPE_VOMSDIR) ? "VOMS": "CA") + " certificate store from directory: "+dir);
         
         // Some sanity checks on VOMSDIR and CA dir
         File theDir = new File(dir);
