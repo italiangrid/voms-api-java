@@ -28,7 +28,6 @@ package org.glite.voms;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,21 +35,20 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Principal;
-import java.security.Security;
 import java.security.PrivateKey;
-import java.security.KeyPair;
+import java.security.Security;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.ListIterator;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -61,7 +59,6 @@ import javax.security.auth.x500.X500Principal;
 import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERBitString;
@@ -78,9 +75,9 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.provider.JCERSAPrivateKey;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
-import org.bouncycastle.jce.provider.JCERSAPrivateKey;
 
 
 public class PKIUtils {
@@ -581,7 +578,7 @@ public class PKIUtils {
         if (subject.endsWith(issuer)) {
             logger.debug("ENDNAME CHECK OK");
 
-            String s = subject.replaceFirst(issuer, "");
+            String s = subject.replace(issuer, "");
 
             logger.debug("TO CHECK: " + s);
 
