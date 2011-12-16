@@ -15,14 +15,6 @@ BuildRequires:  maven
 BuildRequires:  jpackage-utils
 BuildRequires:  java-devel
 
-BuildRequires:  maven-compiler-plugin
-BuildRequires:  maven-install-plugin
-BuildRequires:  maven-jar-plugin
-BuildRequires:  maven-javadoc-plugin
-BuildRequires:  maven-release-plugin
-BuildRequires:  maven-resources-plugin
-BuildRequires:  maven-surefire-plugin
-
 Requires:       jpackage-utils
 Requires:       bouncycastle >= 1.39
 Requires:       jakarta-commons-cli
