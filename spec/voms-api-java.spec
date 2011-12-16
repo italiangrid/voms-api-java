@@ -54,9 +54,10 @@ Virtual Organization Membership Service (VOMS) Java API Documentation.
 %setup -q
 
 %build
-mvn javadoc:javadoc assembly:assembly
+mvn -B javadoc:javadoc assembly:assembly
 
 %install
+mkdir -p $RPM_BUILD_ROOT
 tar -C $RPM_BUILD_ROOT -xvzf target/%{name}-%{version}.tar.gz
 
 ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
