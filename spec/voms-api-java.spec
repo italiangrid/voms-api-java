@@ -7,6 +7,7 @@ Group: System Environment/Libraries
 License: ASL 2.0
 URL: https://twiki.cnaf.infn.it/twiki/bin/view/VOMS
 Source: %{name}-%{version}.tar.gz
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:	noarch
 
@@ -39,8 +40,15 @@ authorization purposes.
 
 This package provides a java client APIs for VOMS.
 
-%package javadoc
-Summary: Javadoc for the VOMS Java APIs
+%package    javadoc
+Summary:    Javadoc for the VOMS Java APIs
+Group:      Documentation
+BuildArch:  noarch
+Requires:   jpackage-utils
+Requires:   %{name} = %{version}-%{release}
+
+%description javadoc
+Virtual Organization Membership Service (VOMS) Java API Documentation.
 
 %prep
 %setup -q
@@ -51,17 +59,20 @@ mvn javadoc:javadoc assembly:assembly
 %install
 tar -C $RPM_BUILD_ROOT -xvzf target/%{name}-%{version}.tar.gz
 
-ln -s $RPM_BUILD_ROOT%{_javadir}/{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/{name}.jar
-ln -s $RPM_BUILD_ROOT%{_javadir}/{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar
+ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
+ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar
 
 mv $RPM_BUILD_ROOT%{_javadocdir}/%{name} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
 ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
+%clean
+rm -rf $RPM_BUILD_ROOT
+
 %files
 %defattr(-,root,root,-)
 
-%{_javadir}/{name}.jar
-%{_javadir}/{name}-%{version}.jar
+%{_javadir}/%{name}.jar
+%{_javadir}/%{name}-%{version}.jar
 
 # Backward compatibility naming
 %{_javadir}/vomsjapi.jar
@@ -75,4 +86,6 @@ ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 %changelog
 
-
+* Fri Dec 16 2011 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.7-1
+- Self-managed packaging
+- maven-based build
