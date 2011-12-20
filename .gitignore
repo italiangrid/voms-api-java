@@ -1,4 +1,5 @@
 /.settings
+/dist
 /target
 /.classpath
 /.project

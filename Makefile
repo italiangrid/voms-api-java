@@ -3,13 +3,14 @@ spec=spec/$(name).spec
 version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g")
 release=1
 rpmbuild_dir=$(shell pwd)/rpmbuild
+stage_dir=dist
 
-.PHONY: etics clean rpm
+.PHONY: stage etics clean rpm
 
 all: 	rpm
 
 clean:	
-		rm -rf target $(rpmbuild_dir) tgz RPMS 
+		rm -rf target $(rpmbuild_dir) tgz RPMS dir
 
 rpm:	
 		mvn -B -s src/config/emi-build-settings.xml assembly:assembly
@@ -24,3 +25,13 @@ etics: 	clean rpm
 		mkdir -p tgz RPMS
 		cp target/*.tar.gz tgz
 		cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
+
+stage:	 
+	mkdir -p $(stage_dir)
+	
+	for r in $(shell find $(rpmbuild_dir)/RPMS -name '*.rpm') ; do \
+		echo "Istalling `basename $$r` in $(stage_dir)..."; \
+		pushd . ; cp $$r $(stage_dir); cd $(stage_dir); \
+		rpm2cpio `basename $$r` | cpio -idm; \
+		rm `basename $$r`; popd; \
+	done
