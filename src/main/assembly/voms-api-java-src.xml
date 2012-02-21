@@ -18,6 +18,7 @@
         <exclude>**/.git/**</exclude>
         <exclude>**/.*</exclude>
         <exclude>**/.*/**</exclude>
+        <exclude>**/rpmbuild/**</exclude>
       </excludes>
     </fileSet>
   </fileSets>
