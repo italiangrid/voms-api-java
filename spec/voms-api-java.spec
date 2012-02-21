@@ -22,6 +22,9 @@ Requires:       jakarta-commons-lang
 Requires:       log4j
 Requires:       java
 
+Provides:       vomsjapi = %{version}-%{release}
+Obsoletes:      vomsjapi < %{version}-%{release}
+
 %description
 The Virtual Organization Membership Service (VOMS) is an attribute authority
 which serves as central repository for VO user authorization information,
@@ -38,6 +41,9 @@ Group:      Documentation
 BuildArch:  noarch
 Requires:   jpackage-utils
 Requires:   %{name} = %{version}-%{release}
+
+Provides:       vomsjapi-javadoc = %{version}-%{release}
+Obsoletes:      vomsjapi-javadoc < %{version}-%{release}
 
 %description javadoc
 Virtual Organization Membership Service (VOMS) Java API Documentation.
