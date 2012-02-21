@@ -3,7 +3,6 @@ spec=spec/$(name).spec
 version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g")
 release=1
 rpmbuild_dir=$(shell pwd)/rpmbuild
-rpmdist=""
 stage_dir=dist
 build_settings=src/config/emi-build-settings.xml
 
@@ -24,8 +23,7 @@ rpm:
 
 		cp target/$(name)-$(version)-src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
 		rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" \
-		--define "build_settings $(build_settings)" \
-		--define "dist $(rpmdist)"
+		--define "build_settings $(build_settings)"
 
 etics: 	clean dist rpm
 		mkdir -p tgz RPMS
