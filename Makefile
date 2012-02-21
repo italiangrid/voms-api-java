@@ -22,7 +22,8 @@ rpm:
 					$(rpmbuild_dir)/SRPMS
 
 		cp target/$(name)-$(version)-src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
-		rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)"
+		rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" \
+		--define "build_settings $(build_settings)"
 
 etics: 	clean dist rpm
 		mkdir -p tgz RPMS
