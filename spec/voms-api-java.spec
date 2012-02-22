@@ -52,7 +52,7 @@ Virtual Organization Membership Service (VOMS) Java API Documentation.
 %setup -q
 
 %build
-mvn -B -s %{build_settings} javadoc:javadoc assembly:assembly
+mvn -B clean javadoc:javadoc assembly:assembly
 
 %install
 mkdir -p $RPM_BUILD_ROOT

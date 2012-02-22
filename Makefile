@@ -4,7 +4,6 @@ version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g
 release=1
 rpmbuild_dir=$(shell pwd)/rpmbuild
 stage_dir=dist
-build_settings=src/config/emi-build-settings.xml
 
 .PHONY: stage etics clean rpm
 
@@ -14,7 +13,7 @@ clean:
 		rm -rf target $(rpmbuild_dir) tgz RPMS dir
 
 dist:
-		mvn -B -s $(build_settings) assembly:assembly
+		mvn -B assembly:assembly
 
 rpm:		
 		mkdir -p 	$(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
@@ -22,8 +21,7 @@ rpm:
 					$(rpmbuild_dir)/SRPMS
 
 		cp target/$(name)-$(version)-src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
-		rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" \
-		--define "build_settings $(build_settings)"
+		rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" 
 
 etics: 	clean dist rpm
 		mkdir -p tgz RPMS
