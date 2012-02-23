@@ -52,7 +52,7 @@ Virtual Organization Membership Service (VOMS) Java API Documentation.
 %setup -q
 
 %build
-mvn -B clean javadoc:javadoc assembly:assembly
+mvn -s src/config/cnaf-build-settings.xml -B clean javadoc:javadoc assembly:assembly
 
 %install
 mkdir -p $RPM_BUILD_ROOT

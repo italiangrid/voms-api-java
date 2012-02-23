@@ -7,7 +7,7 @@ stage_dir=dist
 
 .PHONY: stage etics clean rpm
 
-all: 	rpm
+all: 	dist rpm
 
 clean:	
 		rm -rf target $(rpmbuild_dir) tgz RPMS dir
