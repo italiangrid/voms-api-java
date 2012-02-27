@@ -13,7 +13,7 @@ clean:
 		rm -rf target $(rpmbuild_dir) tgz RPMS dir
 
 dist:
-		mvn -B s src/config/cnaf-build-settings.xml assembly:assembly
+		mvn -B -s src/config/cnaf-build-settings.xml assembly:assembly
 
 rpm:		
 		mkdir -p 	$(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
