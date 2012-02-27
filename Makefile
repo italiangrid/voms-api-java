@@ -13,7 +13,7 @@ clean:
 		rm -rf target $(rpmbuild_dir) tgz RPMS dir
 
 dist:
-		mvn -B -s src/config/cnaf-build-settings.xml assembly:assembly
+		mvn -B -s src/config/emi-build-settings.xml assembly:assembly
 
 rpm:		
 		mkdir -p 	$(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
@@ -23,7 +23,7 @@ rpm:
 		cp target/$(name)-$(version)-src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
 		rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" 
 
-etics: 	clean dist rpm
+etics: 	clean rpm
 		mkdir -p tgz RPMS
 		cp target/*.tar.gz tgz
 		cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
