@@ -543,7 +543,8 @@ public class PKIStore implements VOMSTrustStore {
         String hash = PKIUtils.getHash(cert);
 
         if (certificates.containsKey(hash)) {
-            ((Vector)certificates.get(hash)).add(cert);
+	    if(!((Vector)certificates.get(hash)).contains(cert))
+                ((Vector)certificates.get(hash)).add(cert);
         }
         else {
             Vector certs = new Vector();
