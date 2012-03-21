@@ -301,7 +301,7 @@ public class AttributeCertificate implements DEREncodable {
         GeneralNames gns = acInfo.getHolder().getIssuer();
 
         for (Enumeration e = ((ASN1Sequence)gns.getDERObject()).getObjects(); e.hasMoreElements();) {
-            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+            GeneralName gn = (GeneralName)e.nextElement();
 
             if (gn.getTagNo() == 4) {
                 X509Principal principal = Util.generalNameToX509Name(gn);

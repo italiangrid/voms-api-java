@@ -220,7 +220,7 @@ public class VOMSAttribute {
 
         Enumeration e = ((ASN1Sequence) names.getDERObject()).getObjects();
         if (e.hasMoreElements()) {
-            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject)e.nextElement());
+            GeneralName gn = (GeneralName)e.nextElement();
             
             if (gn.getTagNo() == 4) {
                 try {
