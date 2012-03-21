@@ -4,16 +4,21 @@ version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g
 release=1
 rpmbuild_dir=$(shell pwd)/rpmbuild
 stage_dir=dist
+bc_version=1.45
+settings_file=src/config/emi-build-settings.xml
 
 .PHONY: stage etics clean rpm
 
 all: 	dist rpm
 
+prepare-spec:
+		sed -e 's#@@BUILD_SETTINGS@@#$(settings_file)#g' -e 's#@@BC_VERSION@@#$(bc_version)#g' \
+			spec/voms-api-java.spec.in > spec/voms-api-java.spec
 clean:	
-		rm -rf target $(rpmbuild_dir) tgz RPMS dir
+		rm -rf target $(rpmbuild_dir) tgz RPMS dir spec/voms-api-java.spec
 
-dist:
-		mvn -B -s src/config/emi-build-settings.xml assembly:assembly
+dist:   prepare-spec
+		mvn -B -s $(settings_file) -Dbouncycastle.version=$(bc_version) assembly:assembly
 
 rpm:		
 		mkdir -p 	$(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
@@ -23,7 +28,7 @@ rpm:
 		cp target/$(name)-$(version)-src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
 		rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" 
 
-etics: 	rpm
+etics: 	dist rpm
 		mkdir -p tgz RPMS
 		cp target/*.tar.gz tgz
 		cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS

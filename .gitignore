@@ -1,5 +1,11 @@
 /.settings
+/bin
 /dist
 /target
 /.classpath
 /.project
+/spec/voms-api-java.spec
+/rpmbuild
+/debbuild
+/RPMS
+/tgz

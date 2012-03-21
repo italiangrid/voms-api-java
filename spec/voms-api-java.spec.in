@@ -16,7 +16,7 @@ BuildRequires:  jpackage-utils
 BuildRequires:  java-devel
 
 Requires:       jpackage-utils
-Requires:       bouncycastle >= 1.39
+Requires:       bouncycastle >= @@BC_VERSION@@
 Requires:       jakarta-commons-cli
 Requires:       jakarta-commons-lang
 Requires:       log4j
@@ -52,7 +52,7 @@ Virtual Organization Membership Service (VOMS) Java API Documentation.
 %setup -q
 
 %build
-mvn -s src/config/emi-build-settings.xml -B clean javadoc:javadoc assembly:assembly
+mvn -s @@BUILD_SETTINGS@@ -B clean -Dbouncycastle.version=@@BC_VERSION@@ javadoc:javadoc assembly:assembly
 
 %install
 rm -rf $RPM_BUILD_ROOT
