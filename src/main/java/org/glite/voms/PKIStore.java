@@ -43,6 +43,7 @@ import java.util.ListIterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -57,9 +58,23 @@ import org.glite.voms.ac.VOMSTrustStore;
  * It is also capable of storing files specific to the handling of VOMS
  * proxies, i.e. the content of the vomsdir diectory.
  *
+ *
  * @author Vincenzo Ciaschini
  */
 public class PKIStore implements VOMSTrustStore {
+	
+	/**
+	 * The property used to set the period, in minutes, that is used to refresh this trust store.
+	 */
+	public static final String TRUST_STORE_REFRESH_PERIOD_PROPERTY = "voms.trust-store-refresh-period";
+	
+	
+	/**
+	 * The default period, in minutes, used to refresh this trust store.
+	 */
+	public static final int DEFAULT_TRUST_STORE_REFRESH_PERIOD =  10;
+	
+	
     private Hashtable certificates = null;
     private Hashtable crls         = null;
     private Hashtable signings     = null;
@@ -171,19 +186,7 @@ public class PKIStore implements VOMSTrustStore {
      */
     public synchronized void refresh() {
         PKIStore newReader = null;
-
-        /* The code below did not work.  In place changes to a file do not 
-           change the lastmodified date of the directory, only the 
-           lastaccessed, and java does not provide a way to determine the
-           latter. */
-        /*
-        File f = new File(certDir);
-
-        if (f.lastModified() == lastmodified) {
-            logger.debug("No changes to directory -- Do not refresh");
-            return;
-        }
-        */
+        
         try {
             newReader = new PKIStore(certDir, type, aggressive, false);
         } 
@@ -220,8 +223,7 @@ public class PKIStore implements VOMSTrustStore {
             namespaces.clear();
             namespaces = newReader.namespaces;
             newReader.namespaces = null;
-
-
+            
         }
         finally {
             newReader = null;
@@ -302,12 +304,25 @@ public class PKIStore implements VOMSTrustStore {
         if (theDir.exists())
             load();
 
-
+        // Default 
+        String vomsApiJavaRefreshPeriod = System.getProperty("voms.trust-store-refresh-period");
+        int refreshPeriod;
+        
+        try{
+        	 refreshPeriod = Integer.parseInt(vomsApiJavaRefreshPeriod);
+        	 
+        }catch (NumberFormatException nfe){
+        	
+        	logger.warn("Error parsing voms.trust-store-refresh-period! Using default value: "+DEFAULT_TRUST_STORE_REFRESH_PERIOD+" minutes");
+        	refreshPeriod = DEFAULT_TRUST_STORE_REFRESH_PERIOD;
+        }
+        
 
         if (timer) {
             theTimer = new Timer(true);
-            theTimer.scheduleAtFixedRate(new Refreshener(), 30000, 30000);
+            theTimer.scheduleAtFixedRate(new Refreshener(), 30000, TimeUnit.MINUTES.toMillis(refreshPeriod));
         }
+        
         instances = 1;
     }
 
