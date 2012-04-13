@@ -19,6 +19,7 @@
         <exclude>**/.*</exclude>
         <exclude>**/.*/**</exclude>
         <exclude>**/rpmbuild/**</exclude>
+        <exclude>**/spec/*.in</exclude>
       </excludes>
     </fileSet>
   </fileSets>
