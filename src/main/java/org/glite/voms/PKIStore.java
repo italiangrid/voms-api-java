@@ -304,17 +304,22 @@ public class PKIStore implements VOMSTrustStore {
         if (theDir.exists())
             load();
 
-        // Default 
+        
         String vomsApiJavaRefreshPeriod = System.getProperty("voms.trust-store-refresh-period");
         int refreshPeriod;
         
-        try{
-        	 refreshPeriod = Integer.parseInt(vomsApiJavaRefreshPeriod);
-        	 
-        }catch (NumberFormatException nfe){
-        	
-        	logger.warn("Error parsing voms.trust-store-refresh-period! Using default value: "+DEFAULT_TRUST_STORE_REFRESH_PERIOD+" minutes");
+        if (vomsApiJavaRefreshPeriod == null)
         	refreshPeriod = DEFAULT_TRUST_STORE_REFRESH_PERIOD;
+        else {
+        
+        	try{
+        		refreshPeriod = Integer.parseInt(vomsApiJavaRefreshPeriod);
+        	
+        	}catch (NumberFormatException nfe){
+        	
+        		logger.warn("Error parsing voms.trust-store-refresh-period! Using default value: "+DEFAULT_TRUST_STORE_REFRESH_PERIOD+" minutes");
+        		refreshPeriod = DEFAULT_TRUST_STORE_REFRESH_PERIOD;
+        	}
         }
         
 
