@@ -26,6 +26,7 @@
  *********************************************************************/
 package org.glite.voms.contact.cli;
 
+import java.io.Console;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -258,7 +259,6 @@ public class VomsProxyInitClient {
             helpFormatter.printHelp( "VomsProxyInit", options );
             System.exit(-1);
         }   
-
         
     }
     
@@ -270,7 +270,17 @@ public class VomsProxyInitClient {
         else{
          
             log.warn( "No password given to decrypt the openssl private key..." );
-            proxyInit = VOMSProxyInit.instance();
+            
+            Console console = System.console(); 
+            char[] passwd;
+            
+            if (console != null){
+            	passwd = console.readPassword("[%s]", "Password:");
+            	if (passwd != null)
+            		keyPassword = new String(passwd);
+            }
+            
+            proxyInit = VOMSProxyInit.instance(keyPassword);
         
         }
         if (proxyOutput != null)
