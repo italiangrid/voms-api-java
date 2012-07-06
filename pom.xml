@@ -125,6 +125,7 @@
       <name>CNAF releases</name>
       <url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases/</url>
     </repository>
+    
     <snapshotRepository>
       <id>cnaf-snapshots</id>
       <name>CNAF snapshots</name>
