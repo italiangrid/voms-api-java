@@ -45,7 +45,8 @@
 
 package org.glite.voms;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +71,7 @@ import java.util.Vector;
  * The returning means the return of the getListing method.
  */
 class DirectoryList {
-    static Logger logger = Logger.getLogger(DirectoryList.class.getName());
+    static Logger logger = LoggerFactory.getLogger(DirectoryList.class.getName());
     List files = null;
 
     /** Creates a new instance of DirectoryList

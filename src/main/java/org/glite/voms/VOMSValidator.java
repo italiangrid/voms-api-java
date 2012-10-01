@@ -47,7 +47,8 @@ import java.util.ListIterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.DEROctetString;
@@ -65,7 +66,7 @@ import org.glite.voms.ac.VOMSTrustStore;
  */
 class CertUtil {
     /** log4j util for logging */
-    static Logger logger = Logger.getLogger(CertUtil.class.getName());
+    static Logger logger = LoggerFactory.getLogger(CertUtil.class.getName());
 
     /**
      * Finds out the index of the client cert in a certificate chain.
@@ -118,7 +119,7 @@ class CertUtil {
  * @author Vincenzo Ciaschini
  */
 public class VOMSValidator {
-    static Logger log = Logger.getLogger(VOMSValidator.class);
+    static Logger log = LoggerFactory.getLogger(VOMSValidator.class);
     public static final String VOMS_EXT_OID = "1.3.6.1.4.1.8005.100.100.5";
     protected static ACTrustStore theTrustStore;
     protected ACValidator myValidator;

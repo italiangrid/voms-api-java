@@ -38,7 +38,8 @@ import java.security.cert.CertificateException;
 
 import java.util.Enumeration;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PasswordFinder;
 import org.bouncycastle.openssl.PEMWriter;
@@ -63,7 +64,7 @@ public class UserCredentials {
         }
     }
 
-    private static final Logger log = Logger.getLogger( UserCredentials.class );
+    private static final Logger log = LoggerFactory.getLogger( UserCredentials.class );
 
     private X509Certificate userCert;
     private X509Certificate[] userChain;

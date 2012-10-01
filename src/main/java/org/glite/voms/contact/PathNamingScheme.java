@@ -29,7 +29,8 @@ package org.glite.voms.contact;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides utility methods that are used for parsing, matching voms
@@ -42,7 +43,7 @@ import org.apache.log4j.Logger;
  */
 public class PathNamingScheme {
 
-    public static final Logger log = Logger.getLogger( PathNamingScheme.class );
+    public static final Logger log = LoggerFactory.getLogger( PathNamingScheme.class );
 
     public static final String containerSyntax = "^(/[\\w.-]+)+|((/[\\w.-]+)+/)?(Role=[\\w.-]+)|(Capability=[\\w\\s.-]+)$";
 

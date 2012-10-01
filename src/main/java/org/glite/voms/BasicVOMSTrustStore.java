@@ -37,7 +37,8 @@ import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.glite.voms.ac.ACTrustStore;
 
 
@@ -53,7 +54,7 @@ import org.glite.voms.ac.ACTrustStore;
  * @author Vincenzo Ciaschini
  */
 public final class BasicVOMSTrustStore implements ACTrustStore {
-    static Logger log = Logger.getLogger(BasicVOMSTrustStore.class);
+    static Logger log = LoggerFactory.getLogger(BasicVOMSTrustStore.class);
     public static final String DEFAULT_TRUST_STORE_LISTING = PKIStore.DEFAULT_VOMSDIR;
     String trustedDirList = null;
     private Hashtable issuerCerts = new Hashtable();
@@ -97,7 +98,7 @@ public final class BasicVOMSTrustStore implements ACTrustStore {
 
         if ((l == null) || l.isEmpty()) {
             String msg = "VOMS trust anchors " + trustedDirList + " does not appear to exist";
-            log.fatal(msg);
+            log.error(msg);
             throw new IllegalArgumentException(msg);
         }
 

@@ -34,7 +34,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -51,7 +52,7 @@ import org.w3c.dom.Element;
  */
 public class VOMSRequestFactory {
     
-    private static Logger log = Logger.getLogger( VOMSRequestFactory.class );
+    private static Logger log = LoggerFactory.getLogger( VOMSRequestFactory.class );
     private static VOMSRequestFactory instance = null;
     
     private String orderString;
@@ -79,7 +80,7 @@ public class VOMSRequestFactory {
             docBuilder = factory.newDocumentBuilder();
         } catch ( ParserConfigurationException e ) {
             
-            log.fatal( "Error configuring DOM document builder." );
+            log.error( "Error configuring DOM document builder." );
             
             if (log.isDebugEnabled()){
                 log.debug( e.getMessage(), e );

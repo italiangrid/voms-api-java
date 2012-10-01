@@ -52,7 +52,8 @@ import java.security.cert.X509Certificate;
 import java.security.cert.Certificate;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.glite.voms.PKIVerifier;
 import org.glite.voms.PKIUtils;
 import org.glite.voms.ac.AttributeCertificate;
@@ -84,7 +85,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 public class VOMSProxyInit {
 
-    private static final Logger log = Logger.getLogger( VOMSProxyInit.class );
+    private static final Logger log = LoggerFactory.getLogger( VOMSProxyInit.class );
     
     private static VOMSProxyInit instance;
     
@@ -429,7 +430,7 @@ public class VOMSProxyInit {
         VOMSErrorMessage[] msgs = response.errorMessages();
         
         for ( int i = 0; i < msgs.length; i++ ) {
-            log.error(msgs[i]);
+            log.error(msgs[i].toString());
         }        
     }
 
@@ -437,7 +438,7 @@ public class VOMSProxyInit {
         VOMSWarningMessage[] msgs = response.warningMessages();
         setWarnings(msgs);
         for ( int i = 0; i < msgs.length; i++ ) {
-            log.warn(msgs[i]);
+            log.warn(msgs[i].toString());
         }
     }
 
@@ -625,7 +626,7 @@ public class VOMSProxyInit {
 class GSIVerifier implements HostnameVerifier {
     private String name;
     private HostnameVerifier verifier;
-    private static final Logger log = Logger.getLogger( GSIVerifier.class );
+    private static final Logger log = LoggerFactory.getLogger( GSIVerifier.class );
 
     static {
         if (Security.getProvider("BC") == null) {

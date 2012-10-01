@@ -40,7 +40,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.glite.voms.contact.VOMSException;
 import org.glite.voms.contact.UserCredentials;
@@ -53,7 +54,7 @@ public class VOMSKeyManager implements X509KeyManager {
     public static final int TYPE_PKCS12 = 1;
     public static final int TYPE_PEM    = 2;
 
-    private static final Logger logger = Logger.getLogger(VOMSKeyManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(VOMSKeyManager.class);
 
     static {
         if ( Security.getProvider( "BC" ) == null ) {

@@ -35,7 +35,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.io.IOException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -44,7 +45,7 @@ public class VOMSTrustManager implements X509TrustManager {
     private PKIVerifier verifier = null;
     boolean stopcalled = false;
 
-    private static Logger logger = Logger.getLogger( VOMSTrustManager.class
+    private static Logger logger = LoggerFactory.getLogger( VOMSTrustManager.class
             .getName() );
 
     static {

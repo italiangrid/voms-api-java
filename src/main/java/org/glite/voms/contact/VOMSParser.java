@@ -32,7 +32,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 
@@ -45,7 +46,7 @@ import org.xml.sax.SAXException;
  */
 public class VOMSParser {
 
-    private static Logger log = Logger.getLogger( VOMSParser.class );
+    private static Logger log = LoggerFactory.getLogger( VOMSParser.class );
     
     protected DocumentBuilder docBuilder;
     
@@ -60,7 +61,7 @@ public class VOMSParser {
             docBuilder = factory.newDocumentBuilder();
         } catch ( ParserConfigurationException e ) {
             
-            log.fatal( "Error configuring DOM document builder." );
+            log.error( "Error configuring DOM document builder." );
             if (log.isDebugEnabled()){
                 log.debug( e.getMessage(), e );
             }

@@ -56,7 +56,8 @@ import java.util.regex.Pattern;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -98,7 +99,7 @@ public class PKIUtils {
     private static final int keyCertSign = 5;
     private static final int digitalSignature = 0;
 
-    private static final Logger logger = Logger.getLogger(PKIUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(PKIUtils.class);
 
      static {
         if (Security.getProvider("BC") == null) {
@@ -206,7 +207,7 @@ public class PKIUtils {
                 md = MessageDigest.getInstance("MD5");
             }
             catch(NoSuchAlgorithmException e) {
-                logger.fatal("NO MD5! " + e.getMessage(), e);
+                logger.error("NO MD5! " + e.getMessage(), e);
 
                 throw new IllegalStateException("NO MD5! " + e.getMessage(), e);
             }

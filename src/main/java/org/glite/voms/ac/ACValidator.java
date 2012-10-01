@@ -37,7 +37,8 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.glite.voms.BasicVOMSTrustStore;
 import org.glite.voms.PKIVerifier;
 
@@ -49,7 +50,7 @@ import org.glite.voms.PKIVerifier;
  * @author mulmo
  */
 public class ACValidator {
-    protected static final Logger log = Logger.getLogger(ACValidator.class);
+    protected static final Logger log = LoggerFactory.getLogger(ACValidator.class);
     private static ACValidator theInstance = null;
     protected ACTrustStore myTrustStore;
     protected VOMSTrustStore myVOMSStore;

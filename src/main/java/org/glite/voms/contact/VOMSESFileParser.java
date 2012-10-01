@@ -36,7 +36,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -60,7 +61,7 @@ import org.apache.log4j.Logger;
  */
 public class VOMSESFileParser {
 
-    private static final Logger log = Logger.getLogger( VOMSESFileParser.class );
+    private static final Logger log = LoggerFactory.getLogger( VOMSESFileParser.class );
 
     private static final String splitSyntax = "\\x22[^\\x22]\\x22";
 

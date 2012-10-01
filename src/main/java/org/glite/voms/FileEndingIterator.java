@@ -45,7 +45,8 @@
 
 package org.glite.voms;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -54,7 +55,7 @@ import java.io.File;
  * a certain ending.
  */
 class FileEndingIterator {
-    static Logger logger = Logger.getLogger(FileEndingIterator.class.getName());
+    static Logger logger = LoggerFactory.getLogger(FileEndingIterator.class.getName());
 
     /** The file ending.
      */

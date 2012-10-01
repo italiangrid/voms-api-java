@@ -32,7 +32,8 @@ import java.io.IOException;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The purpose of this class is to represent a *.signing_policy file.
@@ -59,7 +60,7 @@ public class SigningPolicy {
 
     private int mode = ACCESS_ID_CA;
 
-    private static Logger logger = Logger.getLogger( SigningPolicy.class
+    private static Logger logger = LoggerFactory.getLogger( SigningPolicy.class
             .getName() );
 
     /**

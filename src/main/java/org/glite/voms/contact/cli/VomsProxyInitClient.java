@@ -38,7 +38,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.glite.voms.contact.VOMSException;
 import org.glite.voms.contact.VOMSProxyBuilder;
 import org.glite.voms.contact.VOMSProxyInit;
@@ -54,8 +55,7 @@ import org.glite.voms.contact.VOMSProxyConstants;
  */
 public class VomsProxyInitClient {
     
-    private static final Logger log = Logger
-            .getLogger( VomsProxyInitClient.class );
+    private static final Logger log = LoggerFactory.getLogger( VomsProxyInitClient.class );
     
     protected VOMSProxyInit proxyInit;
     

@@ -53,7 +53,8 @@ import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Object;
@@ -82,7 +83,7 @@ class MyDERInputStream extends ASN1InputStream {
 
 public class PKIVerifier {
 
-    private static Logger logger = Logger.getLogger( PKIVerifier.class
+    private static Logger logger = LoggerFactory.getLogger( PKIVerifier.class
             .getName() );
 
     public static final String SUBJECT_KEY_IDENTIFIER = "2.5.29.14";

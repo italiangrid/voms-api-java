@@ -64,7 +64,8 @@ import java.util.TimeZone;
 
 import java.math.BigInteger;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERSequence;
@@ -129,7 +130,7 @@ class ExtensionData {
  */
 public class VOMSProxyBuilder {
 
-    private static final Logger log = Logger.getLogger( VOMSProxyBuilder.class );
+    private static final Logger log = LoggerFactory.getLogger( VOMSProxyBuilder.class );
 
     public static final int GT2_PROXY = 2;
     public static final int GT3_PROXY = 3;

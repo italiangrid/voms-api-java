@@ -47,7 +47,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.voms.ac.VOMSTrustStore;
 
@@ -84,7 +85,7 @@ public class PKIStore implements VOMSTrustStore {
 
     private int       instances    = 1;
 
-    private static Logger logger = Logger.getLogger(PKIStore.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(PKIStore.class.getName());
 
     /**
      * This PKIStore object will contain data from a vomsdir directory.

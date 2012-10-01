@@ -29,7 +29,8 @@ package org.glite.voms.contact;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -42,7 +43,7 @@ import org.apache.log4j.Logger;
 public class VOMSResponse {
 
     private static int ERROR_OFFSET = 1000;
-    private static final Logger log = Logger.getLogger( VOMSResponse.class );
+    private static final Logger log = LoggerFactory.getLogger( VOMSResponse.class );
 
     protected Document xmlResponse;
 

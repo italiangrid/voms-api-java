@@ -45,7 +45,8 @@
 
 package org.glite.voms;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -76,7 +77,7 @@ import org.bouncycastle.asn1.ASN1InputStream;
  * Should accept multiple certs in one file, not tested!
  */
 class FileCertReader {
-    static Logger logger = Logger.getLogger(FileCertReader.class.getName());
+    static Logger logger = LoggerFactory.getLogger(FileCertReader.class.getName());
     static final int BUF_LEN = 1000;
     static final byte CARR = '\r';
     static final byte NL = '\n';
@@ -254,7 +255,7 @@ class FileCertReader {
                 storeVector.addAll(readFile(nextFile, type));
             }
         } catch (IOException e) {
-            logger.fatal("Error while reading certificates or CRLs: " + e.getMessage());
+            logger.error("Error while reading certificates or CRLs: " + e.getMessage());
 
             throw new CertificateException("Error while reading certificates or CRLs: " +
                                            e.getMessage(), e);
@@ -288,7 +289,7 @@ class FileCertReader {
                 skipEmptyLines(binStream);
             }
         } catch (Exception e) {
-            logger.fatal("Error while reading certificates or crls from file " +
+            logger.error("Error while reading certificates or crls from file " +
                 certFile.toString() + "error was: " + e.getMessage());
 
             throw new IOException("Error while reading certificates or crls from file " +
@@ -380,7 +381,7 @@ class FileCertReader {
                 if (type == TYPE_CERT) {
                     obj = cert;
                 } else {
-                    logger.fatal("Internal error: Invalid data type " + type +
+                    logger.error("Internal error: Invalid data type " + type +
                         " when trying to read certificate");
                     throw new CertificateParsingException("Internal error: Invalid data type " +
                                                           type + " when trying to read certificate");

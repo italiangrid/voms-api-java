@@ -37,7 +37,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 
@@ -48,7 +49,7 @@ import org.w3c.dom.Document;
  *
  */
 public class VOMSProtocol {
-    private static final Logger log = Logger.getLogger(VOMSProtocol.class);
+    private static final Logger log = LoggerFactory.getLogger(VOMSProtocol.class);
 
     private VOMSRequestFactory requestFactory = VOMSRequestFactory.instance();
     private TransformerFactory transformerFactory;

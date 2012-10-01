@@ -51,7 +51,8 @@ import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
@@ -82,7 +83,7 @@ import org.glite.voms.PKIUtils;
  * @author Joni Hahkala, Olle Mulmo
  */
 public class AttributeCertificate implements DEREncodable {
-    protected static final Logger logger = Logger.getLogger(AttributeCertificate.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AttributeCertificate.class);
     AttributeCertificateInfo acInfo;
     AlgorithmIdentifier signatureAlgorithm;
     DERBitString signatureValue;

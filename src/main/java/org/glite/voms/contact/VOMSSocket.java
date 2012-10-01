@@ -40,7 +40,8 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.SSLException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.glite.voms.VOMSKeyManager;
@@ -57,7 +58,7 @@ import org.glite.voms.VOMSTrustManager;
  */
 public class VOMSSocket {
 
-    private static final Logger log = Logger.getLogger( VOMSSocket.class );
+    private static final Logger log = LoggerFactory.getLogger( VOMSSocket.class );
 
     UserCredentials cred;
 
@@ -113,14 +114,14 @@ public class VOMSSocket {
 
             return context.getSocketFactory();
         } catch (SSLException e) {
-            log.fatal( "Error opening SSL socket: "+e.getMessage() );
+            log.error( "Error opening SSL socket: "+e.getMessage() );
 
             if (log.isDebugEnabled())
                 log.debug( e.getMessage(),e );
             throw e;
         } catch ( IOException e ) {
 
-            log.fatal( "Error opening SSL socket: "+e.getMessage() );
+            log.error( "Error opening SSL socket: "+e.getMessage() );
 
             if (log.isDebugEnabled())
                 log.debug( e.getMessage(),e );
@@ -148,14 +149,14 @@ public class VOMSSocket {
             String[] protocols = { "SSLv3"};
             socket.setEnabledProtocols(protocols);
         } catch (SSLException e) {
-            log.fatal( "Error opening SSL socket: "+e.getMessage() );
+            log.error( "Error opening SSL socket: "+e.getMessage() );
 
             if (log.isDebugEnabled())
                 log.debug( e.getMessage(),e );
             throw e;
         } catch ( IOException e ) {
 
-            log.fatal( "Error opening SSL socket: "+e.getMessage() );
+            log.error( "Error opening SSL socket: "+e.getMessage() );
 
             if (log.isDebugEnabled())
                 log.debug( e.getMessage(),e );

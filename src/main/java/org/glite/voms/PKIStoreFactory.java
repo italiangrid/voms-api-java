@@ -30,7 +30,8 @@ import java.io.IOException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.util.Hashtable;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.glite.voms.PKIStore;
 
 class Parameters {
@@ -93,7 +94,7 @@ public class PKIStoreFactory {
     private static Hashtable stores = null;
     private static final int HASHCAPACITY = 75;
 
-    private static Logger logger = Logger.getLogger(PKIStoreFactory.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(PKIStoreFactory.class.getName());
 
     public synchronized static PKIStore getStore(String dir, int type, boolean aggressive, boolean timer) throws IOException, CertificateException, CRLException {
         if (stores == null)

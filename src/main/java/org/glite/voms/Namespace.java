@@ -34,11 +34,12 @@ import java.io.IOException;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.security.cert.X509Certificate;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Namespace
 {
-  private static Logger logger = Logger.getLogger(Namespace.class.getName());
+  private static Logger logger = LoggerFactory.getLogger(Namespace.class.getName());
 //   private static final Pattern namespace_self_permit_pattern = Pattern.compile("to\\s+issuer\\s+self\\s+permit\\s+\"(.*)\"", Pattern.CASE_INSENSITIVE);
 //   private static final Pattern namespace_self_deny_pattern = Pattern.compile("to\\s+issuer\\s+self\\s+deny\\s+\"(.*)\"", Pattern.CASE_INSENSITIVE);
 //   private static final Pattern namespace_issuer_permit_pattern = Pattern.compile("to\\s+issuer\\s+\"(.*)\"\\s+permit\\s+subject\\s+\"(.*)\"", Pattern.CASE_INSENSITIVE);
