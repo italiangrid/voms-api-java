@@ -1,14 +1,12 @@
 package org.glite.voms;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
-public class Test extends TestCase {
+public class Test {
 
-	
+	@org.junit.Test
 	public void testExample(){
 		
 		assertTrue(true);
 	}
-	
-	
 }

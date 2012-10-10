@@ -39,6 +39,24 @@
         <role>Developer</role>
       </roles>
     </developer>
+    <developer>
+      <id>vventuri</id>
+      <name>Valerio Venturi</name>
+      <email>valerio.venturi@cnaf.infn.it</email>
+      <organization>INFN CNAF</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>dandreotti</id>
+      <name>Daniele Andreotti</name>
+      <email>daniele.andreotti@cnaf.infn.it</email>
+      <organization>INFN CNAF</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
   </developers>
 
   <build>
@@ -89,16 +107,15 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.10</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-ext-jdk16</artifactId>
-      <version>${bouncycastle.version}</version>
+      <groupId>eu.eu-emi.security</groupId>
+      <artifactId>canl</artifactId>
+      <version>1.1.0-SNAPSHOT</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.slf4j</groupId>
