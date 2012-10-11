@@ -76,4 +76,10 @@ public class TestDefaultVOMSTrustStore {
 			
 		assertTrue(cert.getSubjectX500Principal().equals(store.getLocalAACertificates().get(0).getSubjectX500Principal()));
 	}
+	
+	
+	public void testUpdatingVOMSTrustStore(){
+		
+		
+	}
 }

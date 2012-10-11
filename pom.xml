@@ -4,7 +4,7 @@
 
   <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
-  <version>2.0.9-SNAPSHOT</version>
+  <version>2.0.9.canl-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>voms-api-java</name>
@@ -13,11 +13,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
     <assembly.java.dir>/usr/share/java</assembly.java.dir>
     <assembly.doc.dir>/usr/share/doc/${project.name}-${project.version}</assembly.doc.dir>
     <assembly.javadoc.dir>/usr/share/javadoc/${project.name}</assembly.javadoc.dir>
-    <bouncycastle.version>1.46</bouncycastle.version>
   </properties>
 
   <developers>

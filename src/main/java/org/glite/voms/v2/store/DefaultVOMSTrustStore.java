@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.glite.voms.v2.VOMSError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,8 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 /**
  * 
- * The default implementation for the VOMS trust store.
+ * The default implementation for the VOMS trust store. This implementation <b>does not</b> refresh the trust information
+ * on a periodic basis. For an updating trust store see {@link UpdatingVOMSTrustStore}.
  * 
  * @author andreaceccanti
  * 
@@ -50,9 +53,6 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 	 * information (certs or LSC files)
 	 **/
 	private List<String> localTrustedDirs;
-
-	/** Map of local parsed AA certificates keyed by host name **/
-	private Map<String, List<X509Certificate>> localAACertificatesByVO = new HashMap<String, List<X509Certificate>>(); 
 
 	/** Map of local parsed AA certificates keyed by certificate subject hash **/
 	private Map<String, X509Certificate> localAACertificatesByHash = new HashMap<String, X509Certificate>();
@@ -98,13 +98,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
 		return Collections.unmodifiableList(new ArrayList<X509Certificate>(localAACertificatesByHash.values()));
 	}
-
-	public List<X509Certificate> getAACertificateForVO(String voName) {
-
-		return Collections.unmodifiableList(localAACertificatesByVO.get(voName));
-
-	}
-
+	
 	public LSCInfo getLSC(String voName, String hostname) {
 
 		Set<LSCInfo> candidates = localLSCInfo.get(voName);
@@ -276,6 +270,13 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 				
 	}
 	
+	
+	private void cleanupStores(){
+		
+		localAACertificatesByHash.clear();
+		localLSCInfo.clear();
+		
+	}
 	public synchronized void loadTrustInformation() {
 
 		if (localTrustedDirs.isEmpty()) {
@@ -283,6 +284,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 					"No local trust directory was specified for this trust store. Please provide at least one path where LSC and VOMS service certificates will be searched for.");
 		}
 
+		cleanupStores();
 		log.debug("Trusted information directories: {}", localTrustedDirs);
 
 		for (String localDir : localTrustedDirs) {
@@ -293,7 +295,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 			// Legacy VOMS dir structure put all the certificates in the base trust directory
 			loadCertificatesFromDirectory(baseTrustDir);
 			
-			// Load LSC and certificates files starting from each of the subdirectory of the starting trust info directory
+			// Load LSC and certificates files starting from each of the sub-directory of the starting trust info directory
 			File[] voDirs = baseTrustDir.listFiles(new FileFilter() {
 				public boolean accept(File pathname) {
 					return pathname.isDirectory();
@@ -307,5 +309,13 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		}
 		
 		checkStoreIsNotEmpty();
+	}
+
+	public X509Certificate getAACertificateBySubject(X500Principal aaCertSubject) {
+		
+		String theCertHash = OpensslTrustAnchorStore.getOpenSSLCAHash(aaCertSubject);
+		
+		return localAACertificatesByHash.get(theCertHash);
+		
 	}
 }
