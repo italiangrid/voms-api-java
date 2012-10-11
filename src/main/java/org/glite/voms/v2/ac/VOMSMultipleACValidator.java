@@ -1,7 +1,9 @@
-package org.glite.voms.v2;
+package org.glite.voms.v2.ac;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
+
+import org.glite.voms.v2.VOMSAttributes;
 
 @Deprecated
 public interface VOMSMultipleACValidator extends VOMSACValidator{

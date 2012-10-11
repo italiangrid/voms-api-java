@@ -1,6 +1,8 @@
-package org.glite.voms.v2;
+package org.glite.voms.v2.ac;
 
 import java.security.cert.X509Certificate;
+
+import org.glite.voms.v2.VOMSAttributes;
 
 /**
  * This interface defines the behavior of a VOMS Attribute Certificate parser.
