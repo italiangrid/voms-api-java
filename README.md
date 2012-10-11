@@ -12,7 +12,7 @@ If using Maven, add the dependencies to your pom file
 
 ```bash
 <dependency>
-  <groupId>org.glite.voms</groupId>
+  <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
   <version>${voms-api-java-version}</version>
 </dependency>
