@@ -34,201 +34,204 @@ import java.util.List;
  * This class represents options that constitute VOMS requests.
  * 
  * @author Andrea Ceccanti
- *
+ * 
  */
 public class VOMSRequestOptions {
 
-    
-    /**
-     * The default lifetime value for voms requests is 86400 seconds.
-     * This default value is used if no lifetime is used with the {@link #setLifetime(int)} method.  
-     */
-    public static final int DEFAULT_LIFETIME=86400;
-    
-    // List of hostnames where the AC will be valid (comma-separated list in the request) 
-    /**
-     * This is a list of AC "targets", i.e., a list of hostnames where the AC will be valid.
-     * 
-     */
-    private List targets = new ArrayList();
+	/**
+	 * The default lifetime value for voms requests is 86400 seconds. This
+	 * default value is used if no lifetime is used with the
+	 * {@link #setLifetime(int)} method.
+	 */
+	public static final int DEFAULT_LIFETIME = 86400;
 
-    // Lifetime in seconds of the AC
-    private int lifetime = DEFAULT_LIFETIME;
+	// List of hostnames where the AC will be valid (comma-separated list in the
+	// request)
+	/**
+	 * This is a list of AC "targets", i.e., a list of hostnames where the AC
+	 * will be valid.
+	 * 
+	 */
+	private List targets = new ArrayList();
 
-    // List of FQANs (comma-separated list in the request) to request a specific ordering from the server
-    private String ordering;
-    
-    // List of requested roles
-    private List requestedFQANs = new ArrayList();
+	// Lifetime in seconds of the AC
+	private int lifetime = DEFAULT_LIFETIME;
 
-    // OR mask of verification flags -- unused
-    private int verificationType;
+	// List of FQANs (comma-separated list in the request) to request a specific
+	// ordering from the server
+	private String ordering;
 
-    private String voName;
+	// List of requested roles
+	private List requestedFQANs = new ArrayList();
 
-    private boolean requestList = false;
+	// OR mask of verification flags -- unused
+	private int verificationType;
 
-    /** 
-     * @return the lifetime set for this {@link VOMSRequestOptions} object.
-     */
-    public int getLifetime() {
+	private String voName;
 
-        return lifetime;
-    }
+	private boolean requestList = false;
 
-    /**
-     * Sets the lifetime for this {@link VOMSRequestOptions} object.
-     * @param lifetime
-     */
-    public void setLifetime( int lifetime ) {
+	/**
+	 * @return the lifetime set for this {@link VOMSRequestOptions} object.
+	 */
+	public int getLifetime() {
 
-        this.lifetime = lifetime;
-    }
+		return lifetime;
+	}
 
-    
-    /**
-     * @return the ordering string of this {@link VOMSRequestOptions} object.
-     */
-    public String getOrdering() {
+	/**
+	 * Sets the lifetime for this {@link VOMSRequestOptions} object.
+	 * 
+	 * @param lifetime
+	 */
+	public void setLifetime(int lifetime) {
 
-        return ordering;
-    }
+		this.lifetime = lifetime;
+	}
 
-    
-    /**
-     * Sets the ordering string of this {@link VOMSRequestOptions} object.
-     * The ordering string is used to request a spefic order for the ACs requested 
-     * from the VOMS server.
-     * 
-     * @param ordering
-     */
-    public void setOrdering( String ordering ) {
+	/**
+	 * @return the ordering string of this {@link VOMSRequestOptions} object.
+	 */
+	public String getOrdering() {
 
-        this.ordering = ordering;
-    }
+		return ordering;
+	}
 
-    
-    /**
-     * @return the list of the requested FQANs specified in this {@link VOMSRequestOptions} object.
-     */
-    public List getRequestedFQANs() {
+	/**
+	 * Sets the ordering string of this {@link VOMSRequestOptions} object. The
+	 * ordering string is used to request a spefic order for the ACs requested
+	 * from the VOMS server.
+	 * 
+	 * @param ordering
+	 */
+	public void setOrdering(String ordering) {
 
-        return requestedFQANs;
-    }
+		this.ordering = ordering;
+	}
 
-    
-    /**
-     * 
-     * Sets the list of requested FQANs for this {@link VOMSRequestOptions} object.
-     * 
-     * @param requestedFQANs
-     */
-    public void setRequestedFQANs( List requestedFQANs ) {
+	/**
+	 * @return the list of the requested FQANs specified in this
+	 *         {@link VOMSRequestOptions} object.
+	 */
+	public List getRequestedFQANs() {
 
-        this.requestedFQANs = requestedFQANs;
-    }
+		return requestedFQANs;
+	}
 
-    
-    /**
-     * @return the list of targets (i.e., host where the requested ACs will be valid) for this
-     * {@link VOMSRequestOptions} object.
-     */
-    public List getTargets() {
+	/**
+	 * 
+	 * Sets the list of requested FQANs for this {@link VOMSRequestOptions}
+	 * object.
+	 * 
+	 * @param requestedFQANs
+	 */
+	public void setRequestedFQANs(List requestedFQANs) {
 
-        return targets;
-    }
+		this.requestedFQANs = requestedFQANs;
+	}
 
-    
-    /**
-     * @return the list of targets (i.e., host where the requested ACs will be valid) for this
-     * {@link VOMSRequestOptions} object as a string containing a a comma-separated list of host names.
-     */
-    public String getTargetsAsString() {
+	/**
+	 * @return the list of targets (i.e., host where the requested ACs will be
+	 *         valid) for this {@link VOMSRequestOptions} object.
+	 */
+	public List getTargets() {
 
-        return asCommaSeparatedString( targets );
-    }
+		return targets;
+	}
 
-    /**
-     * 
-     * Sets the list of targets (i.e., host where the requested ACs will be valid) for this
-     * {@link VOMSRequestOptions} object.
-     * @param targets
-     */
-    public void setTargets( List targets ) {
+	/**
+	 * @return the list of targets (i.e., host where the requested ACs will be
+	 *         valid) for this {@link VOMSRequestOptions} object as a string
+	 *         containing a a comma-separated list of host names.
+	 */
+	public String getTargetsAsString() {
 
-        this.targets = targets;
-    }
+		return asCommaSeparatedString(targets);
+	}
 
-    public int getVerificationType() {
+	/**
+	 * 
+	 * Sets the list of targets (i.e., host where the requested ACs will be
+	 * valid) for this {@link VOMSRequestOptions} object.
+	 * 
+	 * @param targets
+	 */
+	public void setTargets(List targets) {
 
-        return verificationType;
-    }
+		this.targets = targets;
+	}
 
-    public void setVerificationType( int verificationType ) {
+	public int getVerificationType() {
 
-        this.verificationType = verificationType;
-    }
+		return verificationType;
+	}
 
-    
-    public String getVoName() {
+	public void setVerificationType(int verificationType) {
 
-        return voName;
-    }
+		this.verificationType = verificationType;
+	}
 
-    public void setVoName( String voName ) {
+	public String getVoName() {
 
-        this.voName = voName;
-    }
+		return voName;
+	}
 
-    /**
-     * 
-     * Adds a FQAN to the list of requested FQANs. See {@link #getRequestedFQANs()}.
-     * 
-     * @param FQAN
-     */
-    public void addFQAN( String FQAN ) {
+	public void setVoName(String voName) {
 
-        getRequestedFQANs().add( FQAN );
+		this.voName = voName;
+	}
 
-    }
+	/**
+	 * 
+	 * Adds a FQAN to the list of requested FQANs. See
+	 * {@link #getRequestedFQANs()}.
+	 * 
+	 * @param FQAN
+	 */
+	public void addFQAN(String FQAN) {
 
-    /**
-     * 
-     * Adds a target to the list of targets for this {@link VOMSRequestOptions} object. See {@link #getTargets()}.
-     * 
-     * @param target
-     */
-    public void addTarget( String target ) {
+		getRequestedFQANs().add(FQAN);
 
-        getTargets().add( target );
-    }
+	}
 
-    public void doRequestList() {
-        requestList = true;
-    }
+	/**
+	 * 
+	 * Adds a target to the list of targets for this {@link VOMSRequestOptions}
+	 * object. See {@link #getTargets()}.
+	 * 
+	 * @param target
+	 */
+	public void addTarget(String target) {
 
-    public boolean isRequestList() {
-        return requestList;
-    }
+		getTargets().add(target);
+	}
 
-    private String asCommaSeparatedString( List l ) {
+	public void doRequestList() {
+		requestList = true;
+	}
 
-        if ( l.isEmpty() )
-            return "";
+	public boolean isRequestList() {
+		return requestList;
+	}
 
-        Iterator i = l.iterator();
+	private String asCommaSeparatedString(List l) {
 
-        StringBuilder result = new StringBuilder();
+		if (l.isEmpty())
+			return "";
 
-        while ( i.hasNext() ) {
-            Object o = i.next();
-            result.append( o.toString() );
-            if ( i.hasNext() )
-                result.append( ',' );
+		Iterator i = l.iterator();
 
-        }
+		StringBuilder result = new StringBuilder();
 
-        return result.toString();
+		while (i.hasNext()) {
+			Object o = i.next();
+			result.append(o.toString());
+			if (i.hasNext())
+				result.append(',');
 
-    }
+		}
+
+		return result.toString();
+
+	}
 }

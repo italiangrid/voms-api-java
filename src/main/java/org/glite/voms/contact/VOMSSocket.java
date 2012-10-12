@@ -33,195 +33,198 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.Security;
-import java.security.SecureRandom;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.SSLException;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import org.glite.voms.VOMSKeyManager;
-import org.glite.voms.VOMSTrustManager;
 
 /**
- * The {@link VOMSSocket} class is used to manage the creation of the gsi socket used for communication with
- * the VOMS server.
- *
+ * The {@link VOMSSocket} class is used to manage the creation of the gsi socket
+ * used for communication with the VOMS server.
+ * 
  * @author Andrea Ceccanti
  * @author Vincenzo Ciaschini
- *
- *
+ * 
+ * 
  */
 public class VOMSSocket {
 
-    private static final Logger log = LoggerFactory.getLogger( VOMSSocket.class );
+	private static final Logger log = LoggerFactory.getLogger(VOMSSocket.class);
 
-    UserCredentials cred;
+	UserCredentials cred;
 
-    String hostDN;
+	String hostDN;
 
-    public static VOMSSocket instance(UserCredentials cred, String hostDN, int proxyType){
-        return new VOMSSocket(cred, hostDN, proxyType);
+	public static VOMSSocket instance(UserCredentials cred, String hostDN,
+			int proxyType) {
+		return new VOMSSocket(cred, hostDN, proxyType);
 
-    }
+	}
 
-    public static VOMSSocket instance(UserCredentials cred, String hostDN){
+	public static VOMSSocket instance(UserCredentials cred, String hostDN) {
 
-        return new VOMSSocket(cred, hostDN, VOMSProxyBuilder.DEFAULT_PROXY_TYPE);
+		return new VOMSSocket(cred, hostDN, VOMSProxyBuilder.DEFAULT_PROXY_TYPE);
 
-    }
+	}
 
-    private VOMSSocket(UserCredentials cred, String hostDN, int proxyType){
+	private VOMSSocket(UserCredentials cred, String hostDN, int proxyType) {
 
-        this.cred = cred;
-        this.hostDN = hostDN;
-    }
+		this.cred = cred;
+		this.hostDN = hostDN;
+	}
 
-    /**
-     *
-     * Connects this socket to the voms server identified by the (host,port) passed
-     * as arguments.
-     *
-     * @param host
-     * @param port
-     * @throws IOException
-     * @throws GeneralSecurityException
-     *
-     * @author Andrea Ceccanti
-     * @author Gidon Moont
-     * @author Vincenzo Ciaschini
-     */
-    private SSLContext context = null;
-    private SSLSocket socket = null;
+	/**
+	 * 
+	 * Connects this socket to the voms server identified by the (host,port)
+	 * passed as arguments.
+	 * 
+	 * @param host
+	 * @param port
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 * 
+	 * @author Andrea Ceccanti
+	 * @author Gidon Moont
+	 * @author Vincenzo Ciaschini
+	 */
+	private SSLContext context = null;
+	private SSLSocket socket = null;
 
-    protected SSLSocketFactory getFactory() throws IOException, GeneralSecurityException {
-        SSLSocketFactory socketFactory = null;
+	protected SSLSocketFactory getFactory() throws IOException,
+			GeneralSecurityException {
+		SSLSocketFactory socketFactory = null;
 
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-        log.debug("Creating socket Factory");
+		if (Security.getProvider("BC") == null) {
+			Security.addProvider(new BouncyCastleProvider());
+		}
+		
 
-        try {
-            context = SSLContext.getInstance("SSLv3");
-            log.debug("CONTEXT CREATED: "+context.getProtocol());
-            log.debug("Context: " + context);
-            context.init(new VOMSKeyManager[] {new VOMSKeyManager(cred)}, new VOMSTrustManager[] {new VOMSTrustManager("")}, SecureRandom.getInstance("SHA1PRNG"));
+//		try {
+			context = SSLContext.getInstance("SSLv3");
+			log.debug("CONTEXT CREATED: " + context.getProtocol());
+			log.debug("Context: " + context);
+//			context.init(new VOMSKeyManager[] { new VOMSKeyManager(cred) },
+//					new VOMSTrustManager[] { new VOMSTrustManager("") },
+//					SecureRandom.getInstance("SHA1PRNG"));
 
-            return context.getSocketFactory();
-        } catch (SSLException e) {
-            log.error( "Error opening SSL socket: "+e.getMessage() );
+			return context.getSocketFactory();
+//		} catch (SSLException e) {
+//			log.error("Error opening SSL socket: " + e.getMessage());
+//
+//			if (log.isDebugEnabled())
+//				log.debug(e.getMessage(), e);
+//			throw e;
+//		} catch (IOException e) {
+//
+//			log.error("Error opening SSL socket: " + e.getMessage());
+//
+//			if (log.isDebugEnabled())
+//				log.debug(e.getMessage(), e);
+//			throw e;
+//		}
 
-            if (log.isDebugEnabled())
-                log.debug( e.getMessage(),e );
-            throw e;
-        } catch ( IOException e ) {
+	}
 
-            log.error( "Error opening SSL socket: "+e.getMessage() );
+	protected void connect(String host, int port) throws IOException,
+			GeneralSecurityException {
 
-            if (log.isDebugEnabled())
-                log.debug( e.getMessage(),e );
-            throw e;
-        }
+		SSLSocketFactory socketFactory = null;
 
-    }
+		if (Security.getProvider("BC") == null) {
+			Security.addProvider(new BouncyCastleProvider());
+		}
 
-    protected void connect(String host, int port) throws IOException, GeneralSecurityException{
+		log.debug("Initting CONNECCTION");
+		try {
+			socketFactory = getFactory();
+			log.debug("Factory Created");
+			log.debug(socketFactory.toString());
+			log.debug("ABOUT to open CONNECTION");
+			socket = (SSLSocket) socketFactory.createSocket(host, port);
+			log.debug("CONNECTION OPEN");
+			String[] protocols = { "SSLv3" };
+			socket.setEnabledProtocols(protocols);
+		} catch (SSLException e) {
+			log.error("Error opening SSL socket: " + e.getMessage());
 
-        SSLSocketFactory socketFactory = null;
+			if (log.isDebugEnabled())
+				log.debug(e.getMessage(), e);
+			throw e;
+		} catch (IOException e) {
 
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
+			log.error("Error opening SSL socket: " + e.getMessage());
 
-        log.debug("Initting CONNECCTION");
-        try {
-            socketFactory = getFactory();
-            log.debug("Factory Created");
-            log.debug(socketFactory.toString());
-            log.debug("ABOUT to open CONNECTION");
-            socket = (SSLSocket)socketFactory.createSocket(host, port);
-            log.debug("CONNECTION OPEN");
-            String[] protocols = { "SSLv3"};
-            socket.setEnabledProtocols(protocols);
-        } catch (SSLException e) {
-            log.error( "Error opening SSL socket: "+e.getMessage() );
+			if (log.isDebugEnabled())
+				log.debug(e.getMessage(), e);
+			throw e;
+		}
 
-            if (log.isDebugEnabled())
-                log.debug( e.getMessage(),e );
-            throw e;
-        } catch ( IOException e ) {
+	}
 
-            log.error( "Error opening SSL socket: "+e.getMessage() );
+	public void close() throws IOException {
 
-            if (log.isDebugEnabled())
-                log.debug( e.getMessage(),e );
-            throw e;
-        }
+		socket.close();
+	}
 
-    }
+	public SSLContext getContext() {
 
-    public void close() throws IOException {
+		return context;
+	}
 
-        socket.close();
-    }
+	public boolean isClosed() {
 
-    public SSLContext getContext() {
+		return socket.isClosed();
+	}
 
-        return context;
-    }
+	public boolean isConnected() {
 
-    public boolean isClosed() {
+		return socket.isConnected();
+	}
 
-        return socket.isClosed();
-    }
+	public void shutdownInput() throws IOException {
 
-    public boolean isConnected() {
+		socket.shutdownInput();
+	}
 
-        return socket.isConnected();
-    }
+	public void shutdownOutput() throws IOException {
 
-    public void shutdownInput() throws IOException {
+		socket.shutdownOutput();
+	}
 
-        socket.shutdownInput();
-    }
+	public OutputStream getOutputStream() throws IOException {
+		try {
+			return socket.getOutputStream();
+		} catch (IOException e) {
 
-    public void shutdownOutput() throws IOException {
+			log.error("Error getting output stream from underlying socket:"
+					+ e.getMessage());
+			if (log.isDebugEnabled())
+				log.error(e.getMessage(), e);
 
-        socket.shutdownOutput();
-    }
+			throw e;
+		}
+	}
 
-    public OutputStream getOutputStream() throws IOException{
-        try {
-            return socket.getOutputStream();
-        } catch ( IOException e ) {
+	public InputStream getInputStream() throws IOException {
 
-            log.error( "Error getting output stream from underlying socket:"+e.getMessage() );
-            if (log.isDebugEnabled())
-                log.error(e.getMessage(),e);
+		try {
 
-            throw e;
-        }
-    }
+			return socket.getInputStream();
 
-    public InputStream getInputStream() throws IOException{
+		} catch (IOException e) {
+			log.error("Error getting input stream from underlying socket:"
+					+ e.getMessage());
+			if (log.isDebugEnabled())
+				log.error(e.getMessage(), e);
 
-        try {
+			throw e;
 
-            return socket.getInputStream();
-
-        } catch ( IOException e ) {
-            log.error( "Error getting input stream from underlying socket:"+e.getMessage() );
-            if (log.isDebugEnabled())
-                log.error(e.getMessage(),e);
-
-            throw e;
-
-        }
-    }
+		}
+	}
 
 }

@@ -46,221 +46,227 @@ import org.slf4j.LoggerFactory;
  * The vomses file search procedure is as follows:
  * 
  * <ul>
- *  <li> if the <code>GLITE_LOCATION</code> system property is set, the <code>$GLITE_LOCATION/etc/vomses</code> path is added
- *  to the search path.
- *  </li>
- *  <li>if the <code>VOMSES_LOCATION</code> system propery is set, its value its interpreted as a colon (:) separated list of paths
- *  that are added to the search path.
- *  </li>
- *  <li> if the <code>${user.home}/.globus/vomses</code> file or directory is set, it is added to the search path.</li>
- *  <li> if the <code>${user.home}/.glite/vomses</code> file or directory is set, it is added to the search path.</li>
- * </ul> 
+ * <li>if the <code>GLITE_LOCATION</code> system property is set, the
+ * <code>$GLITE_LOCATION/etc/vomses</code> path is added to the search path.</li>
+ * <li>if the <code>VOMSES_LOCATION</code> system propery is set, its value its
+ * interpreted as a colon (:) separated list of paths that are added to the
+ * search path.</li>
+ * <li>if the <code>${user.home}/.globus/vomses</code> file or directory is set,
+ * it is added to the search path.</li>
+ * <li>if the <code>${user.home}/.glite/vomses</code> file or directory is set,
+ * it is added to the search path.</li>
+ * </ul>
  * 
  * @author Andrea Ceccanti
- *
+ * 
  */
 public class VOMSESFileParser {
 
-    private static final Logger log = LoggerFactory.getLogger( VOMSESFileParser.class );
+	private static final Logger log = LoggerFactory
+			.getLogger(VOMSESFileParser.class);
 
-    private static final String splitSyntax = "\\x22[^\\x22]\\x22";
+	private static final String splitSyntax = "\\x22[^\\x22]\\x22";
 
-    private static final List<File> vomsesPaths;
+	private static final List<File> vomsesPaths;
 
-    static {
+	static {
 
-        String gliteLoc = System.getProperty( "GLITE_LOCATION", null );
-        String vomsesLoc = System.getProperty( "VOMSES_LOCATION", null );
+		String gliteLoc = System.getProperty("GLITE_LOCATION", null);
+		String vomsesLoc = System.getProperty("VOMSES_LOCATION", null);
 
-        List<File> list = new ArrayList<File>();
+		List<File> list = new ArrayList<File>();
 
-        File defaultLocFile = new File( File.separator + "etc"
-                + File.separator + "vomses" );
+		File defaultLocFile = new File(File.separator + "etc" + File.separator
+				+ "vomses");
 
-        if ( defaultLocFile.exists() )
-            list.add( defaultLocFile );
+		if (defaultLocFile.exists())
+			list.add(defaultLocFile);
 
-        if ( gliteLoc != null ) {
-            File gliteLocFile = new File( gliteLoc + File.separator + "etc"
-                    + File.separator + "vomses" );
+		if (gliteLoc != null) {
+			File gliteLocFile = new File(gliteLoc + File.separator + "etc"
+					+ File.separator + "vomses");
 
-            if ( gliteLocFile.exists() )
-                list.add( gliteLocFile );
-        }
+			if (gliteLocFile.exists())
+				list.add(gliteLocFile);
+		}
 
-        if ( vomsesLoc != null ) {
+		if (vomsesLoc != null) {
 
-            String[] userLocations = vomsesLoc.split( ":" );
+			String[] userLocations = vomsesLoc.split(":");
 
-            for ( int i = 0; i < userLocations.length; i++ ) {
+			for (int i = 0; i < userLocations.length; i++) {
 
-                File vomsesLocFile = new File( userLocations[i]
-                        + File.separator + "vomses" );
+				File vomsesLocFile = new File(userLocations[i] + File.separator
+						+ "vomses");
 
-                if ( vomsesLocFile.exists() )
-                    list.add( vomsesLocFile );
+				if (vomsesLocFile.exists())
+					list.add(vomsesLocFile);
 
-            }
-        }
+			}
+		}
 
-        File globusVomses = new File( System.getProperty( "user.home" )
-                + File.separator + ".globus" + File.separator + "vomses" );
+		File globusVomses = new File(System.getProperty("user.home")
+				+ File.separator + ".globus" + File.separator + "vomses");
 
-        if ( globusVomses.exists() )
-            list.add( globusVomses );
+		if (globusVomses.exists())
+			list.add(globusVomses);
 
-        File gliteVomses = new File( System.getProperty( "user.home" )
-                + File.separator + ".glite" + File.separator + "vomses" );
+		File gliteVomses = new File(System.getProperty("user.home")
+				+ File.separator + ".glite" + File.separator + "vomses");
 
-        if ( gliteVomses.exists() )
-            list.add( gliteVomses );
+		if (gliteVomses.exists())
+			list.add(gliteVomses);
 
-        File vomsVomses = new File( System.getProperty( "user.home" )
-                + File.separator + ".voms" + File.separator + "vomses" );
+		File vomsVomses = new File(System.getProperty("user.home")
+				+ File.separator + ".voms" + File.separator + "vomses");
 
-        if ( vomsVomses.exists() ) {
+		if (vomsVomses.exists()) {
 
-            list.add( vomsVomses );
+			list.add(vomsVomses);
+		}
+
+		vomsesPaths = list;
+
 	}
 
-        vomsesPaths = list;
+	private VOMSESFileParser() {
 
-    }
+	}
 
-    private VOMSESFileParser() {
+	private String fixQuotes(String s) {
 
-    }
+		if (s.startsWith("\""))
+			s = s.substring(1);
+		if (s.endsWith("\""))
+			s = s.substring(0, s.length() - 1);
 
-    private String fixQuotes( String s ) {
+		return s;
 
-        if ( s.startsWith( "\"" ) )
-            s = s.substring( 1 );
-        if ( s.endsWith( "\"" ) )
-            s = s.substring( 0, s.length() - 1 );
+	}
 
-        return s;
+	private String[] splitLine(String line) {
 
-    }
+		String tokens[] = line.split(splitSyntax);
 
-    private String[] splitLine( String line ) {
+		for (int i = 0; i < tokens.length; i++)
+			tokens[i] = fixQuotes(tokens[i]);
 
-        String tokens[] = line.split( splitSyntax );
+		return tokens;
+	}
 
-        for ( int i = 0; i < tokens.length; i++ )
-            tokens[i] = fixQuotes( tokens[i] );
+	private VOMSServerMap parseDir(File vomsesDir) throws IOException {
 
-        return tokens;
-    }
+		File[] allFiles = vomsesDir.listFiles();
+		VOMSServerMap result = new VOMSServerMap();
 
-    private VOMSServerMap parseDir( File vomsesDir ) throws IOException {
+		log.debug("Parsing vomses dir:" + vomsesDir);
 
-        File[] allFiles = vomsesDir.listFiles();
-        VOMSServerMap result = new VOMSServerMap();
+		for (int i = 0; i < allFiles.length; i++)
+			result.merge(parse(allFiles[i]));
 
-        log.debug( "Parsing vomses dir:" + vomsesDir );
+		return result;
 
-        for ( int i = 0; i < allFiles.length; i++ )
-            result.merge( parse( allFiles[i] ) );
+	}
 
-        return result;
+	VOMSServerMap parse(String fileName) throws IOException {
 
-    }
+		return parse(new File(fileName));
+	}
 
-    VOMSServerMap parse( String fileName ) throws IOException {
+	private VOMSServerMap parse(File vomsesFile) throws IOException {
 
-        return parse( new File( fileName ) );
-    }
+		BufferedReader reader = null;
 
-    private VOMSServerMap parse( File vomsesFile ) throws IOException {
+		VOMSServerMap result = new VOMSServerMap();
 
-        BufferedReader reader = null;
+		if (vomsesFile.isDirectory())
+			return parseDir(vomsesFile);
 
-        VOMSServerMap result = new VOMSServerMap();
+		try {
 
-        if ( vomsesFile.isDirectory() )
-            return parseDir( vomsesFile );
+			reader = new BufferedReader(new InputStreamReader(
+					new FileInputStream(vomsesFile)));
 
-        try {
+		} catch (FileNotFoundException e) {
 
-            reader = new BufferedReader( new InputStreamReader(
-                    new FileInputStream( vomsesFile ) ) );
+			log.error("Error opening vomses file '"
+					+ vomsesFile.getAbsolutePath() + "': " + e.getMessage());
 
-        } catch ( FileNotFoundException e ) {
+			if (log.isDebugEnabled())
+				log.error(e.getMessage(), e);
 
-            log.error( "Error opening vomses file '"
-                    + vomsesFile.getAbsolutePath() + "': " + e.getMessage() );
+			throw e;
 
-            if ( log.isDebugEnabled() )
-                log.error( e.getMessage(), e );
+		}
 
-            throw e;
+		log.debug("Parsing vomses file: " + vomsesFile.getAbsolutePath());
 
-        }
+		String line;
 
-        log.debug( "Parsing vomses file: " + vomsesFile.getAbsolutePath() );
+		while ((line = reader.readLine()) != null) {
 
-        String line;
+			// Ignore comments
+			if (line.startsWith("#"))
+				continue;
 
-        while ( ( line = reader.readLine() ) != null ) {
+			// skip empty lines
+			if (line.matches("\\s*$"))
+				continue;
 
-            // Ignore comments
-            if ( line.startsWith( "#" ) )
-                continue;
+			String[] tokens = splitLine(line.trim());
 
-            // skip empty lines
-            if ( line.matches( "\\s*$" ) )
-                continue;
+			if (tokens.length < 5 || tokens.length > 6){
+				reader.close();
+				throw new VOMSException("Syntax error on vomses file!");
+			}
 
-            String[] tokens = splitLine( line.trim() );
+			result.add(VOMSServerInfo.fromStringArray(tokens));
 
-            if ( tokens.length < 5 || tokens.length > 6 )
-                throw new VOMSException( "Syntax error on vomses file!" );
+		}
 
-            result.add( VOMSServerInfo.fromStringArray( tokens ) );
+		reader.close();
+		return result;
 
-        }
+	}
 
-        return result;
+	/**
+	 * This method is used to build a {@link VOMSServerMap} object starting from
+	 * vomses configuration files or directories.
+	 * 
+	 * 
+	 * @return a {@link VOMSServerMap} object that reflects vomses configuration
+	 *         files.
+	 * @throws IOException
+	 *             if a parsing error occurs, or no vomses file is found.
+	 * 
+	 */
+	public VOMSServerMap buildServerMap() throws IOException {
 
-    }
+		Iterator<File> i = vomsesPaths.iterator();
 
-    /**
-     * This method is used to build a {@link VOMSServerMap} object starting from
-     * vomses configuration files or directories. 
-     * 
-     * 
-     * @return a {@link VOMSServerMap} object that reflects vomses configuration files.
-     * @throws IOException
-     *          if a parsing error occurs, or no vomses file is found.
-     * 
-     */
-    public VOMSServerMap buildServerMap() throws IOException {
+		if (log.isDebugEnabled()) {
 
-        Iterator<File> i = vomsesPaths.iterator();
+			String locations = StringUtils.join(vomsesPaths.iterator(), ",");
+			log.debug("Known vomses files: " + locations);
 
-        if ( log.isDebugEnabled() ) {
+		}
 
-            String locations = StringUtils.join( vomsesPaths.iterator(), "," );
-            log.debug( "Known vomses files: " + locations );
+		VOMSServerMap result = new VOMSServerMap();
 
-        }
+		while (i.hasNext()) {
 
-        VOMSServerMap result = new VOMSServerMap();
+			result.merge(parse((File) i.next()));
+		}
 
-        while ( i.hasNext() ) {
+		return result;
 
-            result.merge( parse( (File) i.next() ) );
-        }
+	}
 
-        return result;
+	/**
+	 * @return a new instance of {@link VOMSESFileParser}.
+	 */
+	public static VOMSESFileParser instance() {
 
-    }
-
-    /**
-     * @return a new instance of {@link VOMSESFileParser}.
-     */
-    public static VOMSESFileParser instance() {
-
-        return new VOMSESFileParser();
-    }
+		return new VOMSESFileParser();
+	}
 }

@@ -27,31 +27,31 @@ package org.glite.voms.contact;
 
 /**
  * @author Andrea Ceccanti
- *
+ * 
  */
 public class VOMSSyntaxException extends VOMSException {
 
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public VOMSSyntaxException( String message ) {
+	public VOMSSyntaxException(String message) {
 
-        super( message );
-        // TODO Auto-generated constructor stub
-    }
+		super(message);
+		// TODO Auto-generated constructor stub
+	}
 
-    public VOMSSyntaxException( String message, Throwable t ) {
+	public VOMSSyntaxException(String message, Throwable t) {
 
-        super( message, t );
-        // TODO Auto-generated constructor stub
-    }
+		super(message, t);
+		// TODO Auto-generated constructor stub
+	}
 
-    public VOMSSyntaxException( Throwable t ) {
+	public VOMSSyntaxException(Throwable t) {
 
-        super( t );
-        // TODO Auto-generated constructor stub
-    }
+		super(t);
+		// TODO Auto-generated constructor stub
+	}
 
 }

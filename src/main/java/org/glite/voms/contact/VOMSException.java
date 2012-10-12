@@ -28,28 +28,28 @@ package org.glite.voms.contact;
 /**
  * 
  * @author Andrea Ceccanti
- *
+ * 
  */
 public class VOMSException extends RuntimeException {
 
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public VOMSException( String message ) {
+	public VOMSException(String message) {
 
-        super( message );
-    }
+		super(message);
+	}
 
-    public VOMSException( String message, Throwable t ) {
+	public VOMSException(String message, Throwable t) {
 
-        super( message, t );
-    }
+		super(message, t);
+	}
 
-    public VOMSException( Throwable t ) {
+	public VOMSException(Throwable t) {
 
-        super( t.getMessage(), t );
-    }
+		super(t.getMessage(), t);
+	}
 
 }

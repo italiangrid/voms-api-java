@@ -36,77 +36,79 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-
 /**
  * 
  * This class implements the XML parsing of responses produced by VOMS servers.
  * 
  * @author Andrea Ceccanti
- *
+ * 
  */
 public class VOMSParser {
 
-    private static Logger log = LoggerFactory.getLogger( VOMSParser.class );
-    
-    protected DocumentBuilder docBuilder;
-    
-    private VOMSParser(){
-        
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setIgnoringComments( true );
-        factory.setNamespaceAware( false );
-        factory.setValidating( false );
+	private static Logger log = LoggerFactory.getLogger(VOMSParser.class);
 
-        try {
-            docBuilder = factory.newDocumentBuilder();
-        } catch ( ParserConfigurationException e ) {
-            
-            log.error( "Error configuring DOM document builder." );
-            if (log.isDebugEnabled()){
-                log.debug( e.getMessage(), e );
-            }
-            
-            throw new VOMSException(e.getMessage(),e);
-        }
-    }
-    
-    /**
-     * 
-     * Parses a voms response reading from a given input stream.
-     * @param is the input stream.
-     * @return a {@link VOMSResponse} object that represents the parsed response.
-     */
-    public VOMSResponse parseResponse(InputStream is){
-        
-        
-        try {
-        
-            return new VOMSResponse(docBuilder.parse( is ));
-            
-        } catch ( SAXException e ) {
-            
-            log.error( "Error parsing voms server response:" +e.getMessage());
-            
-            if (log.isDebugEnabled())
-                log.error(e.getMessage(),e);
-            
-            throw new VOMSException(e);
-            
-        } catch ( IOException e ) {
-            
-            log.error( "I/O error reading voms server response:" +e.getMessage());
-            if (log.isDebugEnabled())
-                log.error(e.getMessage(),e);
-            
-            throw new VOMSException(e);
-        }
-        
-    }
-    
-    /**
-     * @return a new VOMSParser instance.
-     */
-    public static VOMSParser instance(){
-        return new VOMSParser();
-    }
+	protected DocumentBuilder docBuilder;
+
+	private VOMSParser() {
+
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setIgnoringComments(true);
+		factory.setNamespaceAware(false);
+		factory.setValidating(false);
+
+		try {
+			docBuilder = factory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+
+			log.error("Error configuring DOM document builder.");
+			if (log.isDebugEnabled()) {
+				log.debug(e.getMessage(), e);
+			}
+
+			throw new VOMSException(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 
+	 * Parses a voms response reading from a given input stream.
+	 * 
+	 * @param is
+	 *            the input stream.
+	 * @return a {@link VOMSResponse} object that represents the parsed
+	 *         response.
+	 */
+	public VOMSResponse parseResponse(InputStream is) {
+
+		try {
+
+			return new VOMSResponse(docBuilder.parse(is));
+
+		} catch (SAXException e) {
+
+			log.error("Error parsing voms server response:" + e.getMessage());
+
+			if (log.isDebugEnabled())
+				log.error(e.getMessage(), e);
+
+			throw new VOMSException(e);
+
+		} catch (IOException e) {
+
+			log.error("I/O error reading voms server response:"
+					+ e.getMessage());
+			if (log.isDebugEnabled())
+				log.error(e.getMessage(), e);
+
+			throw new VOMSException(e);
+		}
+
+	}
+
+	/**
+	 * @return a new VOMSParser instance.
+	 */
+	public static VOMSParser instance() {
+		return new VOMSParser();
+	}
 }

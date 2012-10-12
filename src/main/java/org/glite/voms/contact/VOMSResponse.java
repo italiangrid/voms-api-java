@@ -35,240 +35,249 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  * This class is used to parse and represent VOMS server responses.
- *  
+ * 
  * @author Andrea Ceccanti
  * @author Vincenzo Ciaschini
- *
+ * 
  */
 public class VOMSResponse {
 
-    private static int ERROR_OFFSET = 1000;
-    private static final Logger log = LoggerFactory.getLogger( VOMSResponse.class );
+	private static int ERROR_OFFSET = 1000;
+	private static final Logger log = LoggerFactory
+			.getLogger(VOMSResponse.class);
 
-    protected Document xmlResponse;
+	protected Document xmlResponse;
 
-    public boolean hasErrors() {
-        // handle REST case first
-        if (xmlResponse.getElementsByTagName("error").getLength() != 0)
-            return true;
+	public boolean hasErrors() {
+		// handle REST case first
+		if (xmlResponse.getElementsByTagName("error").getLength() != 0)
+			return true;
 
-        // errors imply that no AC were created
-        return ((xmlResponse.getElementsByTagName( "item" ).getLength() != 0) &&
-                (xmlResponse.getElementsByTagName( "ac" ).getLength() == 0));
-    }
+		// errors imply that no AC were created
+		return ((xmlResponse.getElementsByTagName("item").getLength() != 0) && (xmlResponse
+				.getElementsByTagName("ac").getLength() == 0));
+	}
 
-    public boolean hasWarnings() {
-        // handle REST case first
-        if (xmlResponse.getElementsByTagName("warning").getLength() != 0)
-            return true;
+	public boolean hasWarnings() {
+		// handle REST case first
+		if (xmlResponse.getElementsByTagName("warning").getLength() != 0)
+			return true;
 
-        // warnings imply that ACs were created
-        return ((xmlResponse.getElementsByTagName( "item" ).getLength() != 0) &&
-                (xmlResponse.getElementsByTagName( "ac" ).getLength() != 0));
-    }
-    /**
-     * 
-     * Extracts the AC from the VOMS response.
-     * @return an array of bytes containing the AC. 
-     */
-    public byte[] getAC() {
+		// warnings imply that ACs were created
+		return ((xmlResponse.getElementsByTagName("item").getLength() != 0) && (xmlResponse
+				.getElementsByTagName("ac").getLength() != 0));
+	}
 
-        Element acElement = (Element) xmlResponse.getElementsByTagName( "ac" )
-                .item( 0 );
-        
-        return VOMSDecoder.decode( acElement.getFirstChild().getNodeValue()); 
+	/**
+	 * 
+	 * Extracts the AC from the VOMS response.
+	 * 
+	 * @return an array of bytes containing the AC.
+	 */
+	public byte[] getAC() {
 
-    }
+		Element acElement = (Element) xmlResponse.getElementsByTagName("ac")
+				.item(0);
 
-    /**
-     * 
-     * Extracts the textual data from the VOMS response.
-     * @return an array of bytes containing the data. 
-     */
+		return VOMSDecoder.decode(acElement.getFirstChild().getNodeValue());
 
-    public byte[] getData() {
-        Element acElement = (Element) xmlResponse.getElementsByTagName( "bitstr" )
-                .item( 0 );
-        
-        if (acElement != null)
-            return VOMSDecoder.decode( acElement.getFirstChild().getNodeValue()); 
-        else
-            return null;
-    }
+	}
 
-    /**
-     * Extracts the version from the VOMS response.
-     * 
-     * @return an integer containing the AC.
-     */
-    public int getVersion() {
-        Element versionElement = (Element)xmlResponse.getElementsByTagName("version").item(0);
-        if (versionElement == null) {
-            return 0;
-        }
-        return Integer.parseInt(versionElement.getFirstChild().getNodeValue());
-    }
+	/**
+	 * 
+	 * Extracts the textual data from the VOMS response.
+	 * 
+	 * @return an array of bytes containing the data.
+	 */
 
+	public byte[] getData() {
+		Element acElement = (Element) xmlResponse
+				.getElementsByTagName("bitstr").item(0);
 
-    /**
-     * Extracts the AC from the VOMS response.
-     * 
-     * @return a string containing the AC.
-     */
-    public String getACAsString(){
-        
-        Element acElement = (Element) xmlResponse.getElementsByTagName( "ac" )
-            .item( 0 );
-        
-        return acElement.getFirstChild().getNodeValue();
-        
-    }
+		if (acElement != null)
+			return VOMSDecoder.decode(acElement.getFirstChild().getNodeValue());
+		else
+			return null;
+	}
 
-    /**
-     * 
-     * Extracts the error messages from the VOMS response.
-     * 
-     * @return an array of {@link VOMSErrorMessage} objects.
-     */
-    public VOMSErrorMessage[] errorMessages() {
+	/**
+	 * Extracts the version from the VOMS response.
+	 * 
+	 * @return an integer containing the AC.
+	 */
+	public int getVersion() {
+		Element versionElement = (Element) xmlResponse.getElementsByTagName(
+				"version").item(0);
+		if (versionElement == null) {
+			return 0;
+		}
+		return Integer.parseInt(versionElement.getFirstChild().getNodeValue());
+	}
 
-        VOMSErrorMessage[] result = errorMessagesREST();
-        if (result != null)
-            return result;
+	/**
+	 * Extracts the AC from the VOMS response.
+	 * 
+	 * @return a string containing the AC.
+	 */
+	public String getACAsString() {
 
-        NodeList nodes = xmlResponse.getElementsByTagName( "item" );
+		Element acElement = (Element) xmlResponse.getElementsByTagName("ac")
+				.item(0);
 
-        if ( nodes.getLength() == 0 )
-            return null;
+		return acElement.getFirstChild().getNodeValue();
 
-        result = new VOMSErrorMessage[nodes.getLength()];
+	}
 
-        for ( int i = 0; i < nodes.getLength(); i++ ) {
+	/**
+	 * 
+	 * Extracts the error messages from the VOMS response.
+	 * 
+	 * @return an array of {@link VOMSErrorMessage} objects.
+	 */
+	public VOMSErrorMessage[] errorMessages() {
 
-            Element itemElement = (Element) nodes.item( i );
+		VOMSErrorMessage[] result = errorMessagesREST();
+		if (result != null)
+			return result;
 
-            Element numberElement = (Element) itemElement.getElementsByTagName(
-                    "number" ).item( 0 );
-            Element messageElement = (Element) itemElement
-                    .getElementsByTagName( "message" ).item( 0 );
+		NodeList nodes = xmlResponse.getElementsByTagName("item");
 
-            int number = Integer.parseInt( numberElement
-                                 .getFirstChild().getNodeValue() );
+		if (nodes.getLength() == 0)
+			return null;
 
-            if (number >= ERROR_OFFSET) {
-                result[i] = new VOMSErrorMessage( number, messageElement
-                         .getFirstChild().getNodeValue() );
-            }
-        }
-        
-        return result;
-    }
+		result = new VOMSErrorMessage[nodes.getLength()];
 
-    private VOMSErrorMessage[] errorMessagesREST() {
-        NodeList nodes = xmlResponse.getElementsByTagName( "error");
+		for (int i = 0; i < nodes.getLength(); i++) {
 
-        if (nodes.getLength() == 0)
-            return null;
+			Element itemElement = (Element) nodes.item(i);
 
-        VOMSErrorMessage[] result = new VOMSErrorMessage[nodes.getLength()];
+			Element numberElement = (Element) itemElement.getElementsByTagName(
+					"number").item(0);
+			Element messageElement = (Element) itemElement
+					.getElementsByTagName("message").item(0);
 
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element itemElement = (Element) nodes.item(i);
+			int number = Integer.parseInt(numberElement.getFirstChild()
+					.getNodeValue());
 
-            Element codeElement = (Element)itemElement.getElementsByTagName("code").item(0);
-            Element messageElement = (Element)itemElement.getElementsByTagName("message").item(0);
-            String strcode = codeElement.getFirstChild().getNodeValue();
-            int code;
+			if (number >= ERROR_OFFSET) {
+				result[i] = new VOMSErrorMessage(number, messageElement
+						.getFirstChild().getNodeValue());
+			}
+		}
 
-            if (strcode.equals("NoSuchUser"))
-                code = 1001;
-            else if (strcode.equals("BadRequest"))
-                code = 1005;
-            else if (strcode.equals("SuspendedUser"))
-                code = 1004;
-            else // InternalError
-                code = 1006;
+		return result;
+	}
 
-            result[i] = new VOMSErrorMessage(code, messageElement.getFirstChild().getNodeValue());
-        }
-        return result;
-    }
+	private VOMSErrorMessage[] errorMessagesREST() {
+		NodeList nodes = xmlResponse.getElementsByTagName("error");
 
-    public VOMSWarningMessage[] warningMessages() {
-        VOMSWarningMessage[] result = warningMessagesREST();
-        if (result != null)
-            return result;
+		if (nodes.getLength() == 0)
+			return null;
 
-        NodeList nodes = xmlResponse.getElementsByTagName( "item" );
+		VOMSErrorMessage[] result = new VOMSErrorMessage[nodes.getLength()];
 
-        if ( nodes.getLength() == 0 )
-            return null;
+		for (int i = 0; i < nodes.getLength(); i++) {
+			Element itemElement = (Element) nodes.item(i);
 
-        result = new VOMSWarningMessage[nodes.getLength()];
+			Element codeElement = (Element) itemElement.getElementsByTagName(
+					"code").item(0);
+			Element messageElement = (Element) itemElement
+					.getElementsByTagName("message").item(0);
+			String strcode = codeElement.getFirstChild().getNodeValue();
+			int code;
 
-        for ( int i = 0; i < nodes.getLength(); i++ ) {
+			if (strcode.equals("NoSuchUser"))
+				code = 1001;
+			else if (strcode.equals("BadRequest"))
+				code = 1005;
+			else if (strcode.equals("SuspendedUser"))
+				code = 1004;
+			else
+				// InternalError
+				code = 1006;
 
-            Element itemElement = (Element) nodes.item( i );
+			result[i] = new VOMSErrorMessage(code, messageElement
+					.getFirstChild().getNodeValue());
+		}
+		return result;
+	}
 
-            Element numberElement = (Element) itemElement.getElementsByTagName(
-                    "number" ).item( 0 );
-            Element messageElement = (Element) itemElement
-                    .getElementsByTagName( "message" ).item( 0 );
+	public VOMSWarningMessage[] warningMessages() {
+		VOMSWarningMessage[] result = warningMessagesREST();
+		if (result != null)
+			return result;
 
-            int number = Integer.parseInt( numberElement
-                                 .getFirstChild().getNodeValue() );
+		NodeList nodes = xmlResponse.getElementsByTagName("item");
 
-            if (number < ERROR_OFFSET) {
-                result[i] = new VOMSWarningMessage( number, messageElement
-                         .getFirstChild().getNodeValue() );
-            }
-        }
-        
-        return result;
-    }
+		if (nodes.getLength() == 0)
+			return null;
 
-    private VOMSWarningMessage[] warningMessagesREST() {
-        NodeList nodes = xmlResponse.getElementsByTagName( "warning" );
+		result = new VOMSWarningMessage[nodes.getLength()];
 
-        if ( nodes.getLength() == 0 )
-            return null;
+		for (int i = 0; i < nodes.getLength(); i++) {
 
-        VOMSWarningMessage[] result = new VOMSWarningMessage[nodes.getLength()];
+			Element itemElement = (Element) nodes.item(i);
 
-        for ( int i = 0; i < nodes.getLength(); i++ ) {
+			Element numberElement = (Element) itemElement.getElementsByTagName(
+					"number").item(0);
+			Element messageElement = (Element) itemElement
+					.getElementsByTagName("message").item(0);
 
-            Element itemElement = (Element) nodes.item( i );
+			int number = Integer.parseInt(numberElement.getFirstChild()
+					.getNodeValue());
 
-            Element messageElement = (Element) itemElement
-                    .getElementsByTagName( "message" ).item( 0 );
+			if (number < ERROR_OFFSET) {
+				result[i] = new VOMSWarningMessage(number, messageElement
+						.getFirstChild().getNodeValue());
+			}
+		}
 
-            String message = itemElement.getFirstChild().getNodeValue();
-            int number;
+		return result;
+	}
 
-            if (message.contains("validity"))
-                number = 2;
-            else if (message.contains("selected"))
-                number = 1;
-            else if (message.contains("contains attributes"))
-                number = 3;
-            else
-                number = 4;
+	private VOMSWarningMessage[] warningMessagesREST() {
+		NodeList nodes = xmlResponse.getElementsByTagName("warning");
 
-            log.debug("Message = " + message + " number = " + number);
-            if (number < ERROR_OFFSET) {
-                result[i] = new VOMSWarningMessage( number, message);
-            }
-        }
-        
-        return result;
-    }
+		if (nodes.getLength() == 0)
+			return null;
 
-    /**
-     * Builds a VOMSResponse starting from a DOM an XML document (see {@link Document}).
-     * 
-     * @param res
-     */
-    public VOMSResponse(Document res){
-        this.xmlResponse = res;
-    }
+		VOMSWarningMessage[] result = new VOMSWarningMessage[nodes.getLength()];
+
+		for (int i = 0; i < nodes.getLength(); i++) {
+
+			Element itemElement = (Element) nodes.item(i);
+
+			Element messageElement = (Element) itemElement
+					.getElementsByTagName("message").item(0);
+
+			String message = itemElement.getFirstChild().getNodeValue();
+			int number;
+
+			if (message.contains("validity"))
+				number = 2;
+			else if (message.contains("selected"))
+				number = 1;
+			else if (message.contains("contains attributes"))
+				number = 3;
+			else
+				number = 4;
+
+			log.debug("Message = " + message + " number = " + number);
+			if (number < ERROR_OFFSET) {
+				result[i] = new VOMSWarningMessage(number, message);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Builds a VOMSResponse starting from a DOM an XML document (see
+	 * {@link Document}).
+	 * 
+	 * @param res
+	 */
+	public VOMSResponse(Document res) {
+		this.xmlResponse = res;
+	}
 }

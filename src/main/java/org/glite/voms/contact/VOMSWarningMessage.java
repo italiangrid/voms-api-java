@@ -26,24 +26,23 @@
  *********************************************************************/
 package org.glite.voms.contact;
 
-
 /**
  * 
- * This class is used to decode VOMS error messages contained in a VOMS 
+ * This class is used to decode VOMS error messages contained in a VOMS
  * response.
  * 
  * @author Andrea CEccanti
- *
+ * 
  */
 public class VOMSWarningMessage extends VOMSMessage {
-    
-    public VOMSWarningMessage(int code, String message){
-        super(code, message);
-    }
-    
-    public String toString() {
-        
-        return "voms warning "+code+": "+message;        
-        
-    }
+
+	public VOMSWarningMessage(int code, String message) {
+		super(code, message);
+	}
+
+	public String toString() {
+
+		return "voms warning " + code + ": " + message;
+
+	}
 }
