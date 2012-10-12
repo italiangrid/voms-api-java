@@ -1,6 +1,11 @@
 package org.glite.voms.v2.store;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
+
+import eu.emi.security.authn.x509.helpers.CertificateHelpers;
+import eu.emi.security.authn.x509.impl.OpensslNameUtils;
+import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 
 
@@ -75,6 +80,7 @@ public class LSCFile implements LSCInfo{
 		this.certChainDescription = certChainDesc;
 	}
 
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -112,6 +118,32 @@ public class LSCFile implements LSCInfo{
 		return "LSCFile [filename=" + filename + ", vo=" + vo + ", hostname="
 				+ hostname + ", certChainDescription=" + certChainDescription
 				+ "]";
+	}
+
+	public boolean matches(X509Certificate[] certChain) {
+		
+		if (certChainDescription == null || certChainDescription.isEmpty())
+			return false;
+		
+		if (certChain == null || certChain.length == 0)
+			return false;
+		
+		if (certChainDescription.size() ==  certChain.length * 2 ){
+			
+			for (int i=0; i < certChain.length; i++){
+				
+				String lscSubjectRFC2253 = CertificateHelpers.opensslToRfc2253(certChainDescription.get(i));
+				String lscIssuerRFC2253 = CertificateHelpers.opensslToRfc2253(certChainDescription.get(i+1));
+				
+				String certChainRFC2253Subject = X500NameUtils.getReadableForm(certChain[i].getSubjectX500Principal());
+				String certChainRFC2253Issuer = X500NameUtils.getReadableForm(certChain[i].getIssuerX500Principal());
+				
+				if 	(!lscSubjectRFC2253.equals(certChainRFC2253Subject) ||	(!lscIssuerRFC2253.equals(certChainRFC2253Issuer)))
+					return false;
+			}
+		}
+		
+		return true;
 	}
 	
 }

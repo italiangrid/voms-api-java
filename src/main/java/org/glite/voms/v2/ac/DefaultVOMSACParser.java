@@ -34,6 +34,11 @@ public class DefaultVOMSACParser implements VOMSACParser {
 		this.certChain = validatedChain;
 	}
 
+	protected X509Certificate[] getCertificateChain(){
+		return certChain;
+	}
+	
+	
 	public VOMSAttributes parse() {
 		
 		if (certChain == null)

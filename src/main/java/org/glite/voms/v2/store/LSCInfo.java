@@ -1,5 +1,6 @@
 package org.glite.voms.v2.store;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
@@ -53,5 +54,13 @@ public interface LSCInfo {
 	 * @return
 	 */
 	public List<String> getCertificateChainDescription();
+	
+	/**
+	 * Checks if the certificate chain description maintained in the LSC information
+	 * matches the certificate chain passed as argument.
+	 * @param certChain
+	 * @return <code>true</code> if the description matches, <code>false</code> otherwise
+	 */
+	public boolean matches(X509Certificate[] certChain);
 	
 }

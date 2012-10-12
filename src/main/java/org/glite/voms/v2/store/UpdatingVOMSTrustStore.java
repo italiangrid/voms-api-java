@@ -1,6 +1,7 @@
 package org.glite.voms.v2.store;
 
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -45,7 +46,7 @@ public class UpdatingVOMSTrustStore extends DefaultVOMSTrustStore implements
 		super();
 		updateFrequencySanityChecks(updateFrequency);
 		this.updateFrequency = updateFrequency;
-		scheduler = new ScheduledThreadPoolExecutor(1);
+		scheduler = Executors.newSingleThreadScheduledExecutor();
 		scheduleUpdate();
 	}
 

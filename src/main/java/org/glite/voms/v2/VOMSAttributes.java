@@ -1,9 +1,13 @@
 package org.glite.voms.v2;
 
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
+
+import org.bouncycastle.cert.X509AttributeCertificateHolder;
+
 
 /**
  * The VOMS attribute information.
@@ -63,5 +67,42 @@ public interface VOMSAttributes {
 	 */
 	public byte[] getSignature();
 	
+	/**
+	 * @return The VOMS generic attributes
+	 */
+	public List<VOMSGenericAttribute> getGenericAttributes();
 	
+	/**
+	 * @return The targets for this VOMS attributes
+	 * @return
+	 */
+	public List<String> getTargets();
+	
+	/**
+	 * @return The VOMS AA certificate chain
+	 */
+	public X509Certificate[] getAACertificates();
+	
+	/**
+	 * This method checks whether the attributes are valid in the
+	 * current instant of time. No validation is performed on the attributes.
+	 * @return <code>true</code> if valid, <code>false</code> otherwise
+	 */
+	public boolean isValid();
+	
+	/**
+	 * This method checks whether the attributes are valid in a given time
+	 * passed as argument. No validation is performed on the attributes.
+	 *  
+	 * @param time 
+	 * @return <code>true</code> if valid, <code>false</code> otherwise
+	 */
+	public boolean validAt(Date time);
+	
+	/**
+	 * Returns the underlying VOMS attribute certificate.
+	 * 
+	 * @return 
+	 */
+	public X509AttributeCertificateHolder getVOMSAC();
 }

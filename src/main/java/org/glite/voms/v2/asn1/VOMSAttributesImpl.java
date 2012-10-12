@@ -1,11 +1,14 @@
-package org.glite.voms.v2.ac;
+package org.glite.voms.v2.asn1;
 
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.glite.voms.v2.VOMSAttributes;
+import org.glite.voms.v2.VOMSGenericAttribute;
 
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 
@@ -20,6 +23,10 @@ public class VOMSAttributesImpl implements VOMSAttributes {
 	private Date notAfter;
 	private Date notBefore;
 	private byte[] signature;
+	private List<VOMSGenericAttribute> genericAttributes;
+	private List<String> acTargets;
+	private X509Certificate[] aaCerts;
+	private X509AttributeCertificateHolder VOMSAC;
 	
 	public VOMSAttributesImpl() {
 	
@@ -114,6 +121,41 @@ public class VOMSAttributesImpl implements VOMSAttributes {
 				+ "', holder='" + X500NameUtils.getReadableForm(holder) + "', notAfter=" + notAfter
 				+ ", notBefore=" + notBefore + "]";
 	}
-	
-	
+
+	public List<VOMSGenericAttribute> getGenericAttributes() {
+		return genericAttributes;
+	}
+
+	public void setGenericAttributes(List<VOMSGenericAttribute> genericAttributes) {
+		this.genericAttributes = genericAttributes;
+	}
+
+	public List<String> getTargets() {
+		return acTargets;
+	}
+
+	public X509Certificate[] getAACertificates() {
+		return aaCerts;
+	}
+
+	public void setAACertificates(X509Certificate[] aaCerts) {
+		this.aaCerts = aaCerts;
+	}
+
+	public boolean isValid() {
+		return validAt(new Date());
+	}
+
+	public boolean validAt(Date date) {
+		return (getNotAfter().after(date) && getNotBefore().before(date));
+	}
+
+	public X509AttributeCertificateHolder getVOMSAC() {
+		
+		return VOMSAC;
+	}
+
+	public void setVOMSAC(X509AttributeCertificateHolder ac) {
+		VOMSAC = ac;
+	}
 }

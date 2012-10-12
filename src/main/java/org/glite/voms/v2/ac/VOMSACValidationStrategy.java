@@ -1,6 +1,8 @@
 package org.glite.voms.v2.ac;
 
-import org.bouncycastle.asn1.x509.AttributeCertificate;
+import java.security.cert.X509Certificate;
+
+import org.glite.voms.v2.VOMSAttributes;
 
 /**
  * The strategy implemented to perform the validation of a VOMS attribute certificate.
@@ -12,8 +14,9 @@ public interface VOMSACValidationStrategy {
 
 	/**
 	 * Validates a VOMS Attribute Certificate
-	 * @param ac a VOMS Attribute Certificate
+	 * @param ac a  parsed VOMS Attribute Certificate
+	 * @param theChain the certificate chain from which the AC was parsed
 	 * @return a {@link VOMSValidationResult} object describing the outcome of the validation
 	 */
-	public VOMSValidationResult validateAC(AttributeCertificate ac);
+	public VOMSValidationResult validateAC(VOMSAttributes attributes, X509Certificate[] theChain);
 }
