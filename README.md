@@ -92,17 +92,18 @@ The VOMSAttribute interface provides access to all VOMS
 attributes (i.e., FQANs and Generic attributes):
 
 ```java
-
-List<String> fqans = vomsAttrs.getFQANs();
+if (vomsAttrs.size() > 0) {
 	
-for (String f: fqans)
-	System.out.println(f);
-
-List<VOMSGenericAttribute>	gas = vomsAttrs.getGenericAttributes();
-
-for (VOMSGenericAttribute g: gas) {
+	VOMSAttribute va = vomsAttrs.get(0);
+	List<String> fqans = va.getFQANs();
 	
-	System.out.println(g);
+	for (String f: fqans)
+		System.out.println(f);
+
+	List<VOMSGenericAttribute>	gas = va.getGenericAttributes();
+
+	for (VOMSGenericAttribute g: gas)
+		System.out.println(g);
 }
 ```
 
