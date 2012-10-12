@@ -69,39 +69,44 @@ found under src/test/resources.
 
 ### Validation 
 
-The class for validating a certificate (or chain of certificates) is VOMSValidator. 
-VOMSValidator is given a Java X509Certificate (or an  array of) and has methods for validating
-the attribute certificates
+With version 3.0 of the API, the validation interface changes significantly.
+A partially backward compatible VOMSValidator has been maintained to ease the transition
+to the new API.
+In order to validate VOMS attributes one has to do the following:
+
+
 
 ```java
-/* certificate may come either from loading (and validating)
+/* certificate chain may come either from loading (and validating)
    using BouncyCastle or from an authenticated HTTPS session */
 
-VOMSValidator validator = new VOMSValidator(certificate);
+X509Certificate[] theChain = ...;
 
-validator.validate();
+VOMSACValidator validator = VOMSValidators.newValidator();
+validator.setCertificateChain(theChain);
+
+List<VOMSAttribute> vomsAttrs =  validator.validate();
 ```
 
-and query for the presence of attributes
+The VOMSAttribute interface provides access to all VOMS
+attributes (i.e., FQANs and Generic attributes):
 
 ```java
-if(validator.getRoles(“aVo”).contains(“admin”)) {
 
-  // allows admin actions
+List<String> fqans = vomsAttrs.getFQANs();
+	
+for (String f: fqans)
+	System.out.println(f);
+
+List<VOMSGenericAttribute>	gas = vomsAttrs.getGenericAttributes();
+
+for (VOMSGenericAttribute g: gas) {
+	
+	System.out.println(g);
 }
 ```
 
-or retrieve the entire set of attributes
-
-```java
-List<String> attributes = validator.getVOMSAttributes();
-    
-for(String attribute : attributes) {
-  System.out.println(attribute);
-}
-```
-
-### Creating a Proxy
+### Creating a VOMS Proxy
 
 Proxy creation functionalities are provided by the class VOMSProxyInit
 
