@@ -1,5 +1,6 @@
 package org.italiangrid.voms;
 
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +38,11 @@ public interface VOMSAttribute {
 	 * @return The subject of the holder of these VOMS attributes
 	 */
 	public X500Principal getHolder();
+	
+	/**
+	 * @return The serial number of the holder certificate
+	 */
+	public BigInteger getHolderSerialNumber();
 	
 	/**
 	 * @return The subject of the VOMS AA that signed these attributes
@@ -120,5 +126,7 @@ public interface VOMSAttribute {
 	 * @deprecated use {@link #getFQANs()} instead
 	 */
 	public List<String> getFullyQualifiedAttributes();
+	
+	
 	
 }

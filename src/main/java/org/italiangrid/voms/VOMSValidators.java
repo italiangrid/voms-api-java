@@ -1,8 +1,10 @@
-package org.italiangrid.voms.ac.impl;
+package org.italiangrid.voms;
 
 import org.italiangrid.voms.ac.VOMSACParser;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.ac.ValidationResultListener;
+import org.italiangrid.voms.ac.impl.DefaultVOMSACParser;
+import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.store.VOMSTrustStore;
 
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;

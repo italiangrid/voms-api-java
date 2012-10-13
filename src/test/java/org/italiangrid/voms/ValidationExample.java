@@ -9,14 +9,13 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.italiangrid.voms.ac.VOMSACValidator;
-import org.italiangrid.voms.ac.impl.VOMSValidators;
 
 import eu.emi.security.authn.x509.impl.PEMCredential;
 
 public class ValidationExample {
 
 	public ValidationExample() throws FileNotFoundException, IOException, KeyStoreException, CertificateException {
-		String file = "/tmp/x509up_u501";
+		String file = "/Users/cecco/x509up_u501";
 		
 		VOMSACValidator validator = VOMSValidators.newValidator();
 		

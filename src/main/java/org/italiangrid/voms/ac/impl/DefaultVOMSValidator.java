@@ -14,7 +14,7 @@ import org.italiangrid.voms.ac.ValidationResultListener;
 import org.italiangrid.voms.asn1.VOMSACUtils;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStore;
-import org.italiangrid.voms.store.impl.VOMSTrustStores;
+import org.italiangrid.voms.store.VOMSTrustStores;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,18 +31,18 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	private final ValidationResultListener validationResultHandler;
 	private final VOMSTrustStore trustStore;
  
-	protected DefaultVOMSValidator() {
+	public DefaultVOMSValidator() {
 		this (VOMSTrustStores.newTrustStore(), 
 				new OpensslCertChainValidator(DEFAULT_TRUST_ANCHORS_DIR),
 				new LoggingValidationResultListener());
 	}
 	
-	protected DefaultVOMSValidator(VOMSTrustStore store, 
+	public DefaultVOMSValidator(VOMSTrustStore store, 
 			AbstractValidator validator){
 		this(store, validator, new LoggingValidationResultListener());
 	}
 	
-	protected DefaultVOMSValidator(VOMSTrustStore store, 
+	public DefaultVOMSValidator(VOMSTrustStore store, 
 			AbstractValidator validator,
 			ValidationResultListener resultHandler){
 		trustStore = store;
@@ -82,20 +82,20 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 
 	public List<AttributeCertificate> validateACs(List<AttributeCertificate> acs) {
 		
-		Iterator<AttributeCertificate> i = acs.iterator();
+		List<AttributeCertificate> validatedAcs = new ArrayList<AttributeCertificate>();
 		
-		while(i.hasNext()){
-			
-			AttributeCertificate ac = i.next();
+		for (AttributeCertificate ac : acs){
+
 			VOMSAttribute vomsAttrs = VOMSACUtils.deserializeVOMSAttributes(ac);
+		
 			VOMSValidationResult result = validationStrategy.validateAC(vomsAttrs);
 			validationResultHandler.notifyValidationResult(result, vomsAttrs);
 			
-			if (!result.isValid())
-				i.remove();
+			if (result.isValid())
+				validatedAcs.add(ac);
 		}
 		
-		return acs;
+		return validatedAcs;
 	}
 	
 }

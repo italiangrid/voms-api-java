@@ -24,7 +24,7 @@ public class DefaultVOMSACParser implements VOMSACParser {
 	private final VOMSACLookupStrategy acLookupStrategy = new LeafACLookupStrategy();
 	private final VOMSAttributesNormalizationStrategy acNormalizationStrategy = new LeafVOMSExtensionNormalizationStrategy();
 	
-	protected DefaultVOMSACParser() {
+	public DefaultVOMSACParser() {
 		
 	}
 	

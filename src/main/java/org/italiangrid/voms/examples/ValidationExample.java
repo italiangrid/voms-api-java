@@ -9,8 +9,8 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
-import org.italiangrid.voms.ac.impl.VOMSValidators;
 
 import eu.emi.security.authn.x509.impl.PEMCredential;
 

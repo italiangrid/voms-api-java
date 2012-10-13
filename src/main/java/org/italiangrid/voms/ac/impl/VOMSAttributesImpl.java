@@ -1,5 +1,6 @@
-package org.italiangrid.voms.asn1;
+package org.italiangrid.voms.ac.impl;
 
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,7 @@ public class VOMSAttributesImpl implements VOMSAttribute {
 	private List<String> FQANs;
 	private X500Principal issuer;
 	private X500Principal holder;
+	private BigInteger holderSerialNumber;
 	private Date notAfter;
 	private Date notBefore;
 	private byte[] signature;
@@ -119,9 +121,10 @@ public class VOMSAttributesImpl implements VOMSAttribute {
 	@Override
 	public String toString() {
 		return "VOMSAttributesImpl [VO=" + VO + ", host=" + host + ", port="
-				+ port + ", FQANs=" + FQANs + ", issuer='" + X500NameUtils.getReadableForm(issuer)
+				+ port + ", FQANs=" + FQANs + ", gas=" + genericAttributes+ ", issuer='" + X500NameUtils.getReadableForm(issuer)
 				+ "', holder='" + X500NameUtils.getReadableForm(holder) + "', notAfter=" + notAfter
-				+ ", notBefore=" + notBefore + "]";
+				+ ", notBefore=" + notBefore 
+				+ ", targets=" + acTargets + " ]";
 	}
 
 	public List<VOMSGenericAttribute> getGenericAttributes() {
@@ -136,6 +139,10 @@ public class VOMSAttributesImpl implements VOMSAttribute {
 		return acTargets;
 	}
 
+	public void setTargets(List<String> targets){
+		acTargets = targets;
+	}
+	
 	public X509Certificate[] getAACertificates() {
 		return aaCerts;
 	}
@@ -167,5 +174,13 @@ public class VOMSAttributesImpl implements VOMSAttribute {
 
 	public List<String> getFullyQualifiedAttributes() {
 		return getFQANs();
+	}
+
+	public BigInteger getHolderSerialNumber() {
+		return holderSerialNumber;
+	}
+
+	public void setHolderSerialNumber(BigInteger holderSerialNumber) {
+		this.holderSerialNumber = holderSerialNumber;
 	}
 }

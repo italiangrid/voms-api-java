@@ -1,8 +1,8 @@
-package org.italiangrid.voms.store.impl;
+package org.italiangrid.voms.store;
 
 import java.util.List;
 
-import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
+import org.italiangrid.voms.store.impl.DefaultUpdatingVOMSTrustStore;
 
 public class VOMSTrustStores {
 

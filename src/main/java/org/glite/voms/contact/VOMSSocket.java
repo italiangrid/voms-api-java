@@ -83,7 +83,7 @@ public class VOMSSocket {
 	 * Connects this socket to the voms server identified by the (host,port)
 	 * passed as arguments.
 	 * 
-	 * @param host
+	 * @param defaultHost
 	 * @param port
 	 * @throws IOException
 	 * @throws GeneralSecurityException

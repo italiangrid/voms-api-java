@@ -43,7 +43,7 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	 * 
 	 * @param updateFrequency
 	 */
-	DefaultUpdatingVOMSTrustStore(long updateFrequency) {
+	public DefaultUpdatingVOMSTrustStore(long updateFrequency) {
 		super();
 		updateFrequencySanityChecks(updateFrequency);
 		this.updateFrequency = updateFrequency;
@@ -51,7 +51,7 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 		scheduleUpdate();
 	}
 
-	DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency) {
+	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency) {
 		super(localTrustDirs);
 		updateFrequencySanityChecks(updateFrequency);
 		this.updateFrequency = updateFrequency;
@@ -59,7 +59,7 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 		scheduleUpdate();
 	}
 
-	DefaultUpdatingVOMSTrustStore(){
+	public DefaultUpdatingVOMSTrustStore(){
 		this(DEFAULT_UPDATE_FREQUENCY);
 	}
 	
