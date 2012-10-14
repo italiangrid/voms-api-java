@@ -1,9 +1,9 @@
 package org.italiangrid.voms;
 
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.aaCertNotFound;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.canlError;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.invalidAcCert;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.lscDescriptionDoesntMatchAcCert;
-import static org.italiangrid.voms.error.VOMSValidationErrorCode.aaCertNotFound;
 import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -12,14 +12,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
+import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.italiangrid.voms.ac.VOMSACValidator;
@@ -39,6 +45,10 @@ import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
+import eu.emi.security.authn.x509.proxy.CertificateExtension;
+import eu.emi.security.authn.x509.proxy.ProxyCertificate;
+import eu.emi.security.authn.x509.proxy.ProxyCertificateOptions;
+import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 
 public class TestACGeneration {
 
@@ -87,6 +97,8 @@ public class TestACGeneration {
 	static VOMSValidationErrorMessage expiredCertErrorMessage;
 	static VOMSValidationErrorMessage revokedCertErrorMessage;
 	
+	static VOMSACGenerator defaultGenerator;
+	
 	@SuppressWarnings("unused")
 	@BeforeClass
 	static public void classTestSetup() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
@@ -113,6 +125,7 @@ public class TestACGeneration {
 		expiredCertErrorMessage = newErrorMessage(canlError, "Certificate has expired on: Fri Dec 02 01:00:00 CET 2011");
 		revokedCertErrorMessage = newErrorMessage(canlError, "Certificate was revoked at: Wed Sep 26 17:25:24 CEST 2012, the reason reported is: unspecified");
 		
+		defaultGenerator = new VOMSACGenerator(aaCredential, defaultVO, defaultHost, port);
 	}
 	
 	@SuppressWarnings("unused")
@@ -126,11 +139,7 @@ public class TestACGeneration {
 			String vo,
 			String host){
 		
-		
-		VOMSACGenerator gen;
-		
-		gen = new VOMSACGenerator(aaCredential, vo, host, port);
-		
+		VOMSACGenerator gen = new VOMSACGenerator(aaCredential, vo, host, port);
 		
 		Calendar cal = Calendar.getInstance();
 		
@@ -148,6 +157,7 @@ public class TestACGeneration {
 		
 		return ac.toASN1Structure();
 	}
+	
 	
 	
 	private VOMSGenericAttribute buildGA(String name, String value, String context){
@@ -263,31 +273,61 @@ public class TestACGeneration {
 		List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays.asList(ac));
 		assertEquals(validatedAttrs.size(),0);
 	}
-
-	class ValidationResultChecker implements ValidationResultListener{
-
-		Logger log = LoggerFactory.getLogger(ValidationResultChecker.class);
+	
+	@Test
+	public void testSuccesfullACExtractionFromProxy(){
 		
-		VOMSValidationErrorMessage[] expectedErrorMessages;
-		boolean expectedValidationResult;
+		ValidationResultChecker c = new ValidationResultChecker(true);
 		
-		public ValidationResultChecker(boolean valid, VOMSValidationErrorMessage...expectedErrorMessages) {
-			expectedValidationResult = valid;
-			this.expectedErrorMessages = expectedErrorMessages;
+		VOMSACValidator validator  = VOMSValidators.newValidator(trustStore, certValidator,c);
+		
+		AttributeCertificate ac = createAC(aaCredential,defaultFQANs,defaultGAs, defaultVO, defaultHost);
+		
+		X509Certificate[] chain;
+		
+		try{
+			chain = createVOMSProxy(holderCredential, new AttributeCertificate[]{ac});
+		} catch (Exception e) {
+			throw new VOMSError("Error generating VOMS proxy:"+e.getMessage(),e);
 		}
 		
-		public void notifyValidationResult(VOMSValidationResult result,
-				VOMSAttribute attributes) {
-			
-			log.debug("Checking validation result: {}", result);
-			
-			assertEquals(expectedValidationResult, result.isValid());
-			assertEquals(expectedErrorMessages.length, result.getValidationErrors().size());
-			for (VOMSValidationErrorMessage expectedMessage: expectedErrorMessages){
-				String failureMessage = String.format("<%s> was not found in error messages.", expectedMessage);
-				assertTrue(failureMessage,result.getValidationErrors().contains(expectedMessage));
-			}
-			
+		List<VOMSAttribute> attrs = validator.validate(chain);
+		assertEquals(1, attrs.size());
+	}
+	
+	private X509Certificate[] createVOMSProxy(PEMCredential holder, AttributeCertificate[] acs) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
+		ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(holder.getCertificateChain());
+		
+		proxyOptions.setAttributeCertificates(acs);
+		ProxyCertificate proxy =  ProxyGenerator.generate(proxyOptions, holder.getKey());
+		
+		return proxy.getCertificateChain();
+	}
+}
+
+class ValidationResultChecker implements ValidationResultListener{
+
+	static final Logger log = LoggerFactory.getLogger(ValidationResultChecker.class);
+	
+	VOMSValidationErrorMessage[] expectedErrorMessages;
+	boolean expectedValidationResult;
+	
+	public ValidationResultChecker(boolean valid, VOMSValidationErrorMessage...expectedErrorMessages) {
+		expectedValidationResult = valid;
+		this.expectedErrorMessages = expectedErrorMessages;
+	}
+	
+	public void notifyValidationResult(VOMSValidationResult result,
+			VOMSAttribute attributes) {
+		
+		log.debug("Checking validation result: {}", result);
+		
+		assertEquals(expectedValidationResult, result.isValid());
+		assertEquals(expectedErrorMessages.length, result.getValidationErrors().size());
+		for (VOMSValidationErrorMessage expectedMessage: expectedErrorMessages){
+			String failureMessage = String.format("<%s> was not found in error messages.", expectedMessage);
+			assertTrue(failureMessage,result.getValidationErrors().contains(expectedMessage));
 		}
+		
 	}
 }

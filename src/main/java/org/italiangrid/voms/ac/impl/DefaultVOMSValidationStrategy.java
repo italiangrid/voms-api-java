@@ -1,5 +1,7 @@
 package org.italiangrid.voms.ac.impl;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,6 +9,8 @@ import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
@@ -16,6 +20,7 @@ import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.VOMSACValidationStrategy;
 import org.italiangrid.voms.ac.VOMSValidationResult;
+import org.italiangrid.voms.asn1.VOMSConstants;
 import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 import org.italiangrid.voms.store.LSCInfo;
 import org.italiangrid.voms.store.VOMSTrustStore;
@@ -26,6 +31,8 @@ import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.emi.security.authn.x509.proxy.ProxyUtils;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.*;
+import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
+
 public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 
 	private final VOMSTrustStore store;
@@ -147,10 +154,60 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 	}
 	
 	private boolean checkTargets(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
+		
+		if (attributes.getTargets() == null || attributes.getTargets().size() == 0)
+			return true;
+		
+		String localhostName;
+		
+		try {
+			localhostName = InetAddress.getLocalHost().getCanonicalHostName();
+		
+		} catch (UnknownHostException e) {
+			validationErrors.add(newErrorMessage(other, "Error resolving localhost name: "+e.getMessage()));
+			return false;
+		}
+		
+		if (!attributes.getTargets().contains(localhostName)){
+			validationErrors.add(newErrorMessage(localhostDoesntMatchAcTarget, localhostName, attributes.getTargets().toString()));
+			return false;
+		}
+		
 		return true;
 	}
 	
-	private boolean checkUnhandledExtensions(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
+	private boolean checkNoRevAvailExtension(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
+		
+		X509Extension noRevAvail = attributes.getVOMSAC().getExtension(X509Extension.noRevAvail);
+		if (noRevAvail != null && noRevAvail.isCritical()){
+			validationErrors.add(newErrorMessage(other, "NoRevAvail AC extension cannot be critical!"));
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean checkAuthorityKeyIdentifierExtension(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
+		
+		X509Extension authKeyId = attributes.getVOMSAC().getExtension(X509Extension.authorityKeyIdentifier);
+		if (authKeyId != null && authKeyId.isCritical()){
+			validationErrors.add(newErrorMessage(other, "AuthorityKeyIdentifier AC extension cannot be critical!"));
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean checkUnhandledCriticalExtensions(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
+		
+		@SuppressWarnings("unchecked")
+		List<ASN1ObjectIdentifier> acExtensions = attributes.getVOMSAC().getExtensionOIDs();
+		
+		for (ASN1ObjectIdentifier extId: acExtensions){
+			if (!VOMSConstants.VOMS_HANDLED_EXTENSIONS.contains(extId) && 
+					attributes.getVOMSAC().getExtension(extId).isCritical()){
+				validationErrors.add(newErrorMessage(other, "unknown critical extension found in VOMS AC: "+extId.getId()));
+				return false;
+			}
+		}
 		return true;
 	}
 
@@ -169,9 +226,15 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 			// Check targets
 			valid = checkTargets(attributes, validationErrors);
 		
+		// AC extension checking to be compliant with rfc 3281
 		if (valid)
-			// Check unhandled extensions
-			valid = checkUnhandledExtensions(attributes, validationErrors);
+			valid = checkAuthorityKeyIdentifierExtension(attributes, validationErrors);
+				
+		if (valid)
+			valid = checkNoRevAvailExtension(attributes, validationErrors);
+				
+		if (valid)
+			valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
 		
 		return new VOMSValidationResult(valid, validationErrors);
 	}
@@ -196,9 +259,16 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 			// Check targets
 			valid = checkTargets(attributes, validationErrors);
 		
+		
+		// AC extension checking to be compliant with rfc 3281
 		if (valid)
-			// Check unhandled extensions
-			valid = checkUnhandledExtensions(attributes, validationErrors);
+			valid = checkAuthorityKeyIdentifierExtension(attributes, validationErrors);
+		
+		if (valid)
+			valid = checkNoRevAvailExtension(attributes, validationErrors);
+		
+		if (valid)
+			valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
 		
 		return new VOMSValidationResult(valid, validationErrors);
 	}

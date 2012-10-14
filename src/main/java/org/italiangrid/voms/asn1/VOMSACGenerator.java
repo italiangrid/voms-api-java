@@ -11,6 +11,7 @@ import java.util.List;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DEROctetString;
@@ -19,6 +20,7 @@ import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.X509ExtensionsGenerator;
 import org.bouncycastle.cert.AttributeCertificateHolder;
 import org.bouncycastle.cert.AttributeCertificateIssuer;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
@@ -32,6 +34,7 @@ import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSGenericAttribute;
 
 import eu.emi.security.authn.x509.impl.PEMCredential;
+import eu.emi.security.authn.x509.proxy.CertificateExtension;
 
 /** 
  * 
@@ -223,6 +226,18 @@ public class VOMSACGenerator implements VOMSConstants{
 		
 		
 		return builder.build(signer);
+	}
+	
+	public synchronized CertificateExtension generateVOMSExtension(List<X509AttributeCertificateHolder> acs){
+		ASN1EncodableVector vomsACs = new ASN1EncodableVector();
 		
+		for (X509AttributeCertificateHolder ac: acs)
+			vomsACs.add(ac.toASN1Structure());
+		
+		DERSequence acSeq = new DERSequence(vomsACs);
+		
+		CertificateExtension ext = new CertificateExtension(VOMS_EXTENSION_OID.getId(), acSeq.toASN1Object(), false);
+		
+		return ext;
 	}
 }
