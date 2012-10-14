@@ -16,6 +16,7 @@ import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.VOMSACValidationStrategy;
 import org.italiangrid.voms.ac.VOMSValidationResult;
+import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 import org.italiangrid.voms.store.LSCInfo;
 import org.italiangrid.voms.store.VOMSTrustStore;
 
@@ -24,7 +25,7 @@ import eu.emi.security.authn.x509.ValidationResult;
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.emi.security.authn.x509.proxy.ProxyUtils;
-
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.*;
 public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 
 	private final VOMSTrustStore store;
@@ -37,7 +38,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 		
 	}
 	
-	private boolean checkACHolder(VOMSAttribute attributes, X509Certificate[] chain, List<String> validationErrors){
+	private boolean checkACHolder(VOMSAttribute attributes, X509Certificate[] chain, List<VOMSValidationErrorMessage> validationErrors){
 		
 		X500Principal chainHolder = ProxyUtils.getOriginalUserDN(chain);
 		
@@ -48,82 +49,79 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 			String acHolderSubject = X500NameUtils.getReadableForm(attributes.getHolder());
 			String certChainSubject =X500NameUtils.getReadableForm(chainHolder);
 			
-			String msg = String.format("AC holder check failed: AC holder '%s' does not match certificate chain subject '%s'.", 
-					acHolderSubject, 
-					certChainSubject);
-			
-			validationErrors.add(msg);
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(acHolderDoesntMatchCertChain,
+					acHolderSubject,
+					certChainSubject));
 		}
 		
 		return holderDoesMatch;
 	}
 	
-	private boolean checkACValidity(VOMSAttribute attributes, List<String> validationErrors){
+	private boolean checkACValidity(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		Date now = new Date();
 		
 		boolean valid = attributes.validAt(now); 
+		
 		if (!valid){
-			
-			String msg = String.format("AC validity check failed: AC not valid at current time. "+
-					"[AC start time: %s, AC end time: %s, now: %s]", 
+			VOMSValidationErrorMessage m = VOMSValidationErrorMessage.newErrorMessage(acNotValidAtCurrentTime,
 					attributes.getNotBefore(),
 					attributes.getNotAfter(),
 					now);
 			
-			validationErrors.add(msg);
+			validationErrors.add(m);
 		}
 		
 		return valid;
 	}
 	
 	
-	private boolean checkLocalAACertSignature(VOMSAttribute attributes, List<String> validationErrors){
+	private boolean checkLocalAACertSignature(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		
 		X509Certificate localAACert = store.getAACertificateBySubject(attributes.getIssuer());
 		if (localAACert == null){
-			validationErrors.add("AC signature verification failure: no valid VOMS server credential found.");
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(aaCertNotFound));
 			return false;
 		}
 		
 		if (!validateCertificate(localAACert, validationErrors)){
-			validationErrors.add("AC signature verification failure: local AA cert failed certificate validation!");
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(invalidAaCert));
 			return false;
 		}
 		
 		boolean signatureValid = verifyACSignature(attributes, localAACert);
+		
 		if (!signatureValid){
 			String readableSubject = X500NameUtils.getReadableForm(localAACert.getSubjectX500Principal());
-			String msg = String.format("Signature validation failed: matching AA cert '%s' fails signature verification.", readableSubject);
-			validationErrors.add(msg);
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(aaCertFailsSignatureVerification, readableSubject));
 		}
 		
 		return signatureValid;
 			
 	}
 	
-	private boolean checkLSCSignature(VOMSAttribute attributes, List<String> validationErrors){
+	private boolean checkLSCSignature(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		
 		LSCInfo lsc = store.getLSC(attributes.getVO(), attributes.getHost());
 		X509Certificate[] aaCerts = attributes.getAACertificates();
 		
 		if (lsc == null){
-			validationErrors.add("LSC validation failed: LSC file matching VOMS attributes not found in store.");
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(lscFileNotFound));
 			return false;
 		}
 		
 		if (aaCerts == null || aaCerts.length == 0){
-			validationErrors.add("LSC validation failed: AC certs extension is empty");
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(emptyAcCertsExtension));
 			return false;
 		}
 		
 		if (!lsc.matches(aaCerts)){
-			validationErrors.add("LSC validation failed: LSC chain description does not match AA certificate chain embedded in the VOMS AC!");
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(lscDescriptionDoesntMatchAcCert));
 			return false;
 		}
 		
 		// LSC matches aa certs, verify certificates extracted from the AC
 		if (!validateCertificateChain(aaCerts, validationErrors)){
-			validationErrors.add("LSC validation failed: AA certificate chain embedded in the VOMS AC failed certificate validation!");
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(invalidAcCert));
 			return false;
 		}
 		
@@ -131,14 +129,13 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 		
 		if (!signatureValid){
 			String readableSubject = X500NameUtils.getReadableForm(aaCerts[0].getSubjectX500Principal());
-			String msg = String.format("LSC signature validation failed: matching AA cert '%s' fails signature verification.", readableSubject);
-			validationErrors.add(msg);
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(acCertFailsSignatureVerification, readableSubject));
 		}
 			
 		return signatureValid; 
 	}
 	
-	private boolean checkSignature(VOMSAttribute attributes, List<String> validationErrors){
+	private boolean checkSignature(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		
 		boolean valid = checkLSCSignature(attributes, validationErrors);
 		
@@ -149,17 +146,17 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 
 	}
 	
-	private boolean checkTargets(VOMSAttribute attributes, List<String> validationErrors){
+	private boolean checkTargets(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		return true;
 	}
 	
-	private boolean checkUnhandledExtensions(VOMSAttribute attributes, List<String> validationErrors){
+	private boolean checkUnhandledExtensions(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		return true;
 	}
 
 	public VOMSValidationResult validateAC(VOMSAttribute attributes) {
 		boolean valid = true;
-		List<String> validationErrors = new ArrayList<String>();
+		List<VOMSValidationErrorMessage> validationErrors = new ArrayList<VOMSValidationErrorMessage>();
 
 		// Check temporal validity
 		valid = checkACValidity(attributes, validationErrors);
@@ -182,7 +179,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 	public synchronized VOMSValidationResult validateAC(VOMSAttribute attributes, X509Certificate[] chain) {
 		
 		boolean valid = true;
-		List<String> validationErrors = new ArrayList<String>();
+		List<VOMSValidationErrorMessage> validationErrors = new ArrayList<VOMSValidationErrorMessage>();
 		
 		// Check temporal validity
 		valid = checkACValidity(attributes, validationErrors);
@@ -207,17 +204,17 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 	}
 	
 	
-	private boolean validateCertificate(X509Certificate c, List<String> validationErrors){
+	private boolean validateCertificate(X509Certificate c, List<VOMSValidationErrorMessage> validationErrors){
 		
 		return validateCertificateChain(new X509Certificate[]{c}, validationErrors);
 	}
 	
-	private boolean validateCertificateChain(X509Certificate[] chain, List<String> validationErrors){
+	private boolean validateCertificateChain(X509Certificate[] chain, List<VOMSValidationErrorMessage> validationErrors){
 		
 		ValidationResult result = certChainValidator.validate(chain);
 		
 		for (ValidationError e: result.getErrors())
-			validationErrors.add(e.getMessage());
+			validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(canlError, e.getMessage()));
 		
 		return result.isValid();
 	}

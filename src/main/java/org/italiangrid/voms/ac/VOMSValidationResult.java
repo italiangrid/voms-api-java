@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.italiangrid.voms.error.VOMSValidationErrorMessage;
+
 /**
  * This class represents the outcome of a VOMS validation.
  * 
@@ -15,8 +17,8 @@ public class VOMSValidationResult {
 	/** The flag that tells whether the validation was successfull or not **/
 	private final boolean valid;
 	
-	/** A list of validation error strings **/
-	private final List<String> validationErrors;
+	/** A list of {@link VOMSValidationErrorMessage}**/
+	private final List<VOMSValidationErrorMessage> validationErrors;
 	
 	/**
 	 * Default constructor.
@@ -24,16 +26,16 @@ public class VOMSValidationResult {
 	 * @param valid <code>true</code> in case of validation success, <code>false</code> otherwise
 	 */
 	public VOMSValidationResult(boolean valid) {
-		this(valid, new ArrayList<String>());
+		this(valid, new ArrayList<VOMSValidationErrorMessage>());
 	}
 	
 	/**
 	 * This constructor is used to pass in a list of validation errors as well.
 	 * 
 	 * @param valid <code>true</code> in case of validation success, <code>false</code> otherwise
-	 * @param validationErrors a list of validation error strings
+	 * @param validationErrors a list of validation errors
 	 */
-	public VOMSValidationResult(boolean valid, List<String> validationErrors) {
+	public VOMSValidationResult(boolean valid, List<VOMSValidationErrorMessage> validationErrors) {
 		this.valid = valid;
 		this.validationErrors = validationErrors;
 	}
@@ -50,7 +52,7 @@ public class VOMSValidationResult {
 	/**
 	 * @return the possibly empty list of validation errors
 	 */
-	public List<String> getValidationErrors() {
+	public List<VOMSValidationErrorMessage> getValidationErrors() {
 		return Collections.unmodifiableList(validationErrors);
 	}
 

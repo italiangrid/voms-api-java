@@ -1,5 +1,10 @@
 package org.italiangrid.voms;
 
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.canlError;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.invalidAcCert;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.lscDescriptionDoesntMatchAcCert;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.aaCertNotFound;
+import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -11,7 +16,6 @@ import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -24,11 +28,14 @@ import org.italiangrid.voms.ac.ValidationResultListener;
 import org.italiangrid.voms.ac.impl.VOMSGenericAttributeImpl;
 import org.italiangrid.voms.asn1.VOMSACGenerator;
 import org.italiangrid.voms.asn1.VOMSACUtils;
+import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -77,6 +84,9 @@ public class TestACGeneration {
 	static VOMSTrustStore trustStore;
 	static OpensslCertChainValidator certValidator = null;
 	
+	static VOMSValidationErrorMessage expiredCertErrorMessage;
+	static VOMSValidationErrorMessage revokedCertErrorMessage;
+	
 	@SuppressWarnings("unused")
 	@BeforeClass
 	static public void classTestSetup() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
@@ -99,6 +109,9 @@ public class TestACGeneration {
 		
 		trustStore = new DefaultVOMSTrustStore(Arrays.asList(vomsdir));
 		certValidator = new OpensslCertChainValidator(trustAnchorsDir);
+		
+		expiredCertErrorMessage = newErrorMessage(canlError, "Certificate has expired on: Fri Dec 02 01:00:00 CET 2011");
+		revokedCertErrorMessage = newErrorMessage(canlError, "Certificate was revoked at: Wed Sep 26 17:25:24 CEST 2012, the reason reported is: unspecified");
 		
 	}
 	
@@ -186,8 +199,7 @@ public class TestACGeneration {
 	
 	@Test
 	public void testACValidation() {
-		ValidationResultChecker c = new ValidationResultChecker(true,
-				Collections.EMPTY_LIST);
+		ValidationResultChecker c = new ValidationResultChecker(true);
 		
 		VOMSACValidator validator  = VOMSValidators.newValidator(trustStore, certValidator,c);
 		
@@ -200,9 +212,10 @@ public class TestACGeneration {
 	
 	@Test
 	public void testLSCValidationFailure(){
+		
 		ValidationResultChecker c = new ValidationResultChecker(false,
-				Arrays.asList(TestErrorMessages.LSC_FAILURE_WRONG_CHAIN_DESCRIPTION.toString(),
-						TestErrorMessages.AC_SIGNATURE_VERIFICATION_FAILURE.toString()));
+				newErrorMessage(lscDescriptionDoesntMatchAcCert),
+				newErrorMessage(aaCertNotFound));
 		
 		VOMSACValidator validator  = VOMSValidators.newValidator(trustStore, certValidator,c);
 		AttributeCertificate ac = createAC(aaCredential2,
@@ -216,10 +229,12 @@ public class TestACGeneration {
 	
 	@Test
 	public void testExpiredAACertValidationFailure() throws OperatorCreationException{
-		ValidationResultChecker c = new ValidationResultChecker(false, 
-				Arrays.asList(TestErrorMessages.CERTIFICATE_EXPIRED.toString(),
-				TestErrorMessages.LSC_FAILURE_INVALID_AA_CERT.toString(),
-				TestErrorMessages.AC_SIGNATURE_VERIFICATION_FAILURE.toString()));
+		
+		ValidationResultChecker c = new ValidationResultChecker(false,
+				expiredCertErrorMessage,
+				newErrorMessage(invalidAcCert),
+				newErrorMessage(aaCertNotFound));
+				
 		
 		VOMSACValidator validator  = VOMSValidators.newValidator(trustStore, certValidator, c);
 		AttributeCertificate ac = createAC(expiredCredential,
@@ -227,6 +242,7 @@ public class TestACGeneration {
 				defaultGAs, 
 				defaultVO, 
 				"test-expired.cnaf.infn.it");
+		
 		List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays.asList(ac));
 		assertEquals(validatedAttrs.size(),0);
 	}
@@ -234,9 +250,9 @@ public class TestACGeneration {
 	@Test
 	public void testRevokedAACertValidationFailure(){
 		ValidationResultChecker c = new ValidationResultChecker(false, 
-				Arrays.asList(TestErrorMessages.CERTIFICATE_REVOKED.toString(),
-				TestErrorMessages.LSC_FAILURE_INVALID_AA_CERT.toString(),
-				TestErrorMessages.AC_SIGNATURE_VERIFICATION_FAILURE.toString()));
+				revokedCertErrorMessage, 
+				newErrorMessage(invalidAcCert),
+				newErrorMessage(aaCertNotFound));
 		
 		VOMSACValidator validator  = VOMSValidators.newValidator(trustStore, certValidator, c);
 		AttributeCertificate ac = createAC(revokedCredential,
@@ -250,10 +266,12 @@ public class TestACGeneration {
 
 	class ValidationResultChecker implements ValidationResultListener{
 
-		List<String> expectedErrorMessages;
+		Logger log = LoggerFactory.getLogger(ValidationResultChecker.class);
+		
+		VOMSValidationErrorMessage[] expectedErrorMessages;
 		boolean expectedValidationResult;
 		
-		public ValidationResultChecker(boolean valid, List<String> expectedErrorMessages) {
+		public ValidationResultChecker(boolean valid, VOMSValidationErrorMessage...expectedErrorMessages) {
 			expectedValidationResult = valid;
 			this.expectedErrorMessages = expectedErrorMessages;
 		}
@@ -261,9 +279,11 @@ public class TestACGeneration {
 		public void notifyValidationResult(VOMSValidationResult result,
 				VOMSAttribute attributes) {
 			
+			log.debug("Checking validation result: {}", result);
+			
 			assertEquals(expectedValidationResult, result.isValid());
-			assertEquals(expectedErrorMessages.size(), result.getValidationErrors().size());
-			for (String expectedMessage: expectedErrorMessages){
+			assertEquals(expectedErrorMessages.length, result.getValidationErrors().size());
+			for (VOMSValidationErrorMessage expectedMessage: expectedErrorMessages){
 				String failureMessage = String.format("<%s> was not found in error messages.", expectedMessage);
 				assertTrue(failureMessage,result.getValidationErrors().contains(expectedMessage));
 			}
