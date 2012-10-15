@@ -23,20 +23,15 @@ public class DefaultVOMSACParser implements VOMSACParser {
 	
 	private final VOMSACLookupStrategy acLookupStrategy = new LeafACLookupStrategy();
 	private final VOMSAttributesNormalizationStrategy acNormalizationStrategy = new LeafVOMSExtensionNormalizationStrategy();
-	
-	public DefaultVOMSACParser() {
-		
-	}
-	
 	private X509Certificate[] certChain;
 	
-	public List<VOMSAttribute> parse(X509Certificate[] validatedChain) {
+	public synchronized List<VOMSAttribute> parse(X509Certificate[] validatedChain) {
 		
 		setCertificateChain(validatedChain);
 		return parse();
 	}
 
-	public void setCertificateChain(X509Certificate[] validatedChain) {
+	public synchronized void setCertificateChain(X509Certificate[] validatedChain) {
 		this.certChain = validatedChain;
 	}
 
@@ -44,7 +39,7 @@ public class DefaultVOMSACParser implements VOMSACParser {
 		return certChain;
 	}
 	
-	public List<VOMSAttribute> parse() {
+	public synchronized List<VOMSAttribute> parse() {
 		
 		if (certChain == null)
 			throw new IllegalArgumentException("Cannot parse a null certchain!");
@@ -52,5 +47,4 @@ public class DefaultVOMSACParser implements VOMSACParser {
 		List<ACParsingContext> parsedACs = acLookupStrategy.lookupVOMSAttributeCertificates(certChain);
 		return acNormalizationStrategy.normalizeAttributes(parsedACs);
 	}
-
 }

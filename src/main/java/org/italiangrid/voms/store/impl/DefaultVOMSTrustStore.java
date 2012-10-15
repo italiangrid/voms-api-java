@@ -60,7 +60,14 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 	private Map<String, X509Certificate> localAACertificatesByHash = new HashMap<String, X509Certificate>();
 
 	/** The set of local parsed LSC information keyed by VO **/
-	private Map<String, Set<LSCInfo>> localLSCInfo = new HashMap<String, Set<LSCInfo>>(); 
+	private Map<String, Set<LSCInfo>> localLSCInfo = new HashMap<String, Set<LSCInfo>>();
+	
+	/** Builds a list of trusted directories containing only {@link #DEFAULT_VOMS_DIR}. **/
+	protected static List<String> buildDefaultTrustedDirs(){
+		List<String> tDirs =  new ArrayList<String>();
+		tDirs.add(DEFAULT_VOMS_DIR);
+		return tDirs;		
+	}
 
 	/**
 	 * 
@@ -85,13 +92,12 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 	 */
 	public DefaultVOMSTrustStore() {
 
-		localTrustedDirs = new ArrayList<String>();
-		localTrustedDirs.add(DEFAULT_VOMS_DIR);
+		localTrustedDirs = buildDefaultTrustedDirs();
 		loadTrustInformation();
 
 	}
-
-	public List<String> getLocalTrustedDirectories() {
+	
+	public synchronized List<String> getLocalTrustedDirectories() {
 
 		return localTrustedDirs;
 	}
@@ -101,7 +107,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		return Collections.unmodifiableList(new ArrayList<X509Certificate>(localAACertificatesByHash.values()));
 	}
 	
-	public LSCInfo getLSC(String voName, String hostname) {
+	public synchronized LSCInfo getLSC(String voName, String hostname) {
 
 		Set<LSCInfo> candidates = localLSCInfo.get(voName);
 
@@ -313,11 +319,14 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		checkStoreIsNotEmpty();
 	}
 
-	public X509Certificate getAACertificateBySubject(X500Principal aaCertSubject) {
+	public synchronized X509Certificate getAACertificateBySubject(X500Principal aaCertSubject) {
 		
 		String theCertHash = OpensslTrustAnchorStore.getOpenSSLCAHash(aaCertSubject);
 		
-		return localAACertificatesByHash.get(theCertHash);
-		
+		return localAACertificatesByHash.get(theCertHash);	
+	}
+
+	public Map<String,Set<LSCInfo>> getAllLSCInfo() {
+		return Collections.unmodifiableMap(localLSCInfo);
 	}
 }

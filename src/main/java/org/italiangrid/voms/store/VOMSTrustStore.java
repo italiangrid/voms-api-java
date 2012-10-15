@@ -2,6 +2,8 @@ package org.italiangrid.voms.store;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -48,6 +50,13 @@ public interface VOMSTrustStore {
 	 * @return a {@link LSCInfo} object, or null if no LSC  matching the arguments was found
 	 */
 	public LSCInfo getLSC(String voName, String hostname);
+	
+	/**
+	 * Returns all the LSC information held in this {@link VOMSTrustStore}.
+	 * The returned {@link Map} is keyed by VO name.
+	 * @return a possibly empty map {@link LSCInfo} objects 
+	 */
+	public Map<String,Set<LSCInfo>> getAllLSCInfo();
 	
 	/**
 	 * Loads trust information from the sources specified with the {@link #setLocalTrustedDirectories(List)} information or

@@ -33,8 +33,7 @@ public interface VOMSACParser {
 	 * Looks for VOMS attributes in the certificate chain set by a former call to the {@link #setCertificateChain(X509Certificate[])}
 	 * method.
 	 * 
-	 * @return a a possibly empty list of {@link VOMSAttribute} object providing access to the parsed VOMS attributes
+	 * @return a a possibly empty list of {@link VOMSAttribute} objects providing access to the parsed VOMS attributes
 	 */
 	public List<VOMSAttribute> parse();
-	
 }

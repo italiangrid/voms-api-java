@@ -41,7 +41,7 @@ public interface VOMSACValidator extends VOMSACParser {
 	public List<AttributeCertificate> validateACs(List<AttributeCertificate> acs);
 	
 	/**
-	 * Shutdown the VOMS validator. This method should be called to perform final cleanup and stop 
+	 * Shutdown the VOMS validator. This method should be called to perform final cleanup operations. 
 	 */
 	public void shutdown();
 }

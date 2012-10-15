@@ -14,12 +14,12 @@ import eu.emi.security.authn.x509.impl.PEMCredential;
 
 public class ValidationExample {
 
-	public ValidationExample() throws FileNotFoundException, IOException, KeyStoreException, CertificateException {
-		String file = "/Users/cecco/x509up_u501";
+	public ValidationExample(String filename) throws FileNotFoundException, IOException, KeyStoreException, CertificateException {
+		
 		
 		VOMSACValidator validator = VOMSValidators.newValidator();
 		
-		PEMCredential c = new PEMCredential(new FileInputStream(file), null);
+		PEMCredential c = new PEMCredential(new FileInputStream(filename), null);
 		
 		X509Certificate[] certChain = c.getCertificateChain();	
 		List<VOMSAttribute> attrs = validator.validate(certChain);
@@ -38,7 +38,7 @@ public class ValidationExample {
 	 * @throws KeyStoreException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException, KeyStoreException, CertificateException {
-		new ValidationExample();
+		new ValidationExample(args[0]);
 	}
 
 }

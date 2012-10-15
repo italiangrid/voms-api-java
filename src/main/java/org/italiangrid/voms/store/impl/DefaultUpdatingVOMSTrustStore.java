@@ -1,13 +1,14 @@
 package org.italiangrid.voms.store.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
+import org.italiangrid.voms.store.VOMSTrustStoreUpdateListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,30 +38,33 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	/**
 	 * The scheduler used to schedule the update tasks.
 	 */
-	private final ScheduledExecutorService scheduler;
+	private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new VOMSNamedThreadFactory());
 	
-	/**
-	 * 
-	 * @param updateFrequency
-	 */
-	public DefaultUpdatingVOMSTrustStore(long updateFrequency) {
-		super();
-		updateFrequencySanityChecks(updateFrequency);
-		this.updateFrequency = updateFrequency;
-		scheduler = Executors.newSingleThreadScheduledExecutor();
-		scheduleUpdate();
-	}
-
-	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency) {
+	private VOMSTrustStoreUpdateListener updateListener;
+	
+	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency, VOMSTrustStoreUpdateListener updateListener) {
 		super(localTrustDirs);
 		updateFrequencySanityChecks(updateFrequency);
 		this.updateFrequency = updateFrequency;
-		scheduler = new ScheduledThreadPoolExecutor(1);
+		this.updateListener = updateListener;
 		scheduleUpdate();
+	}
+	
+	public DefaultUpdatingVOMSTrustStore(long updateFrequency) {
+		this(buildDefaultTrustedDirs(), updateFrequency, new TrustStoreUpdatesLogger(false));
+	}
+	
+	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency) {
+		this(localTrustDirs, updateFrequency, new TrustStoreUpdatesLogger(false));
+	}
+
+	
+	public DefaultUpdatingVOMSTrustStore(long updateFrequency, VOMSTrustStoreUpdateListener updateListener) {
+		this(buildDefaultTrustedDirs(), updateFrequency, new TrustStoreUpdatesLogger(false));
 	}
 
 	public DefaultUpdatingVOMSTrustStore(){
-		this(DEFAULT_UPDATE_FREQUENCY);
+		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, new TrustStoreUpdatesLogger(true));
 	}
 	
 	
@@ -78,16 +82,9 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 		long frequency = getUpdateFrequency();
 		
 		scheduler.scheduleWithFixedDelay(new Runnable() {
-			
 			// Just run update on the VOMS trust store and log any error
 			public void run() {
-				try{
-					
-					update();
-					
-				}catch(Throwable e){
-					log.error("Error updating VOMS trust store: "+e.getMessage(),e);	
-				}
+				update();
 			}
 		}, 
 		frequency, // First execution delay 
@@ -101,15 +98,20 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	}
 
 	public synchronized void update() {
-		log.debug("Starting VOMS trustore update...");
 		loadTrustInformation();
-		log.debug("VOMS trustore update finished.");
+		updateListener.notifyTrustStoreUpdate(this);
 	}
 
 	public synchronized void cancel() {
 		log.debug("Canceling update thread");
 		scheduler.shutdownNow();
 
+	}
+
+	public void setTrustStoreUpdateListener(
+			VOMSTrustStoreUpdateListener updateListener) {
+		this.updateListener = updateListener;
+		
 	}
 
 }
