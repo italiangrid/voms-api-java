@@ -16,6 +16,11 @@
     <assembly.java.dir>/usr/share/java</assembly.java.dir>
     <assembly.doc.dir>/usr/share/doc/${project.name}-${project.version}</assembly.doc.dir>
     <assembly.javadoc.dir>/usr/share/javadoc/${project.name}</assembly.javadoc.dir>
+    <junitVersion>4.10</junitVersion>
+    <canlVersion>1.1.0-SNAPSHOT</canlVersion>
+    <bcVersion>1.46</bcVersion>
+    <slf4jVersion>1.7.1</slf4jVersion>
+    <logbackVersion>1.0.7</logbackVersion>
   </properties>
 
   <developers>
@@ -96,32 +101,32 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.10</version>
+      <version>${junitVersion}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>eu.eu-emi.security</groupId>
       <artifactId>canl</artifactId>
-      <version>1.1.0-SNAPSHOT</version>
+      <version>${canlVersion}</version>
     </dependency>
     
     <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcmail-jdk16</artifactId>
-        <version>1.46</version>
+        <version>${bcVersion}</version>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.1</version>
+      <version>${slf4jVersion}</version>
     </dependency>
 
     <dependency>
   	  <groupId>ch.qos.logback</groupId>
  	   <artifactId>logback-classic</artifactId>
-  	  <version>1.0.7</version>
+  	  <version>${logbackVersion}</version>
   	  <scope>test</scope>
 	</dependency>
     
