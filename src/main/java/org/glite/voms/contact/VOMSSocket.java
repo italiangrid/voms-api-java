@@ -32,16 +32,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
 import java.security.Security;
 
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.emi.security.authn.x509.NamespaceCheckingMode;
+import eu.emi.security.authn.x509.impl.KeyAndCertCredential;
+import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
+import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
 
 /**
  * The {@link VOMSSocket} class is used to manage the creation of the gsi socket
@@ -97,37 +107,29 @@ public class VOMSSocket {
 
 	protected SSLSocketFactory getFactory() throws IOException,
 			GeneralSecurityException {
-		SSLSocketFactory socketFactory = null;
-
+		
 		if (Security.getProvider("BC") == null) {
 			Security.addProvider(new BouncyCastleProvider());
 		}
 		
+    context = SSLContext.getInstance("SSLv3");
 
-//		try {
-			context = SSLContext.getInstance("SSLv3");
-			log.debug("CONTEXT CREATED: " + context.getProtocol());
-			log.debug("Context: " + context);
-//			context.init(new VOMSKeyManager[] { new VOMSKeyManager(cred) },
-//					new VOMSTrustManager[] { new VOMSTrustManager("") },
-//					SecureRandom.getInstance("SHA1PRNG"));
+    KeyAndCertCredential credential = new KeyAndCertCredential(cred.getUserKey(), cred.getUserChain());
 
-			return context.getSocketFactory();
-//		} catch (SSLException e) {
-//			log.error("Error opening SSL socket: " + e.getMessage());
-//
-//			if (log.isDebugEnabled())
-//				log.debug(e.getMessage(), e);
-//			throw e;
-//		} catch (IOException e) {
-//
-//			log.error("Error opening SSL socket: " + e.getMessage());
-//
-//			if (log.isDebugEnabled())
-//				log.debug(e.getMessage(), e);
-//			throw e;
-//		}
+    KeyManager[] keyManagers = new KeyManager[] {credential.getKeyManager()};
 
+    OpensslCertChainValidator validator = new OpensslCertChainValidator(
+        DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS, 60000L);
+
+    X509TrustManager trustManager = SocketFactoryCreator.getSSLTrustManager(validator);
+
+    TrustManager[] trustManagers = new TrustManager[] {trustManager};
+
+    SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+
+    context.init(keyManagers, trustManagers, secureRandom);
+
+    return context.getSocketFactory();
 	}
 
 	protected void connect(String host, int port) throws IOException,
