@@ -83,9 +83,7 @@ In order to validate VOMS attributes one has to do the following:
 X509Certificate[] theChain = ...;
 
 VOMSACValidator validator = VOMSValidators.newValidator();
-validator.setCertificateChain(theChain);
-
-List<VOMSAttribute> vomsAttrs =  validator.validate();
+List<VOMSAttribute> vomsAttrs =  validator.validate(theChain);
 ```
 
 The VOMSAttribute interface provides access to all VOMS
