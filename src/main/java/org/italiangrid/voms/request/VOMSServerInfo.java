@@ -6,18 +6,39 @@ import java.net.URL;
  * This interface represents a VOMS server contact information,
  * typically provided in vomses files.
  * 
- * @see VOMSESLookupStrategy VOMSESParser
+ * @see VOMSESLookupStrategy 
+ * @see VOMSESParser
+ * 
  * @author cecco
  *
  */
 public interface VOMSServerInfo {
 
+	/**
+	 * Returns the alias for this {@link VOMSServerInfo}.
+	 * @return the alias
+	 */
 	public String getAlias();
 
+	/**
+	 * Returns the VO name for this {@link VOMSServerInfo}.
+	 * @return the vo name
+	 */
 	public String getVoName();
 	
+	/**
+	 * Returns the URL for this {@link VOMSServerInfo}.
+	 * @return the contact {@link URL}
+	 */
 	public URL getURL();
 	
+	/**
+	 * Returns the certificate subject as listed in the VOMSES configuration for this 
+	 * {@link VOMSServerInfo}
+	 * 
+	 * @return a string containing the certificate subject, 
+	 * enconded following the DN openssl slash-separated syntax
+	 */
 	public String getVOMSServerDN();
 
 }

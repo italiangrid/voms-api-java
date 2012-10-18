@@ -3,10 +3,21 @@ package org.italiangrid.voms.request;
 import org.glite.voms.contact.VOMSErrorMessage;
 import org.glite.voms.contact.VOMSWarningMessage;
 
+/**
+ * 
+ * @author andreaceccanti
+ *
+ */
 public interface VOMSResponse {
 
+	/**
+	 * @return <code>true</code> if this {@link VOMSResponse} has errors, <code>false</code> otherwise
+	 */
 	public boolean hasErrors();
 
+	/**
+	 * @return <code>true</code> if this {@link VOMSResponse} has warnings, <code>false</code> otherwise
+	 */
 	public boolean hasWarnings();
 
 	/**
@@ -32,6 +43,10 @@ public interface VOMSResponse {
 	 */
 	public VOMSErrorMessage[] errorMessages();
 
+	/**
+	 * Extracts the warning messags from the VOMS response.
+	 * @return an array of {@link VOMSWarningMessage} objects.
+	 */
 	public VOMSWarningMessage[] warningMessages();
 
 }

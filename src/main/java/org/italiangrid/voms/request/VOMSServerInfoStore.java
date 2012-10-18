@@ -3,7 +3,8 @@ package org.italiangrid.voms.request;
 import java.util.Set;
 
 /**
- * A 
+ * A store containing the contact information for locally trusted VOMS servers.
+ * 
  * @author cecco
  *
  */

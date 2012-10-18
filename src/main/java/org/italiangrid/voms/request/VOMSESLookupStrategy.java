@@ -4,8 +4,8 @@ import java.io.Reader;
 import java.util.List;
 
 /**
- * An strategy for building a set of paths where VOMSES files
- * live on the local filesystem.
+ * An strategy for building a list of {@link Reader} objects which will provide access
+ * to the local trusted VOMS server contact information.
  * 
  * @author cecco
  *
