@@ -26,17 +26,8 @@ public class DefaultVOMSACParser implements VOMSACParser {
 	private X509Certificate[] certChain;
 	
 	public synchronized List<VOMSAttribute> parse(X509Certificate[] validatedChain) {
-		
-		setCertificateChain(validatedChain);
-		return parse();
-	}
-
-	public synchronized void setCertificateChain(X509Certificate[] validatedChain) {
 		this.certChain = validatedChain;
-	}
-
-	protected X509Certificate[] getCertificateChain(){
-		return certChain;
+		return parse();
 	}
 	
 	public synchronized List<VOMSAttribute> parse() {
@@ -46,5 +37,33 @@ public class DefaultVOMSACParser implements VOMSACParser {
 		
 		List<ACParsingContext> parsedACs = acLookupStrategy.lookupVOMSAttributeCertificates(certChain);
 		return acNormalizationStrategy.normalizeAttributes(parsedACs);
+	}
+
+	/**
+	 * @return the certChain
+	 */
+	protected synchronized X509Certificate[] getCertChain() {
+		return certChain;
+	}
+
+	/**
+	 * @param certChain the certChain to set
+	 */
+	protected synchronized void setCertChain(X509Certificate[] certChain) {
+		this.certChain = certChain;
+	}
+
+	/**
+	 * @return the acLookupStrategy
+	 */
+	protected synchronized VOMSACLookupStrategy getAcLookupStrategy() {
+		return acLookupStrategy;
+	}
+
+	/**
+	 * @return the acNormalizationStrategy
+	 */
+	protected synchronized VOMSAttributesNormalizationStrategy getAcNormalizationStrategy() {
+		return acNormalizationStrategy;
 	}
 }

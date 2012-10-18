@@ -15,14 +15,6 @@ import org.italiangrid.voms.VOMSAttribute;
  *
  */
 public interface VOMSACValidator extends VOMSACParser {
-
-	/**
-	 * Parses and validates VOMS attributes in the certificate chain set by a former call to the {@link #setCertificateChain(X509Certificate[])}
-	 * method.
-	 * 
-	 * @return a possibly empty list of {@link VOMSAttribute} objects providing access to the parsed VOMS attributes
-	 */
-	public List<VOMSAttribute> validate();
 	
 	/**
 	 * Parses and validates the VOMS attributes found in the certificate chain passed 

@@ -56,7 +56,7 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 		
 		for (VOMSAttribute a: parsedAttrs){
 			
-			VOMSValidationResult result = validationStrategy.validateAC(a, getCertificateChain());
+			VOMSValidationResult result = validationStrategy.validateAC(a, getCertChain());
 			validationResultHandler.notifyValidationResult(result, a);
 			
 			if (result.isValid())
@@ -67,7 +67,7 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	}
 
 	public synchronized List<VOMSAttribute> validate(X509Certificate[] validatedChain) {
-		setCertificateChain(validatedChain);
+		setCertChain(validatedChain);
 		return validate();
 	}
 

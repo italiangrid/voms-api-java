@@ -8,20 +8,24 @@ import java.util.regex.Pattern;
 
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.LegacyVOMSValidator;
+import org.italiangrid.voms.ac.VOMSACValidator;
 
 public class LegacyVOMSValidatorAdapter implements
 		LegacyVOMSValidator {
 
-	private final DefaultVOMSValidator validator;
+	private final VOMSACValidator validator;
 	
-	public LegacyVOMSValidatorAdapter(X509Certificate cert) {
-		this(new X509Certificate[]{cert});
+	private ThreadLocal<X509Certificate[]> theChain;
+	
+	
+	public LegacyVOMSValidatorAdapter(X509Certificate certChain) {
+		this(new X509Certificate[]{certChain});
 	}
 	
 	public LegacyVOMSValidatorAdapter(X509Certificate[] certChain) {
 		
 		validator = new DefaultVOMSValidator();
-		validator.setCertificateChain(certChain);
+		theChain.set(certChain);
 	}
 	
 	public void cleanup() {
@@ -29,8 +33,8 @@ public class LegacyVOMSValidatorAdapter implements
 		validator.shutdown(); 
 	}
 
-	public void setClientChain(X509Certificate[] cert) {
-		validator.setCertificateChain(cert);
+	public void setClientChain(X509Certificate[] certChain) {
+		theChain.set(certChain);
 	}
 
 	public void parse() {
@@ -44,7 +48,7 @@ public class LegacyVOMSValidatorAdapter implements
 	}
 
 	public String[] getAllFullyQualifiedAttributes() {
-		List<VOMSAttribute> attributes = validator.validate();
+		List<VOMSAttribute> attributes = validator.validate(theChain.get());
 		List<String> allFQANs = new ArrayList<String>();
 		
 		for (VOMSAttribute a: attributes)
@@ -54,7 +58,7 @@ public class LegacyVOMSValidatorAdapter implements
 	}
 
 	public List<VOMSAttribute> getVOMSAttributes() {
-		List<VOMSAttribute> attributes = validator.validate();
+		List<VOMSAttribute> attributes = validator.validate(theChain.get());
 		return attributes;
 	}
 
