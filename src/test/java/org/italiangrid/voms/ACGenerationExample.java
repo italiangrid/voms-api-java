@@ -1,6 +1,5 @@
 package org.italiangrid.voms;
 
-import org.italiangrid.voms.asn1.VOMSACGenerator;
 
 public class ACGenerationExample {
 	String aaCert = "src/test/resources/certs/test_host_cnaf_infn_it.cert.pem";

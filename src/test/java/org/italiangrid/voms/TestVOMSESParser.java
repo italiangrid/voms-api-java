@@ -22,6 +22,7 @@ public class TestVOMSESParser {
 		VOMSESParser parser = VOMSESParserFactory.newVOMSESParser();
 		
 		try{
+			@SuppressWarnings("unused")
 			List<VOMSServerInfo> info = parser.parse(new File(nonExistentFile));
 		}catch(VOMSError e){
 			Assert.assertEquals("VOMSES file does not exist: "+nonExistentFile, e.getMessage());
@@ -38,6 +39,7 @@ public class TestVOMSESParser {
 		String dir =  "/";
 		
 		try{
+			@SuppressWarnings("unused")
 			List<VOMSServerInfo> info = parser.parse(new File(dir));
 			
 		}catch(VOMSError e){

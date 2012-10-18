@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.junit.Test;
 
@@ -29,6 +28,7 @@ public class TestDefaultVOMSTrustStore {
 	@Test(expected=VOMSError.class)
 	public void testEmptyTrustDirsFailure(){
 
+		@SuppressWarnings({ "unused", "unchecked" })
 		DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(Collections.EMPTY_LIST);
 				
 	}
@@ -37,6 +37,7 @@ public class TestDefaultVOMSTrustStore {
 	public void testNonExistentTrustDirsFailure(){
 		List<String> trustDirs = Arrays.asList(new String[]{"/etc/do/not/exist", "/etc/grid-security/vomsdir" });
 		
+		@SuppressWarnings("unused")
 		DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
 	}
 	
@@ -58,6 +59,7 @@ public class TestDefaultVOMSTrustStore {
 		
 		List<String> trustDirs = Arrays.asList(new String[]{"src/test/resources/empty-voms-dir"});
 		
+		@SuppressWarnings("unused")
 		DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
 		
 	}

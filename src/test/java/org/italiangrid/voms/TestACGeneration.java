@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.italiangrid.voms.ac.VOMSACValidator;
@@ -43,11 +42,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.emi.security.authn.x509.helpers.proxy.ProxyCertificateImpl;
-import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
-import eu.emi.security.authn.x509.proxy.CertificateExtension;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 import eu.emi.security.authn.x509.proxy.ProxyCertificateOptions;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
@@ -101,7 +97,7 @@ public class TestACGeneration {
 	
 	static VOMSACGenerator defaultGenerator;
 	
-	@SuppressWarnings("unused")
+	
 	@BeforeClass
 	static public void classTestSetup() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
 		
@@ -130,7 +126,7 @@ public class TestACGeneration {
 		defaultGenerator = new VOMSACGenerator(aaCredential, defaultVO, defaultHost, port);
 	}
 	
-	@SuppressWarnings("unused")
+	
 	@AfterClass
 	static public void classTestShutdown(){
 		certValidator.dispose();

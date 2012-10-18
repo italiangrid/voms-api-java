@@ -1,13 +1,15 @@
 package org.italiangrid.voms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 
-import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultLSCFileParser;
 import org.italiangrid.voms.store.impl.LSCFile;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class TestLSCParser {
 
@@ -48,6 +50,7 @@ public class TestLSCParser {
 		
 		try{
 			
+			@SuppressWarnings("unused")
 			LSCFile f = parser.parse("vo", "host", nonExistentFile);
 		
 		}catch(VOMSError e){
