@@ -23,7 +23,7 @@
  * follows.
  *
  *********************************************************************/
-package org.glite.voms.contact;
+package org.italiangrid.voms.credential;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,6 +41,7 @@ import java.util.Enumeration;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.openssl.PasswordFinder;
+import org.glite.voms.contact.VOMSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

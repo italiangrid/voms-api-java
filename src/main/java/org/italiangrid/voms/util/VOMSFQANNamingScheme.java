@@ -24,11 +24,12 @@
  * follows.
  *
  *********************************************************************/
-package org.glite.voms.contact;
+package org.italiangrid.voms.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.glite.voms.contact.VOMSSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +42,10 @@ import org.slf4j.LoggerFactory;
  * 
  * 
  */
-public class PathNamingScheme {
+public class VOMSFQANNamingScheme {
 
 	public static final Logger log = LoggerFactory
-			.getLogger(PathNamingScheme.class);
+			.getLogger(VOMSFQANNamingScheme.class);
 
 	public static final String containerSyntax = "^(/[\\w.-]+)+|((/[\\w.-]+)+/)?(Role=[\\w.-]+)|(Capability=[\\w\\s.-]+)$";
 

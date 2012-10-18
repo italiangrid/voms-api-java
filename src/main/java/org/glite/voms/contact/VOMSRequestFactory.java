@@ -34,6 +34,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.italiangrid.voms.util.VOMSFQANNamingScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -232,18 +233,18 @@ public class VOMSRequestFactory {
 
 			if (FQAN.equals("all")) {
 				frag.allCommand();
-			} else if (PathNamingScheme.isGroup(FQAN)) {
+			} else if (VOMSFQANNamingScheme.isGroup(FQAN)) {
 
 				frag.groupCommand(FQAN);
 
-			} else if (PathNamingScheme.isRole(FQAN)) {
+			} else if (VOMSFQANNamingScheme.isRole(FQAN)) {
 
-				frag.roleCommand(PathNamingScheme.getRoleName(FQAN));
+				frag.roleCommand(VOMSFQANNamingScheme.getRoleName(FQAN));
 
-			} else if (PathNamingScheme.isQualifiedRole(FQAN)) {
+			} else if (VOMSFQANNamingScheme.isQualifiedRole(FQAN)) {
 
-				frag.mappingCommand(PathNamingScheme.getGroupName(FQAN),
-						PathNamingScheme.getRoleName(FQAN));
+				frag.mappingCommand(VOMSFQANNamingScheme.getGroupName(FQAN),
+						VOMSFQANNamingScheme.getRoleName(FQAN));
 			}
 		}
 
@@ -296,8 +297,8 @@ class VOMSRequestFragment {
 			return "";
 
 		for (int i = 0; i < FQANs.length; i++) {
-			if (PathNamingScheme.isQualifiedRole(FQANs[i]))
-				FQANs[i] = PathNamingScheme.toOldQualifiedRoleSyntax(FQANs[i]);
+			if (VOMSFQANNamingScheme.isQualifiedRole(FQANs[i]))
+				FQANs[i] = VOMSFQANNamingScheme.toOldQualifiedRoleSyntax(FQANs[i]);
 		}
 
 		return StringUtils.join(FQANs, ",");

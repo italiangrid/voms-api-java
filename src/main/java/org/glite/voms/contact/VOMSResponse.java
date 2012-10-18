@@ -26,11 +26,12 @@
  *********************************************************************/
 package org.glite.voms.contact;
 
+import org.italiangrid.voms.util.VOMSBase64Decoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -48,6 +49,9 @@ public class VOMSResponse {
 
 	protected Document xmlResponse;
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSResponseIF#hasErrors()
+	 */
 	public boolean hasErrors() {
 		// handle REST case first
 		if (xmlResponse.getElementsByTagName("error").getLength() != 0)
@@ -58,6 +62,9 @@ public class VOMSResponse {
 				.getElementsByTagName("ac").getLength() == 0));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSResponseIF#hasWarnings()
+	 */
 	public boolean hasWarnings() {
 		// handle REST case first
 		if (xmlResponse.getElementsByTagName("warning").getLength() != 0)
@@ -68,18 +75,15 @@ public class VOMSResponse {
 				.getElementsByTagName("ac").getLength() != 0));
 	}
 
-	/**
-	 * 
-	 * Extracts the AC from the VOMS response.
-	 * 
-	 * @return an array of bytes containing the AC.
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSResponseIF#getAC()
 	 */
 	public byte[] getAC() {
 
 		Element acElement = (Element) xmlResponse.getElementsByTagName("ac")
 				.item(0);
 
-		return VOMSDecoder.decode(acElement.getFirstChild().getNodeValue());
+		return VOMSBase64Decoder.decode(acElement.getFirstChild().getNodeValue());
 
 	}
 
@@ -95,15 +99,13 @@ public class VOMSResponse {
 				.getElementsByTagName("bitstr").item(0);
 
 		if (acElement != null)
-			return VOMSDecoder.decode(acElement.getFirstChild().getNodeValue());
+			return VOMSBase64Decoder.decode(acElement.getFirstChild().getNodeValue());
 		else
 			return null;
 	}
 
-	/**
-	 * Extracts the version from the VOMS response.
-	 * 
-	 * @return an integer containing the AC.
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSResponseIF#getVersion()
 	 */
 	public int getVersion() {
 		Element versionElement = (Element) xmlResponse.getElementsByTagName(
@@ -128,11 +130,8 @@ public class VOMSResponse {
 
 	}
 
-	/**
-	 * 
-	 * Extracts the error messages from the VOMS response.
-	 * 
-	 * @return an array of {@link VOMSErrorMessage} objects.
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSResponseIF#errorMessages()
 	 */
 	public VOMSErrorMessage[] errorMessages() {
 
@@ -202,6 +201,9 @@ public class VOMSResponse {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSResponseIF#warningMessages()
+	 */
 	public VOMSWarningMessage[] warningMessages() {
 		VOMSWarningMessage[] result = warningMessagesREST();
 		if (result != null)

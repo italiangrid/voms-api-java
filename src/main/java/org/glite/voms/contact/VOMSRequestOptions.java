@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.italiangrid.voms.request.VOMSACRequest;
+
 /**
  * 
  * This class represents options that constitute VOMS requests.
@@ -36,7 +38,7 @@ import java.util.List;
  * @author Andrea Ceccanti
  * 
  */
-public class VOMSRequestOptions {
+public class VOMSRequestOptions implements VOMSACRequest {
 
 	/**
 	 * The default lifetime value for voms requests is 86400 seconds. This
@@ -71,8 +73,8 @@ public class VOMSRequestOptions {
 
 	private boolean requestList = false;
 
-	/**
-	 * @return the lifetime set for this {@link VOMSRequestOptions} object.
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSRequest#getLifetime()
 	 */
 	public int getLifetime() {
 
@@ -109,9 +111,8 @@ public class VOMSRequestOptions {
 		this.ordering = ordering;
 	}
 
-	/**
-	 * @return the list of the requested FQANs specified in this
-	 *         {@link VOMSRequestOptions} object.
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSRequest#getRequestedFQANs()
 	 */
 	public List getRequestedFQANs() {
 
@@ -130,9 +131,8 @@ public class VOMSRequestOptions {
 		this.requestedFQANs = requestedFQANs;
 	}
 
-	/**
-	 * @return the list of targets (i.e., host where the requested ACs will be
-	 *         valid) for this {@link VOMSRequestOptions} object.
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSRequest#getTargets()
 	 */
 	public List getTargets() {
 
@@ -171,6 +171,9 @@ public class VOMSRequestOptions {
 		this.verificationType = verificationType;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSRequest#getVoName()
+	 */
 	public String getVoName() {
 
 		return voName;

@@ -23,9 +23,13 @@
  * follows.
  *
  *********************************************************************/
-package org.glite.voms.contact;
+package org.italiangrid.voms.request.impl;
+
+import java.net.URL;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.glite.voms.contact.VOMSESFileParser;
+import org.italiangrid.voms.request.VOMSServerInfo;
 
 /**
  * 
@@ -36,7 +40,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Vincenzo Ciaschini
  * 
  */
-public class VOMSServerInfo {
+public class VOMSServerInfoImpl implements VOMSServerInfo{
 
 	String hostName;
 	int port;
@@ -45,6 +49,9 @@ public class VOMSServerInfo {
 	String globusVersion;
 	String alias;
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerInfoIF#getAlias()
+	 */
 	public String getAlias() {
 		return alias;
 	}
@@ -53,7 +60,10 @@ public class VOMSServerInfo {
 		this.alias = alias;
 	}
 
-	public String getHostDn() {
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerInfoIF#getHostDn()
+	 */
+	public String getVOMSServerDN() {
 
 		return hostDn;
 	}
@@ -63,6 +73,9 @@ public class VOMSServerInfo {
 		this.hostDn = hostDn;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerInfoIF#getHostName()
+	 */
 	public String getHostName() {
 
 		return hostName;
@@ -73,6 +86,9 @@ public class VOMSServerInfo {
 		this.hostName = hostname;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerInfoIF#getPort()
+	 */
 	public int getPort() {
 
 		return port;
@@ -83,6 +99,9 @@ public class VOMSServerInfo {
 		this.port = port;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerInfoIF#getVoName()
+	 */
 	public String getVoName() {
 
 		return voName;
@@ -93,6 +112,9 @@ public class VOMSServerInfo {
 		this.voName = voName;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerInfoIF#getGlobusVersionAsInt()
+	 */
 	public int getGlobusVersionAsInt() {
 
 		if (globusVersion == null)
@@ -101,6 +123,9 @@ public class VOMSServerInfo {
 		return (int) (Integer.parseInt(globusVersion) / 10);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerInfoIF#getGlobusVersion()
+	 */
 	public String getGlobusVersion() {
 
 		return globusVersion;
@@ -116,10 +141,10 @@ public class VOMSServerInfo {
 		if (this == obj)
 			return true;
 
-		if (!(obj instanceof VOMSServerInfo))
+		if (!(obj instanceof VOMSServerInfoImpl))
 			return false;
 
-		VOMSServerInfo other = (VOMSServerInfo) obj;
+		VOMSServerInfoImpl other = (VOMSServerInfoImpl) obj;
 
 		if (other.getHostName() != null) {
 			if (this.hostName.equals(other.getHostName())) {
@@ -138,8 +163,8 @@ public class VOMSServerInfo {
 		return 29 * result + port;
 	}
 
-	public static VOMSServerInfo fromStringArray(String[] tokens) {
-		VOMSServerInfo info = new VOMSServerInfo();
+	public static VOMSServerInfoImpl fromStringArray(String[] tokens) {
+		VOMSServerInfoImpl info = new VOMSServerInfoImpl();
 
 		info.setVoName(tokens[4]);
 		info.setHostName(tokens[1]);
@@ -155,7 +180,10 @@ public class VOMSServerInfo {
 
 	}
 
-	public String compactString() {
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerInfoIF#compactString()
+	 */
+	public String asString() {
 
 		return "[vo=" + voName + ",host=" + hostName + ",port=" + port
 				+ ",hostDN=" + hostDn + ",globusVersion=" + globusVersion + "]";
@@ -165,5 +193,10 @@ public class VOMSServerInfo {
 
 		return ToStringBuilder.reflectionToString(this);
 
+	}
+
+	public URL getURL() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

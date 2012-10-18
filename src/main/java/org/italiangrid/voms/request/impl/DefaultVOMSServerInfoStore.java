@@ -23,20 +23,27 @@
  * follows.
  *
  *********************************************************************/
-package org.glite.voms.contact;
+package org.italiangrid.voms.request.impl;
 
+import java.io.Reader;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
+import org.glite.voms.contact.VOMSESFileParser;
+import org.italiangrid.voms.request.VOMSESLookupStrategy;
+import org.italiangrid.voms.request.VOMSESParser;
+import org.italiangrid.voms.request.VOMSServerInfo;
+import org.italiangrid.voms.request.VOMSServerInfoStore;
 
 /**
  * 
- * A {@link VOMSServerMap} organizes voms servers found in vomses configuration
+ * A {@link DefaultVOMSServerInfoStore} organizes voms servers found in vomses configuration
  * files in map keyed by vo. This way is easy to know which servers acts as
  * replicas for the same vos. For more info about vomses configuration files,
  * see {@link VOMSESFileParser}.
@@ -45,11 +52,23 @@ import org.apache.commons.lang.StringUtils;
  * @author Vincenzo Ciaschini
  * 
  */
-public class VOMSServerMap {
+public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 
 	protected Map map = new TreeMap();
+	
+	private VOMSESLookupStrategy lookupStrategy;
+	
+	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy) {
+		
+	}
 
-	public void add(VOMSServerInfo info) {
+	public DefaultVOMSServerInfoStore() {
+		// TODO Auto-generated constructor stub
+	}
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerMapIF#add(org.italiangrid.voms.request.VOMSServerInfo)
+	 */
+	public void addVOMSServerInfo(VOMSServerInfo info) {
 		String key = info.getAlias();
 
 		if (map.containsKey(key)) {
@@ -64,12 +83,18 @@ public class VOMSServerMap {
 		map.put(key, l);
 	}
 
-	public Set get(String nick) {
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerMapIF#get(java.lang.String)
+	 */
+	public Set getVOMSServerInfo(String nick) {
 
 		return (Set) map.get(nick);
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerMapIF#serverCount(java.lang.String)
+	 */
 	public int serverCount(String nick) {
 
 		if (map.containsKey(nick))
@@ -78,12 +103,10 @@ public class VOMSServerMap {
 		return 0;
 	}
 
-	/**
-	 * Merge this map with another {@link VOMSServerMap} object.
-	 * 
-	 * @param other
+	/* (non-Javadoc)
+	 * @see org.glite.voms.contact.VOMSServerMapIF#merge(org.glite.voms.contact.VOMSServerMap)
 	 */
-	public void merge(VOMSServerMap other) {
+	public void merge(DefaultVOMSServerInfoStore other) {
 
 		Iterator i = other.map.entrySet().iterator();
 
@@ -91,7 +114,7 @@ public class VOMSServerMap {
 			Map.Entry e = (Entry) i.next();
 
 			if (map.containsKey(e.getKey()))
-				get((String) e.getKey()).addAll((Set) e.getValue());
+				getVOMSServerInfo((String) e.getKey()).addAll((Set) e.getValue());
 			else
 				map.put(e.getKey(), e.getValue());
 		}
@@ -120,5 +143,15 @@ public class VOMSServerMap {
 
 		return buf.toString();
 
+	}
+
+	public Set<VOMSServerInfo> getVOMSServerInfo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void merge(VOMSServerInfoStore other) {
+		// TODO Auto-generated method stub
+		
 	}
 }

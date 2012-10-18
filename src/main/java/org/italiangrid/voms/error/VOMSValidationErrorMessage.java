@@ -12,7 +12,7 @@ import java.util.ResourceBundle;
  */
 public class VOMSValidationErrorMessage {
 	
-	static final String ERROR_BUNDLE = VOMSValidationErrorMessage.class.getPackage().getName()+"."+"errors";
+	static final String ERROR_BUNDLE = VOMSValidationErrorMessage.class.getPackage().getName()+"."+"validationErrors";
 	
 	private VOMSValidationErrorCode errorCode;
 	private String message;

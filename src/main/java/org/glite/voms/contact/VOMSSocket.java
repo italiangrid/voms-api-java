@@ -45,6 +45,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
+import org.italiangrid.voms.credential.UserCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

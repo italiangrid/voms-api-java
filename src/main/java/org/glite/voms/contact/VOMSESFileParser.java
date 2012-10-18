@@ -36,6 +36,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.italiangrid.voms.request.VOMSServerInfoStore;
+import org.italiangrid.voms.request.impl.VOMSServerInfoImpl;
+import org.italiangrid.voms.request.impl.DefaultVOMSServerInfoStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,10 +157,10 @@ public class VOMSESFileParser {
 		return tokens;
 	}
 
-	private VOMSServerMap parseDir(File vomsesDir) throws IOException {
+	private DefaultVOMSServerInfoStore parseDir(File vomsesDir) throws IOException {
 
 		File[] allFiles = vomsesDir.listFiles();
-		VOMSServerMap result = new VOMSServerMap();
+		DefaultVOMSServerInfoStore result = new DefaultVOMSServerInfoStore();
 
 		log.debug("Parsing vomses dir:" + vomsesDir);
 
@@ -168,16 +171,16 @@ public class VOMSESFileParser {
 
 	}
 
-	VOMSServerMap parse(String fileName) throws IOException {
+	VOMSServerInfoStore parse(String fileName) throws IOException {
 
 		return parse(new File(fileName));
 	}
 
-	private VOMSServerMap parse(File vomsesFile) throws IOException {
+	private DefaultVOMSServerInfoStore parse(File vomsesFile) throws IOException {
 
 		BufferedReader reader = null;
 
-		VOMSServerMap result = new VOMSServerMap();
+		DefaultVOMSServerInfoStore result = new DefaultVOMSServerInfoStore();
 
 		if (vomsesFile.isDirectory())
 			return parseDir(vomsesFile);
@@ -220,7 +223,7 @@ public class VOMSESFileParser {
 				throw new VOMSException("Syntax error on vomses file!");
 			}
 
-			result.add(VOMSServerInfo.fromStringArray(tokens));
+			result.addVOMSServerInfo(VOMSServerInfoImpl.fromStringArray(tokens));
 
 		}
 
@@ -230,17 +233,17 @@ public class VOMSESFileParser {
 	}
 
 	/**
-	 * This method is used to build a {@link VOMSServerMap} object starting from
+	 * This method is used to build a {@link DefaultVOMSServerInfoStore} object starting from
 	 * vomses configuration files or directories.
 	 * 
 	 * 
-	 * @return a {@link VOMSServerMap} object that reflects vomses configuration
+	 * @return a {@link DefaultVOMSServerInfoStore} object that reflects vomses configuration
 	 *         files.
 	 * @throws IOException
 	 *             if a parsing error occurs, or no vomses file is found.
 	 * 
 	 */
-	public VOMSServerMap buildServerMap() throws IOException {
+	public VOMSServerInfoStore buildServerMap() throws IOException {
 
 		Iterator<File> i = vomsesPaths.iterator();
 
@@ -251,7 +254,7 @@ public class VOMSESFileParser {
 
 		}
 
-		VOMSServerMap result = new VOMSServerMap();
+		VOMSServerInfoStore result = new DefaultVOMSServerInfoStore();
 
 		while (i.hasNext()) {
 

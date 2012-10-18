@@ -25,7 +25,7 @@
  * follows.
  *
  *********************************************************************/
-package org.glite.voms.contact;
+package org.italiangrid.voms.util;
 
 // Gidon Moont
 // Imperial College London
@@ -45,7 +45,7 @@ import org.bouncycastle.util.encoders.Base64;
  * @author Vincenzo Ciaschini
  * 
  */
-public class VOMSDecoder {
+public class VOMSBase64Decoder {
 
 	// matrix out of src/common/xml.c
 	private static int[] decodemapint = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0,

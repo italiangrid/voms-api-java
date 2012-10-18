@@ -50,6 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
+import org.italiangrid.voms.credential.UserCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
