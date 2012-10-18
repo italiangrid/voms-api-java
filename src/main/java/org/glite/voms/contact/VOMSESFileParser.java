@@ -37,7 +37,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
-import org.italiangrid.voms.request.impl.VOMSServerInfoImpl;
 import org.italiangrid.voms.request.impl.DefaultVOMSServerInfoStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,7 +222,7 @@ public class VOMSESFileParser {
 				throw new VOMSException("Syntax error on vomses file!");
 			}
 
-			result.addVOMSServerInfo(VOMSServerInfoImpl.fromStringArray(tokens));
+			// result.addVOMSServerInfo(VOMSServerInfoImpl.fromStringArray(tokens));
 
 		}
 

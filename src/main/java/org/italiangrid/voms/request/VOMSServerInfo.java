@@ -1,5 +1,6 @@
 package org.italiangrid.voms.request;
 
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -28,9 +29,9 @@ public interface VOMSServerInfo {
 	
 	/**
 	 * Returns the URL for this {@link VOMSServerInfo}.
-	 * @return the contact {@link URL}
+	 * @return the contact {@link URI}
 	 */
-	public URL getURL();
+	public URI getURL();
 	
 	/**
 	 * Returns the certificate subject as listed in the VOMSES configuration for this 
