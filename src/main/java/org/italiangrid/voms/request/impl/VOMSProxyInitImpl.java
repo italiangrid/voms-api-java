@@ -10,7 +10,7 @@ import eu.emi.security.authn.x509.impl.PEMCredential;
 /**
  * The default {@link VOMSProxyInit} functionality implementation.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class VOMSProxyInitImpl implements VOMSProxyInit {

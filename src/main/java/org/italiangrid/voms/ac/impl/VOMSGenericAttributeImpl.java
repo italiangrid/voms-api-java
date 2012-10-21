@@ -4,7 +4,7 @@ import org.italiangrid.voms.VOMSGenericAttribute;
 
 /**
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class VOMSGenericAttributeImpl implements VOMSGenericAttribute{

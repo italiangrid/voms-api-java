@@ -31,25 +31,6 @@ public class TestVOMSESParser {
 		
 		Assert.fail("Parsing of non existent VOMSES file succeeded.");
 	}
-	
-	@Test
-	public void testDirectoryParsingFailure(){
-		
-		VOMSESParser parser = VOMSESParserFactory.newVOMSESParser();
-		String dir =  "/";
-		
-		try{
-			@SuppressWarnings("unused")
-			List<VOMSServerInfo> info = parser.parse(new File(dir));
-			
-		}catch(VOMSError e){
-			Assert.assertEquals("VOMSES file is a directory: "+dir, e.getMessage());
-			return;
-		}
-		
-		Assert.fail("Parsing of directory succeeded.");
-		
-	}
 
 	@Test
 	public void testValidStringParsing() throws URISyntaxException{
@@ -70,7 +51,7 @@ public class TestVOMSESParser {
 	
 	@Test
 	public void testValidFileParsing() throws URISyntaxException{
-		String vomsesFile = "src/test/resources/vomses/vomses";
+		String vomsesFile = "src/test/resources/vomses/eumed";
 		VOMSESParser parser = VOMSESParserFactory.newVOMSESParser();
 		List<VOMSServerInfo> info = parser.parse(new File(vomsesFile));
 		Assert.assertEquals(2, info.size());
@@ -81,11 +62,22 @@ public class TestVOMSESParser {
 		Assert.assertEquals(new URI("voms://voms-02.pd.infn.it:15016"), pdVoms.getURL());
 		Assert.assertEquals("/C=IT/O=INFN/OU=Host/L=Padova/CN=voms-02.pd.infn.it", pdVoms.getVOMSServerDN());
 		
-		// "eumed" "voms2.cnaf.infn.it" "15016" "/C=IT/O=INFN/OU=Host/L=CNAF/CN=voms2.cnaf.infn.it" "eumed"
+		
 		VOMSServerInfo cnafVoms = info.get(1);
 		Assert.assertEquals("eumed", cnafVoms.getAlias());
 		Assert.assertEquals("eumed", cnafVoms.getVoName());
 		Assert.assertEquals(new URI("voms://voms2.cnaf.infn.it:15016"), cnafVoms.getURL());
 		Assert.assertEquals("/C=IT/O=INFN/OU=Host/L=CNAF/CN=voms2.cnaf.infn.it", cnafVoms.getVOMSServerDN());
+	}
+	
+	@Test
+	public void testValidDirectoryParsing() throws URISyntaxException{
+		String vomsesDir = "src/test/resources/vomses";
+		VOMSESParser parser = VOMSESParserFactory.newVOMSESParser();
+		List<VOMSServerInfo> info = parser.parse(new File(vomsesDir));
+		Assert.assertEquals(5, info.size());
+		
+		System.out.println(info);
+		
 	}
 }

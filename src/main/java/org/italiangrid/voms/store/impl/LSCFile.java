@@ -22,7 +22,7 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
  *  Two {@link LSCFile} object are considered to be equal if their vo and hostname fields match.
  *  See the {@link #equals()} and {@link #hashCode()} implementation. 
  *  
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class LSCFile implements LSCInfo{

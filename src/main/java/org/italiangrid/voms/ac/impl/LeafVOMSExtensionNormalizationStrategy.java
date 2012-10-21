@@ -13,7 +13,7 @@ import org.italiangrid.voms.asn1.VOMSConstants;
  * This strategy extracts the VOMS attributes from the top VOMS extension found 
  * in the parsing context passed as argument.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class LeafVOMSExtensionNormalizationStrategy implements

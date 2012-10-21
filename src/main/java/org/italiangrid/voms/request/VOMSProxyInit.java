@@ -11,7 +11,7 @@ import eu.emi.security.authn.x509.impl.PEMCredential;
  * An interface describing the process of requesting attributes from a VOMS server and generating
  * a proxy embedding the received attributes.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSProxyInit {

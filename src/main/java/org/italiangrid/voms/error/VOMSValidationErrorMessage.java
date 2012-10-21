@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 /**
  * A VOMS validation error message class (freely inspired by the CANL validation error message class).
  * 
- * @author cecco
+ * @author Andrea Ceccanti
  *
  */
 public class VOMSValidationErrorMessage {

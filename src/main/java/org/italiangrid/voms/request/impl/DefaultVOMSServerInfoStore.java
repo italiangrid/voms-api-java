@@ -25,133 +25,96 @@
  *********************************************************************/
 package org.italiangrid.voms.request.impl;
 
-import java.io.Reader;
+import java.io.File;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
-import org.glite.voms.contact.VOMSESFileParser;
+import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
  * A {@link DefaultVOMSServerInfoStore} organizes voms servers found in vomses configuration
  * files in map keyed by vo. This way is easy to know which servers acts as
- * replicas for the same vos. For more info about vomses configuration files,
- * see {@link VOMSESFileParser}.
+ * replicas for the same vos. 
  * 
  * @author Andrea Ceccanti
- * @author Vincenzo Ciaschini
+ * 
  * 
  */
 public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 
-	protected Map map = new TreeMap();
+	public static final Logger log = LoggerFactory.getLogger(DefaultVOMSServerInfoStore.class);
 	
 	private VOMSESLookupStrategy lookupStrategy;
 	
-	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy) {
-		
-	}
-
+	protected Map<String, Set<VOMSServerInfo>> serverInfoStore = new TreeMap<String, Set<VOMSServerInfo>>();
+	private VOMSESParser vomsesParser;
+	
 	public DefaultVOMSServerInfoStore() {
-		// TODO Auto-generated constructor stub
+		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl());
 	}
-	/* (non-Javadoc)
-	 * @see org.glite.voms.contact.VOMSServerMapIF#add(org.italiangrid.voms.request.VOMSServerInfo)
-	 */
+	
+	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy){
+		this(lookupStrategy, new LegacyVOMSESParserImpl());
+	}
+	
+	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy, VOMSESParser parser) {
+		this.lookupStrategy = lookupStrategy;
+		this.vomsesParser = parser;
+		initializeStore();
+	}
+
 	public void addVOMSServerInfo(VOMSServerInfo info) {
-		String key = info.getAlias();
-
-		if (map.containsKey(key)) {
-
-			Set servers = (Set) map.get(key);
-			servers.add(info);
-			return;
+		
+		if (serverInfoStore.containsKey(info.getVoName())){
+			
+			serverInfoStore.get(info.getVoName()).add(info);
+			
+		}else{
+			
+			Set<VOMSServerInfo> siCont = new HashSet<VOMSServerInfo>();
+			siCont.add(info);
+			serverInfoStore.put(info.getVoName(), siCont);
 		}
-
-		Set l = new HashSet();
-		l.add(info);
-		map.put(key, l);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.glite.voms.contact.VOMSServerMapIF#get(java.lang.String)
-	 */
-	public Set getVOMSServerInfo(String nick) {
-
-		return (Set) map.get(nick);
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.glite.voms.contact.VOMSServerMapIF#serverCount(java.lang.String)
-	 */
-	public int serverCount(String nick) {
-
-		if (map.containsKey(nick))
-			return ((Set) map.get(nick)).size();
-
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.glite.voms.contact.VOMSServerMapIF#merge(org.glite.voms.contact.VOMSServerMap)
-	 */
-	public void merge(DefaultVOMSServerInfoStore other) {
-
-		Iterator i = other.map.entrySet().iterator();
-
-		while (i.hasNext()) {
-			Map.Entry e = (Entry) i.next();
-
-			if (map.containsKey(e.getKey()))
-				getVOMSServerInfo((String) e.getKey()).addAll((Set) e.getValue());
-			else
-				map.put(e.getKey(), e.getValue());
-		}
-	}
-
-	public String toString() {
-
-		if (map == null || map.isEmpty())
-			return "[]";
-
-		StringBuilder buf = new StringBuilder();
-
-		Iterator i = map.entrySet().iterator();
-		buf.append("VOMSServerMap:[\n");
-
-		while (i.hasNext()) {
-			Map.Entry e = (Entry) i.next();
-
-			buf.append(e.getKey() + ":\n");
-			buf.append("\tnum_servers: " + ((Set) e.getValue()).size() + "\n");
-			buf.append("\tserver_details: \n\t\t"
-					+ StringUtils.join(((Set) e.getValue()).iterator(),
-							"\n\t\t") + "\n");
-		}
-		buf.append("]\n");
-
-		return buf.toString();
-
 	}
 
 	public Set<VOMSServerInfo> getVOMSServerInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<VOMSServerInfo> allEntries = new HashSet<VOMSServerInfo>();
+		
+		for (Map.Entry<String, Set<VOMSServerInfo>> entry: serverInfoStore.entrySet())
+			allEntries.addAll(entry.getValue());
+		
+		return allEntries;
 	}
 
-	public void merge(VOMSServerInfoStore other) {
-		// TODO Auto-generated method stub
+	public Set<VOMSServerInfo> getVOMSServerInfo(String voAlias) {
+		return serverInfoStore.get(voAlias);
+	}
+
+	private void initializeStore() {
 		
+		List<File> vomsesPaths = lookupStrategy.lookupVomsesInfo();
+		
+		if (vomsesPaths.isEmpty())
+			throw new VOMSError("No VOMSES path found in local system.");
+		
+		for (File f: vomsesPaths){
+			log.debug("Looking for VOMSES information in {}", f.getAbsolutePath());
+			List<VOMSServerInfo> vomsServerInfo  = vomsesParser.parse(f);
+			for (VOMSServerInfo si: vomsServerInfo)
+				addVOMSServerInfo(si);
+		}
+		
+		if (serverInfoStore.isEmpty())
+			throw new VOMSError("No VOMSES contact information found in local system.");
 	}
 }

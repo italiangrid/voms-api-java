@@ -21,7 +21,7 @@ import eu.emi.security.authn.x509.proxy.ProxyUtils;
  * This strategy returns the leaf VOMS Attribute Certificate in a certificate chain, i.e.
  * the Attribute Certificate found in the latest delegation in the chain. 
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class LeafACLookupStrategy implements VOMSACLookupStrategy, VOMSConstants {

@@ -10,7 +10,7 @@ import java.net.URL;
  * @see VOMSESLookupStrategy 
  * @see VOMSESParser
  * 
- * @author cecco
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSServerInfo {

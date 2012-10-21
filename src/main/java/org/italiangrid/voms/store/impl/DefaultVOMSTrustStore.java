@@ -32,7 +32,7 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
  * The default implementation for the VOMS trust store. This implementation <b>does not</b> refresh the trust information
  * on a periodic basis. For an updating trust store see {@link DefaultUpdatingVOMSTrustStore}.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  * 
  */
 public class DefaultVOMSTrustStore implements VOMSTrustStore {

@@ -9,7 +9,7 @@ import org.italiangrid.voms.VOMSAttribute;
  * This interface defines the behavior of a VOMS Attribute Certificate parser.
  * 
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSACParser {

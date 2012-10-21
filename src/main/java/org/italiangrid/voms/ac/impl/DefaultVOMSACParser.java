@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Default implementation of the VOMS attribute certificate parsing logic.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class DefaultVOMSACParser implements VOMSACParser {

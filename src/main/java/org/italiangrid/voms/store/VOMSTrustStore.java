@@ -11,7 +11,7 @@ import javax.security.auth.x500.X500Principal;
  * The VOMS trust store takes care of parsing local trusted information (being certificates or LSC files)
  * for known VOMS servers.
  *  
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSTrustStore {

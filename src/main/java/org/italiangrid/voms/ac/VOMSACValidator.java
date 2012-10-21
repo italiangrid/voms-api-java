@@ -11,7 +11,7 @@ import org.italiangrid.voms.VOMSAttribute;
  * to perform validation on the VOMS Attribute Certificates parsed from a given
  * certificate chain.  
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSACValidator extends VOMSACParser {

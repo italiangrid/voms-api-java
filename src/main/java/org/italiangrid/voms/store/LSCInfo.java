@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface LSCInfo {

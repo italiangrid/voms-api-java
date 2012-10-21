@@ -9,7 +9,7 @@ import org.italiangrid.voms.VOMSError;
 /**
  * A VOMSES file parser.
  * 
- * @author cecco
+ * @author Andrea Ceccanti
  * 
  */
 public interface VOMSESParser {

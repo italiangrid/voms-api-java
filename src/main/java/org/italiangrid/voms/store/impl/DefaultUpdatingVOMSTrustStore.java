@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * once at VOMS trust store creation time.
  * 
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore implements

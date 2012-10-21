@@ -7,7 +7,7 @@ import java.util.List;
  * 
  * A strategy for looking up a set of VOMS Attribute Certificates from a certificate chain.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSACLookupStrategy {

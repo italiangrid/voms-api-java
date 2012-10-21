@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * A request for a VOMS Attribute certificate.
  * 
- * @author cecco
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSACRequest {

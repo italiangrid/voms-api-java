@@ -10,7 +10,7 @@ import org.bouncycastle.asn1.x509.X509Extension;
 /**
  * A set of useful constants for ASN.1 parsing of VOMS attributes.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSConstants {

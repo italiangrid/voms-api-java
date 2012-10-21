@@ -7,7 +7,7 @@ import org.italiangrid.voms.VOMSAttribute;
 /**
  * The strategy implemented to perform the validation of a VOMS attribute certificate.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSACValidationStrategy {

@@ -8,7 +8,7 @@ import org.italiangrid.voms.ac.impl.LegacyVOMSValidatorAdapter;
  * This class is deprecated, and is provided for partial backwards compatibility with
  * existing users of the VOMS Java APIs.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  * @deprecated
  *
  */

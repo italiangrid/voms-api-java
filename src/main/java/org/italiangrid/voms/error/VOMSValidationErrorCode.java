@@ -3,7 +3,7 @@ package org.italiangrid.voms.error;
 /**
  * VOMS validation error codes.
  * 
- * @author cecco
+ * @author Andrea Ceccanti
  *
  */
 public enum VOMSValidationErrorCode {

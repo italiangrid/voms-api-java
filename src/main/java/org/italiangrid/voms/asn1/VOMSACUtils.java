@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A set of VOMS AC handling utilities.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class VOMSACUtils implements VOMSConstants{

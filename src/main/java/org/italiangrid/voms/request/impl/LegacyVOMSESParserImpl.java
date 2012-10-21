@@ -2,13 +2,16 @@ package org.italiangrid.voms.request.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSESParser;
@@ -23,8 +26,6 @@ public class LegacyVOMSESParserImpl implements VOMSESParser {
 			throw new VOMSError("VOMSES file does not exist: "+f.getAbsolutePath());
 		if (!f.canRead())
 			throw new VOMSError("VOMSES file is not readable: "+f.getAbsolutePath());
-		if (f.isDirectory())
-			throw new VOMSError("VOMSES file is a directory: "+f.getAbsolutePath());
 	}
 	
 	private String[] splitLine(String line) {
@@ -104,9 +105,28 @@ public class LegacyVOMSESParserImpl implements VOMSESParser {
 		return result;
 	}
 
+	protected List<VOMSServerInfo> parseDirectory(File directory){
+		Set<VOMSServerInfo> joinedServerInfo = new HashSet<VOMSServerInfo>();
+		
+		File[] certFiles = directory.listFiles(new FileFilter() {
+			
+			public boolean accept(File pathname) {
+				return pathname.isFile() && !pathname.getName().startsWith(".");
+			}
+		});
+		
+		for (File f: certFiles)
+			joinedServerInfo.addAll(parse(f));
+		
+		return new ArrayList<VOMSServerInfo>(joinedServerInfo);
+	}
+	
 	
 	public List<VOMSServerInfo> parse(File f) {
 		fileSanityChecks(f);
+		
+		if (f.isDirectory())
+			return parseDirectory(f);
 		
 		try {
 			

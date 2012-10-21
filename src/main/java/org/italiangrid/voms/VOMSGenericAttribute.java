@@ -4,7 +4,7 @@ package org.italiangrid.voms;
  * A VOMS generic attribute is a name=value pair attribute augmented with a context.
  * 
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSGenericAttribute {

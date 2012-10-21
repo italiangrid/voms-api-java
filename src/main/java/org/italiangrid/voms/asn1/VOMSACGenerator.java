@@ -40,7 +40,7 @@ import eu.emi.security.authn.x509.proxy.CertificateExtension;
  * 
  * This AC generator provides the VOMS AC encoding starting from a set of attributes.
  *  
- * @author cecco
+ * @author Andrea Ceccanti
  *
  */
 public class VOMSACGenerator implements VOMSConstants{

@@ -8,7 +8,7 @@ import org.glite.voms.FQAN;
 /**
  * FQAN handling utilities
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class FQANHelper {

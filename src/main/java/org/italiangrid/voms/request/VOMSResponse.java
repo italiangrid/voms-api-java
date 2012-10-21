@@ -5,7 +5,7 @@ import org.glite.voms.contact.VOMSWarningMessage;
 
 /**
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSResponse {

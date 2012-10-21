@@ -7,7 +7,7 @@ import org.bouncycastle.asn1.x509.AttributeCertificate;
 
 /**
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class ACParsingContext {

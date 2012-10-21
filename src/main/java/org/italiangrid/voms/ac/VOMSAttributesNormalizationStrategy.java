@@ -11,7 +11,7 @@ import org.italiangrid.voms.VOMSAttribute;
  * This strategy is responsible of creating the {@link VOMSAttribute} objects
  * which represents the authorizative VOMS authorization information.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSAttributesNormalizationStrategy {

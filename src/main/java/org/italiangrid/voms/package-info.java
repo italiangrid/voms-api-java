@@ -2,7 +2,7 @@
  * 
  */
 /**
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 package org.italiangrid.voms;

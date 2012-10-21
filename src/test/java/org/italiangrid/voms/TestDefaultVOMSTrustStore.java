@@ -20,7 +20,7 @@ import org.junit.Test;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
 /**
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class TestDefaultVOMSTrustStore {

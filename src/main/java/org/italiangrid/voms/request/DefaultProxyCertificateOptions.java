@@ -7,7 +7,7 @@ import eu.emi.security.authn.x509.proxy.ProxyType;
 /**
  * The default options used when creating VOMS proxy certificates.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface DefaultProxyCertificateOptions {

@@ -5,7 +5,7 @@ import java.util.Set;
 /**
  * A store containing the contact information for locally trusted VOMS servers.
  * 
- * @author cecco
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSServerInfoStore {
@@ -37,11 +37,5 @@ public interface VOMSServerInfoStore {
 	 */
 	public void addVOMSServerInfo(VOMSServerInfo info);
 
-		/**
-	 * Merge this {@link VOMSServerInfoStore} with another {@link VOMSServerInfoStore}.
-	 * 
-	 * @param other
-	 */
-	public void merge(VOMSServerInfoStore other);
 
 }

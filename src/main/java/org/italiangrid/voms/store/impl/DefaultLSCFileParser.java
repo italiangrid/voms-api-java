@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The default implementation for the LSC file parser.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class DefaultLSCFileParser implements LSCFileParser {

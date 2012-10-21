@@ -3,7 +3,7 @@ package org.italiangrid.voms.store;
 /**
  * Represents an object which can be periodically updated according to an update frequency. 
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface Updateable {

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
  * This class just sets the name for the thread and set an {@link UncaughtExceptionHandler}
  * which logs the caught exception.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class VOMSThread extends Thread {

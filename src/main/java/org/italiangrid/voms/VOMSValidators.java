@@ -12,7 +12,7 @@ import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 /**
  * A factory for VOMS attributes validators and parsers.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class VOMSValidators {

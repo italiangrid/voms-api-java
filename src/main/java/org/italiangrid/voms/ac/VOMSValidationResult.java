@@ -9,7 +9,7 @@ import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 /**
  * This class represents the outcome of a VOMS validation.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class VOMSValidationResult {

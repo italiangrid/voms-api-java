@@ -14,7 +14,7 @@ import org.glite.voms.FQAN;
 /**
  * The VOMS attribute information.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSAttribute {

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  * This {@link ValidationResultListener} logs the outcome of validation results.
  * Succesful validations are logged in debug, while validator failures are logged as
  * warnings.
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class LoggingValidationResultListener implements ValidationResultListener {

@@ -1,20 +1,20 @@
 package org.italiangrid.voms.request;
 
-import java.io.Reader;
+import java.io.File;
 import java.util.List;
 
 /**
- * An strategy for building a list of {@link Reader} objects which will provide access
+ * An strategy for building a list of {@link File} objects which will provide access
  * to the local trusted VOMS server contact information.
  * 
- * @author cecco
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSESLookupStrategy {
 
 	/**
-	 * @return a {@link List} of {@link Reader} objects that can be 
+	 * @return a {@link List} of {@link File} objects that can be 
 	 * used to parse VOMSES information.
 	 */
-	public List<Reader> lookupVomsesInfo();
+	public List<File> lookupVomsesInfo();
 }

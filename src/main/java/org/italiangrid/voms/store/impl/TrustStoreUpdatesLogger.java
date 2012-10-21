@@ -18,7 +18,7 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
  * 
  * The messages are logged in debug.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class TrustStoreUpdatesLogger implements VOMSTrustStoreUpdateListener {

@@ -9,7 +9,7 @@ import org.italiangrid.voms.store.impl.LSCFile;
 /**
  * This interface defines a parser for VOMS LSC files.
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface LSCFileParser {

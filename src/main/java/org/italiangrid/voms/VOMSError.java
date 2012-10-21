@@ -3,7 +3,7 @@ package org.italiangrid.voms;
 /**
  * A VOMS runtime exception. 
  * 
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class VOMSError extends RuntimeException {

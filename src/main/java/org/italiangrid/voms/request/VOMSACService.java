@@ -4,7 +4,7 @@ import org.bouncycastle.asn1.x509.AttributeCertificate;
 /**
  * The {@link VOMSACService} interface.
  *  
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public interface VOMSACService {

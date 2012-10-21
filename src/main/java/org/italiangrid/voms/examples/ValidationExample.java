@@ -16,7 +16,7 @@ import eu.emi.security.authn.x509.impl.PEMCredential;
 
 /** 
  * A simple example showing how VOMS attributes validation is done with the new API
- * @author andreaceccanti
+ * @author Andrea Ceccanti
  *
  */
 public class ValidationExample {
