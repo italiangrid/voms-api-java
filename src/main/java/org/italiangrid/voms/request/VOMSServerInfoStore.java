@@ -12,13 +12,13 @@ public interface VOMSServerInfoStore {
 
 	/**
 	 * Returns a set of {@link VOMSServerInfo} object matching
-	 * a vo alias passed as argument.
+	 * a vo name passed as argument.
 	 * 
-	 * @param voAlias a VO alias
+	 * @param voName a VO name
 	 * @return a possibly empty set of {@link VOMSServerInfo} object matching
-	 * the vo alias passed as argument
+	 * the vo name passed as argument
 	 */
-	public Set<VOMSServerInfo> getVOMSServerInfo(String voAlias);
+	public Set<VOMSServerInfo> getVOMSServerInfo(String voName);
 	
 	
 	/**
