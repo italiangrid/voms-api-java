@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.credential.CredentialsUtils;
-import org.italiangrid.voms.credential.UserCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,10 +82,8 @@ public class ProxyGenerationExample {
 
 
 		/* Save the proxy */
-
-		UserCredentials uc = UserCredentials.instance(pxcert.getPrivateKey(), pxcert.getCertificateChain());
 		OutputStream os = new FileOutputStream("/tmp/savedProxy");
-		CredentialsUtils.saveCredentials(os, uc);
+		CredentialsUtils.saveCredentials(os, pxcert.getCredential());
 
 	}
 }

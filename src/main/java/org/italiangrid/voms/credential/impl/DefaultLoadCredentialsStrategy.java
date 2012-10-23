@@ -1,4 +1,4 @@
-package org.italiangrid.voms.credential;
+package org.italiangrid.voms.credential.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,6 +8,9 @@ import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 
 import org.italiangrid.voms.VOMSError;
+import org.italiangrid.voms.credential.LoadCredentialsStrategy;
+import org.italiangrid.voms.credential.ProxyPathBuilder;
+import org.italiangrid.voms.credential.VOMSEnvironmentVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +65,8 @@ public class DefaultLoadCredentialsStrategy implements
 	
 	private static final String HOME_PROPERTY = "user.home";
 	private static final String TMPDIR_PROPERTY = "java.io.tmpdir";
+	
+	private static final ProxyPathBuilder proxyPathBuilder = new DefaultProxyPathBuilder();
 	
 	private String home;
 	private String tmpDir;
@@ -155,7 +160,7 @@ public class DefaultLoadCredentialsStrategy implements
 		String uid = getFromEnvOrSystemProperty(VOMS_USER_ID);
 		
 		if (uid != null){
-			String proxyFile = String.format("%s/x509x509up_u%d", tmpDir, Integer.parseInt(uid));
+			String proxyFile = proxyPathBuilder.buildProxyFilePath(tmpDir, Integer.parseInt(uid));
 			return loadProxyCertificate(proxyFile);
 		}
 		

@@ -2,28 +2,30 @@ package org.italiangrid.voms.credential;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
-import org.bouncycastle.openssl.PEMWriter;
+import eu.emi.security.authn.x509.X509Credential;
+import eu.emi.security.authn.x509.impl.CertificateUtils;
+import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
 
 /**
  * An utility class for handling credentials
  * 
- * @author daniele
+ * @author Daniele Andreotti
+ * @author Andrea Ceccanti
  * 
  */
-
 public class CredentialsUtils {
-
+	
 	/**
 	 * Saves user credentials as a plain text PEM data. <br>
-	 * Writes the user certificate first, then the user key and finally all certs
-	 * in the certificate chain.
+	 * Writes the user certificate chain first, then the user key.
 	 * 
 	 * 
 	 * @throws IOException
@@ -34,41 +36,20 @@ public class CredentialsUtils {
 	 * @throws NoSuchProviderException
 	 * @throws CertificateException
 	 */
-	public static void saveCredentials(OutputStream os, UserCredentials uc) throws UnrecoverableKeyException,
+	public static void saveCredentials(OutputStream os, X509Credential uc) throws UnrecoverableKeyException,
 			KeyStoreException, IllegalArgumentException, NoSuchAlgorithmException, IOException, NoSuchProviderException,
 			CertificateException {
-
-
-		/* Using the old save() method for writing the proxy */
-
-		OutputStreamWriter osw = new OutputStreamWriter(os);
-		PEMWriter writer = new PEMWriter(osw);
-
-		writer.writeObject(uc.getUserCertificate());
-
-		if (uc.getUserKey() != null)
-			writer.writeObject(uc.getUserKey());
-
-		for (int i = 1; i < uc.getUserChain().length; i++) {
-			writer.writeObject(uc.getUserChain()[i]);
-		}
-		writer.flush();
-
-
-		// /* New method for writing the proxy */
-		//
-		// String encryptionAlg = null;
-		// String alias = "mykey";
-		// char[] keyPassword = null;
-		// char[] encryptionPassword = null;
-		//
-		// KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
-		//
-		// ks.load(null, null);
-		// ks.setKeyEntry(alias, uc.getUserKey(), keyPassword, uc.getUserChain());
-		//
-		// CertificateUtils.savePEMKeystore(os, ks, alias, encryptionAlg,
-		// keyPassword, encryptionPassword);
-
+		
+		X509Certificate[] chain = uc.getCertificateChain();
+		
+		for (X509Certificate c: chain)
+			CertificateUtils.saveCertificate(os, c, Encoding.PEM);
+		
+		PrivateKey key = uc.getKey();
+		
+		if (key != null)
+			CertificateUtils.savePrivateKey(os, key, Encoding.PEM, null, null);
+		
+		os.flush();
 	}
 }
