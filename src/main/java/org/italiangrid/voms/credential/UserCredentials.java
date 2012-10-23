@@ -27,14 +27,12 @@ package org.italiangrid.voms.credential;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Security;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
@@ -53,7 +51,6 @@ import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
  * PKCS12 format.
  * 
  * @author Andrea Ceccanti
- * @author Vincenzo Ciaschini
  * 
  */
 public class UserCredentials {

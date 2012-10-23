@@ -26,6 +26,8 @@
 package org.italiangrid.voms.request.impl;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +99,10 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 	}
 
 	public Set<VOMSServerInfo> getVOMSServerInfo(String voAlias) {
-		return serverInfoStore.get(voAlias);
+		Set<VOMSServerInfo> result = serverInfoStore.get(voAlias);
+		if (result == null)
+			return Collections.emptySet();
+		return result;
 	}
 
 	private void initializeStore() {
