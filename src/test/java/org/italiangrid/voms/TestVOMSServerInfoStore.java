@@ -19,7 +19,7 @@ public class TestVOMSServerInfoStore {
 		
 		assertEquals(3, store.getVOMSServerInfo("atlas").size());
 		assertEquals(2, store.getVOMSServerInfo("eumed").size());
-		Assert.assertNull(store.getVOMSServerInfo("non-existing-vo"));
+		Assert.assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
 		
 		assertEquals(5, store.getVOMSServerInfo().size());
 	}
