@@ -52,32 +52,37 @@ import eu.emi.security.authn.x509.impl.PEMCredential;
  *  
  */
 public class DefaultLoadCredentialsStrategy implements
-		LoadCredentialsStrategy {
+		LoadCredentialsStrategy, VOMSEnvironmentVariables {
 
 	public static final Logger log = LoggerFactory.getLogger(DefaultLoadCredentialsStrategy.class);
-	
-	private static final String X509_USER_PROXY = "X509_USER_PROXY";
-	private static final String X509_USER_CERT = "X509_USER_CERT";
-	private static final String X509_USER_KEY = "X509_USER_KEY";
-	private static final String PKCS12_USER_CERT = "PKCS12_USER_CERT";
 	
 	private static final String GLOBUS_PKCS12_CRED_PATH_SUFFIX = ".globus/usercred.p12";
 	private static final String GLOBUS_PEM_CERT_PATH_SUFFIX = ".globus/usercert.pem";
 	private static final String GLOBUS_PEM_KEY_PATH_SUFFIX = ".globus/userkey.pem";
 	
 	private static final String HOME_PROPERTY = "user.home";
+	private static final String TMPDIR_PROPERTY = "java.io.tmpdir";
 	
 	private String home;
+	private String tmpDir;
 	
-	public DefaultLoadCredentialsStrategy(String homeFolder) {
+	public DefaultLoadCredentialsStrategy(String homeFolder, String tempDir) {
 		this.home = homeFolder;
-	}
-	
-	public DefaultLoadCredentialsStrategy() {
-		home = System.getProperty(HOME_PROPERTY);
+		this.tmpDir = tempDir;
+		
 		if (home == null)
 			throw new VOMSError(HOME_PROPERTY+" not found in system properties!");
 	}
+	
+	public DefaultLoadCredentialsStrategy(String homeFolder) {
+		this(homeFolder, System.getProperty(TMPDIR_PROPERTY));
+	}
+	
+	
+	public DefaultLoadCredentialsStrategy() {
+		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY));
+	}
+	
 	/**
 	 * Looks for the value of a given property in the environment or in the
 	 * system properties
@@ -146,14 +151,24 @@ public class DefaultLoadCredentialsStrategy implements
 	}
 
 
+	private X509Credential loadProxyFromUID() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
+		String uid = getFromEnvOrSystemProperty(VOMS_USER_ID);
+		
+		if (uid != null){
+			String proxyFile = String.format("%s/x509x509up_u%d", tmpDir, Integer.parseInt(uid));
+			return loadProxyCertificate(proxyFile);
+		}
+		
+		return null;
+	}
 	private X509Credential loadProxyFromEnv() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
 		
 		String proxyPath = getFromEnvOrSystemProperty(X509_USER_PROXY);
 		if (proxyPath != null)
 			return loadProxyCertificate(proxyPath);
 		
-		return null;
 		
+		return loadProxyFromUID();
 	}
 	
 	private X509Credential loadPEMCredentialFromEnv(char[] keyPassword) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
