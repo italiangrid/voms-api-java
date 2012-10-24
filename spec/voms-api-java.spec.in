@@ -1,3 +1,5 @@
+%define pom_version @@POM_VERSION@@
+
 Name: voms-api-java
 Version: 3.0.0
 Release: 1%{?dist}
@@ -47,21 +49,21 @@ Obsoletes:      vomsjapi-javadoc < %{version}-%{release}
 Virtual Organization Membership Service (VOMS) Java API Documentation.
 
 %prep
-%setup -q
+%setup -q -n voms-api-java
 
 %build
-mvn -s @@BUILD_SETTINGS@@ -B clean javadoc:javadoc assembly:assembly
+mvn @@BUILD_SETTINGS@@ -Dmaven.test.skip=true -B clean javadoc:javadoc assembly:assembly
 
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
-tar -C $RPM_BUILD_ROOT -xvzf target/%{name}-%{version}.tar.gz
+tar -C $RPM_BUILD_ROOT -xvzf target/%{name}.tar.gz
 
-ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
-ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar
+ln -s %{name}-%{pom_version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
+ln -s %{name}-%{pom_version}.jar $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar
 
-mv $RPM_BUILD_ROOT%{_javadocdir}/%{name} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+mv $RPM_BUILD_ROOT%{_javadocdir}/%{name} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{pom_version}
+ln -s %{name}-%{pom_version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -70,7 +72,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 
 %{_javadir}/%{name}.jar
-%{_javadir}/%{name}-%{version}.jar
+%{_javadir}/%{name}-%{pom_version}.jar
 
 # Backward compatibility naming
 %{_javadir}/vomsjapi.jar
@@ -80,7 +82,7 @@ rm -rf $RPM_BUILD_ROOT
 %files javadoc
 %defattr(-,root,root,-)
 %doc %{_javadocdir}/%{name}
-%doc %{_javadocdir}/%{name}-%{version}
+%doc %{_javadocdir}/%{name}-%{pom_version}
 
 %changelog
 * Wed Oct 24 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 3.0.0-1

@@ -14,7 +14,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <assembly.java.dir>/usr/share/java</assembly.java.dir>
-    <assembly.doc.dir>/usr/share/doc/${project.name}-${project.version}</assembly.doc.dir>
+    <assembly.doc.dir>/usr/share/doc/${project.name}</assembly.doc.dir>
     <assembly.javadoc.dir>/usr/share/javadoc/${project.name}</assembly.javadoc.dir>
     <junitVersion>4.10</junitVersion>
     <canlVersion>1.1.0-SNAPSHOT</canlVersion>
@@ -69,9 +69,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
+          <finalName>${project.name}</finalName>
           <descriptors>
             <descriptor>${basedir}/src/main/assembly/voms-api-java.xml</descriptor>
-            <descriptor>${basedir}/src/main/assembly/voms-api-java-src.xml</descriptor>
           </descriptors>
         </configuration>
       </plugin>

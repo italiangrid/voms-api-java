@@ -1,18 +1,22 @@
 name=voms-api-java
 spec=spec/$(name).spec
+pom=pom.xml
 version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g")
+pom_version=$(shell grep "<version>" $(pom) | head -1 | sed -e 's/<version>//g' -e 's/<\/version>//g' -e "s/[ \t]*//g")
 release=1
 rpmbuild_dir=$(shell pwd)/rpmbuild
 tarbuild_dir=$(shell pwd)/tarbuild
 stage_dir=dist
-settings_file=src/config/emi-build-settings.xml
+#mvn_settings=-s src/config/emi-build-settings.xml
+mvn_settings=
 
 .PHONY: stage etics clean rpm
 
 all: 	dist rpm
 
 prepare-spec:
-		sed -e 's#@@BUILD_SETTINGS@@#$(settings_file)#g' \
+		sed -e 's#@@BUILD_SETTINGS@@#$(mvn_settings)#g' \
+			-e 's#@@POM_VERSION@@#$(pom_version)#g' \
 			spec/voms-api-java.spec.in > spec/voms-api-java.spec
 
 prepare-sources: prepare-spec
@@ -24,19 +28,19 @@ prepare-sources: prepare-spec
 clean:	
 		rm -rf target $(rpmbuild_dir) $(tarbuild_dir) tgz RPMS dir spec/voms-api-java.spec
 
-dist:   prepare-spec
+dist:   prepare-sources
 
 rpm:		
 		mkdir -p 	$(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
 					$(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS \
 					$(rpmbuild_dir)/SRPMS
 
-		cp target/$(name)-$(version)-src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
+		cp $(tarbuild_dir)/$(name)-$(version).tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
 		rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)" 
 
 etics: 	dist rpm
 		mkdir -p tgz RPMS
-		cp target/*.tar.gz tgz
+		cp $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz tgz
 		cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
 
 stage:	 
