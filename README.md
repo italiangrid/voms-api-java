@@ -105,19 +105,60 @@ if (vomsAttrs.size() > 0) {
 }
 ```
 
+
 ### Creating a VOMS Proxy
 
-Proxy creation functionalities are provided by the class VOMSProxyInit
+UserCredentials class has been redesigned. It implements a default strategy to load X509 user credentials in PEM or PKCS12 format.
+The default strategy looks for user credentials in standard locations.
 
 ```java
-UserCredentials credentials = UserCredentials.instance("/home/vinz/.globus/usercert.pem", 
-    "/home/vinz/.globus/userkey.pem", 
-    "passphrase");
-    
-VOMSProxyInit vomsProxyInit = VOMSProxyInit.instance(credentials);
 
-X509Certificate[] proxyCertificateChain = vomsProxyInit.getVomsProxy().getUserChain();
+/* Load user's credentials */
+
+X509Credential cred = UserCredentials.loadCredentials("passphrase".toCharArray());
 ```
+
+Request an AC to a VOMS service, using vomses file in one of the default places and the standard implementation for the VOMS AC service.
+
+```java
+DefaultVOMSACRequest request = new DefaultVOMSACRequest();
+request.setLifetime(12);
+request.setVoName("voName");
+
+VOMSACService service = new DefaultVOMSACService();
+    
+AttributeCertificate attributeCertificate = service.getVOMSAttributeCertificate(cred, request);
+```
+
+
+Proxy creation:
+
+```java
+
+/* Get the VOMS proxy */
+
+ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(cred.getCertificateChain());
+proxyOptions.setAttributeCertificates(new AttributeCertificate[] {attributeCertificate});
+
+ProxyCertificate proxyCert = ProxyGenerator.generate(proxyOptions, cred.getKey());    
+```
+
+
+A new CredentialsUtils class provides the method ```saveCredentials(OutputStream os, X509Credential uc)```  which saves user credentials as a plain text PEM data.
+
+```java
+
+/* 
+   Save the proxy
+   Writes the user certificate chain first, then the user key.
+*/
+
+OutputStream os = new FileOutputStream("/tmp/savedProxy");
+CredentialsUtils.saveCredentials(os, procyCert.getCredential());
+
+```
+
+
 
 ## Documentation
 
