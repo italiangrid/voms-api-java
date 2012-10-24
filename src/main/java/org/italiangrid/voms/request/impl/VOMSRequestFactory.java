@@ -24,16 +24,17 @@
  * follows.
  *
  *********************************************************************/
-package org.glite.voms.contact;
+package org.italiangrid.voms.request.impl;
 
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.italiangrid.voms.VOMSError;
+import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.util.VOMSFQANNamingScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,8 +88,9 @@ public class VOMSRequestFactory {
 				log.debug(e.getMessage(), e);
 			}
 
-			throw new VOMSException(e);
+			throw new VOMSError(e.getMessage());
 		}
+
 	}
 
 	public long getLifetime() {
@@ -132,85 +134,22 @@ public class VOMSRequestFactory {
 		fragment.buildLifetime(lifetime);
 	}
 
-	private void loadOptions(VOMSRequestOptions options) {
+	private void loadOptions(VOMSACRequest options) {
 
 		lifetime = options.getLifetime();
-		setOrderString(options.getOrdering());
-		setTargetString(options.getTargetsAsString());
-
 	}
 
-	public String buildRESTRequest(VOMSRequestOptions options) {
-		loadOptions(options);
-
-		if (options.isRequestList()) {
-			/* handle list requests */
-
-			return "/generate-ac?fqans=all";
-		}
-
-		StringBuilder request = new StringBuilder();
-
-		request.append("/generate-ac?fqans=");
-
-		if (options.getRequestedFQANs().isEmpty()) {
-
-			if (options.getVoName() == null)
-				throw new VOMSException(
-						"No vo name specified for AC retrieval.");
-			String voName = options.getVoName();
-
-			if (!voName.startsWith("/"))
-				voName = "/" + voName;
-
-			request.append(voName);
-		} else {
-			List FQANs = options.getRequestedFQANs();
-			Iterator i = FQANs.iterator();
-			boolean first = true;
-
-			while (i.hasNext()) {
-				if (!first)
-					request.append(",");
-				request.append((String) i.next());
-				first = false;
-			}
-		}
-		if (targetString != null && targetString.trim().length() != 0) {
-			request.append("&targets=");
-			request.append(targetString);
-		}
-
-		if (orderString != null && orderString.trim().length() != 0) {
-			request.append("&order=");
-			request.append(orderString);
-		}
-
-		request.append("&lifetime=");
-		request.append(lifetime);
-		log.debug("Generated request: " + request.toString());
-		return request.toString();
-	}
-
-	public Document buildRequest(VOMSRequestOptions options) {
+	public Document buildRequest(VOMSACRequest options) {
 
 		loadOptions(options);
 
 		Document request = docBuilder.newDocument();
 		VOMSRequestFragment frag = new VOMSRequestFragment(request);
 
-		if (options.isRequestList()) {
-			frag.listCommand();
-			setOptionsForRequest(frag);
-			request.appendChild(frag.getFragment());
-			return request;
-		}
-
 		if (options.getRequestedFQANs().isEmpty()) {
 
 			if (options.getVoName() == null)
-				throw new VOMSException(
-						"No vo name specified for AC retrieval.");
+				throw new VOMSError("No vo name specified for AC retrieval.");
 
 			String voName = options.getVoName();
 

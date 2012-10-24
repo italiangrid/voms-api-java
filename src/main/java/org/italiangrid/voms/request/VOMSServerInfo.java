@@ -1,7 +1,6 @@
 package org.italiangrid.voms.request;
 
 import java.net.URI;
-import java.net.URL;
 
 /**
  * This interface represents a VOMS server contact information,
