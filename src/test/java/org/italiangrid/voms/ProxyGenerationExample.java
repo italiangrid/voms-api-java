@@ -17,10 +17,11 @@ import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.credential.CredentialsUtils;
+import org.italiangrid.voms.credential.UserCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.emi.security.authn.x509.impl.CertificateUtils;
+import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 import eu.emi.security.authn.x509.proxy.ProxyCertificateOptions;
@@ -29,9 +30,8 @@ import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 public class ProxyGenerationExample {
 
 	/**
-	 * Extracts VOMS AC from a given VOMS proxy (adoption of the new voms-api-java
-	 * design) and use it to generate a new proxy by using the CNAL library
-	 * (ProxyGenerator)
+	 * Extracts VOMS AC from a given VOMS proxy (adoption of the new voms-api-java design) and use it to generate a new
+	 * proxy by using the CNAL library (ProxyGenerator)
 	 * 
 	 * @param args
 	 * @throws IOException
@@ -52,16 +52,16 @@ public class ProxyGenerationExample {
 
 		char[] pwd = "pass".toCharArray();
 
-		FileInputStream fcert = new FileInputStream("/home/daniele/.globus/usercert.pem");
-		FileInputStream fpkey = new FileInputStream("/home/daniele/.globus/userkey.pem");
 		FileInputStream fvoms_proxy = new FileInputStream("/home/daniele/x509up_u1000");
 
-		X509Certificate[] certchain = CertificateUtils.loadCertificateChain(fcert, CertificateUtils.Encoding.PEM);
-		PrivateKey pkey = CertificateUtils.loadPrivateKey(fpkey, CertificateUtils.Encoding.PEM, pwd);
+		X509Credential cred = UserCredentials.loadCredentials(pwd);
+
+		X509Certificate[] certchain = cred.getCertificateChain();
+		PrivateKey pkey = cred.getKey();
+
 
 		PEMCredential pc = new PEMCredential(fvoms_proxy, null);
-		X509Certificate[] vomspx_chain = pc.getCertificateChain();
-		X509Certificate voms_proxy = vomspx_chain[0];
+		X509Certificate voms_proxy = pc.getCertificate();
 
 		/* Get VOMS AC from the given proxy */
 		List<AttributeCertificate> ac_list = org.italiangrid.voms.asn1.VOMSACUtils.getACsFromCertificate(voms_proxy);
