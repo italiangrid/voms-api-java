@@ -186,6 +186,7 @@ public class PKIStore implements VOMSTrustStore {
      */
     public synchronized void refresh() {
         PKIStore newReader = null;
+        logger.info("Starting PKIStore refresh (type: "+type+")");
         
         try {
             newReader = new PKIStore(certDir, type, aggressive, false);
@@ -256,7 +257,7 @@ public class PKIStore implements VOMSTrustStore {
             }
         }
 
-        logger.debug("Initializing "+ ((type == TYPE_VOMSDIR) ? "VOMS": "CA") + " certificate store from directory: "+dir);
+        logger.info("Initializing "+ ((type == TYPE_VOMSDIR) ? "VOMS": "CA") + " certificate store from directory: "+dir);
         
         // Some sanity checks on VOMSDIR and CA dir
         File theDir = new File(dir);
@@ -388,6 +389,7 @@ public class PKIStore implements VOMSTrustStore {
             theTimer.cancel();
         theTimer = null;
 
+        logger.info("Rescheduling refresh interval to "+millisec+" milliseconds");
         theTimer = new Timer(true);
         theTimer.scheduleAtFixedRate(new Refreshener(), millisec, millisec);
     }

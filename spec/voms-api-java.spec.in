@@ -1,5 +1,5 @@
 Name: voms-api-java
-Version: 2.0.8
+Version: 2.0.9
 Release: 1%{?dist}
 Summary: The Virtual Organisation Membership Service Java APIs
 
@@ -85,6 +85,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_javadocdir}/%{name}-%{version}
 
 %changelog
+* Wed Oct 24 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.9-1
+- Fix for https://savannah.cern.ch/bugs/?98296
 
 * Tue Apr 10 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.8-1
 - Fix for https://savannah.cern.ch/bugs/?93551

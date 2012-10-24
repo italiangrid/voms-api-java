@@ -44,6 +44,8 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Stack;
@@ -63,6 +65,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.provider.JDKKeyFactory.X509;
 import org.glite.voms.ac.ACCerts;
 import org.glite.voms.ac.ACTargets;
 import org.glite.voms.ac.AttributeCertificate;
@@ -961,66 +964,100 @@ public class PKIVerifier {
         return null;
     }
 
+    private boolean checkCRLIssuer(X509CRL crl, X509Certificate issuer){
+    	
+    	return crl.getIssuerX500Principal().equals(issuer.getSubjectX500Principal());
+    }
+    
+    private boolean checkCRLCriticalExtensions(X509CRL crl){
+    	
+    	// Check critical extensions
+		Set criticalExts = crl.getCriticalExtensionOIDs();
+		
+		Set permittedCriticals = new HashSet();
+		permittedCriticals.add("2.5.29.28");
+		
+		if (criticalExts == null || criticalExts.isEmpty())
+			return true;
+		
+		if (!criticalExts.isEmpty() && !criticalExts.containsAll(permittedCriticals)){
+			logger.error("CRL critical extensions check failed for CRL "+crl.getIssuerX500Principal()+". Critical extensions "+permittedCriticals+" not found!");
+			return false;
+		}
+		
+    	return true;
+    }
+    
+    
+    private boolean checkCRLValidity(X509CRL crl){
+    	
+    	Date now = new Date();
+    	return crl.getNextUpdate().after(now) && crl.getThisUpdate().before(now);
+    }
+    
+    private X509CRL lookupCRL(X509Certificate issuer) {
+    	Map<String, List<X509CRL>> crlMap = caStore.getCRLs();
+    	
+    	List<X509CRL> crlList =  crlMap.get(PKIUtils.getHash(issuer));
+    	
+    	for (X509CRL candidateCRL: crlList){
+    		
+    		// Verify signature
+    		try{
+    			
+    			candidateCRL.verify(issuer.getPublicKey());
+    			
+    		}catch (Exception e){
+    			logger.info("Signature verification check failed for CRL "+candidateCRL.getIssuerX500Principal()+"...");
+    			continue;
+    		}
+    		
+    		
+    		boolean criticalExtensionsAreValid = checkCRLCriticalExtensions(candidateCRL);
+    		if (!criticalExtensionsAreValid){
+    			logger.info("Critical extensions check failed for CRL "+ candidateCRL.getIssuerX500Principal()+"...");
+    			continue;
+    		}
+    		
+    		if (!checkCRLIssuer(candidateCRL, issuer)){
+    			logger.info(String.format("Issuer check failed for CRL %s against issuer %s.", candidateCRL.getIssuerX500Principal(), issuer.getSubjectX500Principal()));
+    			continue;
+    		}
+    		
+    		return candidateCRL;
+    	}
+    	
+    	return null;
+    }
+    
+    
     private boolean isRevoked( X509Certificate cert, X509Certificate issuer ) {
 
-        Hashtable crls = caStore.getCRLs();
-        Vector crllist = (Vector) ( crls.get( PKIUtils.getHash( issuer ) ) );
-
-        boolean issued = false;
-
-        if ( crllist != null ) {
-            Iterator i = crllist.iterator();
-
-            while ( i.hasNext() ) {
-
-                X509CRL candidateCRL = (X509CRL) i.next();
-
-                if ( candidateCRL != null ) {
-                    try {
-                        candidateCRL.verify( issuer.getPublicKey() );
-                    } catch ( Exception e ) {
-                        continue;
-                    }
-
-                    Set criticalExts = candidateCRL.getCriticalExtensionOIDs();
-
-                    Set permittedCriticals = new HashSet();
-                    permittedCriticals.add("2.5.29.28");
-
-                    if ( criticalExts == null || criticalExts.isEmpty() ||
-                         (!criticalExts.isEmpty() && permittedCriticals.containsAll(criticalExts))) {
-                        if ( candidateCRL.getIssuerX500Principal().equals(
-                                          issuer.getSubjectX500Principal() ) ) {
-                            if ( candidateCRL.getNextUpdate().compareTo(
-                                        new Date() ) >= 0
-                                 && candidateCRL.getThisUpdate()
-                                 .compareTo( new Date() ) <= 0 ) {
-
-                                X509CRLEntry entry = candidateCRL
-                                    .getRevokedCertificate( cert
-                                        .getSerialNumber() );
-                                if ( entry == null ) {
-                                    return false;
-                                }
-                            }
-                            else {
-                                logger.error( "CRL for CA '"+issuer.getSubjectDN().toString()+"' has expired!" );
-                                return true;
-                            }
-                        }
-                    }
-                    else {
-                        logger.error("Critical extension found in crl!");
-                        for (Iterator ii = criticalExts.iterator(); ii.hasNext();) {
-                            logger.debug("Critical CRL Extension: " +
-                                         (String)ii.next());
-                        }
-
-                    }
-                    issued = true;
-                }
-            }
-        }
-        return issued;
+    	X509CRL crl = lookupCRL(issuer);
+    	
+    	if (crl == null){
+    		logger.warn("No CRL for CA '"+issuer.getSubjectDN()+"' was found. Considering the certificate valid.");
+    		return true;
+    	}
+    	
+    	boolean crlIsValid  = checkCRLValidity(crl);
+    	
+    	if (!crlIsValid){
+    		String msg = String.format("CRL for CA '%s' has expired on %s. Considering certificate '%s' as revoked.",
+    					issuer.getSubjectDN(), crl.getNextUpdate(), cert.getSubjectDN());
+    				
+    		logger.error(msg);
+    		return true;
+    	}
+    			
+    	logger.debug("Candidate CRL: "+crl);
+        X509CRLEntry entry = crl.getRevokedCertificate( cert.getSerialNumber() );
+        
+        if (entry == null)
+        	return false;
+        
+        logger.info(String.format("Certificate %s (%d) was revoked on date %s.", cert.getSubjectDN(), entry.getSerialNumber(), entry.getRevocationDate()));
+        return true;
+        
     }
 }
