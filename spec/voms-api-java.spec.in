@@ -52,7 +52,7 @@ Virtual Organization Membership Service (VOMS) Java API Documentation.
 %setup -q -n voms-api-java
 
 %build
-mvn @@BUILD_SETTINGS@@ -Dmaven.test.skip=true -B clean javadoc:javadoc assembly:assembly
+mvn @@BUILD_SETTINGS@@ -U -Dmaven.test.skip=true -B clean javadoc:javadoc assembly:assembly
 
 %install
 rm -rf $RPM_BUILD_ROOT
