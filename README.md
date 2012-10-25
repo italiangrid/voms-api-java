@@ -159,6 +159,110 @@ CredentialsUtils.saveCredentials(os, procyCert.getCredential());
 ```
 
 
+### Migration workflow 
+
+In order to use the new API update your pom.xml file with the right version.
+
+
+```bash
+<dependency>
+  <groupId>org.italiangrid</groupId>
+  <artifactId>voms-api-java</artifactId>
+  <version>3.0-SNAPSHOT</version>
+</dependency>
+```
+
+
+An example of how using the new API is reported below.
+First, a VOMS proxy is loaded, then its attributes are validated.
+
+
+Old approach:
+
+```java
+/* Old API packages */
+import org.glite.voms.PKIUtils;
+import org.glite.voms.VOMSAttribute;
+import org.glite.voms.VOMSValidator;
+
+
+/* Load a VOMS proxy and validates its attribute certificates */
+
+
+public class MigrationTestOld {
+
+  final static Logger log = LoggerFactory.getLogger(MigrationTestNew.class);
+
+  public static void ValidationExample(String filename) throws FileNotFoundException, IOException, KeyStoreException,
+      CertificateException {
+
+
+    X509Certificate[] certchain = PKIUtils.loadCertificates(filename);
+
+    VOMSValidator validator = new VOMSValidator(certchain);
+
+    validator.validate();
+
+    List<VOMSAttribute> attrs = validator.getVOMSAttributes();
+
+    for (VOMSAttribute a : attrs)
+      log.info("Attribute: " + a);
+
+  }
+
+
+  public static void main(String[] args) throws FileNotFoundException, IOException, KeyStoreException,
+      CertificateException {
+    ValidationExample("/tmp/x509up_u1000");
+  }
+}
+```
+
+
+New approach:
+
+```java
+/* New API packages */
+import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSValidators;
+import org.italiangrid.voms.ac.VOMSACValidator;
+
+import eu.emi.security.authn.x509.impl.PEMCredential;
+
+
+/* Load a VOMS proxy and validates its attribute certificates */
+
+public class MigrationTestNew {
+
+  final static Logger log = LoggerFactory.getLogger(MigrationTestNew.class);
+
+  public static void ValidationExample(String filename) throws FileNotFoundException, IOException, KeyStoreException,
+      CertificateException {
+
+    VOMSACValidator validator = VOMSValidators.newValidator();
+
+    PEMCredential c = new PEMCredential(new FileInputStream(filename), null);
+
+    X509Certificate[] certChain = c.getCertificateChain();
+    List<VOMSAttribute> attrs = validator.validate(certChain);
+
+    for (VOMSAttribute a : attrs)
+      log.info("Attribute: " + a);
+
+    validator.shutdown();
+  }
+
+
+  public static void main(String[] args) throws FileNotFoundException, IOException, KeyStoreException,
+      CertificateException {
+    ValidationExample("/tmp/x509up_u1000");
+
+  }
+}
+
+```
+
+
 
 ## Documentation
 
