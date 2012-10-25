@@ -9,9 +9,9 @@ public interface TestFixture {
 	public static final String revokedCert = "src/test/resources/certs/revoked.cert.pem";
 	public static final String validCert = "src/test/resources/certs/test0.cert.pem";
 	
-	public static final String defaultCRL = "src/test/resources/trust-anchors/default-crl.pem";
-	public static final String testCertRevokedCRL = "src/test/resources/trust-anchors/cert-17-revoked-crl.pem";
-	public static final String expiredCRL = "src/test/resources/trust-anchors/expired-crl.pem";
+	public static final String defaultCRL = "src/test/resources/crls/default-crl.pem";
+	public static final String testCertRevokedCRL = "src/test/resources/crls/cert-17-revoked-crl.pem";
+	public static final String expiredCRL = "src/test/resources/crls/expired-crl.pem";
 	
 	public static final String[] caHashes = {"d82942ab", "10b10516"};
 }
