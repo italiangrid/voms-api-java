@@ -537,41 +537,23 @@ public class PKIVerifier {
 
         X509Certificate currentCert = certs[0];
 
-        logger.debug( "path length = " + certs.length );
-
         for ( int i = 1; i < certs.length; i++ ) {
             if ( logger.isDebugEnabled() )
                 logger.debug( "Checking: " + certs[i].getSubjectDN().getName() );
 
             if ( PKIUtils.checkIssued( certs[i], certs[i - 1] ) ) {
 
-                logger.debug( "Is issuer" );
-
-                if (PKIUtils.isProxy(currentCert)) {
-                    logger.debug("Increase proxycount");
+                if (PKIUtils.isProxy(currentCert))                     
                     proxyCount ++;
-                }
+                
 
                 certStack.push( certs[i] );
                 currentCert = certs[i];
-
-                if ( logger.isDebugEnabled() )
-                    logger.debug( "ELEMENT: "
-                            + currentCert.getSubjectDN().getName() );
             }
-            logger.debug( "Is not issuer" );
+            
         }
 
-        logger.debug( "Before anchor searching." );
         X509Certificate candidate = null;
-
-        if ( logger.isDebugEnabled() ) {
-            Iterator j = certStack.iterator();
-            while ( j.hasNext() )
-                logger.debug( "Content: "
-                        + ( (X509Certificate) j.next() ).getSubjectDN()
-                                .getName() );
-        }
 
         // replace self-signed certificate passed with one from store.
         if ( PKIUtils.selfIssued( currentCert ) ) {
@@ -584,46 +566,33 @@ public class PKIVerifier {
                 candidate = (X509Certificate) candidates.elementAt( index );
                 certStack.push( candidate );
 
-                if ( logger.isDebugEnabled() )
-                    logger.debug( "ELEMENT: "
-                            + candidate.getSubjectDN().getName() );
             } else {
                 logger.error("Cannot find issuer candidate for: " +currentCert.getSubjectDN().getName());
                 return false;
             }
         } else {
             candidate = null;
-
-            logger.debug( "Looking for anchor" );
             // now, complete the certification path.
             do {
                 String hash = PKIUtils.getHash( currentCert
                         .getIssuerX500Principal() );
 
-                logger.debug( "hash = " + hash );
+                logger.debug( "Issuer principal hash = " + hash );
                 Vector candidates = (Vector) certificates.get( hash );
                 if ( candidates != null ) {
 
-                    logger.debug( "CANDIDATES: " + candidates );
+                    logger.debug( "Candidates trust anchors from store: " + candidates );
                     Iterator i = candidates.iterator();
                     while ( i.hasNext() ) {
                         candidate = (X509Certificate) i.next();
 
                         if ( logger.isDebugEnabled() )
-                            logger.debug( "Candidate = "
+                            logger.debug( "Candidate trust anchor subject = "
                                     + candidate.getSubjectDN().getName() );
 
                         if ( PKIUtils.checkIssued( candidate, currentCert ) ) {
                             certStack.push( candidate );
                             currentCert = candidate;
-
-//                             if (PKIUtils.isProxy(candidate))
-//                                 proxyCount ++;
-
-                            if ( logger.isDebugEnabled() )
-                                logger.debug( "ELEMENT: "
-                                        + candidate.getSubjectDN().getName() );
-
                             break;
                         } else
                             candidate = null;
@@ -639,22 +608,22 @@ public class PKIVerifier {
         }
 
         int currentLength = 0;
-        boolean success = true;
 
         PublicKey candidatePublicKey = null;
         X509Certificate issuerCert = null;
 
         if ( logger.isDebugEnabled() ) {
-            logger.debug( "Constructed chain:" );
+            logger.debug( "Constructed certificate chain:" );
 
             Iterator j = certStack.iterator();
+            int chainIndex = 0;
             while ( j.hasNext() )
-                logger.debug( "Content: "
+                logger.debug( "["+chainIndex+"]: "
                         + ( (X509Certificate) j.next() ).getSubjectDN()
                                 .getName() );
         }
 
-        // now verifies it
+        
         int stackSize = certStack.size();
         int stackPos = stackSize+1;
         Stack constructedStack = new Stack();
@@ -666,9 +635,9 @@ public class PKIVerifier {
 
             if (!PKIUtils.isProxy(currentCert))
                 certCount ++;
-
+            
             if ( logger.isDebugEnabled() )
-                logger.debug( "VERIFYING : "
+                logger.debug( "Checking : "
                         + currentCert.getSubjectDN().getName() );
 
             if (!checkProxyCertInfo(currentCert, stackPos, stackSize)) {
@@ -678,28 +647,22 @@ public class PKIVerifier {
             if ( PKIUtils.selfIssued( currentCert ) ) {
                 if ( currentLength != 0 ) {
                     logger
-                            .error( "Certificate verification: Self signed certificate not trust anchor" );
-                    logger.error( "subject: "
-                            + currentCert.getSubjectDN().getName() );
-                    success = false;
-                    break;
+                            .error( "Certificate verification: Self signed certificate not trust anchor: " + 
+                    currentCert.getSubjectDN().getName()  );
+                    return false;
                 } else {
-                    // this is the trust anchor
+                    
                     candidatePublicKey = currentCert.getPublicKey();
                     issuerCert = currentCert;
                 }
             }
-
-            logger.debug( "Checking chain" );
-
+            
             if ( !currentCert.getIssuerX500Principal().equals(
                     issuerCert.getSubjectX500Principal() ) ) {
                 logger
                         .error( "Certificate verification: issuing chain broken." );
                 return false;
             }
-
-            logger.debug( "Checking validity" );
 
             try {
                 currentCert.checkValidity();
@@ -723,8 +686,6 @@ public class PKIVerifier {
                 return false;
             }
 
-            logger.debug( "Checking key" );
-
             try {
                 currentCert.verify( candidatePublicKey );
             } catch ( Exception e ) {
@@ -735,9 +696,7 @@ public class PKIVerifier {
                         + currentCert.getSubjectDN().getName() );
                 return false;
             }
-
-            logger.debug( "Checking revoked" );
-
+            
             if ( isRevoked( currentCert, issuerCert ) ) {
                 logger
                         .error( "Certificate verification: certificate in chain has been revoked." );
@@ -747,8 +706,6 @@ public class PKIVerifier {
             }
 
             boolean isCA = PKIUtils.isCA( issuerCert );
-
-            logger.debug( "Checking CA " + isCA );
             if ( isCA ) {
                 if ( !allowsPath( currentCert, issuerCert, constructedStack ) ) {
                     logger.error( "Certificate verification: subject '"
@@ -761,22 +718,16 @@ public class PKIVerifier {
                 // check path length
                 int maxPath = currentCert.getBasicConstraints();
 
-                logger.debug( "stack.size = " + certStack.size()
-                        + " maxPath = " + maxPath );
-
                 if ( maxPath != -1 ) {
                     if ( maxPath < certStack.size() - proxyCount - 1  ) {
                         logger
                                 .error( "Certificate verification: Maximum certification path length exceeded." );
-                        success = false;
-                        break;
+                        return false;
                     }
                 }
             } else {
-                // not a ca. Maybe a proxy?
-                logger.debug( "Checking for Proxy" );
-
-                if ( !PKIUtils.isProxy( currentCert ) ) {
+                
+            	if ( !PKIUtils.isProxy( currentCert ) ) {
                     logger
                             .error( "Certificate verification: Non-proxy, non-CA certificate issued a certificate." );
                     return false;
@@ -797,10 +748,7 @@ public class PKIVerifier {
             candidatePublicKey = currentCert.getPublicKey();
             currentLength++;
             constructedStack.push(currentCert);
-        }
-
-        if ( !success )
-            return false;
+        }        
 
         return true;
     }
