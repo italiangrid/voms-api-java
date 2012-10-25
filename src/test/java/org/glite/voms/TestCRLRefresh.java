@@ -12,10 +12,11 @@ import org.apache.log4j.Logger;
 
 public class TestCRLRefresh extends TestCase implements TestFixture{
 	
-	public static final Logger logger = Logger.getLogger(TestCRLRefresh.class); 
+	public static final Logger log = Logger.getLogger(TestCRLRefresh.class); 
 	
 	public void testCRLAreFunctional() throws CertificateException, CRLException, IOException, InterruptedException{
 				
+		log.info("TestCRLRefresh.testCRLAreFunctional");
 		PKIStore caStore = PKIStoreFactory.getStore(trustDir, PKIStore.TYPE_CADIR, true);
 		PKIStore vomsTrustStore = PKIStoreFactory.getStore(vomsDir, PKIStore.TYPE_VOMSDIR, true);
 		
@@ -39,16 +40,15 @@ public class TestCRLRefresh extends TestCase implements TestFixture{
 	
 	@Override
 	protected void setUp() throws Exception {
+		log.info("TestCRLRefresh.setUp");
+		
 		Utils.setCRL(defaultCRL);
 	}
 	
-	@Override
-	protected void tearDown() throws Exception {
-		Utils.setCRL(defaultCRL);
-	}
+	
 	
 	public void testExpiredCRLCertificateRejection() throws IOException, InterruptedException, CertificateException, CRLException{
-		
+		log.info("TestCRLRefresh.testExpiredCRLCertificateRejection");
 		Utils.setCRL(expiredCRL);
 		
 		PKIStore caStore = PKIStoreFactory.getStore(trustDir, PKIStore.TYPE_CADIR, true);
