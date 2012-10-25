@@ -34,13 +34,6 @@ public class Utils implements TestFixture{
 			logger.info("Loaded :"+crl);
 			
 		}
-		try {
-			Thread.sleep(TimeUnit.SECONDS.toMillis(2));
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 	}
 	
 }
