@@ -21,7 +21,7 @@ public class TestCRLRefresh extends TestCase {
 	public static final String revokedCert = "src/test/resources/certs/revoked.cert.pem";
 	public static final String validCert = "src/test/resources/certs/test0.cert.pem";
 	
-	private static final int NUM_ITERATIONS = 3;
+	private static final int NUM_ITERATIONS = 2;
 	
 	
 	protected void executeCommandsInDir(String[] commands, String dir) throws IOException, InterruptedException{
@@ -68,34 +68,18 @@ public class TestCRLRefresh extends TestCase {
 		PKIStore caStore = PKIStoreFactory.getStore(trustDir, PKIStore.TYPE_CADIR, true);
 		PKIStore vomsTrustStore = PKIStoreFactory.getStore(vomsDir, PKIStore.TYPE_VOMSDIR, true);
 		
-		caStore.rescheduleRefresh((int)TimeUnit.SECONDS.toMillis(5));
-		vomsTrustStore.rescheduleRefresh((int)TimeUnit.SECONDS.toMillis(5));
+		caStore.rescheduleRefresh((int)TimeUnit.SECONDS.toMillis(30));
+		vomsTrustStore.rescheduleRefresh((int)TimeUnit.SECONDS.toMillis(30));
 				
 		PKIVerifier verifier = new PKIVerifier(vomsTrustStore,caStore);
 		X509Certificate[] theCert = PKIUtils.loadCertificates(testCert);
 		
-		for (int i=0; i < NUM_ITERATIONS; i++){
-			
-			boolean valid  = verifier.verify(theCert);
-			
-			System.out.println("Iteration #"+i+": valid -> "+valid);
-			if (i < NUM_ITERATIONS - 2 )
-				assertTrue("Certificate found invalid when it was supposed to be valid", valid);
-			else
-				assertFalse("Certificate found valid after CRL that revokes it was put in place.", valid);
-			
-			try {
-				
-				if (i == NUM_ITERATIONS - 3)
-					updateCRL();
-				Thread.sleep(TimeUnit.SECONDS.toMillis(10));
-				
-				
-			} catch (InterruptedException e) {
-				
-			}
-		}
-		
+		boolean valid  = verifier.verify(theCert);
+		assertTrue("Certificate found invalid when it was supposed to be valid", valid);
+		updateCRL();
+		caStore.refresh();
+		valid  = verifier.verify(theCert);
+		assertFalse("Certificate found valid after CRL that revokes it was put in place.", valid);
 		restoreCRL();
 	}
 	
@@ -103,8 +87,6 @@ public class TestCRLRefresh extends TestCase {
 	public void testExpiredCRLCertificateRejection() throws IOException, InterruptedException, CertificateException, CRLException{
 		
 		setupExpiredCRL();
-		
-		Thread.sleep(TimeUnit.SECONDS.toMillis(5));
 		
 		PKIStore caStore = PKIStoreFactory.getStore(trustDir, PKIStore.TYPE_CADIR, true);
 		PKIStore vomsTrustStore = PKIStoreFactory.getStore(vomsDir, PKIStore.TYPE_VOMSDIR, true);
