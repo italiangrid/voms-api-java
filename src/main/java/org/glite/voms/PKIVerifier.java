@@ -987,8 +987,11 @@ public class PKIVerifier {
     		logger.warn("No CRL for CA '"+issuer.getSubjectDN()+"' was found. Considering the certificate valid.");
     		return true;
     	}
+    	logger.debug("Candidate CRL: "+crl);
     	
     	boolean crlIsValid  = checkCRLValidity(crl);
+    	
+    	logger.debug("CRL is valid? "+crlIsValid);
     	
     	if (!crlIsValid){
     		String msg = String.format("CRL for CA '%s' has expired on %s. Considering certificate '%s' as revoked.",
@@ -998,8 +1001,9 @@ public class PKIVerifier {
     		return true;
     	}
     			
-    	logger.debug("Candidate CRL: "+crl);
         X509CRLEntry entry = crl.getRevokedCertificate( cert.getSerialNumber() );
+        
+        logger.debug("CRLEntry for certificate serial number "+cert.getSerialNumber()+": "+entry);
         
         if (entry == null)
         	return false;
