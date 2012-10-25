@@ -24,9 +24,6 @@ public class TestCRL extends TestCase implements TestFixture{
 		log.info("TestCRL.testCRLAreFunctional");
 		PKIStore caStore = new PKIStore(trustDir, PKIStore.TYPE_CADIR, true);
 		PKIStore vomsTrustStore = new PKIStore(vomsDir, PKIStore.TYPE_VOMSDIR, true);
-		
-		caStore.rescheduleRefresh((int)TimeUnit.SECONDS.toMillis(30));
-		vomsTrustStore.rescheduleRefresh((int)TimeUnit.SECONDS.toMillis(30));
 				
 		PKIVerifier verifier = new PKIVerifier(vomsTrustStore,caStore);
 		X509Certificate[] theCert = PKIUtils.loadCertificates(testCert);
@@ -44,9 +41,6 @@ public class TestCRL extends TestCase implements TestFixture{
 		
 		PKIStore caStore = new PKIStore(trustDir, PKIStore.TYPE_CADIR, true);
 		PKIStore vomsTrustStore = new PKIStore(vomsDir, PKIStore.TYPE_VOMSDIR, true);
-		
-		caStore.rescheduleRefresh((int)TimeUnit.SECONDS.toMillis(30));
-		vomsTrustStore.rescheduleRefresh((int)TimeUnit.SECONDS.toMillis(30));
 				
 		PKIVerifier verifier = new PKIVerifier(vomsTrustStore,caStore);
 		X509Certificate[] theCert = PKIUtils.loadCertificates(revokedCert);

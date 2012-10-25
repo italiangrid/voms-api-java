@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -28,10 +29,18 @@ public class Utils implements TestFixture{
 			
 			if (destChecksum != crlOrigChecksum)
 				throw new IllegalStateException("Checksum verification failed!");
+			
+			X509CRL crl = PKIUtils.loadCRL(hashFile);
+			logger.info("Loaded :"+crl);
+			
+		}
+		try {
+			Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
-		X509CRL crl = PKIUtils.loadCRL(crlStartFile);
-		logger.info("Loaded :"+crl);
 	}
 	
 }

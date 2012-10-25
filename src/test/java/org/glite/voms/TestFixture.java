@@ -13,5 +13,5 @@ public interface TestFixture {
 	public static final String testCertRevokedCRL = "src/test/resources/trust-anchors/cert-17-revoked-crl.pem";
 	public static final String expiredCRL = "src/test/resources/trust-anchors/expired-crl.pem";
 	
-	public static final String[] caHashes = {"10b10516","d82942ab"};
+	public static final String[] caHashes = {"d82942ab", "10b10516"};
 }
