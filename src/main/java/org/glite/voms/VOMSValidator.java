@@ -252,10 +252,11 @@ public class VOMSValidator {
     }
 
     /**
-     * Cleans up the object.
-     *
-     * This method MUST be called before disposing of the object, on pains of
-     * a memory leak.
+     * Cleans up the object. In particular this method stops the refreshing thread of
+     * the underlying {@link VOMSTrustStore} or {@link PKIStore}.
+     * 
+     * A {@link VOMSValidator} should be cleaned up *only* before disposing the object.
+     * 
      */
     public void cleanup() {
         myValidatedChain = null;

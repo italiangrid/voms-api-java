@@ -98,4 +98,17 @@ public class TestCRL extends TestCase implements TestFixture{
 		
 		verifier.cleanup();
 	}
+	
+	public void testNoCRLFoundVerificationSuccess() throws Exception{
+		log.info("TestCRL.testNoCRLFoundVerificationSuccess");
+		
+		PKIStore caStore = new PKIStore(noCRLsTrustDir, PKIStore.TYPE_CADIR, true);
+		PKIStore vomsTrustStore = new PKIStore(vomsDir, PKIStore.TYPE_VOMSDIR, true);
+		
+		PKIVerifier verifier = new PKIVerifier(vomsTrustStore,caStore);
+		X509Certificate[] theCert = PKIUtils.loadCertificates(testCert);
+		
+		boolean valid  = verifier.verify(theCert);
+		assertTrue("Certificate found invalid when it was supposed to be valid", valid);
+	}	
 }

@@ -25,9 +25,9 @@
 
 package org.glite.voms;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.PublicKey;
@@ -39,9 +39,11 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -50,22 +52,18 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
-import java.util.HashSet;
 import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.provider.JDKKeyFactory.X509;
 import org.glite.voms.ac.ACCerts;
 import org.glite.voms.ac.ACTargets;
 import org.glite.voms.ac.AttributeCertificate;
@@ -943,16 +941,29 @@ public class PKIVerifier {
     	return crl.getNextUpdate().after(now) && crl.getThisUpdate().before(now);
     }
     
-    private X509CRL lookupCRL(X509Certificate issuer) {
+    /**
+     * Looks for CRLs that match a given CA certificate.
+     * 
+     * @param issuer
+     * @return <code>null</code> if no CRLs were found in the trust-anchors directory, or a list of valid
+     * CRLs. When the list is empty the caller can assume that the CRL was present in the trust-anchors but
+     * was ill-formed.
+     * 	
+     */
+    private List<X509CRL> lookupCRL(X509Certificate issuer) {
     	Map<String, List<X509CRL>> crlMap = caStore.getCRLs();
     	
     	List<X509CRL> crlList =  crlMap.get(PKIUtils.getHash(issuer));
+    	
+    	List<X509CRL> correctCrls = new ArrayList<X509CRL>();
+    	
+    	if (crlList == null || crlList.isEmpty())
+    		return null;
     	
     	for (X509CRL candidateCRL: crlList){
     		
     		// Verify signature
     		try{
-    			
     			candidateCRL.verify(issuer.getPublicKey());
     			
     		}catch (Exception e){
@@ -971,37 +982,57 @@ public class PKIVerifier {
     			logger.info(String.format("Issuer check failed for CRL %s against issuer %s.", candidateCRL.getIssuerX500Principal(), issuer.getSubjectX500Principal()));
     			continue;
     		}
-    		
-    		return candidateCRL;
+    		correctCrls.add(candidateCRL);
+
     	}
     	
-    	return null;
+    	return correctCrls;
     }
     
     
     private boolean isRevoked( X509Certificate cert, X509Certificate issuer ) {
 
-    	X509CRL crl = lookupCRL(issuer);
     	
-    	if (crl == null){
-    		logger.warn("No CRL for CA '"+issuer.getSubjectDN()+"' was found. Considering the certificate valid.");
+    	List<X509CRL> crls = lookupCRL(issuer);
+    	
+    	if (crls == null){
+    		logger.warn("No CRL for CA '"+issuer.getSubjectDN()+"' was found in local trust-anchor dir. Considering certificate '"+cert.getSubjectDN()+"' valid.");
+    		return false;
+    	}
+    	
+    	if (crls.isEmpty()){
+    		logger.warn("CRLs for CA '"+issuer.getSubjectDN()+"' was found but was ill-formed. Considering the certificate '"+cert.getSubjectDN()+"' revoked.");
     		return true;
     	}
-    	logger.debug("Candidate CRL: "+crl);
     	
-    	boolean crlIsValid  = checkCRLValidity(crl);
+    	X509CRL validCrl = null;
     	
-    	logger.debug("CRL is valid? "+crlIsValid);
+    	for (X509CRL crl: crls){
     	
-    	if (!crlIsValid){
-    		String msg = String.format("CRL for CA '%s' has expired on %s. Considering certificate '%s' as revoked.",
-    					issuer.getSubjectDN(), crl.getNextUpdate(), cert.getSubjectDN());
+    		logger.debug("Checking CRL: "+crl);
+    	
+    		boolean crlIsValid  = checkCRLValidity(crl);
+    	
+    		logger.debug("CRL is valid? "+crlIsValid);
+    	
+    		// Break at first valid CRL found...
+    		if (crlIsValid){
+    			validCrl = crl;
+    			break;
+    		}
+    		
+    		String msg = String.format("CRL for CA '%s' has expired on %s.",
+    				issuer.getSubjectDN(), crl.getNextUpdate());
     				
     		logger.error(msg);
-    		return true;
     	}
     			
-        X509CRLEntry entry = crl.getRevokedCertificate( cert.getSerialNumber() );
+    	if (validCrl == null){
+    		logger.warn(" No temporally valid CRL for CA '"+issuer.getSubjectDN()+"' was found. Considering the certificate '"+cert.getSubjectDN()+"' revoked.");
+    		return true;
+    	}
+    		
+        X509CRLEntry entry = validCrl.getRevokedCertificate( cert.getSerialNumber() );
         
         logger.debug("CRLEntry for certificate serial number "+cert.getSerialNumber()+": "+entry);
         

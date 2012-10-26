@@ -3,6 +3,7 @@ package org.glite.voms;
 public interface TestFixture {
 
 	public static final String trustDir = "src/test/resources/trust-anchors";
+	public static final String noCRLsTrustDir = "src/test/resources/no-crls-trust-anchors";
 	
 	public static final String vomsDir = "src/test/resources/vomsdir";
 	public static final String testCert = "src/test/resources/certs/quasi_revoked.cert.pem";
