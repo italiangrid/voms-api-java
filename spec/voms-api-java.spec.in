@@ -1,4 +1,5 @@
 %define pom_version @@POM_VERSION@@
+%define mvn_settings @@MVN_SETTINGS@@
 
 Name: voms-api-java
 Version: 3.0.0
@@ -18,8 +19,7 @@ BuildRequires:  jpackage-utils
 BuildRequires:  java-devel
 
 Requires:       jpackage-utils
-Requires:       jakarta-commons-cli
-Requires:       jakarta-commons-lang
+Requires:       slf4j
 Requires:       java
 
 Provides:       vomsjapi = %{version}-%{release}
@@ -52,7 +52,7 @@ Virtual Organization Membership Service (VOMS) Java API Documentation.
 %setup -q -n voms-api-java
 
 %build
-mvn @@BUILD_SETTINGS@@ -U -Dmaven.test.skip=true -B clean javadoc:javadoc assembly:assembly
+mvn %{mvn_settings} -U -Dmaven.test.skip=true -B clean javadoc:javadoc assembly:assembly
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -87,11 +87,3 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Wed Oct 24 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 3.0.0-1
 - New version of VOMS Java APIs based on CAnL
-
-* Tue Apr 10 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.8-1
-- Fix for https://savannah.cern.ch/bugs/?93551
-- Fix for https://savannah.cern.ch/bugs/?90112
-
-* Fri Dec 16 2011 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.7-1
-- Self-managed packaging
-- maven-based build
