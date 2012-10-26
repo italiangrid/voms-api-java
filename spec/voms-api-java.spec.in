@@ -1,3 +1,7 @@
+%define pom_version @@POM_VERSION@@
+%define bc_version @@BC_VERSION@@
+%define mvn_settings @@MVN_SETTINGS@@
+
 Name: voms-api-java
 Version: 2.0.9
 Release: 1%{?dist}
@@ -16,7 +20,7 @@ BuildRequires:  jpackage-utils
 BuildRequires:  java-devel
 
 Requires:       jpackage-utils
-Requires:       bouncycastle >= @@BC_VERSION@@
+Requires:       bouncycastle = %{bc_version} 
 Requires:       jakarta-commons-cli
 Requires:       jakarta-commons-lang
 Requires:       log4j
@@ -49,21 +53,21 @@ Obsoletes:      vomsjapi-javadoc < %{version}-%{release}
 Virtual Organization Membership Service (VOMS) Java API Documentation.
 
 %prep
-%setup -q
+%setup -q -n voms-api-java
 
 %build
-mvn -s @@BUILD_SETTINGS@@ -B clean -Dbouncycastle.version=@@BC_VERSION@@ javadoc:javadoc assembly:assembly
+mvn %{?mvn_settings} -U clean -Dmaven.test.skip=true -Dbouncycastle.version=%{bc_version} -B clean javadoc:javadoc assembly:assembly
 
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
-tar -C $RPM_BUILD_ROOT -xvzf target/%{name}-%{version}.tar.gz
+tar -C $RPM_BUILD_ROOT -xvzf target/%{name}.tar.gz
 
-ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
-ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar
+ln -s %{name}-%{pom_version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
+ln -s %{name}-%{pom_version}.jar $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar
 
-mv $RPM_BUILD_ROOT%{_javadocdir}/%{name} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+mv $RPM_BUILD_ROOT%{_javadocdir}/%{name} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{pom_version}
+ln -s %{name}-%{pom_version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -72,7 +76,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 
 %{_javadir}/%{name}.jar
-%{_javadir}/%{name}-%{version}.jar
+%{_javadir}/%{name}-%{pom_version}.jar
 
 # Backward compatibility naming
 %{_javadir}/vomsjapi.jar
@@ -82,7 +86,7 @@ rm -rf $RPM_BUILD_ROOT
 %files javadoc
 %defattr(-,root,root,-)
 %doc %{_javadocdir}/%{name}
-%doc %{_javadocdir}/%{name}-%{version}
+%doc %{_javadocdir}/%{name}-%{pom_version}
 
 %changelog
 * Wed Oct 24 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.9-1
