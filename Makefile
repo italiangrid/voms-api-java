@@ -20,7 +20,7 @@ prepare-sources: prepare-spec
 		cd $(tarbuild_dir) && tar cvzf $(tarbuild_dir)/$(name)-$(version).tar.gz $(name)
 		
 prepare-spec:
-		sed -e 's#@@MVN_SETTINGS@@#$(settings_file)#g' \
+		sed -e 's#@@MVN_SETTINGS@@#$(mvn_settings)#g' \
 			-e 's#@@BC_VERSION@@#$(bc_version)#g' \
 			-e 's#@@POM_VERSION@@#$(pom_version)#g' \
 			spec/voms-api-java.spec.in > spec/voms-api-java.spec
