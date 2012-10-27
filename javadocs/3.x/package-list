@@ -1,0 +1,15 @@
+org.glite.voms
+org.glite.voms.contact
+org.italiangrid.voms
+org.italiangrid.voms.ac
+org.italiangrid.voms.ac.impl
+org.italiangrid.voms.asn1
+org.italiangrid.voms.credential
+org.italiangrid.voms.credential.impl
+org.italiangrid.voms.error
+org.italiangrid.voms.examples
+org.italiangrid.voms.request
+org.italiangrid.voms.request.impl
+org.italiangrid.voms.store
+org.italiangrid.voms.store.impl
+org.italiangrid.voms.util
