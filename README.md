@@ -155,15 +155,8 @@ CredentialsUtils.saveCredentials(OutputStream os, X509Credential uc)
 method, as shown in the following example:
 
 ```java
-
-/* 
-   Save the proxy
-   Writes the user certificate chain first, then the user key.
-*/
-
 OutputStream os = new FileOutputStream("/tmp/savedProxy");
 CredentialsUtils.saveCredentials(os, procyCert.getCredential());
-
 ```
 
 
@@ -181,37 +174,33 @@ you use maven).
 </dependency>
 ```
 
+or install the VOMS API 3.0 packages.
+
 With the API v. 2.0.9 the following approach would be used to validate a VOMS AC:
 
 ```java
-/* Old API packages */
-import org.glite.voms.PKIUtils;
+/* 2.0.x API packages */
 import org.glite.voms.VOMSAttribute;
 import org.glite.voms.VOMSValidator;
 
 ...
 
-
 // Validated certificate chain  */
 X509Certificate[] certchain = ...;
-
 VOMSValidator validator = new VOMSValidator(certchain);
-
-//
 validator.validate();
 
 List<VOMSAttribute> attrs = validator.getVOMSAttributes();
 
 for (VOMSAttribute a : attrs)
 	// Do something with the attribute
-      log.info("Attribute: " + a);
+    ...
 ```
-
 
 With version 3.0 the name of the packages to import has changed:
 
 ```java
-/* New API packages */
+/* 3.0.x API packages */
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
@@ -226,8 +215,10 @@ X509Certificate[] certChain = ...;
 // Use the validate method to obtain a list of VOMSAttribute objects
 List<VOMSAttribute> attrs = validator.validate(certChain);
 
-for (VOMSAttribute a : attrs)
+for (VOMSAttribute a : attrs){
 	// Do something with the attribute
+	...
+}
 
 // Shutdown the validator. This should be called only when you're sure that
 // you will not need the validator anymore. 
