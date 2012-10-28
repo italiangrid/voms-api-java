@@ -106,10 +106,17 @@ if (vomsAttrs.size() > 0) {
 ```
 
 
-### Creating a VOMS Proxy
+### Requesting a VOMS AC from a server and creating a proxy out of it
 
-UserCredentials class has been redesigned. It implements a default strategy to load X509 user credentials in PEM or PKCS12 format.
-The default strategy looks for user credentials in standard locations.
+In order to request a VOMS AC from a VOMS server you start by providing your
+own credentials. To parse your credentials (certificate + private key) you will use
+the 
+
+```java
+UserCredentials.loadCredentials(char[] keyPassword);
+```
+method. This methods looks for PEM or PKCS12 credentials in standard localtions 
+and returns a CANL X509Credential.
 
 ```java
 
@@ -118,33 +125,34 @@ The default strategy looks for user credentials in standard locations.
 X509Credential cred = UserCredentials.loadCredentials("passphrase".toCharArray());
 ```
 
-Request an AC to a VOMS service, using vomses file in one of the default places and the standard implementation for the VOMS AC service.
+To request an AC from a VOMS service, one has to create a VOMSACRequest in order to set
+options for the requested AC, like its lifetime, the VO name or the requested VOMS fqans.
 
 ```java
-DefaultVOMSACRequest request = new DefaultVOMSACRequest();
+VOMSACRequest request = new DefaultVOMSACRequest();
 request.setLifetime(12);
-request.setVoName("voName");
+request.setVoName("atlas");
 
 VOMSACService service = new DefaultVOMSACService();
     
 AttributeCertificate attributeCertificate = service.getVOMSAttributeCertificate(cred, request);
 ```
 
-
-Proxy creation:
+Creating a proxy containing the VOMS AC just obtained is trivial with the help of CANL
+proxy generation utilities:
 
 ```java
-
-/* Get the VOMS proxy */
 
 ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(cred.getCertificateChain());
 proxyOptions.setAttributeCertificates(new AttributeCertificate[] {attributeCertificate});
 
 ProxyCertificate proxyCert = ProxyGenerator.generate(proxyOptions, cred.getKey());    
 ```
-
-
-A new CredentialsUtils class provides the method ```saveCredentials(OutputStream os, X509Credential uc)```  which saves user credentials as a plain text PEM data.
+The proxy can then be saved to an output stream in PEM format using the 
+```java
+CredentialsUtils.saveCredentials(OutputStream os, X509Credential uc)
+```
+method, as shown in the following example:
 
 ```java
 
