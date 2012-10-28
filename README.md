@@ -159,9 +159,10 @@ CredentialsUtils.saveCredentials(os, procyCert.getCredential());
 ```
 
 
-### Migration workflow 
+### Migrating from VOMS API Java v. 2.x
 
-In order to use the new API update your pom.xml file with the right version.
+In order to use the new API update your pom.xml with the right dependencies (in case
+you use maven).
 
 
 ```bash
@@ -172,12 +173,7 @@ In order to use the new API update your pom.xml file with the right version.
 </dependency>
 ```
 
-
-An example of how using the new API is reported below.
-First, a VOMS proxy is loaded, then its attributes are validated.
-
-
-Old approach:
+With the API v. 2.0.9 the following approach would be used to validate a VOMS AC:
 
 ```java
 /* Old API packages */
@@ -185,41 +181,26 @@ import org.glite.voms.PKIUtils;
 import org.glite.voms.VOMSAttribute;
 import org.glite.voms.VOMSValidator;
 
-
-/* Load a VOMS proxy and validates its attribute certificates */
-
-
-public class MigrationTestOld {
-
-  final static Logger log = LoggerFactory.getLogger(MigrationTestNew.class);
-
-  public static void ValidationExample(String filename) throws FileNotFoundException, IOException, KeyStoreException,
-      CertificateException {
+...
 
 
-    X509Certificate[] certchain = PKIUtils.loadCertificates(filename);
+// Validated certificate chain  */
+X509Certificate[] certchain = ...;
 
-    VOMSValidator validator = new VOMSValidator(certchain);
+VOMSValidator validator = new VOMSValidator(certchain);
 
-    validator.validate();
+//
+validator.validate();
 
-    List<VOMSAttribute> attrs = validator.getVOMSAttributes();
+List<VOMSAttribute> attrs = validator.getVOMSAttributes();
 
-    for (VOMSAttribute a : attrs)
+for (VOMSAttribute a : attrs)
+	// Do something with the attribute
       log.info("Attribute: " + a);
-
-  }
-
-
-  public static void main(String[] args) throws FileNotFoundException, IOException, KeyStoreException,
-      CertificateException {
-    ValidationExample("/tmp/x509up_u1000");
-  }
-}
 ```
 
 
-New approach:
+With version 3.0 the name of the packages to import has changed:
 
 ```java
 /* New API packages */
@@ -227,46 +208,27 @@ import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
 
-import eu.emi.security.authn.x509.impl.PEMCredential;
+// The VOMSACValidator interface provides access to VOMS AC validation logic.
+// In order to obtain a validator use the VOMSValidators factory
+VOMSACValidator validator = VOMSValidators.newValidator();
 
+// An X.509 certcain obtained somehow
+X509Certificate[] certChain = ...;
 
-/* Load a VOMS proxy and validates its attribute certificates */
+// Use the validate method to obtain a list of VOMSAttribute objects
+List<VOMSAttribute> attrs = validator.validate(certChain);
 
-public class MigrationTestNew {
+for (VOMSAttribute a : attrs)
+	// Do something with the attribute
 
-  final static Logger log = LoggerFactory.getLogger(MigrationTestNew.class);
-
-  public static void ValidationExample(String filename) throws FileNotFoundException, IOException, KeyStoreException,
-      CertificateException {
-
-    VOMSACValidator validator = VOMSValidators.newValidator();
-
-    PEMCredential c = new PEMCredential(new FileInputStream(filename), null);
-
-    X509Certificate[] certChain = c.getCertificateChain();
-    List<VOMSAttribute> attrs = validator.validate(certChain);
-
-    for (VOMSAttribute a : attrs)
-      log.info("Attribute: " + a);
-
-    validator.shutdown();
-  }
-
-
-  public static void main(String[] args) throws FileNotFoundException, IOException, KeyStoreException,
-      CertificateException {
-    ValidationExample("/tmp/x509up_u1000");
-
-  }
-}
-
+// Shutdown the validator. This should be called only when you're sure that
+// you will not need the validator anymore. 
+validator.shutdown();
 ```
-
-
 
 ## Documentation
 
-More details on the APIs can be found in the Javadoc.
+More details on the new APIs can be found in the [Javadoc](http://italiangrid.github.com/voms-api-java/javadocs/3.x/index.html).
 
 ## Licence
 
