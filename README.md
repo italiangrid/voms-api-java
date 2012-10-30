@@ -106,27 +106,28 @@ if (vomsAttrs.size() > 0) {
 #### Setting a ValidationResultListener
 
 VOMS API now provides the ability of being informed of the outcome of each VOMS validation
-by registering a '''ValidationResultListener'''. 
+by registering a ValidationResultListener. 
 
-The interface of a '''ValidationResultListener''' is defined as follows:
+The interface of a ValidationResultListener is defined as follows:
 
-'''java
+```java
 void notifyValidationResult(VOMSValidationResult result, VOMSAttribute attributes)
-'''
+```
 
 The VOMSValidationResult class provides info the outcome of VOMS validation:
 
-'''java
+```java
+
 VOMSValidationResult{
 
 	boolean isValid();
 	List<VOMSValidationErrorMessage> getValidationErrors();
 }
-'''
+```
 
 You can register a ValidationResultListener at VOMSACValidator creation time:
 
-'''java
+```java
 VOMSACValidator validator = VOMSValidators.newValidator(new ValidationResultListener() {
 			
 	public void notifyValidationResult(VOMSValidationResult result,	VOMSAttribute attributes) {
@@ -135,7 +136,7 @@ VOMSACValidator validator = VOMSValidators.newValidator(new ValidationResultList
 		...
 			
 		}});
-'''
+```
 
 ### Requesting a VOMS AC from a server and creating a proxy out of it
 
