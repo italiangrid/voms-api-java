@@ -74,8 +74,6 @@ A partially backward compatible VOMSValidator has been maintained to ease the tr
 to the new API.
 In order to validate VOMS attributes one has to do the following:
 
-
-
 ```java
 /* certificate chain may come either from loading (and validating)
    using BouncyCastle or from an authenticated HTTPS session */
@@ -105,6 +103,39 @@ if (vomsAttrs.size() > 0) {
 }
 ```
 
+#### Setting a ValidationResultListener
+
+VOMS API now provides the ability of being informed of the outcome of each VOMS validation
+by registering a '''ValidationResultListener'''. 
+
+The interface of a '''ValidationResultListener''' is defined as follows:
+
+'''java
+void notifyValidationResult(VOMSValidationResult result, VOMSAttribute attributes)
+'''
+
+The VOMSValidationResult class provides info the outcome of VOMS validation:
+
+'''java
+VOMSValidationResult{
+
+	boolean isValid();
+	List<VOMSValidationErrorMessage> getValidationErrors();
+}
+'''
+
+You can register a ValidationResultListener at VOMSACValidator creation time:
+
+'''java
+VOMSACValidator validator = VOMSValidators.newValidator(new ValidationResultListener() {
+			
+	public void notifyValidationResult(VOMSValidationResult result,	VOMSAttribute attributes) {
+
+		// Your code here
+		...
+			
+		}});
+'''
 
 ### Requesting a VOMS AC from a server and creating a proxy out of it
 
@@ -156,7 +187,7 @@ method, as shown in the following example:
 
 ```java
 OutputStream os = new FileOutputStream("/tmp/savedProxy");
-CredentialsUtils.saveCredentials(os, procyCert.getCredential());
+CredentialsUtils.saveCredentials(os, proxyCert.getCredential());
 ```
 
 
@@ -174,7 +205,7 @@ you use maven).
 </dependency>
 ```
 
-or install the VOMS API 3.0 packages.
+or install the VOMS API 3.0 packages (rpms or debs).
 
 With the API v. 2.0.9 the following approach would be used to validate a VOMS AC:
 
