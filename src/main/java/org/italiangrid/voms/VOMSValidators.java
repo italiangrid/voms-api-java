@@ -17,6 +17,10 @@ import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
  */
 public class VOMSValidators {
 	
+	public static VOMSACValidator newValidator(ValidationResultListener listener){
+		return new DefaultVOMSValidator(listener);
+	}
+	
 	public static VOMSACValidator newValidator(VOMSTrustStore trustStore, 
 			AbstractValidator validator,
 			ValidationResultListener vrListener){
@@ -34,7 +38,6 @@ public class VOMSValidators {
 	public static VOMSACValidator newValidator(){
 		return new DefaultVOMSValidator();
 	}
-	
 	
 	public static VOMSACParser newParser(){
 		return new DefaultVOMSACParser();

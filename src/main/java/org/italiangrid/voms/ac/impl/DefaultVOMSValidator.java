@@ -30,6 +30,12 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	private final ValidationResultListener validationResultHandler;
 	private final VOMSTrustStore trustStore;
  
+	public DefaultVOMSValidator(ValidationResultListener resultHandler){
+		this(VOMSTrustStores.newTrustStore(), 
+				new OpensslCertChainValidator(DEFAULT_TRUST_ANCHORS_DIR),
+				resultHandler);
+	}
+	
 	public DefaultVOMSValidator() {
 		this (VOMSTrustStores.newTrustStore(), 
 				new OpensslCertChainValidator(DEFAULT_TRUST_ANCHORS_DIR),
