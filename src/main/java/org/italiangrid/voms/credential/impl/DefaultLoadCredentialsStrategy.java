@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 
+import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.credential.LoadCredentialsStrategy;
 import org.italiangrid.voms.credential.ProxyPathBuilder;
@@ -114,14 +115,14 @@ public class DefaultLoadCredentialsStrategy implements
 		return cred;
 	}
 	
-	protected X509Credential loadPEMCredential(String certFile, String keyFile, char[] keyPassword) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
+	protected X509Credential loadPEMCredential(String certFile, String keyFile, final char[] keyPassword) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
 		PEMCredential cred = null;
 		if (fileExistsAndIsReadable(certFile) && fileExistsAndIsReadable(keyFile))
 			cred = new PEMCredential(new FileInputStream(keyFile), new FileInputStream(certFile), keyPassword);
 		return cred;
 	}
 	
-	protected X509Credential loadPKCS12Credential(String credFile, char[] keyPassword) throws KeyStoreException, IOException{
+	protected X509Credential loadPKCS12Credential(String credFile, final char[] keyPassword) throws KeyStoreException, IOException{
 		KeystoreCredential cred = null;
 		if (fileExistsAndIsReadable(credFile))
 			cred = new KeystoreCredential(credFile, keyPassword, keyPassword, null, "PKCS12");
@@ -130,23 +131,26 @@ public class DefaultLoadCredentialsStrategy implements
 	
 	
 	
-	public X509Credential loadCredentials(char[] keyPassword) {
+	public X509Credential loadCredentials(PasswordFinder pf) {
 			
+		if (pf == null)
+			throw new IllegalArgumentException("Please provide a non-null password finder!");
+		
 		try {
 			
 			X509Credential cred = loadProxyFromEnv();
 			
 			if (cred == null)
-				cred = loadPEMCredentialFromEnv(keyPassword);
+				cred = loadPEMCredentialFromEnv(pf.getPassword());
 			
 			if (cred == null)
-				cred = loadPKCS12CredentialFromEnv(keyPassword);
+				cred = loadPKCS12CredentialFromEnv(pf.getPassword());
 			
 			if (cred == null)
-				cred = loadPEMCredentialsFromGlobusDir(keyPassword);
+				cred = loadPEMCredentialsFromGlobusDir(pf.getPassword());
 			
 			if (cred == null)
-				cred = loadPKCS12CredentialsFromGlobusDir(keyPassword);
+				cred = loadPKCS12CredentialsFromGlobusDir(pf.getPassword());
 			
 			return cred;
 		
@@ -212,7 +216,4 @@ public class DefaultLoadCredentialsStrategy implements
 		
 		return loadPEMCredential(certPath, keyPath, keyPassword);
 	}
-	
-	
-
 }

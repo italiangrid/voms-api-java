@@ -13,6 +13,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.credential.VOMSEnvironmentVariables;
 import org.italiangrid.voms.credential.impl.DefaultLoadCredentialsStrategy;
 import org.italiangrid.voms.credential.impl.DefaultProxyPathBuilder;
@@ -44,13 +45,27 @@ public class TestLoadCredential {
 	public static final String pemCredsHome = "src/test/resources/homes/pem-creds";
 	public static final String pkcs12CredsHome = "src/test/resources/homes/pkcs12-creds";
 	
+	static class TestPasswordFinder implements PasswordFinder{
+
+		public char[] getPassword() {
+			
+			return keyPassword.toCharArray();
+		}
+	}
 	
+	static class NullPasswordFinder implements PasswordFinder{
+		
+		public char[] getPassword() {
+			
+			return null;
+		}
+	}
 	
 	@Test
 	public void testNoCredentialsFoundSuccess() {
 	
 		DefaultLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(emptyHome);
-		X509Credential cred = strategy.loadCredentials(null);
+		X509Credential cred = strategy.loadCredentials(new NullPasswordFinder());
 		Assert.assertNull(cred);
 	}
 	
@@ -58,7 +73,7 @@ public class TestLoadCredential {
 	public void testNoCredentialsFoundEmptyGlobusSuccess() {
 	
 		DefaultLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(emptyGlobusHome);
-		X509Credential cred = strategy.loadCredentials(null);
+		X509Credential cred = strategy.loadCredentials(new NullPasswordFinder());
 		Assert.assertNull(cred);
 	}
 	
@@ -66,7 +81,7 @@ public class TestLoadCredential {
 	public void testPEMCredentialLoadingSuccess() {
 	
 		DefaultLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(pemCredsHome);
-		X509Credential cred = strategy.loadCredentials(keyPassword.toCharArray());
+		X509Credential cred = strategy.loadCredentials(new TestPasswordFinder());
 		Assert.assertNotNull(cred);
 		Assert.assertTrue(X500NameUtils.equal(cred.getCertificate().getSubjectX500Principal(), TEST_CERT_SUBJECT));
 	}
@@ -76,7 +91,7 @@ public class TestLoadCredential {
 	public void testPKCS12CredentialLoadingSuccess() {
 	
 		DefaultLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(pkcs12CredsHome);
-		X509Credential cred = strategy.loadCredentials(keyPassword.toCharArray());
+		X509Credential cred = strategy.loadCredentials(new TestPasswordFinder());
 		Assert.assertNotNull(cred);
 		Assert.assertTrue(X500NameUtils.equal(cred.getCertificate().getSubjectX500Principal(), TEST_CERT_SUBJECT));
 	}	
@@ -88,7 +103,7 @@ public class TestLoadCredential {
 		System.setProperty(VOMSEnvironmentVariables.X509_USER_PROXY,PROXY_TMP_PATH);
 		
 		DefaultLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(pemCredsHome);
-		X509Credential cred = strategy.loadCredentials(null);
+		X509Credential cred = strategy.loadCredentials(new NullPasswordFinder());
 		Assert.assertTrue(cred.getCertificate().getSubjectX500Principal().equals(proxy.getCertificateChain()[0].getSubjectX500Principal()));
 	}
 	
@@ -104,7 +119,7 @@ public class TestLoadCredential {
 		ProxyCertificate proxy = buildAndSaveProxy(pemCert, pemKey, keyPassword.toCharArray(), proxyPath);
 		
 		DefaultLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(pemCredsHome);
-		X509Credential cred = strategy.loadCredentials(null);
+		X509Credential cred = strategy.loadCredentials(new NullPasswordFinder());
 		Assert.assertTrue(cred.getCertificate().getSubjectX500Principal().equals(proxy.getCertificateChain()[0].getSubjectX500Principal()));
 	}
 	
