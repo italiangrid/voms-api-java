@@ -122,10 +122,12 @@ public class DefaultLoadCredentialsStrategy implements
 		return cred;
 	}
 	
-	protected X509Credential loadPKCS12Credential(String credFile, final char[] keyPassword) throws KeyStoreException, IOException{
+	protected X509Credential loadPKCS12Credential(String credFile, PasswordFinder pf) throws KeyStoreException, IOException{
 		KeystoreCredential cred = null;
-		if (fileExistsAndIsReadable(credFile))
+		if (fileExistsAndIsReadable(credFile)){
+			char[] keyPassword = pf.getPassword();
 			cred = new KeystoreCredential(credFile, keyPassword, keyPassword, null, "PKCS12");
+		}
 		return cred;
 	}
 	
@@ -195,8 +197,7 @@ public class DefaultLoadCredentialsStrategy implements
 		String pkcs12Path = getFromEnvOrSystemProperty(PKCS12_USER_CERT);
 		
 		if (pkcs12Path != null){
-			char[] keyPassword = pf.getPassword();
-			return loadPKCS12Credential(pkcs12Path, keyPassword);
+			return loadPKCS12Credential(pkcs12Path, pf);
 		}
 		return null;
 	}
@@ -206,8 +207,7 @@ public class DefaultLoadCredentialsStrategy implements
 	private X509Credential loadPKCS12CredentialsFromGlobusDir(PasswordFinder pf) throws KeyStoreException, IOException {
 		
 		String credPath = String.format("%s/%s", home, GLOBUS_PKCS12_CRED_PATH_SUFFIX);
-		char[] keyPassword = pf.getPassword();
-		return loadPKCS12Credential(credPath, keyPassword);
+		return loadPKCS12Credential(credPath, pf);
 		
 	}
 
