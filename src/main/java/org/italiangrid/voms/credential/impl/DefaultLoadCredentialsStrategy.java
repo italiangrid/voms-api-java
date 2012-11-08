@@ -115,10 +115,10 @@ public class DefaultLoadCredentialsStrategy implements
 		return cred;
 	}
 	
-	protected X509Credential loadPEMCredential(String certFile, String keyFile, final char[] keyPassword) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
-		PEMCredential cred = null;
+	protected X509Credential loadPEMCredential(String certFile, String keyFile, PasswordFinder pf) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
+		VOMSPEMCredential cred = null;
 		if (fileExistsAndIsReadable(certFile) && fileExistsAndIsReadable(keyFile))
-			cred = new PEMCredential(new FileInputStream(keyFile), new FileInputStream(certFile), keyPassword);
+			cred = new VOMSPEMCredential(keyFile, certFile, pf);
 		return cred;
 	}
 	
@@ -141,16 +141,16 @@ public class DefaultLoadCredentialsStrategy implements
 			X509Credential cred = loadProxyFromEnv();
 			
 			if (cred == null)
-				cred = loadPEMCredentialFromEnv(pf.getPassword());
+				cred = loadPEMCredentialFromEnv(pf);
 			
 			if (cred == null)
-				cred = loadPKCS12CredentialFromEnv(pf.getPassword());
+				cred = loadPKCS12CredentialFromEnv(pf);
 			
 			if (cred == null)
-				cred = loadPEMCredentialsFromGlobusDir(pf.getPassword());
+				cred = loadPEMCredentialsFromGlobusDir(pf);
 			
 			if (cred == null)
-				cred = loadPKCS12CredentialsFromGlobusDir(pf.getPassword());
+				cred = loadPKCS12CredentialsFromGlobusDir(pf);
 			
 			return cred;
 		
@@ -180,40 +180,43 @@ public class DefaultLoadCredentialsStrategy implements
 		return loadProxyFromUID();
 	}
 	
-	private X509Credential loadPEMCredentialFromEnv(char[] keyPassword) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
+	private X509Credential loadPEMCredentialFromEnv(PasswordFinder pf) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
 		String certPath = getFromEnvOrSystemProperty(X509_USER_CERT);
 		String keyPath = getFromEnvOrSystemProperty(X509_USER_KEY);
 		
-		if (certPath != null && keyPath != null)
-			return loadPEMCredential(certPath, keyPath, keyPassword);
-		
+		if (certPath != null && keyPath != null){
+			
+			return loadPEMCredential(certPath, keyPath, pf);
+		}
 		return null;
 	}
 	
-	private X509Credential loadPKCS12CredentialFromEnv(char[] keyPassword) throws KeyStoreException, IOException{
+	private X509Credential loadPKCS12CredentialFromEnv(PasswordFinder pf) throws KeyStoreException, IOException{
 		String pkcs12Path = getFromEnvOrSystemProperty(PKCS12_USER_CERT);
 		
-		if (pkcs12Path != null)
+		if (pkcs12Path != null){
+			char[] keyPassword = pf.getPassword();
 			return loadPKCS12Credential(pkcs12Path, keyPassword);
-		
+		}
 		return null;
 	}
 	
 	
 	
-	private X509Credential loadPKCS12CredentialsFromGlobusDir(char[] keyPassword) throws KeyStoreException, IOException {
+	private X509Credential loadPKCS12CredentialsFromGlobusDir(PasswordFinder pf) throws KeyStoreException, IOException {
 		
 		String credPath = String.format("%s/%s", home, GLOBUS_PKCS12_CRED_PATH_SUFFIX);
+		char[] keyPassword = pf.getPassword();
 		return loadPKCS12Credential(credPath, keyPassword);
 		
 	}
 
 
-	private X509Credential loadPEMCredentialsFromGlobusDir(char[] keyPassword) throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
+	private X509Credential loadPEMCredentialsFromGlobusDir(PasswordFinder pf) throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
 		
 		String certPath  = String.format("%s/%s", home, GLOBUS_PEM_CERT_PATH_SUFFIX);
 		String keyPath = String.format("%s/%s", home, GLOBUS_PEM_KEY_PATH_SUFFIX);
 		
-		return loadPEMCredential(certPath, keyPath, keyPassword);
+		return loadPEMCredential(certPath, keyPath, pf);
 	}
 }
