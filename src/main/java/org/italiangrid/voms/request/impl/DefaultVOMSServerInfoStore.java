@@ -33,13 +33,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
 
 /**
  * 
@@ -51,30 +49,39 @@ import org.slf4j.LoggerFactory;
  * 
  * 
  */
-public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
+public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 
-	public static final Logger log = LoggerFactory.getLogger(DefaultVOMSServerInfoStore.class);
-	
 	private VOMSESLookupStrategy lookupStrategy;
+	private VOMSServerInfoStoreListener listener;
 	
 	protected Map<String, Set<VOMSServerInfo>> serverInfoStore = new TreeMap<String, Set<VOMSServerInfo>>();
 	private VOMSESParser vomsesParser;
 	
 	public DefaultVOMSServerInfoStore() {
-		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl());
+		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl(), new LoggingServerInfoStoreListener());
+	}
+	
+	public DefaultVOMSServerInfoStore(VOMSServerInfoStoreListener listener){
+		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl(), listener);
 	}
 	
 	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy){
-		this(lookupStrategy, new LegacyVOMSESParserImpl());
+		this(lookupStrategy, new LegacyVOMSESParserImpl(), new LoggingServerInfoStoreListener());
 	}
 	
-	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy, VOMSESParser parser) {
+	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy, VOMSESParser parser, VOMSServerInfoStoreListener listener) {
 		this.lookupStrategy = lookupStrategy;
 		this.vomsesParser = parser;
+		this.listener = listener;
 		initializeStore();
 	}
 
 	public void addVOMSServerInfo(VOMSServerInfo info) {
+		
+		addVOMSServerInfo(info, null);
+	}
+
+	private void addVOMSServerInfo(VOMSServerInfo info, String path){
 		
 		if (serverInfoStore.containsKey(info.getVoName())){
 			
@@ -86,8 +93,9 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 			siCont.add(info);
 			serverInfoStore.put(info.getVoName(), siCont);
 		}
+		
+		listener.serverInfoLoaded(path, info);
 	}
-
 	public Set<VOMSServerInfo> getVOMSServerInfo() {
 		Set<VOMSServerInfo> allEntries = new HashSet<VOMSServerInfo>();
 		
@@ -108,17 +116,13 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 		
 		List<File> vomsesPaths = lookupStrategy.lookupVomsesInfo();
 		
-		if (vomsesPaths.isEmpty())
-			throw new VOMSError("No VOMSES path found in local system.");
-		
 		for (File f: vomsesPaths){
-			log.debug("Looking for VOMSES information in {}", f.getAbsolutePath());
+			
 			List<VOMSServerInfo> vomsServerInfo  = vomsesParser.parse(f);
-			for (VOMSServerInfo si: vomsServerInfo)
-				addVOMSServerInfo(si);
+			for (VOMSServerInfo si: vomsServerInfo){
+				addVOMSServerInfo(si, f.getAbsolutePath());
+			}
+				
 		}
-		
-		if (serverInfoStore.isEmpty())
-			throw new VOMSError("No VOMSES contact information found in local system.");
 	}
 }

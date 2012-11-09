@@ -1,7 +1,5 @@
 package org.italiangrid.voms.mt;
 
-import static org.junit.Assert.fail;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -64,7 +62,7 @@ public class TestConcurrentValidation {
 	static final String aaCert2 = "src/test/resources/certs/wilco_cnaf_infn_it.cert.pem";
 	static final String aaKey2 = "src/test/resources/certs/wilco_cnaf_infn_it.key.pem";
 	
-	static final long NUM_ITERATIONS = 50;
+	static final long NUM_ITERATIONS = 20;
 	static final int NUM_WORKERS = 10;
 	
 	static final CyclicBarrier barrier = new CyclicBarrier(NUM_WORKERS+1);

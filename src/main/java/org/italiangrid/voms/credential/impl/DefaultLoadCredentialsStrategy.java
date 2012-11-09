@@ -1,7 +1,5 @@
 package org.italiangrid.voms.credential.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyStoreException;
@@ -9,15 +7,13 @@ import java.security.cert.CertificateException;
 
 import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.VOMSError;
-import org.italiangrid.voms.credential.LoadCredentialsStrategy;
+import org.italiangrid.voms.credential.LoadCredentialsEventListener;
 import org.italiangrid.voms.credential.ProxyPathBuilder;
 import org.italiangrid.voms.credential.VOMSEnvironmentVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.impl.KeystoreCredential;
-import eu.emi.security.authn.x509.impl.PEMCredential;
 
 /**
  * The default strategy used to load user credentials when no file is explicitly
@@ -55,8 +51,8 @@ import eu.emi.security.authn.x509.impl.PEMCredential;
  * </ul>
  *  
  */
-public class DefaultLoadCredentialsStrategy implements
-		LoadCredentialsStrategy, VOMSEnvironmentVariables {
+public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStrategy 
+	implements VOMSEnvironmentVariables {
 
 	public static final Logger log = LoggerFactory.getLogger(DefaultLoadCredentialsStrategy.class);
 	
@@ -72,7 +68,9 @@ public class DefaultLoadCredentialsStrategy implements
 	private String home;
 	private String tmpDir;
 	
-	public DefaultLoadCredentialsStrategy(String homeFolder, String tempDir) {
+	public DefaultLoadCredentialsStrategy(String homeFolder, String tempDir, LoadCredentialsEventListener listener) {
+		super(listener);
+		
 		this.home = homeFolder;
 		this.tmpDir = tempDir;
 		
@@ -81,12 +79,12 @@ public class DefaultLoadCredentialsStrategy implements
 	}
 	
 	public DefaultLoadCredentialsStrategy(String homeFolder) {
-		this(homeFolder, System.getProperty(TMPDIR_PROPERTY));
+		this(homeFolder, System.getProperty(TMPDIR_PROPERTY), new LoggingCredentialNotificationListener());
 	}
 	
 	
 	public DefaultLoadCredentialsStrategy() {
-		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY));
+		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY), new LoggingCredentialNotificationListener());
 	}
 	
 	/**
@@ -103,36 +101,6 @@ public class DefaultLoadCredentialsStrategy implements
 		return val;
 	}
 	
-	private boolean fileExistsAndIsReadable(String filename){
-		File f = new File(filename);
-		return f.exists() && f.isFile() && f.canRead();
-	}
-
-	protected X509Credential loadProxyCertificate(String proxyCertFile) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
-		PEMCredential cred = null;
-		if (fileExistsAndIsReadable(proxyCertFile))
-			cred = new PEMCredential(new FileInputStream(proxyCertFile), null);
-		return cred;
-	}
-	
-	protected X509Credential loadPEMCredential(String certFile, String keyFile, PasswordFinder pf) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
-		VOMSPEMCredential cred = null;
-		if (fileExistsAndIsReadable(certFile) && fileExistsAndIsReadable(keyFile))
-			cred = new VOMSPEMCredential(keyFile, certFile, pf);
-		return cred;
-	}
-	
-	protected X509Credential loadPKCS12Credential(String credFile, PasswordFinder pf) throws KeyStoreException, IOException{
-		KeystoreCredential cred = null;
-		if (fileExistsAndIsReadable(credFile)){
-			char[] keyPassword = pf.getPassword();
-			cred = new KeystoreCredential(credFile, keyPassword, keyPassword, null, "PKCS12");
-		}
-		return cred;
-	}
-	
-	
-	
 	public X509Credential loadCredentials(PasswordFinder pf) {
 			
 		if (pf == null)
@@ -141,6 +109,9 @@ public class DefaultLoadCredentialsStrategy implements
 		try {
 			
 			X509Credential cred = loadProxyFromEnv();
+			
+			if (cred == null)
+				cred = loadProxyFromUID();
 			
 			if (cred == null)
 				cred = loadPEMCredentialFromEnv(pf);
@@ -167,7 +138,7 @@ public class DefaultLoadCredentialsStrategy implements
 		
 		if (uid != null){
 			String proxyFile = proxyPathBuilder.buildProxyFilePath(tmpDir, Integer.parseInt(uid));
-			return loadProxyCertificate(proxyFile);
+			return loadProxyCredential(proxyFile);
 		}
 		
 		return null;
@@ -176,10 +147,9 @@ public class DefaultLoadCredentialsStrategy implements
 		
 		String proxyPath = getFromEnvOrSystemProperty(X509_USER_PROXY);
 		if (proxyPath != null)
-			return loadProxyCertificate(proxyPath);
+			return loadProxyCredential(proxyPath);
 		
-		
-		return loadProxyFromUID();
+		return null;
 	}
 	
 	private X509Credential loadPEMCredentialFromEnv(PasswordFinder pf) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
@@ -188,7 +158,7 @@ public class DefaultLoadCredentialsStrategy implements
 		
 		if (certPath != null && keyPath != null){
 			
-			return loadPEMCredential(certPath, keyPath, pf);
+			return loadPEMCredential(keyPath, certPath, pf);
 		}
 		return null;
 	}
@@ -217,6 +187,6 @@ public class DefaultLoadCredentialsStrategy implements
 		String certPath  = String.format("%s/%s", home, GLOBUS_PEM_CERT_PATH_SUFFIX);
 		String keyPath = String.format("%s/%s", home, GLOBUS_PEM_KEY_PATH_SUFFIX);
 		
-		return loadPEMCredential(certPath, keyPath, pf);
+		return loadPEMCredential(keyPath, certPath, pf);
 	}
 }

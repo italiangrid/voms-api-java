@@ -45,12 +45,15 @@ public class DefaultVOMSACService implements VOMSACService {
       if(response != null)
         break;
       
-      log.info("Can't get a response from " + vomsServerInfo.getAlias() + ", trying with next one");
+      log.info("Can't get a response from {}:{} for VO alias {}",
+    		  new Object[]{vomsServerInfo.getURL().getHost(),vomsServerInfo.getURL().getPort(),
+    		  vomsServerInfo.getAlias()});
+      
     }
     
     if(response == null) {
       
-      log.info("Can't get a response from any of the server for " + request.getVoName());
+      log.info("Can't get a response from any server for VO " + request.getVoName());
       return null;
     }
       

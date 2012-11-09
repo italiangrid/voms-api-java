@@ -23,24 +23,4 @@ public class TestVOMSServerInfoStore {
 		
 		assertEquals(5, store.getVOMSServerInfo().size());
 	}
-	
-	@Test
-	public void testEmptyVOMSESParsingFailure() {
-		
-		VOMSESLookupStrategy strategy = new BaseVOMSESLookupStrategy(new String[]{"src/test/resources/empty-vomses"});
-		
-		try{
-			DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore(strategy);
-		}catch(VOMSError e){
-			
-			assertEquals("No VOMSES contact information found in local system.", e.getMessage());
-			return;
-		}
-		
-		Assert.fail("Parsing empty vomses file didn't raise any error!");
-		
-	}
-	
-	
-
 }
