@@ -110,6 +110,9 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 	public synchronized LSCInfo getLSC(String voName, String hostname) {
 
 		Set<LSCInfo> candidates = localLSCInfo.get(voName);
+		
+		if (candidates == null)
+			return null;
 
 		for (LSCInfo lsc : candidates) {
 

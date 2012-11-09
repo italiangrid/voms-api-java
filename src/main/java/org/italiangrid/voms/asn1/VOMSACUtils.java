@@ -308,9 +308,14 @@ public class VOMSACUtils implements VOMSConstants{
 		
 		// TagList -  this also should be a sigle element sequence
 		ASN1Sequence tagListSeq = (ASN1Sequence) tagContainerSeq.getObjectAt(0);
-		if (tagListSeq.size() != 1)
+		if (tagListSeq.size() > 1)
 			raiseACNonConformantError("unsupported taglist format.");
 
+		// This TagList sequence is empty, gLite 3.2 VOMS versions had a bug
+		// that added the extension even there were no attributes encoded...
+		if (tagListSeq.size() == 0)
+			return gas;
+		
 		// Down one level
 		tagListSeq = (ASN1Sequence) tagListSeq.getObjectAt(0);
 		
