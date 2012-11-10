@@ -116,7 +116,12 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 		
 		List<File> vomsesPaths = lookupStrategy.lookupVomsesInfo();
 		
+		if (vomsesPaths.isEmpty())
+			listener.noValidVomsesNotification(lookupStrategy.searchedPaths());
+		
 		for (File f: vomsesPaths){
+			
+			listener.lookupNotification(f.getAbsolutePath());
 			
 			List<VOMSServerInfo> vomsServerInfo  = vomsesParser.parse(f);
 			for (VOMSServerInfo si: vomsServerInfo){

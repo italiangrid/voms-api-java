@@ -8,6 +8,7 @@ import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener.LoadCredentialOutcome;
 import org.italiangrid.voms.credential.LoadCredentialsStrategy;
+import org.italiangrid.voms.credential.VOMSEnvironmentVariables;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.KeystoreCredential;
@@ -20,19 +21,12 @@ import eu.emi.security.authn.x509.impl.PEMCredential;
  * @author andreaceccanti
  *
  */
-public abstract class AbstractLoadCredentialsStrategy implements LoadCredentialsStrategy {
+public abstract class AbstractLoadCredentialsStrategy implements LoadCredentialsStrategy, VOMSEnvironmentVariables {
 
 	/** 
 	 * The {@link LoadCredentialsEventListener} that is notified of load credentials outcome.
 	 */
 	LoadCredentialsEventListener listener;
-	
-	/**
-	 * Default constructor
-	 */
-	protected AbstractLoadCredentialsStrategy(){
-		this.listener = new LoggingCredentialNotificationListener();
-	}
 	
 	/**
 	 * Constructor that let client pass in a {@link LoadCredentialsEventListener}.

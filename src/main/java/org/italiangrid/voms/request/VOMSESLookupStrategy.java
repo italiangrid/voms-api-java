@@ -17,4 +17,10 @@ public interface VOMSESLookupStrategy {
 	 * used to parse VOMSES information.
 	 */
 	public List<File> lookupVomsesInfo();
+	
+	/**
+	 * @return a {@link List} of the paths that have been looked up to find
+	 * {@link File} objects that can be used to parse VOMSES information.
+	 */
+	public List<String> searchedPaths();
 }

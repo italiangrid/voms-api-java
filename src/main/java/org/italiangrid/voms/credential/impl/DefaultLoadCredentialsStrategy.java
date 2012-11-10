@@ -51,8 +51,7 @@ import eu.emi.security.authn.x509.X509Credential;
  * </ul>
  *  
  */
-public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStrategy 
-	implements VOMSEnvironmentVariables {
+public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStrategy {
 
 	public static final Logger log = LoggerFactory.getLogger(DefaultLoadCredentialsStrategy.class);
 	
@@ -60,8 +59,9 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 	private static final String GLOBUS_PEM_CERT_PATH_SUFFIX = ".globus/usercert.pem";
 	private static final String GLOBUS_PEM_KEY_PATH_SUFFIX = ".globus/userkey.pem";
 	
-	private static final String HOME_PROPERTY = "user.home";
-	private static final String TMPDIR_PROPERTY = "java.io.tmpdir";
+	public static final String HOME_PROPERTY = "user.home";
+	public static final String TMPDIR_PROPERTY = "java.io.tmpdir";
+	public static final String TMPDIR_PATH = "/tmp";
 	
 	private static final ProxyPathBuilder proxyPathBuilder = new DefaultProxyPathBuilder();
 	
@@ -85,6 +85,10 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 	
 	public DefaultLoadCredentialsStrategy() {
 		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY), new LoggingCredentialNotificationListener());
+	}
+	
+	public DefaultLoadCredentialsStrategy(LoadCredentialsEventListener listener){
+		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY), listener);
 	}
 	
 	/**
@@ -133,7 +137,7 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 	}
 
 
-	private X509Credential loadProxyFromUID() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
+	protected X509Credential loadProxyFromUID(){
 		String uid = getFromEnvOrSystemProperty(VOMS_USER_ID);
 		
 		if (uid != null){
@@ -143,7 +147,8 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 		
 		return null;
 	}
-	private X509Credential loadProxyFromEnv() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
+	
+	protected X509Credential loadProxyFromEnv() {
 		
 		String proxyPath = getFromEnvOrSystemProperty(X509_USER_PROXY);
 		if (proxyPath != null)
@@ -152,7 +157,7 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 		return null;
 	}
 	
-	private X509Credential loadPEMCredentialFromEnv(PasswordFinder pf) throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
+	protected X509Credential loadPEMCredentialFromEnv(PasswordFinder pf) {
 		String certPath = getFromEnvOrSystemProperty(X509_USER_CERT);
 		String keyPath = getFromEnvOrSystemProperty(X509_USER_KEY);
 		
@@ -163,7 +168,7 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 		return null;
 	}
 	
-	private X509Credential loadPKCS12CredentialFromEnv(PasswordFinder pf) throws KeyStoreException, IOException{
+	protected X509Credential loadPKCS12CredentialFromEnv(PasswordFinder pf) {
 		String pkcs12Path = getFromEnvOrSystemProperty(PKCS12_USER_CERT);
 		
 		if (pkcs12Path != null){
@@ -174,7 +179,7 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 	
 	
 	
-	private X509Credential loadPKCS12CredentialsFromGlobusDir(PasswordFinder pf) throws KeyStoreException, IOException {
+	protected X509Credential loadPKCS12CredentialsFromGlobusDir(PasswordFinder pf) {
 		
 		String credPath = String.format("%s/%s", home, GLOBUS_PKCS12_CRED_PATH_SUFFIX);
 		return loadPKCS12Credential(credPath, pf);
@@ -182,7 +187,7 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 	}
 
 
-	private X509Credential loadPEMCredentialsFromGlobusDir(PasswordFinder pf) throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
+	protected X509Credential loadPEMCredentialsFromGlobusDir(PasswordFinder pf) {
 		
 		String certPath  = String.format("%s/%s", home, GLOBUS_PEM_CERT_PATH_SUFFIX);
 		String keyPath = String.format("%s/%s", home, GLOBUS_PEM_KEY_PATH_SUFFIX);

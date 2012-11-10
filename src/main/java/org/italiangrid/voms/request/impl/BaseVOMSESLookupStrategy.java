@@ -2,6 +2,7 @@ package org.italiangrid.voms.request.impl;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
@@ -31,6 +32,10 @@ public class BaseVOMSESLookupStrategy implements VOMSESLookupStrategy {
 		}
 			
 		return vomsesPaths;
+	}
+
+	public List<String> searchedPaths() {
+		return Arrays.asList(checkedPaths);
 	}
 
 }
