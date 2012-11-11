@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
-import org.italiangrid.voms.credential.LoadCredentialsEventListener.LoadCredentialOutcome;
 import org.italiangrid.voms.credential.LoadCredentialsStrategy;
 import org.italiangrid.voms.credential.VOMSEnvironmentVariables;
 
@@ -62,10 +61,12 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 		try {
 			cred = new VOMSPEMCredential(privateKeyPath, certificatePath, pf);
 			
-			notifyLoadSuccess(privateKeyPath, certificatePath);
+			listener.notifyLoadCredentialSuccess(privateKeyPath, certificatePath);
+			
 		
 		} catch (Throwable t) {
-			notifyLoadFailure(t, privateKeyPath, certificatePath);
+			
+			listener.notifyLoadCredentialFailure(t, privateKeyPath, certificatePath);
 		}
 	
 		return cred;
@@ -88,15 +89,15 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 			try {
 				
 				cred = new KeystoreCredential(pkcs12FilePath, keyPassword, keyPassword, null, "PKCS12");
-				notifyLoadSuccess(pkcs12FilePath);
+				listener.notifyLoadCredentialSuccess(pkcs12FilePath);
 			
 			} catch (Throwable t) {
 				
-				notifyLoadFailure(t,pkcs12FilePath);
+				listener.notifyLoadCredentialFailure(t, pkcs12FilePath);
 			}
 		
 		}else
-			notifyLoadFailure(new IOException(pkcs12FilePath+" (cannot read file)"), pkcs12FilePath);
+			listener.notifyLoadCredentialFailure(new IOException(pkcs12FilePath+" (cannot read file)"), pkcs12FilePath);
 			
 		return cred;
 	}
@@ -114,31 +115,13 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 		try {
 			
 			cred = new PEMCredential(new FileInputStream(proxyPath), null);
-			notifyLoadSuccess(proxyPath);
+			listener.notifyLoadCredentialSuccess(proxyPath);
 		
 		} catch (Throwable t) {
 			
-			notifyLoadFailure(t, proxyPath);
+			listener.notifyLoadCredentialFailure(t, proxyPath);
 		}
 		
 		return cred;	
-	}
-	
-	/**
-	 * Notifies a credential load failure to the registered {@link LoadCredentialsEventListener}.
-	 * 
-	 * @param error the {@link Throwable} associated to the load failure
-	 * @param credentialPaths the files for which the credentials load failed
-	 */
-	private void notifyLoadFailure(Throwable error, String... credentialPaths){
-		listener.loadCredentialNotification(LoadCredentialOutcome.FAILURE, error, credentialPaths);
-	}
-
-	/**
-	 * Notifies a credential load success to the registered {@link LoadCredentialsEventListener}.
-	 * @param credentialPaths the files for which the credentials load succeded
-	 */
-	private void notifyLoadSuccess(String...credentialPaths){
-		listener.loadCredentialNotification(LoadCredentialOutcome.SUCCESS, null, credentialPaths);
 	}
 }

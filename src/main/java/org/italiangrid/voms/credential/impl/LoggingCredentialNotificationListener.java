@@ -18,17 +18,20 @@ public class LoggingCredentialNotificationListener implements
 	
 	private static final String CRED_SEPARATOR = ",";
 
-	public void loadCredentialNotification(LoadCredentialOutcome outcome,
-			Throwable error, String... locations) {
-		
-		if (outcome.equals(LoadCredentialOutcome.SUCCESS)){
-			log.info("Credentials loaded succesfully ({})", StringUtils.join(locations,CRED_SEPARATOR));
-		}else{
-			log.warn("Error loading credentials ({}). Reason: {}", StringUtils.join(locations, CRED_SEPARATOR),error.getMessage());
-			
-			if (log.isDebugEnabled())
-				log.warn("Error loading credentials ({}). Reason: {}", StringUtils.join(locations, CRED_SEPARATOR),error.getMessage(), error);
-		}
+
+	public void notifyCredentialLookup(String... locations) {
+		log.debug("Looking for user credentials in ({})...", StringUtils.join(locations, CRED_SEPARATOR));
 	}
 
+	public void notifyLoadCredentialSuccess(String... locations) {
+		log.info("Credentials loaded succesfully ({})", StringUtils.join(locations,CRED_SEPARATOR));
+	}
+
+	public void notifyLoadCredentialFailure(Throwable error, String... locations) {
+		log.warn("Error loading credentials ({}). Reason: {}", StringUtils.join(locations, CRED_SEPARATOR),error.getMessage());
+		
+		if (log.isDebugEnabled())
+			log.warn("Error loading credentials ({}). Reason: {}", StringUtils.join(locations, CRED_SEPARATOR),error.getMessage(), error);
+		
+	}
 }

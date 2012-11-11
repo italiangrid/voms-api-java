@@ -8,16 +8,24 @@ package org.italiangrid.voms.credential;
  */
 public interface LoadCredentialsEventListener {
 	
-	public enum LoadCredentialOutcome {
-		SUCCESS,
-		FAILURE
-	}
+	/**
+	 * Informs that credentials are been looked for in the locations passed as argument.
+	 * @param locations 
+	 */
+	public void notifyCredentialLookup(String...locations);
 	
 	/**
-	 * Informs about the outcome of a load credential operation. 
-	 * @param outcome the outcome of the load credential operation
-	 * @param error the exception that caused the load credential operation to fail
-	 * @param locations the paths of the credentials being loaded
+	 * Informs that credentials have been succesfully loaded from the credentials passed as argument.
+	 * 
+	 * @param locations
 	 */
-	public void loadCredentialNotification(LoadCredentialOutcome outcome, Throwable error, String... locations);
+	public void notifyLoadCredentialSuccess(String...locations);
+	
+	/**
+	 * Informs that credentials could not be loaded form the locations passed as argument.
+	 * 
+	 * @param error the {@link Throwable} that caused the credential load operation to fail
+	 * @param locations the locations where the credentials where loaded from 
+	 */
+	public void notifyLoadCredentialFailure(Throwable error, String...locations);
 }
