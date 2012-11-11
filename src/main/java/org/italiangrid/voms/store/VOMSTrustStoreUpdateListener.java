@@ -1,7 +1,7 @@
 package org.italiangrid.voms.store;
 
 /**
- * The interface used to notify interested listeners in updates of the VOMS trust store.
+ * This interface used to notify interested listeners in updates of the VOMS trust store.
  * 
  * @author Andrea Ceccanti
  *
