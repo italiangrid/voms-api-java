@@ -58,6 +58,8 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 		
 		VOMSPEMCredential cred = null;
 		
+		listener.notifyCredentialLookup(privateKeyPath, certificatePath);
+		
 		try {
 			cred = new VOMSPEMCredential(privateKeyPath, certificatePath, pf);
 			
@@ -83,6 +85,8 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 	 */
 	protected X509Credential loadPKCS12Credential(String pkcs12FilePath, PasswordFinder pf){
 		KeystoreCredential cred = null;
+		
+		listener.notifyCredentialLookup(pkcs12FilePath);
 		
 		if (fileExistsAndIsReadable(pkcs12FilePath)){
 			char[] keyPassword = pf.getPassword();
@@ -111,6 +115,8 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 	 */
 	protected X509Credential loadProxyCredential(String proxyPath){
 		PEMCredential cred = null;
+		
+		listener.notifyCredentialLookup(proxyPath);
 		
 		try {
 			
