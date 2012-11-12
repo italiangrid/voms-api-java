@@ -12,12 +12,12 @@ import javax.net.ssl.X509TrustManager;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
+import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.emi.security.authn.x509.NamespaceCheckingMode;
 import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
+import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
 
 /**
@@ -32,10 +32,17 @@ public class SSLSocketFactoryProvider {
   private static Logger log = LoggerFactory.getLogger(SSLSocketFactoryProvider.class);
 
   private X509Credential credential;
+  private AbstractValidator validator;
   
+  
+  public SSLSocketFactoryProvider(X509Credential credential, AbstractValidator validator){
+	  this.credential = credential;
+	  this.validator = validator;
+	  
+  }
   public SSLSocketFactoryProvider(X509Credential credential) {
-    
-    this.credential = credential;
+    this(credential, CertificateValidatorBuilder.buildCertificateValidator(DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR,
+    		null, 60000L));
   }
   
   /**
@@ -57,10 +64,7 @@ public class SSLSocketFactoryProvider {
       throw new VOMSError("No SSLv3 algorithm, cannot instanciate SSLContext", e);
     }
 
-    KeyManager[] keyManagers = new KeyManager[] {credential.getKeyManager()};
-
-    OpensslCertChainValidator validator = new OpensslCertChainValidator(
-        DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS, 60000L);
+    KeyManager[] keyManagers = new KeyManager[] {credential.getKeyManager()}; 
 
     X509TrustManager trustManager = SocketFactoryCreator.getSSLTrustManager(validator);
 

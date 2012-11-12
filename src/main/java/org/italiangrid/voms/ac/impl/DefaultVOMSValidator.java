@@ -14,11 +14,11 @@ import org.italiangrid.voms.asn1.VOMSACUtils;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStores;
+import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
-import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 
 public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 		VOMSACValidator {
@@ -32,13 +32,13 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
  
 	public DefaultVOMSValidator(ValidationResultListener resultHandler){
 		this(VOMSTrustStores.newTrustStore(), 
-				new OpensslCertChainValidator(DEFAULT_TRUST_ANCHORS_DIR),
+				CertificateValidatorBuilder.buildCertificateValidator(DEFAULT_TRUST_ANCHORS_DIR),
 				resultHandler);
 	}
 	
 	public DefaultVOMSValidator() {
 		this (VOMSTrustStores.newTrustStore(), 
-				new OpensslCertChainValidator(DEFAULT_TRUST_ANCHORS_DIR),
+				CertificateValidatorBuilder.buildCertificateValidator(DEFAULT_TRUST_ANCHORS_DIR),
 				new LoggingValidationResultListener());
 	}
 	
