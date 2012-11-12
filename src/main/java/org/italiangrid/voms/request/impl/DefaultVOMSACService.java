@@ -5,75 +5,202 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
+import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSACService;
+import org.italiangrid.voms.request.VOMSRequestListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
+import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
+import org.italiangrid.voms.util.CertificateValidatorBuilder;
+import org.italiangrid.voms.util.LoggingListener;
 
 import eu.emi.security.authn.x509.X509Credential;
+import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 
-/**
- * Default implementation for the VOMS AC Service.
+/** 
+ * The default implementation of the {@link VOMSACService}.
  * 
- * @author valerioventuri
+ * 
+ * @author Valerio Venturi
+ * @author Andrea Ceccanti
  *
  */
 public class DefaultVOMSACService implements VOMSACService {
 
-  public AttributeCertificate getVOMSAttributeCertificate(X509Credential credential, VOMSACRequest request) {
-    
-    Set<VOMSServerInfo> vomsServerInfos = getVOMSServerInfos(request);
-    
-    VOMSResponse response = null;
-    
-    for(VOMSServerInfo vomsServerInfo : vomsServerInfos) {
-      
-      RESTProtocol restProtocol = new RESTProtocol(vomsServerInfo);
-      response = restProtocol.doRequest(credential, request);
+	/**
+	 * The listener that will be informed about request events
+	 */
+	private VOMSRequestListener requestListener;
+	
+	/**
+	 * The listener that will be informed about server info store events
+	 */
+	private VOMSServerInfoStoreListener serverInfoStoreListener;
+	
+	/**
+	 * The validator used for the SSL handshake
+	 */
+	private AbstractValidator validator;
+	
+	/**
+	 * Ctor. 
+	 * 
+	 * @param validator the validator used for the SSL handshake
+	 * @param listener the listener that will be informed about request events
+	 * @param serverInfoStoreListener the listener that will be informed about server info store events
+	 */
+	public DefaultVOMSACService(AbstractValidator validator,
+			VOMSRequestListener listener, 
+			VOMSServerInfoStoreListener serverInfoStoreListener) {
+		
+		this.requestListener = listener;
+		this.serverInfoStoreListener = serverInfoStoreListener;
+		this.validator = validator;
+	}
 
-      if(response == null) {
-        
-        LegacyProtocol legacyProtocol = new LegacyProtocol(vomsServerInfo);
-        response = legacyProtocol.doRequest(credential, request);
-      }
-        
-      if(response != null)
-        break;
-      
-    }
-    
-    if(response == null) {
-      
-      return null;
-    }
-      
-    byte[] acBytes = response.getAC();
-    
-    ASN1InputStream asn1InputStream = new ASN1InputStream(acBytes);
-    
-    AttributeCertificate attributeCertificate = null;
-  
-    try {
-    
-      attributeCertificate = AttributeCertificate.getInstance(asn1InputStream.readObject());
-    
-      asn1InputStream.close();
-      
-    } catch (IOException e) {
-    	
-      return null;
-    }
-    
-    return attributeCertificate;
-  }
+	public DefaultVOMSACService() {
+		this.validator = CertificateValidatorBuilder.buildCertificateValidator();
+		
+		LoggingListener logListener = new LoggingListener();
+		this.requestListener = logListener;
+		this.serverInfoStoreListener = logListener;
+		
+	}
+	
+	/**
+	 * Extracts an AC from a VOMS response
+	 * 
+	 * @param request the request
+	 * @param response the received response
+	 * @return a possibly <code>null</code> {@link AttributeCertificate} object
+	 */
+	protected AttributeCertificate getACFromResponse(VOMSACRequest request, VOMSResponse response){
+		byte[] acBytes = response.getAC();
 
-  private Set<VOMSServerInfo> getVOMSServerInfos(VOMSACRequest request) {
-    
-    VOMSServerInfoStore vomsServerInfoStore = new DefaultVOMSServerInfoStore();
-    Set<VOMSServerInfo> vomsServerInfos = vomsServerInfoStore.getVOMSServerInfo(request.getVoName());
-    
-    return vomsServerInfos;
-  }
+		ASN1InputStream asn1InputStream = new ASN1InputStream(acBytes);
 
+		AttributeCertificate attributeCertificate = null;
+
+		try {
+
+			attributeCertificate = AttributeCertificate
+					.getInstance(asn1InputStream.readObject());
+
+			asn1InputStream.close();
+			return attributeCertificate;
+
+		} catch (IOException e) {
+
+			requestListener.notifyVOMSRequestFailure(request, null, e);
+			return null;
+		}
+	}
+	
+	/**
+	 * Executes the request using the VOMS REST protocol
+	 * 
+	 * @param request the request
+	 * @param serverInfo the VOMS server endpoint information
+	 * @param credential the credentials used to authenticate to the server
+	 * @return a {@link VOMSResponse}
+	 */
+	protected VOMSResponse doRESTRequest(VOMSACRequest request, VOMSServerInfo serverInfo, X509Credential credential){
+		
+		RESTProtocol restProtocol = new RESTProtocol(serverInfo, validator);
+		return restProtocol.doRequest(credential, request);
+		
+	}
+	
+	/**
+	 * Executes the request using the VOMS legacy protocol
+	 * @param request the request
+	 * @param serverInfo the VOMS server endpoint information
+	 * @param credential the credentials used to authenticate to the server
+	 * @return a {@link VOMSResponse}
+	 */
+	protected VOMSResponse doLegacyRequest(VOMSACRequest request, VOMSServerInfo serverInfo, X509Credential credential){
+		
+		LegacyProtocol legacyProtocol = new LegacyProtocol(serverInfo, validator);
+		return legacyProtocol.doRequest(credential, request);
+		
+	}
+	
+	/**
+	 * Handles errors included in the VOMS response
+	 * @param request the request
+	 * @param si the VOMS server endpoint information
+	 * @param response the received {@link VOMSResponse}
+	 */
+	protected void handleErrorsInResponse(VOMSACRequest request, VOMSServerInfo si, VOMSResponse response){
+		
+		if (response.hasErrors())
+			requestListener.notifyErrorsInVOMSReponse(request, si, response.errorMessages());		
+		
+	}
+	/**
+	 * Handles warnings included in the VOMS response
+	 * @param request the request
+	 * @param si the VOMS server endpoint information
+	 * @param response the received {@link VOMSResponse}
+	 */
+	protected void handleWarningsInResponse(VOMSACRequest request, VOMSServerInfo si, VOMSResponse response){
+		if (response.hasWarnings())
+			requestListener.notifyWarningsInVOMSResponse(request, si, response.warningMessages());
+	}
+	
+	public AttributeCertificate getVOMSAttributeCertificate(
+			X509Credential credential, VOMSACRequest request) {
+
+		Set<VOMSServerInfo> vomsServerInfos = getVOMSServerInfos(request);
+		
+		if (vomsServerInfos.isEmpty())
+			throw new VOMSError("VOMS server for VO "+request.getVoName()+" is not known! Check your vomses configuration.");
+		
+		VOMSResponse response = null;
+
+		for (VOMSServerInfo vomsServerInfo : vomsServerInfos) {
+
+			requestListener.notifyVOMSRequestStart(request,  vomsServerInfo);
+			
+			response = doRESTRequest(request, vomsServerInfo, credential);
+
+			if (response == null)
+				response = doLegacyRequest(request, vomsServerInfo, credential);
+
+			if (response != null){
+				requestListener.notifyVOMSRequestSuccess(request, vomsServerInfo);
+				
+				handleErrorsInResponse(request, vomsServerInfo, response);
+				handleWarningsInResponse(request, vomsServerInfo, response);
+				
+				break;
+			}
+			
+			requestListener.notifyVOMSRequestFailure(request, vomsServerInfo, null);
+		}
+
+		if (response == null) {
+			requestListener.notifyVOMSRequestFailure(request, null, null);
+			return null;
+		}
+		
+		return getACFromResponse(request, response);
+	}
+
+	/**
+	 * Get VOMS server endpoint information that matches with the {@link VOMSACRequest} passed
+	 * as argument
+	 * @param request the request
+	 * @return a possibly empty {@link Set} of {@link VOMSServerInfo} objects
+	 */
+	protected Set<VOMSServerInfo> getVOMSServerInfos(VOMSACRequest request) {
+
+		VOMSServerInfoStore vomsServerInfoStore = new DefaultVOMSServerInfoStore(serverInfoStoreListener);
+		Set<VOMSServerInfo> vomsServerInfos = vomsServerInfoStore
+				.getVOMSServerInfo(request.getVoName());
+
+		return vomsServerInfos;
+	}
 }

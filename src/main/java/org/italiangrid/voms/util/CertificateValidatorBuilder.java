@@ -1,5 +1,7 @@
 package org.italiangrid.voms.util;
 
+import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
+
 import eu.emi.security.authn.x509.CrlCheckingMode;
 import eu.emi.security.authn.x509.NamespaceCheckingMode;
 import eu.emi.security.authn.x509.OCSPCheckingMode;
@@ -127,6 +129,11 @@ public class CertificateValidatorBuilder {
 	 */
 	public static AbstractValidator buildCertificateValidator(String trustAnchorsDir) {
 		return buildCertificateValidator(trustAnchorsDir, null, 0L, DEFAULT_NS_CHECKS,
+				DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
+	}
+	
+	public static AbstractValidator buildCertificateValidator(){
+		return buildCertificateValidator(DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, 0L, DEFAULT_NS_CHECKS,
 				DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
 	}
 }

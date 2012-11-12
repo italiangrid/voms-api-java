@@ -11,8 +11,12 @@ import org.italiangrid.voms.ac.ACLookupListener;
 import org.italiangrid.voms.ac.VOMSValidationResult;
 import org.italiangrid.voms.ac.ValidationResultListener;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
+import org.italiangrid.voms.request.VOMSACRequest;
+import org.italiangrid.voms.request.VOMSErrorMessage;
+import org.italiangrid.voms.request.VOMSRequestListener;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
+import org.italiangrid.voms.request.VOMSWarningMessage;
 import org.italiangrid.voms.store.LSCInfo;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
@@ -33,7 +37,8 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
 public class LoggingListener implements ACLookupListener,
 		ValidationResultListener, VOMSServerInfoStoreListener,
 		LoadCredentialsEventListener, VOMSTrustStoreStatusListener,
-		VOMSTrustStoreUpdateListener, UncaughtExceptionHandler {
+		VOMSTrustStoreUpdateListener, UncaughtExceptionHandler,
+		VOMSRequestListener{
 
 	public static final Logger log = LoggerFactory
 			.getLogger(LoggingListener.class);
@@ -149,5 +154,34 @@ public class LoggingListener implements ACLookupListener,
 	public void uncaughtException(Thread t, Throwable e) {
 		log.error("Uncaught exception in thread {}: {}", t.getName(),
 				e.getMessage(), e);
+	}
+
+	public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
+		
+		
+	}
+
+	public void notifyVOMSRequestSuccess(VOMSACRequest request,
+			VOMSServerInfo endpoint) {
+		
+		
+	}
+
+	public void notifyVOMSRequestFailure(VOMSACRequest request,
+			VOMSServerInfo endpoint, Throwable error) {
+		
+		
+	}
+
+	public void notifyErrorsInVOMSReponse(VOMSACRequest request,
+			VOMSServerInfo si, VOMSErrorMessage[] errors) {
+		
+		
+	}
+
+	public void notifyWarningsInVOMSResponse(VOMSACRequest request,
+			VOMSServerInfo si, VOMSWarningMessage[] warnings) {
+		
+		
 	}
 }
