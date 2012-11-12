@@ -1,7 +1,8 @@
 /*********************************************************************
  *
  * Authors: 
- *      Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it 
+ *      Andrea Ceccanti    - andrea.ceccanti@cnaf.infn.it 
+ *      Vincenzo Ciaschini - vincenzo.ciaschini@cnaf.infn.it
  *          
  * Copyright (c) Members of the EGEE Collaboration. 2004-2010.
  * See http://www.eu-egee.org/partners/ for details on the copyright holders.
@@ -23,33 +24,26 @@
  * follows.
  *
  *********************************************************************/
-package org.glite.voms.contact;
+package org.italiangrid.voms.request;
+
 
 /**
  * 
- * @author Andrea Ceccanti
+ * This class is used to decode VOMS error messages contained in a VOMS
+ * response.
+ * 
+ * @author Andrea CEccanti
  * 
  */
-public class VOMSException extends RuntimeException {
+public class VOMSWarningMessage extends VOMSMessage {
 
-	/**
-     * 
-     */
-	private static final long serialVersionUID = 1L;
-
-	public VOMSException(String message) {
-
-		super(message);
+	public VOMSWarningMessage(int code, String message) {
+		super(code, message);
 	}
 
-	public VOMSException(String message, Throwable t) {
+	public String toString() {
 
-		super(message, t);
+		return "voms warning " + code + ": " + message;
+
 	}
-
-	public VOMSException(Throwable t) {
-
-		super(t.getMessage(), t);
-	}
-
 }

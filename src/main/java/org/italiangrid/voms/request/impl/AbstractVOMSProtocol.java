@@ -1,7 +1,5 @@
 package org.italiangrid.voms.request.impl;
 
-import java.net.URI;
-
 import javax.net.ssl.SSLSocketFactory;
 
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
@@ -18,15 +16,10 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	public static final String[] VOMS_LEGACY_PROTOCOLS = {"SSLv3"};
 	
 	/**
-	 * The URI.
+	 * The remote server endpoint information
 	 */
-	protected URI uri;
-
-	/**
-	 * The dn of the certificate that the https peer should use.
-	 * 
-	 */
-	protected String dn;
+	protected VOMSServerInfo serverInfo;
+	
 
 	/**
 	 * The CAnL validator used to manage SSL authentication.
@@ -55,8 +48,7 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	 */
 	public AbstractVOMSProtocol(VOMSServerInfo vomsServerInfo, AbstractValidator validator) {
 
-		uri = vomsServerInfo.getURL();
-		dn = vomsServerInfo.getVOMSServerDN();
+		this.serverInfo = vomsServerInfo;
 		this.validator = validator;
 	}
 	

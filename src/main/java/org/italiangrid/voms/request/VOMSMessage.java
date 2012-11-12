@@ -24,7 +24,7 @@
  * follows.
  *
  *********************************************************************/
-package org.glite.voms.contact;
+package org.italiangrid.voms.request;
 
 /**
  * 

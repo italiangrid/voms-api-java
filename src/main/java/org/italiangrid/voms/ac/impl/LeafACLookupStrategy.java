@@ -7,14 +7,13 @@ import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSError;
+import org.italiangrid.voms.ac.ACLookupListener;
 import org.italiangrid.voms.ac.ACParsingContext;
 import org.italiangrid.voms.ac.VOMSACLookupStrategy;
 import org.italiangrid.voms.asn1.VOMSACUtils;
 import org.italiangrid.voms.asn1.VOMSConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.italiangrid.voms.util.LoggingListener;
 
-import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.emi.security.authn.x509.proxy.ProxyUtils;
 
 /**
@@ -26,7 +25,16 @@ import eu.emi.security.authn.x509.proxy.ProxyUtils;
  */
 public class LeafACLookupStrategy implements VOMSACLookupStrategy, VOMSConstants {
 
-	public static final Logger log = LoggerFactory.getLogger(LeafACLookupStrategy.class);
+	private ACLookupListener listener;
+	
+	public LeafACLookupStrategy(ACLookupListener l) {
+		this.listener = l;
+	}
+	
+	public LeafACLookupStrategy(){
+		this(new LoggingListener());
+	}
+	
 	
 	public List<ACParsingContext> lookupVOMSAttributeCertificates(
 			X509Certificate[] certChain) {
@@ -39,10 +47,8 @@ public class LeafACLookupStrategy implements VOMSACLookupStrategy, VOMSConstants
 		for (int index = 0; index < certChain.length; index++){
 		
 			X509Certificate cert  = certChain[index];
-			String readableSubject = X500NameUtils.getReadableForm(cert.getSubjectX500Principal());
-			
-			log.debug("Looking for VOMS AC at certificate chain position {} of {}: {}",
-					new Object[]{index,	certChain.length, readableSubject});
+		
+			listener.notifyACLookupEvent(certChain, index);
 			
 			try{
 				
@@ -53,8 +59,7 @@ public class LeafACLookupStrategy implements VOMSACLookupStrategy, VOMSConstants
 					// Break at the first AC found from the top of the chain
 					if (!vomsACs.isEmpty()){
 						
-						log.debug("Found VOMS AC at certificate chain position {} of {}: {}", 
-								new Object[]{index,	certChain.length, readableSubject});
+						listener.notifyACParseEvent(certChain, index);
 						
 						ACParsingContext ctx = new ACParsingContext(vomsACs, index, certChain);
 						parsedACs.add(ctx);
@@ -63,9 +68,7 @@ public class LeafACLookupStrategy implements VOMSACLookupStrategy, VOMSConstants
 				}
 				
 			}catch (IOException e){
-				
-				log.error("Error extracting VOMS attribute certificates from certificate '{}': {}", 
-					new Object[]{readableSubject, e.getMessage()});
+				throw new VOMSError(e.getMessage(),e);
 			}
 		}
 		

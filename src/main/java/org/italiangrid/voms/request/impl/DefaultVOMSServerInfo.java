@@ -4,11 +4,20 @@ import java.net.URI;
 
 import org.italiangrid.voms.request.VOMSServerInfo;
 
+/**
+ * The default implementation of the {@link VOMSServerInfo} endpoint information.
+ * @author andreaceccanti
+ *
+ */
 public class DefaultVOMSServerInfo implements VOMSServerInfo {
 
+	/** The VOMS server alias **/
 	String alias;
+	/** The VO name **/
 	String voName;
+	/** The VOMS server URI **/
 	URI URL;
+	/** The  VOMS server certificate subject **/ 
 	String vomsServerDN;
 
 	public DefaultVOMSServerInfo() {

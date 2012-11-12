@@ -8,8 +8,6 @@ import org.italiangrid.voms.ac.ACParsingContext;
 import org.italiangrid.voms.ac.VOMSACLookupStrategy;
 import org.italiangrid.voms.ac.VOMSACParser;
 import org.italiangrid.voms.ac.VOMSAttributesNormalizationStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the VOMS attribute certificate parsing logic.
@@ -18,8 +16,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class DefaultVOMSACParser implements VOMSACParser {
-
-	public static final Logger log = LoggerFactory.getLogger(DefaultVOMSACParser.class);
 	
 	private final VOMSACLookupStrategy acLookupStrategy = new LeafACLookupStrategy();
 	private final VOMSAttributesNormalizationStrategy acNormalizationStrategy = new LeafVOMSExtensionNormalizationStrategy();

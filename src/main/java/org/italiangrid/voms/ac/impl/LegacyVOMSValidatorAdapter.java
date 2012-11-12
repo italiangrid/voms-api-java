@@ -10,12 +10,13 @@ import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.LegacyVOMSValidator;
 import org.italiangrid.voms.ac.VOMSACValidator;
 
+@SuppressWarnings("deprecation")
 public class LegacyVOMSValidatorAdapter implements
 		LegacyVOMSValidator {
 
 	private final VOMSACValidator validator;
 	
-	private ThreadLocal<X509Certificate[]> theChain;
+	private X509Certificate[] theChain;
 	
 	
 	public LegacyVOMSValidatorAdapter(X509Certificate certChain) {
@@ -25,7 +26,7 @@ public class LegacyVOMSValidatorAdapter implements
 	public LegacyVOMSValidatorAdapter(X509Certificate[] certChain) {
 		
 		validator = new DefaultVOMSValidator();
-		theChain.set(certChain);
+		theChain = certChain;
 	}
 	
 	public void cleanup() {
@@ -34,7 +35,7 @@ public class LegacyVOMSValidatorAdapter implements
 	}
 
 	public void setClientChain(X509Certificate[] certChain) {
-		theChain.set(certChain);
+		theChain = certChain;
 	}
 
 	public void parse() {
@@ -48,7 +49,7 @@ public class LegacyVOMSValidatorAdapter implements
 	}
 
 	public String[] getAllFullyQualifiedAttributes() {
-		List<VOMSAttribute> attributes = validator.validate(theChain.get());
+		List<VOMSAttribute> attributes = validator.validate(theChain);
 		List<String> allFQANs = new ArrayList<String>();
 		
 		for (VOMSAttribute a: attributes)
@@ -58,7 +59,7 @@ public class LegacyVOMSValidatorAdapter implements
 	}
 
 	public List<VOMSAttribute> getVOMSAttributes() {
-		List<VOMSAttribute> attributes = validator.validate(theChain.get());
+		List<VOMSAttribute> attributes = validator.validate(theChain);
 		return attributes;
 	}
 

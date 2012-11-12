@@ -6,6 +6,8 @@ import java.util.List;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 
 /**
+ * This class describes the context in which a VOMS {@link AttributeCertificate} has been
+ * parsed in a certificate chain.
  * 
  * @author Andrea Ceccanti
  *

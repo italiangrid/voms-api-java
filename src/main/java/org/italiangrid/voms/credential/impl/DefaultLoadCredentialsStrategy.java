@@ -8,8 +8,9 @@ import java.security.cert.CertificateException;
 import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
-import org.italiangrid.voms.credential.ProxyPathBuilder;
+import org.italiangrid.voms.credential.ProxyNamingPolicy;
 import org.italiangrid.voms.credential.VOMSEnvironmentVariables;
+import org.italiangrid.voms.util.LoggingListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +53,6 @@ import eu.emi.security.authn.x509.X509Credential;
  *  
  */
 public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStrategy {
-
-	public static final Logger log = LoggerFactory.getLogger(DefaultLoadCredentialsStrategy.class);
 	
 	private static final String GLOBUS_PKCS12_CRED_PATH_SUFFIX = ".globus/usercred.p12";
 	private static final String GLOBUS_PEM_CERT_PATH_SUFFIX = ".globus/usercert.pem";
@@ -63,7 +62,7 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 	public static final String TMPDIR_PROPERTY = "java.io.tmpdir";
 	public static final String TMPDIR_PATH = "/tmp";
 	
-	private static final ProxyPathBuilder proxyPathBuilder = new DefaultProxyPathBuilder();
+	private static final ProxyNamingPolicy proxyPathBuilder = new DefaultProxyPathBuilder();
 	
 	private String home;
 	private String tmpDir;
@@ -79,12 +78,12 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 	}
 	
 	public DefaultLoadCredentialsStrategy(String homeFolder) {
-		this(homeFolder, System.getProperty(TMPDIR_PROPERTY), new LoggingCredentialNotificationListener());
+		this(homeFolder, System.getProperty(TMPDIR_PROPERTY), new LoggingListener());
 	}
 	
 	
 	public DefaultLoadCredentialsStrategy() {
-		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY), new LoggingCredentialNotificationListener());
+		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY), new LoggingListener());
 	}
 	
 	public DefaultLoadCredentialsStrategy(LoadCredentialsEventListener listener){
@@ -141,7 +140,7 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 		String uid = getFromEnvOrSystemProperty(VOMS_USER_ID);
 		
 		if (uid != null){
-			String proxyFile = proxyPathBuilder.buildProxyFilePath(tmpDir, Integer.parseInt(uid));
+			String proxyFile = proxyPathBuilder.buildProxyFileName(tmpDir, Integer.parseInt(uid));
 			return loadProxyCredential(proxyFile);
 		}
 		

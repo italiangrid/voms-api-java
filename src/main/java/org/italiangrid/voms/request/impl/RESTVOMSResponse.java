@@ -26,12 +26,9 @@
  *********************************************************************/
 package org.italiangrid.voms.request.impl;
 
-import org.glite.voms.contact.VOMSErrorMessage;
-import org.glite.voms.contact.VOMSWarningMessage;
 import org.italiangrid.voms.request.ACDecodingStrategy;
-import org.italiangrid.voms.util.VOMSBase64Decoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.italiangrid.voms.request.VOMSErrorMessage;
+import org.italiangrid.voms.request.VOMSWarningMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -47,8 +44,6 @@ import org.w3c.dom.NodeList;
  * 
  */
 public class RESTVOMSResponse implements org.italiangrid.voms.request.VOMSResponse {
-
-  private static final Logger log = LoggerFactory.getLogger(RESTVOMSResponse.class);
 
 	private static int ERROR_OFFSET = 1000;
 	
@@ -167,8 +162,6 @@ public class RESTVOMSResponse implements org.italiangrid.voms.request.VOMSRespon
 				number = 3;
 			else
 				number = 4;
-
-			log.debug("Message = " + message + " number = " + number);
 			
 			if (number < ERROR_OFFSET) {
 				result[i] = new VOMSWarningMessage(number, message);

@@ -7,10 +7,10 @@ import java.net.UnknownHostException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocol;
+import org.italiangrid.voms.request.VOMSProtocolError;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
@@ -42,15 +42,16 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 
 		try {
 
-			sslSocket = (SSLSocket) sslSocketFactory.createSocket(uri.getHost(), uri.getPort());
+			sslSocket = (SSLSocket) sslSocketFactory.createSocket(serverInfo.getURL().getHost(), 
+					serverInfo.getURL().getPort());
 
 		} catch (UnknownHostException e) {
-
-			throw new VOMSError("Error in creating socket: " + e.getMessage(), e);
+			
+			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
 
 		} catch (IOException e) {
-
-			throw new VOMSError("Error in creating socket: " + e.getMessage(), e);
+			
+			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
 		}
 		
 		sslSocket.setEnabledProtocols(VOMS_LEGACY_PROTOCOLS);
@@ -71,7 +72,7 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 
 		} catch (IOException e) {
 
-			throw new VOMSError("Error communicating with server " + uri + ": " + e.getMessage(), e);
+			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
 		}
 
 		return response;

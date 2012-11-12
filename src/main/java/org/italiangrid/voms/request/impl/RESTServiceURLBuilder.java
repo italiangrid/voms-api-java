@@ -8,7 +8,14 @@ import java.util.List;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
-
+import org.italiangrid.voms.request.VOMSServerInfo;
+/**
+ * An helper class which builds a URL suitable for an HTTPS VOMS REST request
+ * starting from the VOMS URI as available in a {@link VOMSServerInfo} object.
+ * 
+ * @author Valerio Venturi
+ *
+ */
 public class RESTServiceURLBuilder {
 
   public URL build(URI uri, VOMSACRequest request) {

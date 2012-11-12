@@ -36,26 +36,21 @@ import org.apache.commons.lang.StringUtils;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.util.VOMSFQANNamingScheme;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 /**
  * 
- * This class builds VOMS XML requests starting from {@link VOMSRequestOptions}
+ * This class builds VOMS XML requests starting from {@link VOMSACRequest}
  * objects.
  * 
  * @author Andrea Ceccanti
- * @author Vincenzo Ciaschini
  * 
  */
 public class VOMSRequestFactory {
-
-	private static Logger log = LoggerFactory
-			.getLogger(VOMSRequestFactory.class);
-	private static VOMSRequestFactory instance = null;
+	
+	private static volatile VOMSRequestFactory instance = null;
 
 	private String orderString;
 	private String targetString;
@@ -63,7 +58,7 @@ public class VOMSRequestFactory {
 
 	protected DocumentBuilder docBuilder;
 
-	public static VOMSRequestFactory instance() {
+	public synchronized static VOMSRequestFactory instance() {
 		if (instance == null)
 			instance = new VOMSRequestFactory();
 
@@ -81,13 +76,6 @@ public class VOMSRequestFactory {
 		try {
 			docBuilder = factory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-
-			log.error("Error configuring DOM document builder.");
-
-			if (log.isDebugEnabled()) {
-				log.debug(e.getMessage(), e);
-			}
-
 			throw new VOMSError(e.getMessage());
 		}
 
@@ -139,19 +127,19 @@ public class VOMSRequestFactory {
 		lifetime = options.getLifetime();
 	}
 
-	public Document buildRequest(VOMSACRequest options) {
+	public Document buildRequest(VOMSACRequest acRequest) {
 
-		loadOptions(options);
+		loadOptions(acRequest);
 
 		Document request = docBuilder.newDocument();
 		VOMSRequestFragment frag = new VOMSRequestFragment(request);
 
-		if (options.getRequestedFQANs().isEmpty()) {
+		if (acRequest.getRequestedFQANs().isEmpty()) {
 
-			if (options.getVoName() == null)
+			if (acRequest.getVoName() == null)
 				throw new VOMSError("No vo name specified for AC retrieval.");
 
-			String voName = options.getVoName();
+			String voName = acRequest.getVoName();
 
 			if (!voName.startsWith("/"))
 				voName = "/" + voName;
@@ -163,12 +151,12 @@ public class VOMSRequestFactory {
 			return request;
 		}
 
-		Iterator fqanIter = options.getRequestedFQANs().iterator();
+		Iterator<String> fqanIter = acRequest.getRequestedFQANs().iterator();
 		frag.buildBase64();
 		frag.buildVersion();
 		while (fqanIter.hasNext()) {
 
-			String FQAN = (String) fqanIter.next();
+			String FQAN = fqanIter.next();
 
 			if (FQAN.equals("all")) {
 				frag.allCommand();
@@ -195,6 +183,12 @@ public class VOMSRequestFactory {
 
 }
 
+/**
+ * Helper class to manage the creation of VOMS XML requests. 
+ * 
+ * @author andreaceccanti
+ *
+ */
 class VOMSRequestFragment {
 
 	private Document doc;

@@ -39,8 +39,6 @@ import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSGenericAttribute;
 import org.italiangrid.voms.ac.impl.VOMSAttributesImpl;
 import org.italiangrid.voms.ac.impl.VOMSGenericAttributeImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A set of VOMS AC handling utilities.
@@ -49,8 +47,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class VOMSACUtils implements VOMSConstants{
-
-	public static final Logger log = LoggerFactory.getLogger(VOMSACUtils.class);
 	
 	public static final String POLICY_AUTHORITY_SEP ="://";
 	/**

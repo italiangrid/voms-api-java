@@ -6,10 +6,10 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocol;
+import org.italiangrid.voms.request.VOMSProtocolError;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
@@ -37,7 +37,7 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 	public VOMSResponse doRequest(X509Credential credential, VOMSACRequest request) {
 
 		RESTServiceURLBuilder restQueryBuilder = new RESTServiceURLBuilder();
-		URL serviceUrl = restQueryBuilder.build(uri, request);
+		URL serviceUrl = restQueryBuilder.build(serverInfo.getURL(), request);
 
 		HttpsURLConnection connection = null;
 
@@ -46,8 +46,8 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 			connection = (HttpsURLConnection) serviceUrl.openConnection();
 
 		} catch (IOException e) {
-
-			throw new VOMSError("Error opening connection to:" + serviceUrl, e);
+			
+			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
 		}
 
 		connection.setSSLSocketFactory(getSSLSocketFactory(credential));
@@ -57,8 +57,9 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 			connection.connect();
 
 		} catch (IOException e) {
-
-			throw new VOMSError("Error opening connection to:" + serviceUrl, e);
+			
+			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
+			
 		}
 
 		InputStream inputStream = null;
@@ -69,8 +70,7 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 
 		} catch (IOException e) {
 
-			throw new VOMSError(
-					"No content in connection to " + serviceUrl + ": " + e.getMessage(), e);
+			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
 		}
 
 		RESTVOMSResponseParsingStrategy responseParsingStrategy = new RESTVOMSResponseParsingStrategy();

@@ -10,8 +10,6 @@ import org.italiangrid.voms.request.VOMSACService;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.X509Credential;
 
@@ -22,8 +20,6 @@ import eu.emi.security.authn.x509.X509Credential;
  *
  */
 public class DefaultVOMSACService implements VOMSACService {
-
-  private static Logger log = LoggerFactory.getLogger(DefaultVOMSACService.class);
 
   public AttributeCertificate getVOMSAttributeCertificate(X509Credential credential, VOMSACRequest request) {
     
@@ -45,15 +41,10 @@ public class DefaultVOMSACService implements VOMSACService {
       if(response != null)
         break;
       
-      log.info("Can't get a response from {}:{} for VO alias {}",
-    		  new Object[]{vomsServerInfo.getURL().getHost(),vomsServerInfo.getURL().getPort(),
-    		  vomsServerInfo.getAlias()});
-      
     }
     
     if(response == null) {
       
-      log.info("Can't get a response from any server for VO " + request.getVoName());
       return null;
     }
       
@@ -70,8 +61,7 @@ public class DefaultVOMSACService implements VOMSACService {
       asn1InputStream.close();
       
     } catch (IOException e) {
-
-      log.info("Error in parsing attribute certificate: " + e.getMessage());
+    	
       return null;
     }
     

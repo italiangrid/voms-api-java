@@ -1,7 +1,5 @@
 package org.italiangrid.voms.store.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An helper class to create a named VOMS thread.
@@ -12,8 +10,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class VOMSThread extends Thread {
-
-	public static final Logger log = LoggerFactory.getLogger(VOMSThread.class);
 	
 	/**
 	 * Default constructor.
@@ -21,13 +17,8 @@ public class VOMSThread extends Thread {
 	 * @param target the object whose <code>run</code> method is called.
 	 * @param name the name of the new thread.
 	 */
-	public VOMSThread(Runnable target, String name) {
+	public VOMSThread(Runnable target, String name, UncaughtExceptionHandler handler) {
 		super(target, name);
-		setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {	
-			public void uncaughtException(Thread t, Throwable e) {
-				log.error("Uncaught exception in thread "+t.getName(),e);
-				
-			}
-		});
+		setUncaughtExceptionHandler(handler);
 	}	
 }

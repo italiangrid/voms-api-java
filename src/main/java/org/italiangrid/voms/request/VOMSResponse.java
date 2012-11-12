@@ -1,7 +1,5 @@
 package org.italiangrid.voms.request;
 
-import org.glite.voms.contact.VOMSErrorMessage;
-import org.glite.voms.contact.VOMSWarningMessage;
 
 /**
  * 

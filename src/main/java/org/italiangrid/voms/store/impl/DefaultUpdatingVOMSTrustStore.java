@@ -1,6 +1,5 @@
 package org.italiangrid.voms.store.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -9,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreUpdateListener;
+import org.italiangrid.voms.util.LoggingListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore implements
 		UpdatingVOMSTrustStore {
-
-	public static final Logger log = LoggerFactory.getLogger(DefaultUpdatingVOMSTrustStore.class);
 	
 	/**
 	 * Default trust store update frequency. 
@@ -51,30 +49,26 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	}
 	
 	public DefaultUpdatingVOMSTrustStore(long updateFrequency) {
-		this(buildDefaultTrustedDirs(), updateFrequency, new TrustStoreUpdatesLogger(false));
+		this(buildDefaultTrustedDirs(), updateFrequency, new LoggingListener());
 	}
 	
 	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency) {
-		this(localTrustDirs, updateFrequency, new TrustStoreUpdatesLogger(false));
+		this(localTrustDirs, updateFrequency, new LoggingListener());
 	}
 
 	
 	public DefaultUpdatingVOMSTrustStore(long updateFrequency, VOMSTrustStoreUpdateListener updateListener) {
-		this(buildDefaultTrustedDirs(), updateFrequency, new TrustStoreUpdatesLogger(false));
+		this(buildDefaultTrustedDirs(), updateFrequency, new LoggingListener());
 	}
 
 	public DefaultUpdatingVOMSTrustStore(){
-		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, new TrustStoreUpdatesLogger(true));
+		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, new LoggingListener());
 	}
 	
 	
 	protected void updateFrequencySanityChecks(long updateFrequency){
 		if (updateFrequency <= 0)
 			throw new VOMSError("Please provide a positive value for this store update frequency!");
-		
-		if (updateFrequency > TimeUnit.DAYS.toMillis(7)){
-			log.warn("Trust store update frequency set to more than one week! Please use a more sensible value (e.g., 1 DAY).");
-		}
 	}
 	
 	protected void scheduleUpdate(){
@@ -103,7 +97,6 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	}
 
 	public synchronized void cancel() {
-		log.debug("Canceling update thread");
 		scheduler.shutdownNow();
 
 	}

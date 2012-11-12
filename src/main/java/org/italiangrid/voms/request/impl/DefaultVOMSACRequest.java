@@ -5,6 +5,12 @@ import java.util.List;
 
 import org.italiangrid.voms.request.VOMSACRequest;
 
+/**
+ * The default implementation for a {@link VOMSACRequest}.
+ * 
+ * @author Valerio Venturi
+ *
+ */
 public class DefaultVOMSACRequest implements VOMSACRequest {
 
   private int lifetime;

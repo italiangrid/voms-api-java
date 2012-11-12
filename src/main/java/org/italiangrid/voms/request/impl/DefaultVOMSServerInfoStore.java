@@ -38,6 +38,7 @@ import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
 import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
+import org.italiangrid.voms.util.LoggingListener;
 
 /**
  * 
@@ -58,7 +59,7 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 	private VOMSESParser vomsesParser;
 	
 	public DefaultVOMSServerInfoStore() {
-		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl(), new LoggingServerInfoStoreListener());
+		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl(), new LoggingListener());
 	}
 	
 	public DefaultVOMSServerInfoStore(VOMSServerInfoStoreListener listener){
@@ -66,7 +67,7 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 	}
 	
 	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy){
-		this(lookupStrategy, new LegacyVOMSESParserImpl(), new LoggingServerInfoStoreListener());
+		this(lookupStrategy, new LegacyVOMSESParserImpl(), new LoggingListener());
 	}
 	
 	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy, VOMSESParser parser, VOMSServerInfoStoreListener listener) {
@@ -94,7 +95,7 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 			serverInfoStore.put(info.getVoName(), siCont);
 		}
 		
-		listener.serverInfoLoaded(path, info);
+		listener.notifyVOMSESInformationLoaded(path, info);
 	}
 	public Set<VOMSServerInfo> getVOMSServerInfo() {
 		Set<VOMSServerInfo> allEntries = new HashSet<VOMSServerInfo>();
@@ -117,11 +118,11 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 		List<File> vomsesPaths = lookupStrategy.lookupVomsesInfo();
 		
 		if (vomsesPaths.isEmpty())
-			listener.noValidVomsesNotification(lookupStrategy.searchedPaths());
+			listener.notifyNoValidVOMSESError(lookupStrategy.searchedPaths());
 		
 		for (File f: vomsesPaths){
 			
-			listener.lookupNotification(f.getAbsolutePath());
+			listener.notifyVOMSESlookup(f.getAbsolutePath());
 			
 			List<VOMSServerInfo> vomsServerInfo  = vomsesParser.parse(f);
 			for (VOMSServerInfo si: vomsServerInfo){

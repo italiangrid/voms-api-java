@@ -115,7 +115,7 @@ public class TestLoadCredential {
 		String tmpPath = System.getProperty("java.io.tmpdir");
 		System.setProperty(VOMSEnvironmentVariables.VOMS_USER_ID, twelve.toString());
 		DefaultProxyPathBuilder proxyPathBuilder = new DefaultProxyPathBuilder();
-		String proxyPath = proxyPathBuilder.buildProxyFilePath(tmpPath, twelve);
+		String proxyPath = proxyPathBuilder.buildProxyFileName(tmpPath, twelve);
 		
 		ProxyCertificate proxy = buildAndSaveProxy(pemCert, pemKey, keyPassword.toCharArray(), proxyPath);
 		

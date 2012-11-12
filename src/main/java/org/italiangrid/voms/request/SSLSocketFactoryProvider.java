@@ -13,8 +13,6 @@ import javax.net.ssl.X509TrustManager;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
@@ -28,8 +26,6 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
  *
  */
 public class SSLSocketFactoryProvider {
-
-  private static Logger log = LoggerFactory.getLogger(SSLSocketFactoryProvider.class);
 
   private X509Credential credential;
   private AbstractValidator validator;
@@ -60,7 +56,6 @@ public class SSLSocketFactoryProvider {
 
     } catch (NoSuchAlgorithmException e) {
 
-      log.error("No SSLv3 algorithm, cannot instanciate SSLContext");
       throw new VOMSError("No SSLv3 algorithm, cannot instanciate SSLContext", e);
     }
 
@@ -78,7 +73,6 @@ public class SSLSocketFactoryProvider {
 
     } catch (NoSuchAlgorithmException e) {
 
-      log.error("No algorithm SHA1PRNG, unable to initialize SSL context");
       throw new VOMSError("No algorithm SHA1PRNG, unable to initialize SSL context", e);
     }
 
@@ -88,7 +82,6 @@ public class SSLSocketFactoryProvider {
 
     } catch (KeyManagementException e) {
 
-      log.error("No algorithm SHA1PRNG, unable to initialize SSL context");
       throw new VOMSError("No algorithm SHA1PRNG, unable to initialize SSL context", e);
     }
 

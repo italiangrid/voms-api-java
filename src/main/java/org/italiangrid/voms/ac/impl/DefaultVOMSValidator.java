@@ -15,8 +15,7 @@ import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStores;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.italiangrid.voms.util.LoggingListener;
 
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 
@@ -24,7 +23,6 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 		VOMSACValidator {
 
 	public static final String DEFAULT_TRUST_ANCHORS_DIR = "/etc/grid-security/certificates";
-	public static final Logger log = LoggerFactory.getLogger(DefaultVOMSValidator.class);
 	
 	private final VOMSACValidationStrategy validationStrategy;
 	private final ValidationResultListener validationResultHandler;
@@ -39,12 +37,12 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	public DefaultVOMSValidator() {
 		this (VOMSTrustStores.newTrustStore(), 
 				CertificateValidatorBuilder.buildCertificateValidator(DEFAULT_TRUST_ANCHORS_DIR),
-				new LoggingValidationResultListener());
+				new LoggingListener());
 	}
 	
 	public DefaultVOMSValidator(VOMSTrustStore store, 
 			AbstractValidator validator){
-		this(store, validator, new LoggingValidationResultListener());
+		this(store, validator, new LoggingListener());
 	}
 	
 	public DefaultVOMSValidator(VOMSTrustStore store, 
@@ -78,8 +76,6 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	}
 
 	public synchronized void shutdown() {
-		
-		log.debug("Shutdown invoked.");
 		// Shut down eventual truststore refresh thread.
 		if (trustStore instanceof UpdatingVOMSTrustStore)
 			((UpdatingVOMSTrustStore)trustStore).cancel();

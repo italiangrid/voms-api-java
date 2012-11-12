@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class DefaultLSCFileParser implements LSCFileParser {
-
-	Logger log = LoggerFactory.getLogger(DefaultLSCFileParser.class);
 	
 	public static final String EMPTY_LINE_REGEX = "(?m)^\\s*?$";
 	
@@ -39,9 +37,6 @@ public class DefaultLSCFileParser implements LSCFileParser {
 	
 	
 	public LSCFile parse(String vo, String hostname, String filename) {
-		
-		log.debug("Parsing LSC information from file {} for VO {} and hostname {}", 
-				new Object[]{filename,vo, hostname});
 		
 		LSCFile lsc = null;
 		
@@ -77,8 +72,7 @@ public class DefaultLSCFileParser implements LSCFileParser {
 			List<String> certificateChainDescription = new ArrayList<String>();
 			
 			do{
-				line = lscReader.readLine();
-				log.debug("Parsing line: {}", line); 
+				line = lscReader.readLine(); 
 				
 				// This is EOF
 				if (line == null)
@@ -116,9 +110,6 @@ public class DefaultLSCFileParser implements LSCFileParser {
 
 
 	public LSCFile parse(String vo, String hostname, File file) {
-		
-		log.debug("Parsing LSC information from file {} for VO {} and hostname {}", 
-				new Object[]{file.getAbsolutePath(),vo, hostname});
 		
 		LSCFile lsc = null;
 		

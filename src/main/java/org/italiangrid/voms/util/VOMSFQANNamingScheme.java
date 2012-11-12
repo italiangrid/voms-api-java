@@ -29,9 +29,7 @@ package org.italiangrid.voms.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.glite.voms.contact.VOMSSyntaxException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.italiangrid.voms.VOMSError;
 
 /**
  * This class provides utility methods that are used for parsing, matching voms
@@ -43,9 +41,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class VOMSFQANNamingScheme {
-
-	public static final Logger log = LoggerFactory
-			.getLogger(VOMSFQANNamingScheme.class);
 
 	public static final String containerSyntax = "^(/[\\w.-]+)+|((/[\\w.-]+)+/)?(Role=[\\w.-]+)|(Capability=[\\w\\s.-]+)$";
 
@@ -77,16 +72,16 @@ public class VOMSFQANNamingScheme {
 	 * @param containerName
 	 *            the string that must be checked for compatibility with FQAN
 	 *            syntax.
-	 * @throws VOMSSyntaxException
+	 * @throws VOMSError
 	 *             If there's an error in the FQAN syntax.
 	 */
 	public static void checkSyntax(String containerName) {
 
 		if (containerName.length() > 255)
-			throw new VOMSSyntaxException("containerName.length() > 255");
+			throw new VOMSError("containerName.length() > 255");
 
 		if (!containerPattern.matcher(containerName).matches())
-			throw new VOMSSyntaxException("Syntax error in container name: "
+			throw new VOMSError("Syntax error in container name: "
 					+ containerName);
 	}
 
@@ -97,7 +92,7 @@ public class VOMSFQANNamingScheme {
 	 * 
 	 * @param groupName
 	 *            the string that has to be checked.
-	 * @throws VOMSSyntaxException
+	 * @throws VOMSError
 	 *             If the string passed as argument doens not comply with the
 	 *             voms sytax.
 	 */
@@ -106,7 +101,7 @@ public class VOMSFQANNamingScheme {
 		checkSyntax(groupName);
 
 		if (!groupPattern.matcher(groupName).matches())
-			throw new VOMSSyntaxException("Syntax error in group name: "
+			throw new VOMSError("Syntax error in group name: "
 					+ groupName);
 	}
 
@@ -116,17 +111,17 @@ public class VOMSFQANNamingScheme {
 	 * 
 	 * 
 	 * @param roleName
-	 * @throws VOMSSyntaxException
+	 * @throws VOMSError
 	 *             If the string passed as argument doens not comply with the
 	 *             voms sytax.
 	 */
 	public static void checkRole(String roleName) {
 
 		if (roleName.length() > 255)
-			throw new VOMSSyntaxException("roleName.length()>255");
+			throw new VOMSError("roleName.length()>255");
 
 		if (!rolePattern.matcher(roleName).matches())
-			throw new VOMSSyntaxException("Syntax error in role name: "
+			throw new VOMSError("Syntax error in role name: "
 					+ roleName);
 	}
 
@@ -200,7 +195,7 @@ public class VOMSFQANNamingScheme {
 	public static String getRoleName(String containerName) {
 
 		if (!isRole(containerName) && !isQualifiedRole(containerName))
-			throw new VOMSSyntaxException("No role specified in \""
+			throw new VOMSError("No role specified in \""
 					+ containerName + "\" voms syntax.");
 
 		Matcher m = containerPattern.matcher(containerName);
@@ -257,7 +252,7 @@ public class VOMSFQANNamingScheme {
 		checkSyntax(qualifiedRole);
 
 		if (!isQualifiedRole(qualifiedRole))
-			throw new VOMSSyntaxException(
+			throw new VOMSError(
 					"String passed as argument is not a qualified role!");
 
 		return getGroupName(qualifiedRole) + ":" + getRoleName(qualifiedRole);

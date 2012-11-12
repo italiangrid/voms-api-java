@@ -22,8 +22,6 @@ import org.xml.sax.SAXException;
  *
  */
 public class RESTVOMSResponseParsingStrategy implements VOMSResponseParsingStrategy {
-
-  private static Logger log = LoggerFactory.getLogger(RESTVOMSResponseParsingStrategy.class);
   
   private DocumentBuilder docBuilder;
   
@@ -42,9 +40,6 @@ public class RESTVOMSResponseParsingStrategy implements VOMSResponseParsingStrat
       docBuilder = factory.newDocumentBuilder();
     
     } catch (ParserConfigurationException e) {
-
-      log.error("Error configuring DOM document builder.");
-      log.debug(e.getMessage(), e);
       
       throw new VOMSError(e.getMessage(), e);
     }
@@ -67,25 +62,11 @@ public class RESTVOMSResponseParsingStrategy implements VOMSResponseParsingStrat
       
       return new RESTVOMSResponse(document);
 
-    } catch (SAXException e) {
-
-      log.error("Error parsing voms server response: " + e.getMessage());
-
-      if (log.isDebugEnabled())
-        log.error(e.getMessage(), e);
+    } catch (Exception e) {
 
       throw new VOMSError(e.getMessage());
 
-    } catch (IOException e) {
-
-      log.error("I/O error reading voms server response:" + e.getMessage());
-      
-      if (log.isDebugEnabled())
-        log.error(e.getMessage(), e);
-
-      throw new VOMSError(e.getMessage());
-    }
-    
+    } 
   }
 
 }
