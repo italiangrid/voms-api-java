@@ -81,7 +81,7 @@ public class VOMSFQANNamingScheme {
 			throw new VOMSError("containerName.length() > 255");
 
 		if (!containerPattern.matcher(containerName).matches())
-			throw new VOMSError("Syntax error in container name: "
+			throw new VOMSError("Syntax error in fqan: "
 					+ containerName);
 	}
 
