@@ -21,7 +21,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang.StringUtils;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.util.VOMSFQANNamingScheme;
@@ -223,7 +222,15 @@ class VOMSRequestFragment {
 				FQANs[i] = VOMSFQANNamingScheme.toOldQualifiedRoleSyntax(FQANs[i]);
 		}
 
-		return StringUtils.join(FQANs, ",");
+		StringBuilder fqansString = new StringBuilder();
+		
+		for (int i=0; i < FQANs.length; i++){
+			fqansString.append(FQANs);
+			if (i  <  FQANs.length - 1)
+				fqansString.append(",");
+		}
+			
+		return fqansString.toString();
 	}
 
 	void buildCommandElement(String cmdString) {

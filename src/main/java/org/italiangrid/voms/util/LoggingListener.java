@@ -20,7 +20,6 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.ACLookupListener;
 import org.italiangrid.voms.ac.VOMSValidationResult;
@@ -111,22 +110,22 @@ public class LoggingListener implements ACLookupListener,
 
 	public void notifyCredentialLookup(String... locations) {
 		log.debug("Looking for user credentials in ({})...",
-				StringUtils.join(locations, CRED_SEPARATOR));
+				locations.toString());
 	}
 
 	public void notifyLoadCredentialSuccess(String... locations) {
 		log.info("Credentials loaded succesfully ({})",
-				StringUtils.join(locations, CRED_SEPARATOR));
+				locations.toString());
 	}
 
 	public void notifyLoadCredentialFailure(Throwable error,
 			String... locations) {
 		log.warn("Error loading credentials ({}). Reason: {}",
-				StringUtils.join(locations, CRED_SEPARATOR), error.getMessage());
+				locations.toString(), error.getMessage());
 
 		if (log.isDebugEnabled())
 			log.warn("Error loading credentials ({}). Reason: {}",
-					StringUtils.join(locations, CRED_SEPARATOR),
+					locations.toString(),
 					error.getMessage(), error);
 
 	}

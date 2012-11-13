@@ -1,5 +1,5 @@
-%define pom_version @@POM_VERSION@@
-%define mvn_settings @@MVN_SETTINGS@@
+%global pom_version @@POM_VERSION@@
+%global mvn_settings @@MVN_SETTINGS@@
 
 Name: voms-api-java
 Version: 3.0.0
@@ -20,6 +20,7 @@ BuildRequires:  java-devel
 
 Requires:       jpackage-utils
 Requires:       slf4j
+Requires:       canl-java
 Requires:       java
 
 Provides:       vomsjapi = %{version}-%{release}
