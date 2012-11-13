@@ -18,6 +18,7 @@ package org.italiangrid.voms.util;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.List;
 
 import org.italiangrid.voms.VOMSAttribute;
@@ -56,8 +57,6 @@ public class LoggingListener implements ACLookupListener,
 
 	public static final Logger log = LoggerFactory
 			.getLogger(LoggingListener.class);
-
-	private static final String CRED_SEPARATOR = ",";
 
 	public void notifyACLookupEvent(X509Certificate[] chain, int chainLevel) {
 		String readableSubject = X500NameUtils
@@ -110,22 +109,22 @@ public class LoggingListener implements ACLookupListener,
 
 	public void notifyCredentialLookup(String... locations) {
 		log.debug("Looking for user credentials in ({})...",
-				locations.toString());
+				Arrays.toString(locations));
 	}
 
 	public void notifyLoadCredentialSuccess(String... locations) {
 		log.info("Credentials loaded succesfully ({})",
-				locations.toString());
+				Arrays.toString(locations));
 	}
 
 	public void notifyLoadCredentialFailure(Throwable error,
 			String... locations) {
 		log.warn("Error loading credentials ({}). Reason: {}",
-				locations.toString(), error.getMessage());
+				Arrays.toString(locations), error.getMessage());
 
 		if (log.isDebugEnabled())
 			log.warn("Error loading credentials ({}). Reason: {}",
-					locations.toString(),
+					Arrays.toString(locations),
 					error.getMessage(), error);
 
 	}
