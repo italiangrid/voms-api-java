@@ -1,5 +1,5 @@
 name=voms-api-java
-spec=spec/$(name).spec
+spec=spec/$(name)3.spec
 pom=pom.xml
 version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g")
 pom_version=$(shell grep "<version>" $(pom) | head -1 | sed -e 's/<version>//g' -e 's/<\/version>//g' -e "s/[ \t]*//g")
@@ -8,7 +8,7 @@ rpmbuild_dir=$(shell pwd)/rpmbuild
 tarbuild_dir=$(shell pwd)/tarbuild
 stage_dir=dist
 #mvn_settings=-s src/config/emi-build-settings.xml
-mvn_settings=
+mvn_settings=\%{nil}
 
 .PHONY: stage etics clean rpm
 
@@ -17,7 +17,7 @@ all: 	dist rpm
 prepare-spec:
 		sed -e 's#@@MVN_SETTINGS@@#$(mvn_settings)#g' \
 			-e 's#@@POM_VERSION@@#$(pom_version)#g' \
-			spec/voms-api-java.spec.in > spec/voms-api-java.spec
+			spec/voms-api-java.spec.in > $(spec)
 
 prepare-sources: prepare-spec
 		rm -rf 	$(tarbuild_dir)
@@ -26,7 +26,7 @@ prepare-sources: prepare-spec
 		cd $(tarbuild_dir) && tar cvzf $(tarbuild_dir)/$(name)-$(version).tar.gz $(name)
 
 clean:	
-		rm -rf target $(rpmbuild_dir) $(tarbuild_dir) tgz RPMS dir spec/voms-api-java.spec
+		rm -rf target $(rpmbuild_dir) $(tarbuild_dir) tgz RPMS dir $(spec)
 
 dist:   prepare-sources
 

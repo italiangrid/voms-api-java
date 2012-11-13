@@ -1,15 +1,17 @@
 %global pom_version @@POM_VERSION@@
 %global mvn_settings @@MVN_SETTINGS@@
 
-Name: voms-api-java
+%global orig_name voms-api-java
+
+Name: voms-api-java3
 Version: 3.0.0
 Release: 1%{?dist}
 Summary: The Virtual Organisation Membership Service Java APIs
 
 Group: System Environment/Libraries
 License: ASL 2.0
-URL: https://twiki.cnaf.infn.it/twiki/bin/view/VOMS
-Source: %{name}-%{version}.tar.gz
+URL: http://italiangrid.github.com/voms-api-java/
+Source0: %{orig_name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:	noarch
@@ -22,9 +24,6 @@ Requires:       jpackage-utils
 Requires:       slf4j
 Requires:       canl-java
 Requires:       java
-
-Provides:       vomsjapi = %{version}-%{release}
-Obsoletes:      vomsjapi < %{version}-%{release}
 
 %description
 The Virtual Organization Membership Service (VOMS) is an attribute authority
@@ -43,8 +42,6 @@ BuildArch:  noarch
 Requires:   jpackage-utils
 Requires:   %{name} = %{version}-%{release}
 
-Provides:       vomsjapi-javadoc = %{version}-%{release}
-Obsoletes:      vomsjapi-javadoc < %{version}-%{release}
 
 %description javadoc
 Virtual Organization Membership Service (VOMS) Java API Documentation.
@@ -58,12 +55,11 @@ mvn %{?mvn_settings} -U -Dmaven.test.skip=true -B clean javadoc:javadoc assembly
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
-tar -C $RPM_BUILD_ROOT -xvzf target/%{name}.tar.gz
+tar -C $RPM_BUILD_ROOT -xvzf target/%{orig_name}.tar.gz
 
-ln -s %{name}-%{pom_version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
-ln -s %{name}-%{pom_version}.jar $RPM_BUILD_ROOT%{_javadir}/vomsjapi.jar
+ln -s %{orig_name}-%{pom_version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
 
-mv $RPM_BUILD_ROOT%{_javadocdir}/%{name} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{pom_version}
+mv $RPM_BUILD_ROOT%{_javadocdir}/%{orig_name} $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{pom_version}
 ln -s %{name}-%{pom_version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 %clean
@@ -73,10 +69,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 
 %{_javadir}/%{name}.jar
-%{_javadir}/%{name}-%{pom_version}.jar
-
-# Backward compatibility naming
-%{_javadir}/vomsjapi.jar
+%{_javadir}/%{orig_name}-%{pom_version}.jar
 
 %doc AUTHORS LICENSE
 
