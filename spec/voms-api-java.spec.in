@@ -1,5 +1,12 @@
 %global pom_version @@POM_VERSION@@
 %global mvn_settings @@MVN_SETTINGS@@
+%global bcmail-package @@BCMAIL_PACKAGE@@
+
+%if %{?rhel}%{!?rhel:0} == 5
+%global bcmail_package  bouncycastle146-mail
+%else
+%global bcmail_package  bouncycastle-mail
+%endif
 
 %global orig_name voms-api-java
 
@@ -23,6 +30,7 @@ BuildRequires:  java-devel
 Requires:       jpackage-utils
 Requires:       slf4j
 Requires:       canl-java
+Requires:       %{bcmail_package}
 Requires:       java
 
 %description
