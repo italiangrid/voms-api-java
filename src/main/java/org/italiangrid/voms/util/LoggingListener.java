@@ -59,7 +59,7 @@ public class LoggingListener implements ACLookupListener,
 				.getReadableForm(chain[chainLevel].getSubjectX500Principal());
 		
 		
-		String format = "Looking for VOMS AC at certificate chain position %d of %d: %d\n";
+		String format = "Looking for VOMS AC at certificate chain position %d of %d: %s\n";
 		System.out.format(format, chainLevel, chain.length, readableSubject);
 
 	}
@@ -68,7 +68,7 @@ public class LoggingListener implements ACLookupListener,
 		String readableSubject = X500NameUtils
 				.getReadableForm(chain[chainLevel].getSubjectX500Principal());
 
-		String format = "Found VOMS AC at certificate chain position %d of %d: %d\n";
+		String format = "Found VOMS AC at certificate chain position %d of %d: %s\n";
 		System.out.format(format,chainLevel, chain.length, readableSubject);
 
 	}
