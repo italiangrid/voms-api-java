@@ -15,19 +15,11 @@
  */
 package org.italiangrid.voms.credential.impl;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.cert.CertificateException;
-
 import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
 import org.italiangrid.voms.credential.ProxyNamingPolicy;
-import org.italiangrid.voms.credential.VOMSEnvironmentVariables;
 import org.italiangrid.voms.util.LoggingListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.X509Credential;
 

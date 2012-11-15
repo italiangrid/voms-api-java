@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
@@ -54,8 +55,6 @@ import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -320,7 +319,6 @@ public class TestACGeneration {
 
 class ValidationResultChecker implements ValidationResultListener{
 
-	static final Logger log = LoggerFactory.getLogger(ValidationResultChecker.class);
 	
 	VOMSValidationErrorMessage[] expectedErrorMessages;
 	boolean expectedValidationResult;
@@ -333,7 +331,6 @@ class ValidationResultChecker implements ValidationResultListener{
 	public void notifyValidationResult(VOMSValidationResult result,
 			VOMSAttribute attributes) {
 		
-		log.debug("Checking validation result: {}", result);
 		
 		assertEquals(expectedValidationResult, result.isValid());
 		assertEquals(expectedErrorMessages.length, result.getValidationErrors().size());

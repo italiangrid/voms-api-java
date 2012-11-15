@@ -33,8 +33,6 @@ import java.util.List;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.credential.CredentialsUtils;
 import org.italiangrid.voms.credential.UserCredentials;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -63,7 +61,6 @@ public class ProxyGenerationExample {
 			InvalidKeyException, SignatureException, NoSuchAlgorithmException, UnrecoverableKeyException,
 			IllegalArgumentException, NoSuchProviderException {
 
-		Logger logger = LoggerFactory.getLogger(ProxyGenerationExample.class);
 
 		char[] pwd = "pass".toCharArray();
 
@@ -93,7 +90,7 @@ public class ProxyGenerationExample {
 		X509Certificate[] list = pxcert.getCertificateChain();
 
 		for (int i = 0; i < list.length; i++)
-			logger.info(list[i].toString() + "\n\n#######################\n\n");
+			System.out.println(list[i].toString() + "\n\n#######################\n\n");
 
 
 		/* Save the proxy */

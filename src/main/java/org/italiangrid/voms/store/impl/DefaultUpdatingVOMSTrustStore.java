@@ -24,8 +24,6 @@ import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreUpdateListener;
 import org.italiangrid.voms.util.LoggingListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A VOMS trust store that periodically updates itself. The update frequency is set

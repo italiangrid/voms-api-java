@@ -26,8 +26,6 @@ import java.util.List;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.LSCFileParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The default implementation for the LSC file parser.

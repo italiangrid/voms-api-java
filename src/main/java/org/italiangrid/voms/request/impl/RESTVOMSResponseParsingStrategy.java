@@ -15,7 +15,6 @@
  */
 package org.italiangrid.voms.request.impl;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,10 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSResponseParsingStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * Strategy for parsing a response coming from a RESTFul VOMS.

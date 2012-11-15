@@ -45,8 +45,6 @@ import org.italiangrid.voms.store.impl.DefaultUpdatingVOMSTrustStore;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.NamespaceCheckingMode;
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
@@ -155,8 +153,6 @@ public class TestConcurrentValidation {
 
 	
 	class ValidatorWorker implements Runnable{
-
-		Logger log = LoggerFactory.getLogger(ValidatorWorker.class);
 			
 		private volatile boolean shutdownRequested = false;
 		
@@ -175,7 +171,6 @@ public class TestConcurrentValidation {
 				e1.printStackTrace();
 			}
 			
-			log.info("Started");
 			
 			while (true){
 				

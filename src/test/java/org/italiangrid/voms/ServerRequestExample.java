@@ -75,8 +75,6 @@ public class ServerRequestExample {
 
     ProxyCertificate pxcert = ProxyGenerator.generate(pxopt, credential.getKey());
 
-    X509Certificate[] list = pxcert.getCertificateChain();
-
     /* Save the proxy */
 
     OutputStream os = new FileOutputStream("/tmp/savedProxy");

@@ -36,15 +36,14 @@ import org.italiangrid.voms.store.LSCInfo;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
 import org.italiangrid.voms.store.VOMSTrustStoreUpdateListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.helpers.trust.OpensslTrustAnchorStore;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 /**
  * This class provides a default listener implementation
- * for all VOMS API Java listeners that will log received events 
+ * for all VOMS API Java listeners that will print received events
+ * to standard output 
  * 
  * @author andreaceccanti
  *
@@ -55,16 +54,13 @@ public class LoggingListener implements ACLookupListener,
 		VOMSTrustStoreUpdateListener, UncaughtExceptionHandler,
 		VOMSRequestListener{
 
-	public static final Logger log = LoggerFactory
-			.getLogger(LoggingListener.class);
-
 	public void notifyACLookupEvent(X509Certificate[] chain, int chainLevel) {
 		String readableSubject = X500NameUtils
 				.getReadableForm(chain[chainLevel].getSubjectX500Principal());
-
-		log.debug(
-				"Looking for VOMS AC at certificate chain position {} of {}: {}",
-				new Object[] { chainLevel, chain.length, readableSubject });
+		
+		
+		String format = "Looking for VOMS AC at certificate chain position %d of %d: %d\n";
+		System.out.format(format, chainLevel, chain.length, readableSubject);
 
 	}
 
@@ -72,71 +68,64 @@ public class LoggingListener implements ACLookupListener,
 		String readableSubject = X500NameUtils
 				.getReadableForm(chain[chainLevel].getSubjectX500Principal());
 
-		log.debug("Found VOMS AC at certificate chain position {} of {}: {}",
-				new Object[] { chainLevel, chain.length, readableSubject });
+		String format = "Found VOMS AC at certificate chain position %d of %d: %d\n";
+		System.out.format(format,chainLevel, chain.length, readableSubject);
 
 	}
 
 	public void notifyValidationResult(VOMSValidationResult result,
 			VOMSAttribute attributes) {
 
-		if (result.isValid()) {
-			log.debug("{} {}", result, attributes);
-		} else {
-			log.warn("{} {}", result, attributes);
-		}
+		System.out.format("%s %s", result, attributes);
 
 	}
 
 	public void notifyNoValidVOMSESError(List<String> searchedPaths) {
-		log.debug("No valid VOMSES information found on the local machine while looking in: "
+		
+		System.out.println("No valid VOMSES information found on the local machine while looking in: "
 				+ searchedPaths);
 	}
 
 	public void notifyVOMSESlookup(String vomsesPath) {
 
-		log.debug("Looking for VOMSES information in {}", vomsesPath);
+		System.out.println("Looking for VOMSES information in "+vomsesPath);
 	}
 
 	public void notifyVOMSESInformationLoaded(String vomsesPath,
 			VOMSServerInfo info) {
 
 		if (vomsesPath == null)
-			log.debug("Loaded {}", info);
+			System.out.println("Loaded "+info);
 		else
-			log.debug("Loaded {} from {}", info, vomsesPath);
+			System.out.format("Loaded %s from %s\n", info, vomsesPath);
 	}
 
 	public void notifyCredentialLookup(String... locations) {
-		log.debug("Looking for user credentials in ({})...",
+		System.out.format("Looking for user credentials in (%s)...\n",
 				Arrays.toString(locations));
 	}
 
 	public void notifyLoadCredentialSuccess(String... locations) {
-		log.info("Credentials loaded succesfully ({})",
+		System.out.format("Credentials loaded succesfully (%s)\n",
 				Arrays.toString(locations));
 	}
 
 	public void notifyLoadCredentialFailure(Throwable error,
 			String... locations) {
-		log.warn("Error loading credentials ({}). Reason: {}",
+		
+		System.out.format("Error loading credentials (%s). Reason: %s\n",
 				Arrays.toString(locations), error.getMessage());
-
-		if (log.isDebugEnabled())
-			log.warn("Error loading credentials ({}). Reason: {}",
-					Arrays.toString(locations),
-					error.getMessage(), error);
 
 	}
 
 	public void notifyCertficateLookupEvent(String dir) {
 
-		log.debug("Looking for VOMS AA certificates in directory: {}", dir);
+		System.out.println("Looking for VOMS AA certificates in directory: "+dir);
 	}
 
 	public void notifyLSCLookupEvent(String dir) {
 
-		log.debug("Looking for VOMS LSC files in directory: {}", dir);
+		System.out.println("Looking for VOMS LSC files in directory: "+dir);
 
 	}
 
@@ -147,54 +136,55 @@ public class LoggingListener implements ACLookupListener,
 		String certHash = OpensslTrustAnchorStore.getOpenSSLCAHash(cert
 				.getSubjectX500Principal());
 
-		log.debug(
-				"Loaded VOMS AA certificate '{}' from file '{}' with subject hash '{}'",
-				new Object[] { readableSubject, f.getAbsolutePath(), certHash });
+		System.out.format("Loaded VOMS AA certificate '%s' from file '%s' with subject hash '%s'\n",
+				readableSubject, f.getAbsolutePath(), certHash);
 
 	}
 
 	public void notifyLSCLoadEvent(LSCInfo lsc, File f) {
-		log.debug("Loaded VOMS LSC information from {}: {}",
-				new Object[] { f.getAbsolutePath(), lsc.toString() });
+		System.out.format("Loaded VOMS LSC information from %s: %s\n",
+				f.getAbsolutePath(), lsc.toString());
 	}
 
 	public void notifyTrustStoreUpdate(VOMSTrustStore store) {
 
-		log.debug("VOMS trust store {} has been updated.", store);
+		System.out.format("VOMS trust store %s has been updated.\n", store);
 
 	}
 
 	public void uncaughtException(Thread t, Throwable e) {
-		log.error("Uncaught exception in thread {}: {}", t.getName(),
-				e.getMessage(), e);
+		System.out.format("Uncaught exception in thread %s: %s", t.getName(),
+				e.getMessage());
 	}
 
 	public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
-		
+		System.out.format("Contacting server %s for VO %s\n", si.getURL(), request.getVoName());
 		
 	}
 
 	public void notifyVOMSRequestSuccess(VOMSACRequest request,
-			VOMSServerInfo endpoint) {
+			VOMSServerInfo si) {
 		
+		System.out.format("Contacted server %s for VO %s succesfully\n", si.getURL(), request.getVoName());
 		
 	}
 
 	public void notifyVOMSRequestFailure(VOMSACRequest request,
 			VOMSServerInfo endpoint, Throwable error) {
-		
+		System.out.format("Request to server %s for VO %s failed! %s\n", endpoint.getURL(), 
+				request.getVoName(), error.getMessage());
 		
 	}
 
 	public void notifyErrorsInVOMSReponse(VOMSACRequest request,
 			VOMSServerInfo si, VOMSErrorMessage[] errors) {
 		
-		
+		System.out.format("Errors found in VOMS response: %s", Arrays.toString(errors));
 	}
 
 	public void notifyWarningsInVOMSResponse(VOMSACRequest request,
 			VOMSServerInfo si, VOMSWarningMessage[] warnings) {
-		
+		System.out.format("Warnings found in VOMS response: %s", Arrays.toString(warnings));
 		
 	}
 }

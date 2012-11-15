@@ -37,8 +37,6 @@
     <junitVersion>4.10</junitVersion>
     <canlVersion>1.1.0-rc2</canlVersion>
     <bcVersion>1.46</bcVersion>
-    <slf4jVersion>1.7.1</slf4jVersion>
-    <logbackVersion>1.0.7</logbackVersion>
     <licensePluginVersion>1.9.0</licensePluginVersion>
     <releasePluginVersion>2.2.2</releasePluginVersion>
   </properties>
@@ -174,19 +172,6 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcmail-jdk16</artifactId>
       <version>${bcVersion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4jVersion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logbackVersion}</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
