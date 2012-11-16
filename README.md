@@ -20,50 +20,9 @@ If using Maven, add the dependencies to your pom file
 
 ### Configure logging
 
-VOMS  Java API uses [SLF4J](http://www.slf4j.org/) for logging. SLF4J can direct your logging output 
-to several logging frameworks (log4j version 1.2, JCL, Logback, and others). See the 
-[SLF4J manual](http://www.slf4j.org/manual.html) for more details.
-
-In order to setup logging you first need to add the slf4j jar file for your preferred binding
-(e.g. slf4j-log4j12.jar in the case of log4j) to the classpath. Not doing so will cause an error like this
-
-```bash
-LF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
-```
-
-You also need to add the framework jar to your classpath. In case you are using Maven and log4j
-
-```bash
-<dependency>
-  <groupId>org.slf4j</groupId>
-  <artifactId>slf4j-log4j12</artifactId>
-  <version>1.7.1</version>
-</dependency>
-<dependency>
-  <groupId>log4j</groupId>
-  <artifactId>log4j</artifactId>
-  <version>1.2.17</version>
-</dependency>
-```
-
-and configure your logging framework, e.g. having a log4j.proprties file in the classpath 
-if using log4j
-
-```bash
-# Root logger option
-log4j.rootLogger=DEBUG, stdout
- 
-# Direct log messages to stdout
-log4j.appender.stdout=org.apache.log4j.ConsoleAppender
-log4j.appender.stdout.Target=System.out
-log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
-log4j.appender.stdout.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
-```
-
-or a logback.xml file if using Logback. An example Logback configuration file can be 
-found under src/test/resources. 
+VOMS Java API does not rely on logging anymore to provide information to the API user.
+The API now provides listeners that receive interesting events related to VOMS attribute
+certificate parsing and validation and interactions with remote VOMS servers.
 
 ## Getting started
 
@@ -161,7 +120,7 @@ To request an AC from a VOMS service, one has to create a VOMSACRequest in order
 options for the requested AC, like its lifetime, the VO name or the requested VOMS fqans.
 
 ```java
-VOMSACRequest request = new DefaultVOMSACRequest();
+DefaultVOMSACRequest request = new DefaultVOMSACRequest();
 request.setLifetime(12);
 request.setVoName("atlas");
 
@@ -190,7 +149,6 @@ method, as shown in the following example:
 OutputStream os = new FileOutputStream("/tmp/savedProxy");
 CredentialsUtils.saveCredentials(os, proxyCert.getCredential());
 ```
-
 
 ### Migrating from VOMS API Java v. 2.x
 
