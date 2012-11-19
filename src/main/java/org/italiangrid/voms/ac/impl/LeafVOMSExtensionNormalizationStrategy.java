@@ -15,6 +15,8 @@
  */
 package org.italiangrid.voms.ac.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
@@ -37,7 +39,7 @@ public class LeafVOMSExtensionNormalizationStrategy implements
 	public List<VOMSAttribute> normalizeAttributes(List<ACParsingContext> acs) {
 		
 		if (acs == null || acs.isEmpty())
-			return null;
+			return Collections.emptyList();
 		
 		List<AttributeCertificate> attrs = acs.get(0).getACs();
 		
