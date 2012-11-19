@@ -60,6 +60,13 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 		this(lookupStrategy, new LegacyVOMSESParserImpl(), new LoggingListener());
 	}
 	
+	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy, VOMSServerInfoStoreListener listener) {
+		this.lookupStrategy = lookupStrategy;
+		this.vomsesParser = new LegacyVOMSESParserImpl();
+		this.listener = listener;
+		initializeStore();
+	}
+	
 	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy, VOMSESParser parser, VOMSServerInfoStoreListener listener) {
 		this.lookupStrategy = lookupStrategy;
 		this.vomsesParser = parser;

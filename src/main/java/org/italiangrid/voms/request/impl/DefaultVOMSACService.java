@@ -23,6 +23,7 @@ import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSACService;
+import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSRequestListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
@@ -48,16 +49,16 @@ public class DefaultVOMSACService implements VOMSACService {
 	 * The listener that will be informed about request events
 	 */
 	private VOMSRequestListener requestListener;
-	
-	/**
-	 * The listener that will be informed about server info store events
-	 */
-	private VOMSServerInfoStoreListener serverInfoStoreListener;
-	
+		
 	/**
 	 * The validator used for the SSL handshake
 	 */
 	private AbstractValidator validator;
+	
+	/**
+	 * The store used to keep VOMS server contact information.
+	 */
+	private VOMSServerInfoStore serverInfoStore;
 	
 	/**
 	 * Ctor. 
@@ -68,11 +69,13 @@ public class DefaultVOMSACService implements VOMSACService {
 	 */
 	public DefaultVOMSACService(AbstractValidator validator,
 			VOMSRequestListener listener, 
+			VOMSESLookupStrategy lookupStrategy,
 			VOMSServerInfoStoreListener serverInfoStoreListener) {
 		
 		this.requestListener = listener;
-		this.serverInfoStoreListener = serverInfoStoreListener;
 		this.validator = validator;
+		
+		serverInfoStore = new DefaultVOMSServerInfoStore(lookupStrategy,serverInfoStoreListener);
 	}
 
 	public DefaultVOMSACService() {
@@ -80,7 +83,8 @@ public class DefaultVOMSACService implements VOMSACService {
 		
 		LoggingListener logListener = new LoggingListener();
 		this.requestListener = logListener;
-		this.serverInfoStoreListener = logListener;
+		
+		serverInfoStore = new DefaultVOMSServerInfoStore(logListener);
 		
 	}
 	
@@ -212,8 +216,7 @@ public class DefaultVOMSACService implements VOMSACService {
 	 */
 	protected Set<VOMSServerInfo> getVOMSServerInfos(VOMSACRequest request) {
 
-		VOMSServerInfoStore vomsServerInfoStore = new DefaultVOMSServerInfoStore(serverInfoStoreListener);
-		Set<VOMSServerInfo> vomsServerInfos = vomsServerInfoStore
+		Set<VOMSServerInfo> vomsServerInfos = serverInfoStore
 				.getVOMSServerInfo(request.getVoName());
 
 		return vomsServerInfos;
