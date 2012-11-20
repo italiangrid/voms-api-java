@@ -19,7 +19,7 @@ import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
 import org.italiangrid.voms.credential.ProxyNamingPolicy;
-import org.italiangrid.voms.util.LoggingListener;
+import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.X509Credential;
 
@@ -85,12 +85,12 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 	}
 	
 	public DefaultLoadCredentialsStrategy(String homeFolder) {
-		this(homeFolder, System.getProperty(TMPDIR_PROPERTY), new LoggingListener());
+		this(homeFolder, System.getProperty(TMPDIR_PROPERTY), new NullListener());
 	}
 	
 	
 	public DefaultLoadCredentialsStrategy() {
-		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY), new LoggingListener());
+		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY), new NullListener());
 	}
 	
 	public DefaultLoadCredentialsStrategy(LoadCredentialsEventListener listener){

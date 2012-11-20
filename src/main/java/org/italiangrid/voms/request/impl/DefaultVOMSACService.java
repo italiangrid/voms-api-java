@@ -30,7 +30,7 @@ import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
 import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
-import org.italiangrid.voms.util.LoggingListener;
+import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
@@ -81,10 +81,10 @@ public class DefaultVOMSACService implements VOMSACService {
 	public DefaultVOMSACService() {
 		this.validator = CertificateValidatorBuilder.buildCertificateValidator();
 		
-		LoggingListener logListener = new LoggingListener();
-		this.requestListener = logListener;
+		NullListener listener =  new NullListener();
+		this.requestListener = listener;
 		
-		serverInfoStore = new DefaultVOMSServerInfoStore(logListener);
+		serverInfoStore = new DefaultVOMSServerInfoStore(listener);
 		
 	}
 	

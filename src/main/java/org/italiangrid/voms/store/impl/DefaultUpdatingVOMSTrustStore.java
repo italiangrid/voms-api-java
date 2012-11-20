@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreUpdateListener;
-import org.italiangrid.voms.util.LoggingListener;
+import org.italiangrid.voms.util.NullListener;
 
 /**
  * A VOMS trust store that periodically updates itself. The update frequency is set
@@ -62,20 +62,20 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	}
 	
 	public DefaultUpdatingVOMSTrustStore(long updateFrequency) {
-		this(buildDefaultTrustedDirs(), updateFrequency, new LoggingListener());
+		this(buildDefaultTrustedDirs(), updateFrequency, new NullListener());
 	}
 	
 	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency) {
-		this(localTrustDirs, updateFrequency, new LoggingListener());
+		this(localTrustDirs, updateFrequency, new NullListener());
 	}
 
 	
 	public DefaultUpdatingVOMSTrustStore(long updateFrequency, VOMSTrustStoreUpdateListener updateListener) {
-		this(buildDefaultTrustedDirs(), updateFrequency, new LoggingListener());
+		this(buildDefaultTrustedDirs(), updateFrequency, new NullListener());
 	}
 
 	public DefaultUpdatingVOMSTrustStore(){
-		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, new LoggingListener());
+		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, new NullListener());
 	}
 	
 	

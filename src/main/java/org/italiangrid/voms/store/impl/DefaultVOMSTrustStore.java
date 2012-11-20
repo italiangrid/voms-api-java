@@ -35,7 +35,7 @@ import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.LSCInfo;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
-import org.italiangrid.voms.util.LoggingListener;
+import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.helpers.trust.OpensslTrustAnchorStore;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
@@ -102,7 +102,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 	}
 	
 	public DefaultVOMSTrustStore(List<String> localTrustDirs){
-		this(localTrustDirs, new LoggingListener());
+		this(localTrustDirs, new NullListener());
 	}
 	/**  
 	 * Default constructor.

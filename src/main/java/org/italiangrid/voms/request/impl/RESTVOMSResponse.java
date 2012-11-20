@@ -137,7 +137,7 @@ public class RESTVOMSResponse implements org.italiangrid.voms.request.VOMSRespon
 
 			Element itemElement = (Element) nodes.item(i);
 
-			Element messageElement = (Element) itemElement.getElementsByTagName("message").item(0);
+			// Element messageElement = (Element) itemElement.getElementsByTagName("message").item(0);
 
 			String message = itemElement.getFirstChild().getNodeValue();
 			

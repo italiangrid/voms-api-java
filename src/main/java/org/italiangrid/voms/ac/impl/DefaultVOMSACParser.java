@@ -23,6 +23,7 @@ import org.italiangrid.voms.ac.ACParsingContext;
 import org.italiangrid.voms.ac.VOMSACLookupStrategy;
 import org.italiangrid.voms.ac.VOMSACParser;
 import org.italiangrid.voms.ac.VOMSAttributesNormalizationStrategy;
+import org.italiangrid.voms.util.NullListener;
 
 /**
  * Default implementation of the VOMS attribute certificate parsing logic.
@@ -32,9 +33,17 @@ import org.italiangrid.voms.ac.VOMSAttributesNormalizationStrategy;
  */
 public class DefaultVOMSACParser implements VOMSACParser {
 	
-	private final VOMSACLookupStrategy acLookupStrategy = new LeafACLookupStrategy();
+	private VOMSACLookupStrategy acLookupStrategy;
 	private final VOMSAttributesNormalizationStrategy acNormalizationStrategy = new LeafVOMSExtensionNormalizationStrategy();
 	private X509Certificate[] certChain;
+	
+	public DefaultVOMSACParser() {
+		this(new LeafACLookupStrategy(new NullListener()));
+	}
+	
+	public DefaultVOMSACParser(VOMSACLookupStrategy strategy){
+		this.acLookupStrategy = strategy;
+	}
 	
 	public synchronized List<VOMSAttribute> parse(X509Certificate[] validatedChain) {
 		this.certChain = validatedChain;

@@ -15,6 +15,7 @@
  */
 package org.italiangrid.voms;
 
+import org.italiangrid.voms.ac.VOMSACLookupStrategy;
 import org.italiangrid.voms.ac.VOMSACParser;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.ac.ValidationResultListener;
@@ -32,6 +33,9 @@ import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
  */
 public class VOMSValidators {
 	
+	
+	private VOMSValidators(){}
+	
 	public static VOMSACValidator newValidator(ValidationResultListener listener){
 		return new DefaultVOMSValidator(listener);
 	}
@@ -44,12 +48,22 @@ public class VOMSValidators {
 		
 	}
 	
+	public static VOMSACValidator newValidator(VOMSTrustStore store,
+			AbstractValidator validator,
+			ValidationResultListener resultHandler,
+			VOMSACLookupStrategy strategy) {
+		
+		return new DefaultVOMSValidator(store, validator, resultHandler,
+				strategy);
+	}
+	
 	public static VOMSACValidator newValidator(VOMSTrustStore trustStore, 
 			AbstractValidator validator){
 		
 		return new DefaultVOMSValidator(trustStore, validator);
 		
 	}
+	
 	public static VOMSACValidator newValidator(){
 		return new DefaultVOMSValidator();
 	}
@@ -57,5 +71,7 @@ public class VOMSValidators {
 	public static VOMSACParser newParser(){
 		return new DefaultVOMSACParser();
 	}
+
+	
 
 }

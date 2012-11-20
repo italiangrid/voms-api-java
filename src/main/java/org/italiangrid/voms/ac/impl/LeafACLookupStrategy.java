@@ -27,7 +27,7 @@ import org.italiangrid.voms.ac.ACParsingContext;
 import org.italiangrid.voms.ac.VOMSACLookupStrategy;
 import org.italiangrid.voms.asn1.VOMSACUtils;
 import org.italiangrid.voms.asn1.VOMSConstants;
-import org.italiangrid.voms.util.LoggingListener;
+import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.proxy.ProxyUtils;
 
@@ -47,7 +47,7 @@ public class LeafACLookupStrategy implements VOMSACLookupStrategy, VOMSConstants
 	}
 	
 	public LeafACLookupStrategy(){
-		this(new LoggingListener());
+		this(new NullListener());
 	}
 	
 	

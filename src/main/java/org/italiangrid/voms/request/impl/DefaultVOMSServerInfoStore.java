@@ -28,7 +28,7 @@ import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
 import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
-import org.italiangrid.voms.util.LoggingListener;
+import org.italiangrid.voms.util.NullListener;
 
 /**
  * 
@@ -49,7 +49,7 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 	private VOMSESParser vomsesParser;
 	
 	public DefaultVOMSServerInfoStore() {
-		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl(), new LoggingListener());
+		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl(), new NullListener());
 	}
 	
 	public DefaultVOMSServerInfoStore(VOMSServerInfoStoreListener listener){
@@ -57,7 +57,7 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 	}
 	
 	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy){
-		this(lookupStrategy, new LegacyVOMSESParserImpl(), new LoggingListener());
+		this(lookupStrategy, new LegacyVOMSESParserImpl(), new NullListener());
 	}
 	
 	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy, VOMSServerInfoStoreListener listener) {

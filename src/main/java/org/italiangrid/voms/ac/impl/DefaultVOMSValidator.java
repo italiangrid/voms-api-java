@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.ac.VOMSACLookupStrategy;
 import org.italiangrid.voms.ac.VOMSACValidationStrategy;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.ac.VOMSValidationResult;
@@ -30,7 +31,7 @@ import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStores;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
-import org.italiangrid.voms.util.LoggingListener;
+import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 
@@ -52,17 +53,27 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	public DefaultVOMSValidator() {
 		this (VOMSTrustStores.newTrustStore(), 
 				CertificateValidatorBuilder.buildCertificateValidator(DEFAULT_TRUST_ANCHORS_DIR),
-				new LoggingListener());
+				new NullListener());
 	}
 	
 	public DefaultVOMSValidator(VOMSTrustStore store, 
 			AbstractValidator validator){
-		this(store, validator, new LoggingListener());
+		this(store, validator, new NullListener());
 	}
 	
 	public DefaultVOMSValidator(VOMSTrustStore store, 
 			AbstractValidator validator,
 			ValidationResultListener resultHandler){
+		trustStore = store;
+		validationStrategy = new DefaultVOMSValidationStrategy(trustStore, validator);
+		this.validationResultHandler = resultHandler;
+	}
+	
+	public DefaultVOMSValidator(VOMSTrustStore store, 
+			AbstractValidator validator,
+			ValidationResultListener resultHandler,
+			VOMSACLookupStrategy strategy){
+		super(strategy);
 		trustStore = store;
 		validationStrategy = new DefaultVOMSValidationStrategy(trustStore, validator);
 		this.validationResultHandler = resultHandler;
