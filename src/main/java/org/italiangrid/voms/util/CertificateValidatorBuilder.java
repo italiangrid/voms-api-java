@@ -15,6 +15,8 @@
  */
 package org.italiangrid.voms.util;
 
+import java.util.Arrays;
+
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 
 import eu.emi.security.authn.x509.CrlCheckingMode;
@@ -22,6 +24,7 @@ import eu.emi.security.authn.x509.NamespaceCheckingMode;
 import eu.emi.security.authn.x509.OCSPCheckingMode;
 import eu.emi.security.authn.x509.OCSPParametes;
 import eu.emi.security.authn.x509.ProxySupport;
+import eu.emi.security.authn.x509.StoreUpdateListener;
 import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 import eu.emi.security.authn.x509.impl.CRLParameters;
@@ -74,19 +77,26 @@ public class CertificateValidatorBuilder {
 	 *            the ocsp checking policy
 	 * @return
 	 */
-	public static AbstractValidator buildCertificateValidator(String trustAnchorsDir,
-			ValidationErrorListener validationErrorListener, long updateInterval,
+	public static AbstractValidator buildCertificateValidator(
+			String trustAnchorsDir,
+			ValidationErrorListener validationErrorListener,
+			StoreUpdateListener storeUpdateListener, long updateInterval,
 			NamespaceCheckingMode namespaceChecks, CrlCheckingMode crlChecks,
 			OCSPCheckingMode ocspChecks) {
 
-		RevocationParametersExt revocationParameters = new RevocationParametersExt(crlChecks,
-				new CRLParameters(), new OCSPParametes(ocspChecks));
+		RevocationParametersExt revocationParameters = new RevocationParametersExt(
+				crlChecks, new CRLParameters(), new OCSPParametes(ocspChecks));
 
-		ValidatorParamsExt validationParams = new ValidatorParamsExt(revocationParameters,
-				ProxySupport.ALLOW);
+		ValidatorParamsExt validationParams = new ValidatorParamsExt(
+				revocationParameters, ProxySupport.ALLOW);
 
-		OpensslCertChainValidator validator = new OpensslCertChainValidator(trustAnchorsDir,
-				namespaceChecks, updateInterval, validationParams);
+		if (storeUpdateListener != null)
+			validationParams.setInitialListeners(Arrays
+					.asList(storeUpdateListener));
+
+		OpensslCertChainValidator validator = new OpensslCertChainValidator(
+				trustAnchorsDir, namespaceChecks, updateInterval,
+				validationParams);
 
 		if (validationErrorListener != null)
 			validator.addValidationListener(validationErrorListener);
@@ -106,11 +116,36 @@ public class CertificateValidatorBuilder {
 	 * 
 	 * @return
 	 */
-	public static AbstractValidator buildCertificateValidator(String trustAnchorsDir,
+	public static AbstractValidator buildCertificateValidator(
+			String trustAnchorsDir,
 			ValidationErrorListener validationErrorListener) {
 
-		return buildCertificateValidator(trustAnchorsDir, validationErrorListener, 0L,
-				DEFAULT_NS_CHECKS, DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
+		return buildCertificateValidator(trustAnchorsDir,
+				validationErrorListener, null, 0L, DEFAULT_NS_CHECKS,
+				DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
+	}
+
+	/**
+	 * Builds an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 * 
+	 * @param trustAnchorsDir
+	 *            the directory where trust anchors are loaded from
+	 * @param validationErrorListener
+	 *            the listener that will receive notification about validation
+	 *            errors
+	 * @param storeListener
+	 *            the listener that will be informed of trust store load errors
+	 * @return
+	 */
+	public static AbstractValidator buildCertificateValidator(
+			String trustAnchorsDir,
+			ValidationErrorListener validationErrorListener,
+			StoreUpdateListener storeListener) {
+
+		return buildCertificateValidator(trustAnchorsDir,
+				validationErrorListener, storeListener, 0L, DEFAULT_NS_CHECKS,
+				DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
 	}
 
 	/**
@@ -124,13 +159,15 @@ public class CertificateValidatorBuilder {
 	 *            errors
 	 * @param updateInterval
 	 *            the trust anchor store update interval
-	 *            
+	 * 
 	 * @return
 	 */
-	public static AbstractValidator buildCertificateValidator(String trustAnchorsDir,
+	public static AbstractValidator buildCertificateValidator(
+			String trustAnchorsDir,
 			ValidationErrorListener validationErrorListener, long updateInterval) {
 
-		return buildCertificateValidator(trustAnchorsDir, validationErrorListener, updateInterval,
+		return buildCertificateValidator(trustAnchorsDir,
+				validationErrorListener, null, updateInterval,
 				DEFAULT_NS_CHECKS, DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
 	}
 
@@ -142,13 +179,20 @@ public class CertificateValidatorBuilder {
 	 *            the directory where trust anchors are loaded from
 	 * @return
 	 */
-	public static AbstractValidator buildCertificateValidator(String trustAnchorsDir) {
-		return buildCertificateValidator(trustAnchorsDir, null, 0L, DEFAULT_NS_CHECKS,
-				DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
+	public static AbstractValidator buildCertificateValidator(
+			String trustAnchorsDir) {
+		return buildCertificateValidator(trustAnchorsDir, null, null, 0L,
+				DEFAULT_NS_CHECKS, DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
 	}
-	
-	public static AbstractValidator buildCertificateValidator(){
-		return buildCertificateValidator(DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, 0L, DEFAULT_NS_CHECKS,
-				DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
+
+	/**
+	 * Builds an Openssl-style certificate validator. the parameters
+	 * 
+	 * @return
+	 */
+	public static AbstractValidator buildCertificateValidator() {
+		return buildCertificateValidator(
+				DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, null, 0L,
+				DEFAULT_NS_CHECKS, DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
 	}
 }
