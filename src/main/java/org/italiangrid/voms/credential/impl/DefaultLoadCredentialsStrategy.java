@@ -30,12 +30,7 @@ import eu.emi.security.authn.x509.X509Credential;
  * Credentials are searched in the following places (in sequence):
  * 
  * <ul>
- * <li>If the <code>X509_USER_PROXY</code> <b>environment variable</b>
- * is set, its value is used to load the user proxy credentials</li>
- * 
- * <li>If the <code>X509_USER_PROXY</code> <b>system property</b>
- * is set, its value is used to load the user proxy credentials</li>
- * 
+ *  
  * <li>If the <code>X509_USER_CERT</code> and <code>X509_USER_KEY</code>
  * <b>environment variables</b> are set, their values are used to load the user
  * credentials</li>
@@ -118,13 +113,7 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 		
 		try {
 			
-			X509Credential cred = loadProxyFromEnv();
-			
-			if (cred == null)
-				cred = loadProxyFromUID();
-			
-			if (cred == null)
-				cred = loadPEMCredentialFromEnv(pf);
+			X509Credential cred = loadPEMCredentialFromEnv(pf);
 			
 			if (cred == null)
 				cred = loadPKCS12CredentialFromEnv(pf);
