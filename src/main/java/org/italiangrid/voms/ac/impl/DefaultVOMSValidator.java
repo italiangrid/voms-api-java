@@ -35,6 +35,12 @@ import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 
+/**
+ * The default implementation of the VOMS validator.
+ * 
+ * @author andreaceccanti
+ *
+ */
 public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 		VOMSACValidator {
 

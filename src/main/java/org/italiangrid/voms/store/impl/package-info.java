@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
- * This package provides the API for managing VOMS trust stores.
+ * This package provides the implementation of VOMS trust store management.
  */
-package org.italiangrid.voms.store;
+package org.italiangrid.voms.store.impl;
 

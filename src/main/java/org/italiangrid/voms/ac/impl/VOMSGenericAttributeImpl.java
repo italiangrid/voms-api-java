@@ -18,7 +18,7 @@ package org.italiangrid.voms.ac.impl;
 import org.italiangrid.voms.VOMSGenericAttribute;
 
 /**
- * 
+ * The default implementation for VOMS Generic Attributes.
  * @author Andrea Ceccanti
  *
  */

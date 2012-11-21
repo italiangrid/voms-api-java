@@ -75,7 +75,9 @@ public class CertificateValidatorBuilder {
 	 *            the crl checking policy
 	 * @param ocspChecks
 	 *            the ocsp checking policy
-	 * @return
+	 * 
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
 	 */
 	public static AbstractValidator buildCertificateValidator(
 			String trustAnchorsDir,
@@ -114,7 +116,8 @@ public class CertificateValidatorBuilder {
 	 *            the listener that will receive notification about validation
 	 *            errors
 	 * 
-	 * @return
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
 	 */
 	public static AbstractValidator buildCertificateValidator(
 			String trustAnchorsDir,
@@ -136,7 +139,9 @@ public class CertificateValidatorBuilder {
 	 *            errors
 	 * @param storeListener
 	 *            the listener that will be informed of trust store load errors
-	 * @return
+	 * 
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
 	 */
 	public static AbstractValidator buildCertificateValidator(
 			String trustAnchorsDir,
@@ -160,7 +165,9 @@ public class CertificateValidatorBuilder {
 	 * @param updateInterval
 	 *            the trust anchor store update interval
 	 * 
-	 * @return
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 * 
 	 */
 	public static AbstractValidator buildCertificateValidator(
 			String trustAnchorsDir,
@@ -177,7 +184,9 @@ public class CertificateValidatorBuilder {
 	 * 
 	 * @param trustAnchorsDir
 	 *            the directory where trust anchors are loaded from
-	 * @return
+	 *            
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
 	 */
 	public static AbstractValidator buildCertificateValidator(
 			String trustAnchorsDir) {
@@ -186,9 +195,10 @@ public class CertificateValidatorBuilder {
 	}
 
 	/**
-	 * Builds an Openssl-style certificate validator. the parameters
+	 * Builds an Openssl-style certificate validator. 
 	 * 
-	 * @return
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
 	 */
 	public static AbstractValidator buildCertificateValidator() {
 		return buildCertificateValidator(

@@ -29,7 +29,8 @@ package org.glite.voms;
  *
  * FQANs are defined as<br>
  * <code>&lt;group&gt;[/Role=[&lt;role&gt;][/Capability=&lt;capability&gt;]]</code>
- *
+ * 
+ * @deprecated
  * @author mulmo
  */
 public class FQAN {

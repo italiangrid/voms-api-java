@@ -71,7 +71,7 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	 * Builds an SSL socket factory based on the credential passed as argument and the validator
 	 * configured for this {@link AbstractVOMSProtocol}
 	 * @param credential the client credential used for the socket factory being created
-	 * @return
+	 * @return an {@link SSLSocketFactory} 
 	 */
 	protected SSLSocketFactory getSSLSocketFactory(X509Credential credential){
 		SSLSocketFactoryProvider sslSocketFactoryProvider = new SSLSocketFactoryProvider(credential, validator);

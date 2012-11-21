@@ -16,7 +16,7 @@
 package org.italiangrid.voms;
 
 /**
- * A VOMS runtime exception. 
+ * The VOMS error class.  
  * 
  * @author Andrea Ceccanti
  *

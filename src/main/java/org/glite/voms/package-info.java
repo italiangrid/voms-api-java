@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
- * This package provides the API for managing VOMS trust stores.
+ * This package provides legacy deprecated VOMS classes. Use classes in the {@link org.italiangrid.voms} package
+ * instead of classes in this one.  
  */
-package org.italiangrid.voms.store;
+package org.glite.voms;
 

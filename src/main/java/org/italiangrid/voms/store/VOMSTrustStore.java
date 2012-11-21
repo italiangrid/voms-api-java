@@ -74,8 +74,7 @@ public interface VOMSTrustStore {
 	public Map<String,Set<LSCInfo>> getAllLSCInfo();
 	
 	/**
-	 * Loads trust information from the sources specified with the {@link #setLocalTrustedDirectories(List)} information or
-	 * using sensible defaults chosen by the implementor
+	 * Loads trust information from the sources configured for this trust store.
 	 */
 	public void loadTrustInformation();
 	

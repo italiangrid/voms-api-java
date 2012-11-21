@@ -18,7 +18,7 @@ package org.italiangrid.voms.store.impl;
 
 /**
  * An helper class to create a named VOMS thread.
- * This class just sets the name for the thread and set an {@link UncaughtExceptionHandler}
+ * This class just sets the name for the thread and set an {@link java.lang.Thread.UncaughtExceptionHandler}
  * which logs the caught exception.
  * 
  * @author Andrea Ceccanti

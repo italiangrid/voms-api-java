@@ -15,7 +15,7 @@
  */
 
 /**
- * This package provides the API for managing VOMS trust stores.
+ * This package provides error code and message definitions for the VOMS API.
  */
-package org.italiangrid.voms.store;
+package org.italiangrid.voms.error;
 

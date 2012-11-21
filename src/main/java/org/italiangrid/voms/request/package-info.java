@@ -15,7 +15,7 @@
  */
 
 /**
- * This package provides the API for managing VOMS trust stores.
+ * This package provides the API for requesting VOMS attribtues from a remote VOMS server. 
  */
-package org.italiangrid.voms.store;
+package org.italiangrid.voms.request;
 

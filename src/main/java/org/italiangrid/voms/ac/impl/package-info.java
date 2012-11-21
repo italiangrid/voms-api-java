@@ -13,5 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * Implementation classes for VOMS attributes validation and parsing.
+ */
 package org.italiangrid.voms.ac.impl;
 

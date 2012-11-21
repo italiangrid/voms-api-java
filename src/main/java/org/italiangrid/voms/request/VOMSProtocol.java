@@ -29,8 +29,9 @@ public interface VOMSProtocol {
   /**
    * Makes a request, get the response.
    * 
+   * @param credential the credentials.
    * @param request the request.
-   * @param credentials the credentials.
+   * 
    * @return a {@link VOMSResponse} containing the response.
    */
   public VOMSResponse doRequest(X509Credential credential, VOMSACRequest request);

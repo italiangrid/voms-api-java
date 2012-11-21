@@ -13,5 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This package provides utility classes used in other packages.
+ */
 package org.italiangrid.voms.util;
 

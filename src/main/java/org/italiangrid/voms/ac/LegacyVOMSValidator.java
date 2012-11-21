@@ -23,7 +23,7 @@ import org.italiangrid.voms.VOMSAttribute;
 
 @Deprecated
 /**
- * Legacy VOMS validator interface
+ * This interface describes the legacy VOMS validator interface.
  * 
  */
 public interface LegacyVOMSValidator {

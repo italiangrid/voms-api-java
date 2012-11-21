@@ -19,7 +19,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
- * 
+ * The VOMS LSC information.
  * @author Andrea Ceccanti
  *
  */
@@ -66,7 +66,7 @@ public interface LSCInfo {
 	 * </verbatim>
 	 * 
 	 * The first element in the description is the leaf certificate, while the last is the CA certificate.
-	 * @return
+	 * @return the certificate chain description of the VOMS AA for the given VO and hostname.
 	 */
 	public List<String> getCertificateChainDescription();
 	

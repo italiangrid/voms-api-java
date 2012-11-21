@@ -41,7 +41,7 @@ import eu.emi.security.authn.x509.helpers.trust.OpensslTrustAnchorStore;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 /**
- * This class provides a default listener implementation
+ * This class provides a listener implementation
  * for all VOMS API Java listeners that will print received events
  * to standard output 
  * 

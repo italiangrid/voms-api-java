@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * 
- */
-/**
+ * This document provides help and documentation on the VOMS Java APIs.
+ * For an introductory guide to the use of the API, check the API user manual
+ *  <a href="http://italiangrid.github.com/voms-api-java">here</a>.
+ * 
  * @author Andrea Ceccanti
  *
  */

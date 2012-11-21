@@ -24,8 +24,7 @@ package org.italiangrid.voms.store;
 public interface Updateable {
 	
 	/**
-	 * Returns the frequency (in milliseconds) currently set for this {@link Updateable} object.  
-	 * @return
+	 * @return the frequency (in milliseconds) currently set for this {@link Updateable} object.
 	 */
 	public long getUpdateFrequency();
 	

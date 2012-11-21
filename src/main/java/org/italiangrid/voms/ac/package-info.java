@@ -13,5 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This package provides the APIs to perform validation and parsing
+ * of VOMS attributes.
+ */
 package org.italiangrid.voms.ac;
 

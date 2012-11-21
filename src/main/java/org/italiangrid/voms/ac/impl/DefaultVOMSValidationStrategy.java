@@ -48,6 +48,11 @@ import eu.emi.security.authn.x509.proxy.ProxyUtils;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.*;
 import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
 
+/**
+ * The Default VOMS validation strategy.
+ * @author andreaceccanti
+ *
+ */
 public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 
 	private final VOMSTrustStore store;

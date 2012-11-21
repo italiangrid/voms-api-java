@@ -15,7 +15,7 @@
  */
 
 /**
- * This package provides the API for managing VOMS trust stores.
+ * This package provides the implementation logic for VOMS attributes requests. 
  */
-package org.italiangrid.voms.store;
+package org.italiangrid.voms.request.impl;
 

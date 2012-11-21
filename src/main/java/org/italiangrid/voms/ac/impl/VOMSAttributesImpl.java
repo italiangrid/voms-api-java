@@ -30,6 +30,14 @@ import org.italiangrid.voms.util.FQANHelper;
 
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 
+@SuppressWarnings("deprecation")
+
+/**
+ * The default implementation for voms attributes
+ * 
+ * @author andreaceccanti
+ *
+ */
 public class VOMSAttributesImpl implements VOMSAttribute {
 
 	private String VO;

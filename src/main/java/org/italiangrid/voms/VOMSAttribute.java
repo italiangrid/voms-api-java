@@ -27,7 +27,8 @@ import org.glite.voms.FQAN;
 
 
 /**
- * The VOMS attribute information.
+ * The VOMS attributes information. This interface provides access to all the information 
+ * available in a VOMS attribute certificate.
  * 
  * @author Andrea Ceccanti
  *
@@ -96,7 +97,6 @@ public interface VOMSAttribute {
 	
 	/**
 	 * @return The targets for this VOMS attributes
-	 * @return
 	 */
 	public List<String> getTargets();
 	
@@ -122,22 +122,20 @@ public interface VOMSAttribute {
 	public boolean validAt(Date time);
 	
 	/**
-	 * Returns the underlying VOMS attribute certificate.
 	 * 
-	 * @return 
+	 * @return the underlying bouncycastle object for the VOMS attribute certificate.
 	 */
 	public X509AttributeCertificateHolder getVOMSAC();
 	
 	/**
-	 * Returns a possibly-empty list of {@link FQAN} objects
-	 * @return
+	 * @return a possibly-empty list of {@link FQAN} objects
 	 * @deprecated use {@link #getFQANs()} instead
 	 */
 	public List<FQAN> getListOfFQAN();
 	
 	/**
 	 * 
-	 * @return
+	 * @return a possibly-empty list of FQAN strings
 	 * @deprecated use {@link #getFQANs()} instead
 	 */
 	public List<String> getFullyQualifiedAttributes();

@@ -91,7 +91,7 @@ public class LegacyRequestSender {
 	 * This method is used to send a request to a VOMS server.
 	 * 
 	 * @param acRequest
-	 *            the request options. See {@link VOMSRequestOptions}.
+	 *            the AC request parameters. See {@link VOMSACRequest}.
 	 * @param stream
 	 *            an output stream.
 	 */

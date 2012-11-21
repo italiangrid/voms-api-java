@@ -25,20 +25,17 @@ package org.italiangrid.voms;
 public interface VOMSGenericAttribute {
 
 	/**
-	 * Returns the name of this generic attribute
-	 * @return
+	 * @return the name of this generic attribute
 	 */
 	public String getName();
 	
 	/**
-	 * Returns the value of this generic attribute
-	 * @return
+	 * @return the value of this generic attribute
 	 */
 	public String getValue();
 	
 	/**
-	 * Returns the context of this generic attribute
-	 * @return
+	 * @return the context of this generic attribute
 	 */
 	public String getContext();
 	
