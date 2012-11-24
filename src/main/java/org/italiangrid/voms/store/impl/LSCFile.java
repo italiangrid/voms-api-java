@@ -21,6 +21,7 @@ import java.util.List;
 import org.italiangrid.voms.store.LSCInfo;
 
 import eu.emi.security.authn.x509.helpers.CertificateHelpers;
+import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 
@@ -152,7 +153,7 @@ public class LSCFile implements LSCInfo{
 				
 				boolean subjectDoesMatch = X500NameUtils.equal(certChain[i].getSubjectX500Principal(), lscSubjectRFC2253);
 				boolean issuerDoesMatch = X500NameUtils.equal(certChain[i].getIssuerX500Principal(), lscIssuerRFC2253);
-				
+							
 				if (!subjectDoesMatch || !issuerDoesMatch)
 					return false;
 				

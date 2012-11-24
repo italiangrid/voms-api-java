@@ -71,7 +71,7 @@ public class SSLSocketFactoryProvider {
 
     } catch (NoSuchAlgorithmException e) {
 
-      throw new VOMSError("No SSLv3 algorithm, cannot instanciate SSLContext", e);
+      throw new VOMSError(e.getMessage(), e);
     }
 
     KeyManager[] keyManagers = new KeyManager[] {credential.getKeyManager()}; 
@@ -88,7 +88,7 @@ public class SSLSocketFactoryProvider {
 
     } catch (NoSuchAlgorithmException e) {
 
-      throw new VOMSError("No algorithm SHA1PRNG, unable to initialize SSL context", e);
+      throw new VOMSError(e.getMessage(), e);
     }
 
     try {
@@ -97,7 +97,7 @@ public class SSLSocketFactoryProvider {
 
     } catch (KeyManagementException e) {
 
-      throw new VOMSError("No algorithm SHA1PRNG, unable to initialize SSL context", e);
+      throw new VOMSError(e.getMessage(), e);
     }
 
     return context.getSocketFactory();

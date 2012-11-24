@@ -15,6 +15,21 @@
  */
 package org.italiangrid.voms.ac.impl;
 
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.aaCertFailsSignatureVerification;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.aaCertNotFound;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.acCertFailsSignatureVerification;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.acHolderDoesntMatchCertChain;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.acNotValidAtCurrentTime;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.canlError;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.emptyAcCertsExtension;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.invalidAaCert;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.invalidAcCert;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.localhostDoesntMatchAcTarget;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.lscDescriptionDoesntMatchAcCert;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.lscFileNotFound;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.other;
+import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
@@ -43,11 +58,8 @@ import org.italiangrid.voms.store.VOMSTrustStore;
 import eu.emi.security.authn.x509.ValidationError;
 import eu.emi.security.authn.x509.ValidationResult;
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.emi.security.authn.x509.proxy.ProxyUtils;
-import static org.italiangrid.voms.error.VOMSValidationErrorCode.*;
-import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
 
 /**
  * The Default VOMS validation strategy.
