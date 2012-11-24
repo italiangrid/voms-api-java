@@ -19,11 +19,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
@@ -254,5 +249,15 @@ public class DefaultVOMSACService implements VOMSACService {
 				.getVOMSServerInfo(request.getVoName());
 
 		return vomsServerInfos;
+	}
+
+	public void setConnectTimeout(int timeout) {
+		connectTimeout = timeout;
+		
+	}
+
+	public void setReadTimeout(int timeout) {
+		readTimeout = timeout;
+		
 	}
 }
