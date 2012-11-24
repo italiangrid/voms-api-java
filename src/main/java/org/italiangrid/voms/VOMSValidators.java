@@ -23,7 +23,7 @@ import org.italiangrid.voms.ac.impl.DefaultVOMSACParser;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.store.VOMSTrustStore;
 
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 
 /**
  * A factory for VOMS attributes validators and parsers.
@@ -41,7 +41,7 @@ public class VOMSValidators {
 	}
 	
 	public static VOMSACValidator newValidator(VOMSTrustStore trustStore, 
-			AbstractValidator validator,
+			X509CertChainValidatorExt validator,
 			ValidationResultListener vrListener){
 		
 		return new DefaultVOMSValidator(trustStore, validator, vrListener);
@@ -49,7 +49,7 @@ public class VOMSValidators {
 	}
 	
 	public static VOMSACValidator newValidator(VOMSTrustStore store,
-			AbstractValidator validator,
+			X509CertChainValidatorExt validator,
 			ValidationResultListener resultHandler,
 			VOMSACLookupStrategy strategy) {
 		
@@ -58,7 +58,7 @@ public class VOMSValidators {
 	}
 	
 	public static VOMSACValidator newValidator(VOMSTrustStore trustStore, 
-			AbstractValidator validator){
+			X509CertChainValidatorExt validator){
 		
 		return new DefaultVOMSValidator(trustStore, validator);
 		

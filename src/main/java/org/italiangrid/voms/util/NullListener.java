@@ -34,7 +34,6 @@ import org.italiangrid.voms.request.VOMSWarningMessage;
 import org.italiangrid.voms.store.LSCInfo;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
-import org.italiangrid.voms.store.VOMSTrustStoreUpdateListener;
 
 /**
  * 
@@ -46,8 +45,7 @@ import org.italiangrid.voms.store.VOMSTrustStoreUpdateListener;
 public class NullListener implements ACLookupListener,
 		ValidationResultListener, VOMSServerInfoStoreListener,
 		LoadCredentialsEventListener, VOMSTrustStoreStatusListener,
-		VOMSTrustStoreUpdateListener, UncaughtExceptionHandler,
-		VOMSRequestListener {
+		UncaughtExceptionHandler, VOMSRequestListener {
 
 	public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
 		// TODO Auto-generated method stub

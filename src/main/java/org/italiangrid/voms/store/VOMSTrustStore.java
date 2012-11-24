@@ -78,4 +78,11 @@ public interface VOMSTrustStore {
 	 */
 	public void loadTrustInformation();
 	
+	/**
+	 * Sets a {@link VOMSTrustStoreStatusListener} that is notified of events related
+	 * to this VOMS trust store
+	 * 
+	 * @param statusListener the status listener that will be notified
+	 */
+	public void setStatusListener(VOMSTrustStoreStatusListener statusListener);
 }

@@ -27,6 +27,7 @@ import org.glite.voms.FQAN;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSGenericAttribute;
 import org.italiangrid.voms.util.FQANHelper;
+import org.italiangrid.voms.util.TimeUtils;
 
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 
@@ -39,7 +40,8 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
  *
  */
 public class VOMSAttributesImpl implements VOMSAttribute {
-
+	public static final int DEFAULT_CLOCK_SKEW_IN_MINUTES = 5;
+	
 	private String VO;
 	private String host;
 	private int port;
@@ -179,7 +181,10 @@ public class VOMSAttributesImpl implements VOMSAttribute {
 	}
 
 	public boolean validAt(Date date) {
-		return (getNotAfter().after(date) && getNotBefore().before(date));
+		return TimeUtils.checkTimeInRangeWithSkew(date, 
+				getNotBefore(), 
+				getNotAfter(), 
+				DEFAULT_CLOCK_SKEW_IN_MINUTES);
 	}
 
 	public X509AttributeCertificateHolder getVOMSAC() {

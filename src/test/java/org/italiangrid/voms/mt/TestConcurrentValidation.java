@@ -47,14 +47,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.emi.security.authn.x509.NamespaceCheckingMode;
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 
 public class TestConcurrentValidation {
 
-	static AbstractValidator sharedCertificateValidator;
+	static X509CertChainValidatorExt sharedCertificateValidator;
 	static UpdatingVOMSTrustStore sharedVOMSTrustStore;
 	
 	static final String trustAnchorsDir = "src/test/resources/trust-anchors";

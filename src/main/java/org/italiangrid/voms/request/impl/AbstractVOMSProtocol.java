@@ -23,12 +23,22 @@ import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 
 public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 
 	public static final String[] VOMS_LEGACY_PROTOCOLS = {"SSLv3"};
+	
+	/** 
+	 * The default value for the socket connection timeout
+	 */
+	public static final int DEFAULT_CONNECT_TIMEOUT = 2000;
+	
+	/** 
+	 * The default value for the socket read timeout
+	 */
+	public static final int DEFAULT_READ_TIMEOUT = 5000;
 	
 	/**
 	 * The remote server endpoint information
@@ -39,8 +49,19 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	/**
 	 * The CAnL validator used to manage SSL authentication.
 	 */
-	protected AbstractValidator validator;
-
+	protected X509CertChainValidatorExt validator;
+	
+	/**
+	 * The tcp connection timeout (in milliseconds)
+	 */
+	protected int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+	
+	/**
+	 * The socket read timeout (in milliseconds)
+	 */
+	protected int readTimeout = DEFAULT_READ_TIMEOUT;
+	
+	
 	/**
 	 * Ctor.
 	 * 
@@ -61,10 +82,30 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	 * @param validator
 	 *            the validator used to manage the SSL authentication
 	 */
-	public AbstractVOMSProtocol(VOMSServerInfo vomsServerInfo, AbstractValidator validator) {
+	public AbstractVOMSProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator) {
 
 		this.serverInfo = vomsServerInfo;
 		this.validator = validator;
+	}
+	
+	/**
+	 * Ctor.
+	 * 
+	 * @param vomsServerInfo
+	 *            the info for the remote VOMS server endpoint
+	 * @param validator
+	 *            the validator used to manage the SSL authentication
+	 * @param connectTimeout
+	 * 			  sets the socket connection timeout
+	 * @param readTimeout
+	 * 			  sets the socket read timeout	
+	 */
+	public AbstractVOMSProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator, int connectTimeout, int readTimeout) {
+
+		this.serverInfo = vomsServerInfo;
+		this.validator = validator;
+		this.connectTimeout = connectTimeout;
+		this.readTimeout = readTimeout;
 	}
 	
 	/**
@@ -77,5 +118,39 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 		SSLSocketFactoryProvider sslSocketFactoryProvider = new SSLSocketFactoryProvider(credential, validator);
 	    return sslSocketFactoryProvider.getSSLSockectFactory();
 	}
+
+	/**
+	 * @return The connect timeout value (in milliseconds)
+	 */
+	public int getConnectTimeout() {
+		return connectTimeout;
+	}
+
+	/**
+	 * Sets the connection timeout value for the underlying socket of this {@link AbstractVOMSProtocol}
+	 * 
+	 * @param connectTimeout the connection timeout in milliseconds
+	 */
+	public void setConnectTimeout(int connectTimeout) {
+		this.connectTimeout = connectTimeout;
+	}
+
+	/**
+	 * @return the read timeout value (in milliseconds)
+	 */
+	public int getReadTimeout() {
+		return readTimeout;
+	}
+
+	/**
+	 * Sets the read timeout value for the underlying socket 
+	 * 
+	 * @param readTimeout the read timeout in milliseconds
+	 */
+	public void setReadTimeout(int readTimeout) {
+		this.readTimeout = readTimeout;
+	}
+	
+	
 
 }

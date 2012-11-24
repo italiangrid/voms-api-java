@@ -33,7 +33,7 @@ import org.italiangrid.voms.store.VOMSTrustStores;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.NullListener;
 
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 
 /**
  * The default implementation of the VOMS validator.
@@ -63,12 +63,12 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	}
 	
 	public DefaultVOMSValidator(VOMSTrustStore store, 
-			AbstractValidator validator){
+			X509CertChainValidatorExt validator){
 		this(store, validator, new NullListener());
 	}
 	
 	public DefaultVOMSValidator(VOMSTrustStore store, 
-			AbstractValidator validator,
+			X509CertChainValidatorExt validator,
 			ValidationResultListener resultHandler){
 		trustStore = store;
 		validationStrategy = new DefaultVOMSValidationStrategy(trustStore, validator);
@@ -76,7 +76,7 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	}
 	
 	public DefaultVOMSValidator(VOMSTrustStore store, 
-			AbstractValidator validator,
+			X509CertChainValidatorExt validator,
 			ValidationResultListener resultHandler,
 			VOMSACLookupStrategy strategy){
 		super(strategy);

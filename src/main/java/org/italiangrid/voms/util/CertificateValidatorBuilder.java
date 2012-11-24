@@ -26,7 +26,7 @@ import eu.emi.security.authn.x509.OCSPParametes;
 import eu.emi.security.authn.x509.ProxySupport;
 import eu.emi.security.authn.x509.StoreUpdateListener;
 import eu.emi.security.authn.x509.ValidationErrorListener;
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.CRLParameters;
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.RevocationParametersExt;
@@ -79,7 +79,7 @@ public class CertificateValidatorBuilder {
 	 * @return an Openssl-style certificate validator configured as specified in
 	 * the parameters
 	 */
-	public static AbstractValidator buildCertificateValidator(
+	public static X509CertChainValidatorExt buildCertificateValidator(
 			String trustAnchorsDir,
 			ValidationErrorListener validationErrorListener,
 			StoreUpdateListener storeUpdateListener, long updateInterval,
@@ -119,7 +119,7 @@ public class CertificateValidatorBuilder {
 	 * @return an Openssl-style certificate validator configured as specified in
 	 * the parameters
 	 */
-	public static AbstractValidator buildCertificateValidator(
+	public static X509CertChainValidatorExt buildCertificateValidator(
 			String trustAnchorsDir,
 			ValidationErrorListener validationErrorListener) {
 
@@ -143,7 +143,7 @@ public class CertificateValidatorBuilder {
 	 * @return an Openssl-style certificate validator configured as specified in
 	 * the parameters
 	 */
-	public static AbstractValidator buildCertificateValidator(
+	public static X509CertChainValidatorExt buildCertificateValidator(
 			String trustAnchorsDir,
 			ValidationErrorListener validationErrorListener,
 			StoreUpdateListener storeListener) {
@@ -169,7 +169,7 @@ public class CertificateValidatorBuilder {
 	 * the parameters
 	 * 
 	 */
-	public static AbstractValidator buildCertificateValidator(
+	public static X509CertChainValidatorExt buildCertificateValidator(
 			String trustAnchorsDir,
 			ValidationErrorListener validationErrorListener, long updateInterval) {
 
@@ -188,7 +188,7 @@ public class CertificateValidatorBuilder {
 	 * @return an Openssl-style certificate validator configured as specified in
 	 * the parameters
 	 */
-	public static AbstractValidator buildCertificateValidator(
+	public static X509CertChainValidatorExt buildCertificateValidator(
 			String trustAnchorsDir) {
 		return buildCertificateValidator(trustAnchorsDir, null, null, 0L,
 				DEFAULT_NS_CHECKS, DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
@@ -200,7 +200,7 @@ public class CertificateValidatorBuilder {
 	 * @return an Openssl-style certificate validator configured as specified in
 	 * the parameters
 	 */
-	public static AbstractValidator buildCertificateValidator() {
+	public static X509CertChainValidatorExt buildCertificateValidator() {
 		return buildCertificateValidator(
 				DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, null, 0L,
 				DEFAULT_NS_CHECKS, DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);

@@ -22,7 +22,5 @@ package org.italiangrid.voms.store;
  *
  */
 public interface UpdatingVOMSTrustStore extends VOMSTrustStore, Updateable {
-	
-	public void setTrustStoreUpdateListener(VOMSTrustStoreUpdateListener updateListener);
 
 }

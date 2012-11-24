@@ -17,6 +17,8 @@ package org.italiangrid.voms.request.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
 import javax.net.ssl.SSLSocket;
@@ -30,8 +32,8 @@ import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 
 /**
  * Protocol implementing the legacy interface.
@@ -45,8 +47,12 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 				DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, 60000L));
 	}
 
-	public LegacyProtocol(VOMSServerInfo vomsServerInfo, AbstractValidator validator) {
+	public LegacyProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator) {
 		super(vomsServerInfo, validator);
+	}
+	
+	public LegacyProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator, int connectTimeout, int readTimeout) {
+		super(vomsServerInfo, validator, connectTimeout, readTimeout);
 	}
 
 	public VOMSResponse doRequest(X509Credential credential, VOMSACRequest request) {
@@ -57,8 +63,14 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 
 		try {
 
-			sslSocket = (SSLSocket) sslSocketFactory.createSocket(serverInfo.getURL().getHost(), 
-					serverInfo.getURL().getPort());
+			
+			sslSocket = (SSLSocket) sslSocketFactory.createSocket();
+			sslSocket.setSoTimeout(readTimeout);
+			
+			SocketAddress sa = new InetSocketAddress(serverInfo.getURL().getHost(),
+					serverInfo.getURL().getPort()); 
+			
+			sslSocket.connect(sa, connectTimeout);
 
 		} catch (UnknownHostException e) {
 			

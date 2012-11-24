@@ -42,6 +42,7 @@ import org.italiangrid.voms.store.VOMSTrustStore;
 
 import eu.emi.security.authn.x509.ValidationError;
 import eu.emi.security.authn.x509.ValidationResult;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.emi.security.authn.x509.proxy.ProxyUtils;
@@ -56,10 +57,10 @@ import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMess
 public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 
 	private final VOMSTrustStore store;
-	private final AbstractValidator certChainValidator;
+	private final X509CertChainValidatorExt certChainValidator;
 	
 	
-	public DefaultVOMSValidationStrategy(VOMSTrustStore store, AbstractValidator validator) {
+	public DefaultVOMSValidationStrategy(VOMSTrustStore store, X509CertChainValidatorExt validator) {
 		this.store = store;
 		this.certChainValidator = validator;
 		

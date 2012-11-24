@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
-import org.italiangrid.voms.store.VOMSTrustStoreUpdateListener;
+import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
 import org.italiangrid.voms.util.NullListener;
 
 /**
@@ -42,7 +42,7 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	public static final long DEFAULT_UPDATE_FREQUENCY = TimeUnit.MINUTES.toMillis(10);
 	
 	/**
-	 * This trust store update frequency.
+	 * This trust store update frequency in milliseconds.
 	 */
 	private long updateFrequency;
 	
@@ -51,29 +51,53 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	 */
 	private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new VOMSNamedThreadFactory());
 	
-	private VOMSTrustStoreUpdateListener updateListener;
-	
-	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency, VOMSTrustStoreUpdateListener updateListener) {
-		super(localTrustDirs);
+	/**
+	 * Builds a trust store configured as defined in the parameters.
+	 * 
+	 * @param localTrustDirs where VOMS trust information will be looked for
+	 * @param updateFrequency the update frequency in milliseconds
+	 * @param listener a listener that is notified of interesting events related to this store
+	 */
+	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency, VOMSTrustStoreStatusListener listener) {
+		super(localTrustDirs, listener);
 		updateFrequencySanityChecks(updateFrequency);
 		this.updateFrequency = updateFrequency;
-		this.updateListener = updateListener;
 		scheduleUpdate();
 	}
 	
+	/**
+	 * Builds a trust store configured as defined in the parameters.
+	 * @param updateFrequency the update frequency in milliseconds
+	 * 
+	 */
 	public DefaultUpdatingVOMSTrustStore(long updateFrequency) {
 		this(buildDefaultTrustedDirs(), updateFrequency, new NullListener());
 	}
 	
+	/**
+	 * Builds a trust store configured as defined in the parameters.
+	 * 
+	 * @param localTrustDirs where VOMS trust information will be looked for
+	 * @param updateFrequency the update frequency in milliseconds
+	 * 
+	 */
 	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency) {
 		this(localTrustDirs, updateFrequency, new NullListener());
 	}
 
-	
-	public DefaultUpdatingVOMSTrustStore(long updateFrequency, VOMSTrustStoreUpdateListener updateListener) {
-		this(buildDefaultTrustedDirs(), updateFrequency, new NullListener());
+	/**
+	 * Builds a trust store configured as defined in the parameters.
+	 * 
+	 * @param localTrustDirs where VOMS trust information will be looked for
+	 */
+	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs){
+		this(localTrustDirs, DEFAULT_UPDATE_FREQUENCY, new NullListener());
 	}
-
+	
+	/**
+	 * Builds a trust store. VOMS information will be searched in {@value DefaultVOMSTrustStore#DEFAULT_VOMS_DIR}.
+	 * This store will be refreshed every {@value #DEFAULT_UPDATE_FREQUENCY} milliseconds.
+	 */
 	public DefaultUpdatingVOMSTrustStore(){
 		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, new NullListener());
 	}
@@ -84,7 +108,7 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 			throw new VOMSError("Please provide a positive value for this store update frequency!");
 	}
 	
-	protected void scheduleUpdate(){
+	protected synchronized void scheduleUpdate(){
 		
 		long frequency = getUpdateFrequency();
 		
@@ -100,24 +124,26 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 		
 	}
 	
+	/**
+	 * Returns the update frequency, in milliseconds, for this store.
+	 */
 	public synchronized long getUpdateFrequency() {
 		return updateFrequency;
 	}
 
+	/**
+	 * Updates the information in this store
+	 */
 	public synchronized void update() {
 		loadTrustInformation();
-		updateListener.notifyTrustStoreUpdate(this);
 	}
 
+	/**
+	 * Cancel the background tasks which updates this store.
+	 */
 	public synchronized void cancel() {
 		scheduler.shutdownNow();
 
-	}
-
-	public void setTrustStoreUpdateListener(
-			VOMSTrustStoreUpdateListener updateListener) {
-		this.updateListener = updateListener;
-		
 	}
 
 }

@@ -29,8 +29,8 @@ import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
 
 /**
@@ -43,10 +43,10 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
 public class SSLSocketFactoryProvider {
 
   private X509Credential credential;
-  private AbstractValidator validator;
+  private X509CertChainValidatorExt validator;
   
   
-  public SSLSocketFactoryProvider(X509Credential credential, AbstractValidator validator){
+  public SSLSocketFactoryProvider(X509Credential credential, X509CertChainValidatorExt validator){
 	  this.credential = credential;
 	  this.validator = validator;
 	  

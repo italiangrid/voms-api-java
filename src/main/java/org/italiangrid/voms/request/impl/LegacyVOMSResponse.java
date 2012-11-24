@@ -82,10 +82,10 @@ public class LegacyVOMSResponse implements VOMSResponse {
 
     Element acElement = (Element) xmlResponse.getElementsByTagName("ac").item(0);
 
-    byte[] ac = new GoodACDecodingStrategy().decode(acElement.getFirstChild().getNodeValue());
+    byte[] ac = VOMSBase64Decoder.decode(acElement.getFirstChild().getNodeValue());
     
     if(ac== null) 
-      ac = VOMSBase64Decoder.decode(acElement.getFirstChild().getNodeValue());
+      ac = new GoodACDecodingStrategy().decode(acElement.getFirstChild().getNodeValue());
     
     return ac;
   }

@@ -29,8 +29,8 @@ import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 
 /**
  * Protocol implementing the REST-style interface.
@@ -40,7 +40,11 @@ import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
  */
 public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 
-	public RESTProtocol(VOMSServerInfo vomsServerInfo, AbstractValidator validator) {
+	public RESTProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator, int connectTimeout, int readTimeout) {
+		super(vomsServerInfo, validator, connectTimeout, readTimeout);
+	}
+	
+	public RESTProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator) {
 		super(vomsServerInfo, validator);
 	}
 
@@ -59,6 +63,9 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 		try {
 
 			connection = (HttpsURLConnection) serviceUrl.openConnection();
+			
+			connection.setConnectTimeout(connectTimeout);
+			connection.setReadTimeout(readTimeout);
 
 		} catch (IOException e) {
 			

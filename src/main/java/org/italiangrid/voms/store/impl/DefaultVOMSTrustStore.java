@@ -337,7 +337,11 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		return localAACertificatesByHash.get(theCertHash);	
 	}
 
-	public Map<String,Set<LSCInfo>> getAllLSCInfo() {
+	public synchronized Map<String,Set<LSCInfo>> getAllLSCInfo() {
 		return Collections.unmodifiableMap(localLSCInfo);
+	}
+
+	public synchronized void setStatusListener(VOMSTrustStoreStatusListener statusListener) {
+		this.listener = statusListener;
 	}
 }

@@ -35,7 +35,6 @@ import org.italiangrid.voms.request.VOMSWarningMessage;
 import org.italiangrid.voms.store.LSCInfo;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
-import org.italiangrid.voms.store.VOMSTrustStoreUpdateListener;
 
 import eu.emi.security.authn.x509.helpers.trust.OpensslTrustAnchorStore;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
@@ -51,8 +50,7 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
 public class LoggingListener implements ACLookupListener,
 		ValidationResultListener, VOMSServerInfoStoreListener,
 		LoadCredentialsEventListener, VOMSTrustStoreStatusListener,
-		VOMSTrustStoreUpdateListener, UncaughtExceptionHandler,
-		VOMSRequestListener{
+		UncaughtExceptionHandler,VOMSRequestListener{
 
 	public void notifyACLookupEvent(X509Certificate[] chain, int chainLevel) {
 		String readableSubject = X500NameUtils

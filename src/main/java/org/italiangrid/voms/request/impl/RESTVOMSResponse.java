@@ -15,6 +15,17 @@
  */
 package org.italiangrid.voms.request.impl;
 
+import java.io.StringWriter;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.italiangrid.voms.request.ACDecodingStrategy;
 import org.italiangrid.voms.request.VOMSErrorMessage;
 import org.italiangrid.voms.request.VOMSWarningMessage;
@@ -39,7 +50,6 @@ public class RESTVOMSResponse implements org.italiangrid.voms.request.VOMSRespon
 	protected Document xmlResponse;
 
 	public RESTVOMSResponse(Document res) {
-    
 	  xmlResponse = res;
   }
 	

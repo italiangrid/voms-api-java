@@ -19,11 +19,17 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSACService;
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
+import org.italiangrid.voms.request.VOMSProtocolError;
 import org.italiangrid.voms.request.VOMSRequestListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
@@ -32,8 +38,8 @@ import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.NullListener;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.helpers.pkipath.AbstractValidator;
 
 /** 
  * The default implementation of the {@link VOMSACService}.
@@ -53,12 +59,23 @@ public class DefaultVOMSACService implements VOMSACService {
 	/**
 	 * The validator used for the SSL handshake
 	 */
-	private AbstractValidator validator;
+	private X509CertChainValidatorExt validator;
 	
 	/**
 	 * The store used to keep VOMS server contact information.
 	 */
 	private VOMSServerInfoStore serverInfoStore;
+	
+	
+	/**
+	 * The connect timeout value 
+	 */
+	private int connectTimeout =  AbstractVOMSProtocol.DEFAULT_CONNECT_TIMEOUT;
+	
+	/** 
+	 * The read timeout used 
+	 */
+	private int readTimeout = AbstractVOMSProtocol.DEFAULT_READ_TIMEOUT;
 	
 	/**
 	 * Ctor. 
@@ -67,7 +84,7 @@ public class DefaultVOMSACService implements VOMSACService {
 	 * @param listener the listener that will be informed about request events
 	 * @param serverInfoStoreListener the listener that will be informed about server info store events
 	 */
-	public DefaultVOMSACService(AbstractValidator validator,
+	public DefaultVOMSACService(X509CertChainValidatorExt validator,
 			VOMSRequestListener listener, 
 			VOMSESLookupStrategy lookupStrategy,
 			VOMSServerInfoStoreListener serverInfoStoreListener) {
@@ -103,7 +120,7 @@ public class DefaultVOMSACService implements VOMSACService {
 		AttributeCertificate attributeCertificate = null;
 
 		try {
-
+			
 			attributeCertificate = AttributeCertificate
 					.getInstance(asn1InputStream.readObject());
 
@@ -127,8 +144,17 @@ public class DefaultVOMSACService implements VOMSACService {
 	 */
 	protected VOMSResponse doRESTRequest(VOMSACRequest request, VOMSServerInfo serverInfo, X509Credential credential){
 		
-		RESTProtocol restProtocol = new RESTProtocol(serverInfo, validator);
-		return restProtocol.doRequest(credential, request);
+		RESTProtocol restProtocol = new RESTProtocol(serverInfo, validator, connectTimeout, readTimeout);
+		
+		VOMSResponse response = null;
+		
+		try {
+			response = restProtocol.doRequest(credential, request);
+		
+		}catch(VOMSProtocolError e){
+			
+		}
+		return response;
 		
 	}
 	
@@ -140,10 +166,18 @@ public class DefaultVOMSACService implements VOMSACService {
 	 * @return a {@link VOMSResponse}
 	 */
 	protected VOMSResponse doLegacyRequest(VOMSACRequest request, VOMSServerInfo serverInfo, X509Credential credential){
+		VOMSResponse response = null;
 		
-		LegacyProtocol legacyProtocol = new LegacyProtocol(serverInfo, validator);
-		return legacyProtocol.doRequest(credential, request);
+		LegacyProtocol legacyProtocol = new LegacyProtocol(serverInfo, validator, connectTimeout, readTimeout);
 		
+		try{
+			response = legacyProtocol.doRequest(credential, request);
+		
+		}catch (VOMSProtocolError e) {
+			requestListener.notifyVOMSRequestFailure(request, serverInfo, e);
+		}
+		
+		return response;
 	}
 	
 	/**
@@ -197,7 +231,7 @@ public class DefaultVOMSACService implements VOMSACService {
 				break;
 			}
 			
-			requestListener.notifyVOMSRequestFailure(request, vomsServerInfo, null);
+			requestListener.notifyVOMSRequestFailure(request, vomsServerInfo, new VOMSError("REST and legacy VOMS endpoints failed."));
 		}
 
 		if (response == null) {
