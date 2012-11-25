@@ -25,6 +25,7 @@ import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSACService;
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSProtocolError;
+import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.italiangrid.voms.request.VOMSRequestListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
@@ -51,6 +52,11 @@ public class DefaultVOMSACService implements VOMSACService {
 	 */
 	private VOMSRequestListener requestListener;
 		
+	/**
+	 * The listener that will be informed about  low-level protocol details
+	 */
+	private VOMSProtocolListener protocolListener;
+	
 	/**
 	 * The validator used for the SSL handshake
 	 */
@@ -82,11 +88,12 @@ public class DefaultVOMSACService implements VOMSACService {
 	public DefaultVOMSACService(X509CertChainValidatorExt validator,
 			VOMSRequestListener listener, 
 			VOMSESLookupStrategy lookupStrategy,
-			VOMSServerInfoStoreListener serverInfoStoreListener) {
+			VOMSServerInfoStoreListener serverInfoStoreListener,
+			VOMSProtocolListener protocolListener) {
 		
 		this.requestListener = listener;
 		this.validator = validator;
-		
+		this.protocolListener = protocolListener;
 		serverInfoStore = new DefaultVOMSServerInfoStore(lookupStrategy,serverInfoStoreListener);
 	}
 
@@ -95,6 +102,7 @@ public class DefaultVOMSACService implements VOMSACService {
 		
 		NullListener listener =  new NullListener();
 		this.requestListener = listener;
+		this.protocolListener = listener;
 		
 		serverInfoStore = new DefaultVOMSServerInfoStore(listener);
 		
@@ -110,6 +118,9 @@ public class DefaultVOMSACService implements VOMSACService {
 	protected AttributeCertificate getACFromResponse(VOMSACRequest request, VOMSResponse response){
 		byte[] acBytes = response.getAC();
 
+		if (acBytes == null)
+			return null;
+		
 		ASN1InputStream asn1InputStream = new ASN1InputStream(acBytes);
 
 		AttributeCertificate attributeCertificate = null;
@@ -139,7 +150,7 @@ public class DefaultVOMSACService implements VOMSACService {
 	 */
 	protected VOMSResponse doRESTRequest(VOMSACRequest request, VOMSServerInfo serverInfo, X509Credential credential){
 		
-		RESTProtocol restProtocol = new RESTProtocol(serverInfo, validator, connectTimeout, readTimeout);
+		RESTProtocol restProtocol = new RESTProtocol(serverInfo, validator, protocolListener, connectTimeout, readTimeout);
 		
 		VOMSResponse response = null;
 		
@@ -147,7 +158,7 @@ public class DefaultVOMSACService implements VOMSACService {
 			response = restProtocol.doRequest(credential, request);
 		
 		}catch(VOMSProtocolError e){
-			
+			requestListener.notifyVOMSRequestFailure(request, serverInfo, e);
 		}
 		return response;
 		
@@ -163,7 +174,7 @@ public class DefaultVOMSACService implements VOMSACService {
 	protected VOMSResponse doLegacyRequest(VOMSACRequest request, VOMSServerInfo serverInfo, X509Credential credential){
 		VOMSResponse response = null;
 		
-		LegacyProtocol legacyProtocol = new LegacyProtocol(serverInfo, validator, connectTimeout, readTimeout);
+		LegacyProtocol legacyProtocol = new LegacyProtocol(serverInfo, validator, protocolListener, connectTimeout, readTimeout);
 		
 		try{
 			response = legacyProtocol.doRequest(credential, request);

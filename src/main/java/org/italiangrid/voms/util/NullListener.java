@@ -27,7 +27,9 @@ import org.italiangrid.voms.ac.ValidationResultListener;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSErrorMessage;
+import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.italiangrid.voms.request.VOMSRequestListener;
+import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
 import org.italiangrid.voms.request.VOMSWarningMessage;
@@ -45,7 +47,7 @@ import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
 public class NullListener implements ACLookupListener,
 		ValidationResultListener, VOMSServerInfoStoreListener,
 		LoadCredentialsEventListener, VOMSTrustStoreStatusListener,
-		UncaughtExceptionHandler, VOMSRequestListener {
+		UncaughtExceptionHandler, VOMSRequestListener, VOMSProtocolListener {
 
 	public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
 		// TODO Auto-generated method stub
@@ -152,6 +154,21 @@ public class NullListener implements ACLookupListener,
 	public void notifyACParseEvent(X509Certificate[] chain, int chainLevel) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void notifyHTTPRequest(String url) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void notifyLegacyRequest(String xmlLegacyRequest) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void notifyReceivedResponse(VOMSResponse r) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

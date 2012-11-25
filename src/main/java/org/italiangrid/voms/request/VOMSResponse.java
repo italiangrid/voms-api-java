@@ -15,6 +15,9 @@
  */
 package org.italiangrid.voms.request;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
+
 
 /**
  * 
@@ -61,5 +64,11 @@ public interface VOMSResponse {
 	 * @return an array of {@link VOMSWarningMessage} objects.
 	 */
 	public VOMSWarningMessage[] warningMessages();
+	
+	/**
+	 * 
+	 * @return Returns the XML representation of the response as a string.
+	 */
+	public String getXMLAsString();
 
 }

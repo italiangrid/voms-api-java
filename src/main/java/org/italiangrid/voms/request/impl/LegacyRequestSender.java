@@ -27,6 +27,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
+import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.w3c.dom.Document;
 
 /**
@@ -41,14 +42,17 @@ public class LegacyRequestSender {
 	private VOMSRequestFactory requestFactory = VOMSRequestFactory.instance();
 	private TransformerFactory transformerFactory;
 
-	private LegacyRequestSender() {
+	private VOMSProtocolListener listener;
+	
+	private LegacyRequestSender(VOMSProtocolListener listener) {
 	  
 		transformerFactory = TransformerFactory.newInstance();
+		this.listener = listener;
 	}
 
-	public static LegacyRequestSender instance() {
+	public static LegacyRequestSender instance(VOMSProtocolListener listener) {
 		
-	  return new LegacyRequestSender();
+	  return new LegacyRequestSender(listener);
 	}
 
 	protected String xmlDocAsString(Document doc) {
@@ -110,6 +114,8 @@ public class LegacyRequestSender {
 			throw new VOMSError(e.getMessage(), e);
 		}
 
+		listener.notifyLegacyRequest(xmlDocAsString(request));
+		
 		DOMSource source = new DOMSource(request);
 		
 		StreamResult res = new StreamResult(stream);

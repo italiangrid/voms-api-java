@@ -20,8 +20,10 @@ import javax.net.ssl.SSLSocketFactory;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.request.SSLSocketFactoryProvider;
 import org.italiangrid.voms.request.VOMSProtocol;
+import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
+import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
@@ -45,6 +47,7 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	 */
 	protected VOMSServerInfo serverInfo;
 	
+	protected VOMSProtocolListener listener = new NullListener();
 
 	/**
 	 * The CAnL validator used to manage SSL authentication.
@@ -95,17 +98,25 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	 *            the info for the remote VOMS server endpoint
 	 * @param validator
 	 *            the validator used to manage the SSL authentication
+	 * @param listener 
+	 *            the listener informed of low-level protocol details
 	 * @param connectTimeout
 	 * 			  sets the socket connection timeout
 	 * @param readTimeout
 	 * 			  sets the socket read timeout	
 	 */
-	public AbstractVOMSProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator, int connectTimeout, int readTimeout) {
+	public AbstractVOMSProtocol(VOMSServerInfo vomsServerInfo, 
+			X509CertChainValidatorExt validator,
+			VOMSProtocolListener listener,
+			int connectTimeout, 
+			int readTimeout)
+			{
 
 		this.serverInfo = vomsServerInfo;
 		this.validator = validator;
 		this.connectTimeout = connectTimeout;
 		this.readTimeout = readTimeout;
+		this.listener = listener;
 	}
 	
 	/**

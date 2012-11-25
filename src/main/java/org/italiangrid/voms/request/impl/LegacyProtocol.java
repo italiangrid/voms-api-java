@@ -28,6 +28,7 @@ import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSProtocolError;
+import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
@@ -51,8 +52,9 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 		super(vomsServerInfo, validator);
 	}
 	
-	public LegacyProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator, int connectTimeout, int readTimeout) {
-		super(vomsServerInfo, validator, connectTimeout, readTimeout);
+	public LegacyProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator, 
+			VOMSProtocolListener listener, int connectTimeout, int readTimeout) {
+		super(vomsServerInfo, validator, listener, connectTimeout, readTimeout);
 	}
 
 	public VOMSResponse doRequest(X509Credential credential, VOMSACRequest request) {
@@ -83,7 +85,7 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 		
 		sslSocket.setEnabledProtocols(VOMS_LEGACY_PROTOCOLS);
 
-		LegacyRequestSender protocol = LegacyRequestSender.instance();
+		LegacyRequestSender protocol = LegacyRequestSender.instance(listener);
 
 		VOMSResponse response = null;
 
@@ -102,6 +104,7 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
 		}
 
+		listener.notifyReceivedResponse(response);
 		return response;
 	}
 

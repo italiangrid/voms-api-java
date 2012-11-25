@@ -21,10 +21,12 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSProtocolError;
+import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
@@ -40,8 +42,12 @@ import eu.emi.security.authn.x509.X509Credential;
  */
 public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 
-	public RESTProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator, int connectTimeout, int readTimeout) {
-		super(vomsServerInfo, validator, connectTimeout, readTimeout);
+	public RESTProtocol(VOMSServerInfo vomsServerInfo, 
+			X509CertChainValidatorExt validator, 
+			VOMSProtocolListener listener, 
+			int connectTimeout, 
+			int readTimeout) {
+		super(vomsServerInfo, validator, listener, connectTimeout, readTimeout);
 	}
 	
 	public RESTProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator) {
@@ -57,6 +63,7 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 
 		RESTServiceURLBuilder restQueryBuilder = new RESTServiceURLBuilder();
 		URL serviceUrl = restQueryBuilder.build(serverInfo.getURL(), request);
+		RESTVOMSResponseParsingStrategy responseParsingStrategy = new RESTVOMSResponseParsingStrategy();
 
 		HttpsURLConnection connection = null;
 
@@ -74,6 +81,8 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 
 		connection.setSSLSocketFactory(getSSLSocketFactory(credential));
 
+		listener.notifyHTTPRequest(serviceUrl.toExternalForm());
+		
 		try {
 
 			connection.connect();
@@ -83,22 +92,23 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
 			
 		}
+		
+		InputStream is = null;
 
-		InputStream inputStream = null;
-
-		try {
-
-			inputStream = (InputStream) connection.getContent();
-
-		} catch (IOException e) {
-
-			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
+		try{
+			if (connection.getResponseCode() != 200){
+				is = connection.getErrorStream();
+			}else
+				is = connection.getInputStream();
+		
+		}catch (IOException e) {
+			
+			throw new VOMSError(e.getMessage(),e);
 		}
+		
+		VOMSResponse response = responseParsingStrategy.parse(is);
 
-		RESTVOMSResponseParsingStrategy responseParsingStrategy = new RESTVOMSResponseParsingStrategy();
-
-		VOMSResponse response = responseParsingStrategy.parse(inputStream);
-
+		listener.notifyReceivedResponse(response);
 		connection.disconnect();
 
 		return response;

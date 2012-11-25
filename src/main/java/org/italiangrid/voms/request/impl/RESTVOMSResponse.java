@@ -15,20 +15,10 @@
  */
 package org.italiangrid.voms.request.impl;
 
-import java.io.StringWriter;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.italiangrid.voms.request.ACDecodingStrategy;
 import org.italiangrid.voms.request.VOMSErrorMessage;
 import org.italiangrid.voms.request.VOMSWarningMessage;
+import org.italiangrid.voms.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -91,6 +81,9 @@ public class RESTVOMSResponse implements org.italiangrid.voms.request.VOMSRespon
 
 		Element acElement = (Element) xmlResponse.getElementsByTagName("ac").item(0);
 
+		if (acElement == null || !acElement.hasChildNodes())
+			return null;
+		
 		String acString = acElement.getFirstChild().getNodeValue();
 		
 		ACDecodingStrategy acDecodingStrategy = new GoodACDecodingStrategy();
@@ -168,6 +161,10 @@ public class RESTVOMSResponse implements org.italiangrid.voms.request.VOMSRespon
 		}
 
 		return result;
+	}
+
+	public String getXMLAsString() {
+		return XMLUtils.documentAsString(xmlResponse);
 	}
 
 }
