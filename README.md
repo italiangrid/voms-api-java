@@ -29,8 +29,6 @@ certificate parsing and validation and interactions with remote VOMS servers.
 ### Validation 
 
 With version 3.0 of the API, the validation interface changes significantly.
-A partially backward compatible VOMSValidator has been maintained to ease the transition
-to the new API.
 In order to validate VOMS attributes one has to do the following:
 
 ```java
@@ -61,16 +59,22 @@ if (vomsAttrs.size() > 0) {
 		System.out.println(g);
 }
 ```
+#### Getting more information about the validation outcome
 
-#### Setting a ValidationResultListener
+The API just described returns a possibly empty list of validated VOMS attributes.
+In order to get more information on the validation outcome (e.g. error messages etc. ) you now have 
+two possibilities:
 
-VOMS API now provides the ability of being informed of the outcome of each VOMS validation
-by registering a ValidationResultListener. 
+- register a `ValidationResultListener` on the validator and separate your error handling logic from
+the main flow of your code
+- use the `validateWithResult` method 
+
+#### Setting a ValidationResultListener 
 
 The interface of a ValidationResultListener is defined as follows:
 
 ```java
-void notifyValidationResult(VOMSValidationResult result, VOMSAttribute attributes)
+void notifyValidationResult(VOMSValidationResult result)
 ```
 
 The VOMSValidationResult class provides info the outcome of VOMS validation:
@@ -81,6 +85,7 @@ VOMSValidationResult{
 
 	boolean isValid();
 	List<VOMSValidationErrorMessage> getValidationErrors();
+	VOMSAttribute getAttributes();
 }
 ```
 
@@ -96,6 +101,23 @@ VOMSACValidator validator = VOMSValidators.newValidator(new ValidationResultList
 			
 		}});
 ```
+
+or later with the `setValidationResultListener(ValidationResultListener l)` method.
+
+### Using the `validateWithResult` method
+
+```java
+List<VOMSValidationResult> results = validator.validateWithResult(theChain);
+	
+for(VOMSValidationResult v: results){
+	
+	if ( v.isValid() ){
+		VOMSAttribute attrs = v.getAttributes();
+		...
+	}else{
+		// error handling code
+	}
+}
 
 ### Requesting a VOMS AC from a server and creating a proxy out of it
 

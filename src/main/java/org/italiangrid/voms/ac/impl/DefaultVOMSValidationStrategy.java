@@ -269,7 +269,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 		if (valid)
 			valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
 		
-		return new VOMSValidationResult(valid, validationErrors);
+		return new VOMSValidationResult(attributes,valid, validationErrors);
 	}
 	
 	public synchronized VOMSValidationResult validateAC(VOMSAttribute attributes, X509Certificate[] chain) {
@@ -303,7 +303,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 		if (valid)
 			valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
 		
-		return new VOMSValidationResult(valid, validationErrors);
+		return new VOMSValidationResult(attributes, valid, validationErrors);
 	}
 	
 	

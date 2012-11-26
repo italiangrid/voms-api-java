@@ -328,9 +328,7 @@ class ValidationResultChecker implements ValidationResultListener{
 		this.expectedErrorMessages = expectedErrorMessages;
 	}
 	
-	public void notifyValidationResult(VOMSValidationResult result,
-			VOMSAttribute attributes) {
-		
+	public void notifyValidationResult(VOMSValidationResult result) {
 		
 		assertEquals(expectedValidationResult, result.isValid());
 		assertEquals(expectedErrorMessages.length, result.getValidationErrors().size());

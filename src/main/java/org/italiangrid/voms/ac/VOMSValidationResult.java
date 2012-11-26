@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 
 /**
@@ -35,13 +36,17 @@ public class VOMSValidationResult {
 	/** A list of {@link VOMSValidationErrorMessage}**/
 	private final List<VOMSValidationErrorMessage> validationErrors;
 	
+	/** The attributes this validation result refer to **/
+	private final VOMSAttribute attributes;
+	
 	/**
 	 * Default constructor.
 	 * 
+	 * @param attributes the attributes this validation result refer to
 	 * @param valid <code>true</code> in case of validation success, <code>false</code> otherwise
 	 */
-	public VOMSValidationResult(boolean valid) {
-		this(valid, new ArrayList<VOMSValidationErrorMessage>());
+	public VOMSValidationResult(VOMSAttribute attributes, boolean valid) {
+		this(attributes, valid, new ArrayList<VOMSValidationErrorMessage>());
 	}
 	
 	/**
@@ -50,7 +55,8 @@ public class VOMSValidationResult {
 	 * @param valid <code>true</code> in case of validation success, <code>false</code> otherwise
 	 * @param validationErrors a list of validation errors
 	 */
-	public VOMSValidationResult(boolean valid, List<VOMSValidationErrorMessage> validationErrors) {
+	public VOMSValidationResult(VOMSAttribute attributes, boolean valid, List<VOMSValidationErrorMessage> validationErrors) {
+		this.attributes = attributes;
 		this.valid = valid;
 		this.validationErrors = validationErrors;
 	}
@@ -65,6 +71,16 @@ public class VOMSValidationResult {
 	}
 
 	/**
+	 * The attributes are to be considered valid only if the {@link #isValid()} method for this
+	 * {@link VOMSValidationResult} is <code>true</code>.
+	 * 
+	 * @return the attributes this validation result refer to
+	 */
+	public VOMSAttribute getAttributes() {
+		return attributes;
+	}
+
+	/**
 	 * @return the possibly empty list of validation errors
 	 */
 	public List<VOMSValidationErrorMessage> getValidationErrors() {
@@ -74,7 +90,7 @@ public class VOMSValidationResult {
 	@Override
 	public String toString() {
 		return "VOMSValidationResult [valid=" + valid + ", validationErrors="
-				+ validationErrors + "]";
+				+ validationErrors + ", attributes="+ attributes+"]";
 	}
 	
 }

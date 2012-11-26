@@ -140,8 +140,7 @@ public class NullListener implements ACLookupListener,
 
 	}
 
-	public void notifyValidationResult(VOMSValidationResult result,
-			VOMSAttribute attributes) {
+	public void notifyValidationResult(VOMSValidationResult result) {
 		// TODO Auto-generated method stub
 
 	}
