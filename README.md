@@ -94,7 +94,7 @@ You can register a ValidationResultListener at VOMSACValidator creation time:
 ```java
 VOMSACValidator validator = VOMSValidators.newValidator(new ValidationResultListener() {
 			
-	public void notifyValidationResult(VOMSValidationResult result,	VOMSAttribute attributes) {
+	public void notifyValidationResult(VOMSValidationResult result) {
 
 		// Your code here
 		...
