@@ -77,7 +77,7 @@ The interface of a ValidationResultListener is defined as follows:
 void notifyValidationResult(VOMSValidationResult result)
 ```
 
-The VOMSValidationResult class provides info the outcome of VOMS validation:
+The VOMSValidationResult class provides info on the outcome of VOMS validation:
 
 ```java
 
@@ -118,6 +118,7 @@ for(VOMSValidationResult v: results){
 		// error handling code
 	}
 }
+```
 
 ### Requesting a VOMS AC from a server and creating a proxy out of it
 
