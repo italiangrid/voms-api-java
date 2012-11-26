@@ -109,10 +109,10 @@ or later with the `setValidationResultListener(ValidationResultListener l)` meth
 ```java
 List<VOMSValidationResult> results = validator.validateWithResult(theChain);
 	
-for(VOMSValidationResult v: results){
+for(VOMSValidationResult r: results){
 	
-	if ( v.isValid() ){
-		VOMSAttribute attrs = v.getAttributes();
+	if ( r.isValid() ){
+		VOMSAttribute attrs = r.getAttributes();
 		...
 	}else{
 		// error handling code
