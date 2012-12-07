@@ -3,7 +3,7 @@
 %define mvn_settings @@MVN_SETTINGS@@
 
 Name: voms-api-java
-Version: 2.0.9
+Version: 2.0.10
 Release: 1%{?dist}
 Summary: The Virtual Organisation Membership Service Java APIs
 
@@ -89,6 +89,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_javadocdir}/%{name}-%{pom_version}
 
 %changelog
+* Fri Dec 7 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it>  - 2.0.10-1
+- Fix for http://issues.cnaf.infn.it/browse/VOMS-174
+
 * Wed Oct 24 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 2.0.9-1
 - Fix for https://savannah.cern.ch/bugs/?98296
 
