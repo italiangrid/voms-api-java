@@ -129,6 +129,8 @@ public class VOMSValidator {
     protected FQANTree myFQANTree = null;
     protected static VOMSTrustStore vomsStore = null;
 
+    protected static volatile ACValidator DEFAULT_VALIDATOR = null;
+    
     static {
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
@@ -154,6 +156,22 @@ public class VOMSValidator {
         this(validatedChain, null);
     }
 
+    private synchronized ACValidator initializeValidator(){
+    	
+    	if (DEFAULT_VALIDATOR == null){
+    	
+    		try {
+				PKIVerifier verifier = new PKIVerifier();
+				DEFAULT_VALIDATOR = new ACValidator(verifier);
+				
+			} catch (Exception e) {
+				log.error("Error initializing default ACValidator: "+e.getMessage(),e);
+				throw new RuntimeException(e);
+			}
+    	}
+    	
+    	return DEFAULT_VALIDATOR;
+    }
     /**
      * If <code>validatedChain</code> is <code>null</code>, a call to
      * <code>setValidatedChain()</code> MUST be made before calling
@@ -171,44 +189,11 @@ public class VOMSValidator {
         else
             myValidatedChain = (X509Certificate[])validatedChain.clone();
 
-        if (acValidator == null) {
-            if (theTrustStore == null) {
-                if (vomsStore == null) {
-                    try {
-                        String vomsDir = System.getProperty( "VOMSDIR" );
-                        
-                        if (vomsDir == null )
-                            vomsStore = PKIStoreFactory.getStore(PKIStore.DEFAULT_VOMSDIR, PKIStore.TYPE_VOMSDIR, true);
-                        else
-                            vomsStore = PKIStoreFactory.getStore(vomsDir, PKIStore.TYPE_VOMSDIR, true);
-                    }
-                    catch(IOException e) {}
-                    catch(CertificateException e) {}
-                    catch(CRLException e) {}
-                }
-            }
-            else if (theTrustStore instanceof BasicVOMSTrustStore) {
-                BasicVOMSTrustStore store = (BasicVOMSTrustStore)theTrustStore;
-                store.stopRefresh();
-                if (vomsStore == null) {
-                    String directory = store.getDirList();
-                
-                    try {
-                        vomsStore = PKIStoreFactory.getStore(directory, PKIStore.TYPE_VOMSDIR, true);
-                    }
-                    catch(IOException e) {}
-                    catch(CertificateException e) {}
-                    catch(CRLException e) {}
-                }
-            }
-            else if (vomsStore == null)
-                log.error("Cannot replace passed truststore.  Validation may not be complete.");
-
-        }
-        if (vomsStore != null)
-            myValidator = (acValidator == null) ? new ACValidator(vomsStore) : acValidator;
+        if (acValidator == null) 
+        	myValidator = initializeValidator();
         else
-            myValidator = (acValidator == null) ? new ACValidator(theTrustStore) : acValidator;
+        	myValidator = acValidator;
+       
     }
 
     /**
@@ -245,6 +230,7 @@ public class VOMSValidator {
      *
      * @param trustStore the trustStore.
      *
+     * @deprecated
      * @see org.glite.voms.ac.VOMSTrustStore
      */
     public static void setTrustStore(VOMSTrustStore trustStore) {
@@ -252,13 +238,10 @@ public class VOMSValidator {
     }
 
     /**
-     * Cleans up the object. In particular this method stops the refreshing thread of
-     * the underlying {@link VOMSTrustStore} or {@link PKIStore}.
-     * 
-     * A {@link VOMSValidator} should be cleaned up *only* before disposing the object.
+     * Cleans up the object. 
      * 
      */
-    public void cleanup() {
+    public synchronized void cleanup() {
         myValidatedChain = null;
 
         if (myVomsAttributes != null) {
@@ -268,24 +251,21 @@ public class VOMSValidator {
 
         myFQANTree       = null;
 
-        if (myValidator != null) {
-            myValidator.cleanup();
-            myValidator = null;
-        }
-
-        if (vomsStore != null) {
-            vomsStore.stopRefresh();
-            vomsStore = null;
-        }
-
-        if (theTrustStore != null) {
-            if (theTrustStore instanceof BasicVOMSTrustStore) {
-                ((BasicVOMSTrustStore)theTrustStore).stopRefresh();
-            }
-            theTrustStore = null;
+        if (myValidator != null && myValidator != DEFAULT_VALIDATOR){
+        	myValidator.cleanup();
+        	myValidator = null;
         }
     }
 
+    /**
+     * Performs shutdown of the default validator object, if allocated.
+     */
+    public static synchronized void shutdown(){
+    	if (DEFAULT_VALIDATOR != null){
+    		DEFAULT_VALIDATOR.cleanup();
+    		DEFAULT_VALIDATOR = null;
+    	}
+    }
     /**
      * Convenience method: enables you to reuse a <code>VOMSValidator</code>
      * instance for another client chain, thus avoiding overhead in

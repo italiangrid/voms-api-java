@@ -992,7 +992,12 @@ public class PKIVerifier {
     
     private boolean isRevoked( X509Certificate cert, X509Certificate issuer ) {
 
+    	logger.debug("Checking if '"+cert.getSubjectDN()+"' issued by '"+issuer.getSubjectDN()+"' has been revoked.");
     	
+    	if (!PKIUtils.isCA(issuer)){
+    		logger.debug("Issuer certificate '"+issuer.getSubjectDN()+"' is not a CA, so it cannot issue CRLs");
+    		return false;
+    	}
     	List<X509CRL> crls = lookupCRL(issuer);
     	
     	if (crls == null){
