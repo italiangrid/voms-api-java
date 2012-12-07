@@ -127,7 +127,7 @@ public class PKIStore implements VOMSTrustStore {
      * @see PKIUtils#getHash(X509Principal principal)
      * @see java.util.Vector
      */
-    public Hashtable getCAs() {
+    public synchronized Hashtable getCAs() {
         return (Hashtable)certificates.clone();
     }
 
@@ -142,7 +142,7 @@ public class PKIStore implements VOMSTrustStore {
      * @see java.util.Vector
      */
 
-    public Hashtable getCRLs() {
+    public synchronized Hashtable getCRLs() {
         return crls;
     }
 
@@ -158,12 +158,12 @@ public class PKIStore implements VOMSTrustStore {
      * @see java.util.Vector
      */
 
-    public Hashtable getSignings() {
+    public synchronized Hashtable getSignings() {
         return signings;
     }
 
 
-    public Hashtable getNamespaces() {
+    public synchronized Hashtable getNamespaces() {
         return namespaces;
     }
 
@@ -384,7 +384,7 @@ public class PKIStore implements VOMSTrustStore {
      * @param millisec New interval (in milliseconds)
      */
 
-    public void rescheduleRefresh(int millisec) {
+    public synchronized void rescheduleRefresh(int millisec) {
         if (theTimer != null)
             theTimer.cancel();
         theTimer = null;
@@ -400,7 +400,7 @@ public class PKIStore implements VOMSTrustStore {
      * NOTE: This method must ALWAYS be called prior to disposing of a PKIStore
      * object.  The penalty for not doing it is a memor leak.
      */
-    public void stopRefresh() {
+    public synchronized void stopRefresh() {
         if (instances != 0)
             instances --;
 
@@ -411,7 +411,7 @@ public class PKIStore implements VOMSTrustStore {
         }
     }
 
-    protected void addInstance() {
+    protected synchronized void addInstance() {
         instances++;
     }
 
@@ -421,7 +421,7 @@ public class PKIStore implements VOMSTrustStore {
      * @param b -- if true (default) load as much as possible,
      *             otherwise stop loading at the first error.
      */
-    public void setAggressive(boolean b) {
+    public synchronized void setAggressive(boolean b) {
         aggressive = b;
     }
 
@@ -444,7 +444,7 @@ public class PKIStore implements VOMSTrustStore {
      *
      * @return The corresponding LSCFile object, or null if none is present.
      */
-    public LSCFile getLSC(String voName, String hostName) {
+    public synchronized LSCFile getLSC(String voName, String hostName) {
         Hashtable lscList = (Hashtable)lscfiles.get(voName);
 
         if (lscList != null) {
@@ -462,7 +462,7 @@ public class PKIStore implements VOMSTrustStore {
      *
      * @return the array of candidates, or null if none is found.
      */
-    public X509Certificate[] getAACandidate(X500Principal issuer, String voName) {
+    public synchronized X509Certificate[] getAACandidate(X500Principal issuer, String voName) {
         Hashtable listCerts = (Hashtable)vomscerts.get(PKIUtils.getHash(issuer));
 
         if (logger.isDebugEnabled())
@@ -487,7 +487,7 @@ public class PKIStore implements VOMSTrustStore {
      * @throws CRLException if there are parsing errors while loading a CRL.
      */
 
-    public void load() throws IOException, CertificateException, CRLException  {
+    public synchronized void load() throws IOException, CertificateException, CRLException  {
         switch (type) {
         case TYPE_VOMSDIR:
             getForVOMS(new File(certDir), null);
