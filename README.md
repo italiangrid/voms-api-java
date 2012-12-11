@@ -142,12 +142,19 @@ X509Credential cred = UserCredentials.loadCredentials("passphrase".toCharArray()
 To request an AC from a VOMS service, one has to create a VOMSACRequest in order to set
 options for the requested AC, like its lifetime, the VO name or the requested VOMS fqans.
 
+The VOMSACService requires that you pass in a CANL `X509CerChainValidatorExt` object
+that will be used to setup the SSL connection and perform certificate validation.
+You can easily build one with the `CertificateValidatorBuilder` VOMS helper class:
+
+
 ```java
+X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator();
+VOMSACService service = new DefaultVOMSACService.Builder(validator).build();
+
 DefaultVOMSACRequest request = new DefaultVOMSACRequest();
 request.setLifetime(12);
 request.setVoName("atlas");
 
-VOMSACService service = new DefaultVOMSACService();
     
 AttributeCertificate attributeCertificate = service.getVOMSAttributeCertificate(cred, request);
 ```
