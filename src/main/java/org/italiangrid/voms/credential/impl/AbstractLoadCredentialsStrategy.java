@@ -71,12 +71,15 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 	 */
 	protected X509Credential loadPEMCredential(String privateKeyPath, String certificatePath, PasswordFinder pf){
 		
-		VOMSPEMCredential cred = null;
+		PEMCredential cred = null;
 		
 		listener.notifyCredentialLookup(privateKeyPath, certificatePath);
 		
 		try {
-			cred = new VOMSPEMCredential(privateKeyPath, certificatePath, pf);
+						
+			cred = 	new PEMCredential(new FileInputStream(privateKeyPath),
+						new FileInputStream(certificatePath),
+						pf);
 			
 			listener.notifyLoadCredentialSuccess(privateKeyPath, certificatePath);
 			
@@ -135,7 +138,7 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 		
 		try {
 			
-			cred = new PEMCredential(new FileInputStream(proxyPath), null);
+			cred = new PEMCredential(new FileInputStream(proxyPath), (char[])null);
 			listener.notifyLoadCredentialSuccess(proxyPath);
 		
 		} catch (Throwable t) {

@@ -21,7 +21,7 @@ import java.util.List;
 import org.italiangrid.voms.store.LSCInfo;
 
 import eu.emi.security.authn.x509.helpers.CertificateHelpers;
-import eu.emi.security.authn.x509.impl.CertificateUtils;
+import eu.emi.security.authn.x509.impl.OpensslNameUtils;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 
@@ -148,8 +148,8 @@ public class LSCFile implements LSCInfo{
 			
 			for (int i=0; i < certChain.length; i++){
 				
-				String lscSubjectRFC2253 = CertificateHelpers.opensslToRfc2253(certChainDescription.get(i));
-				String lscIssuerRFC2253 = CertificateHelpers.opensslToRfc2253(certChainDescription.get(i+1));
+				String lscSubjectRFC2253 =	OpensslNameUtils.opensslToRfc2253(certChainDescription.get(i));
+				String lscIssuerRFC2253 = OpensslNameUtils.opensslToRfc2253(certChainDescription.get(i+1));
 				
 				boolean subjectDoesMatch = X500NameUtils.equal(certChain[i].getSubjectX500Principal(), lscSubjectRFC2253);
 				boolean issuerDoesMatch = X500NameUtils.equal(certChain[i].getIssuerX500Principal(), lscIssuerRFC2253);

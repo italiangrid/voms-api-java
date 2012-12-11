@@ -104,10 +104,10 @@ public class TestConcurrentValidation {
 	static void initVOs() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
 		
 		PEMCredential aaCred1 = new PEMCredential(new FileInputStream(aaKey),
-				new FileInputStream(aaCert), null);
+				new FileInputStream(aaCert), (char[])null);
 		
 		PEMCredential aaCred2 = new PEMCredential(new FileInputStream(aaKey2),
-				new FileInputStream(aaCert2), null);
+				new FileInputStream(aaCert2), (char[])null);
 		
 		testVO_1 = new VOMSAA(aaCred1, "test.vo", "test-host.cnaf.infn.it", 15000);
 		testVO_2 = new VOMSAA(aaCred2, "test.vo.2", "wilco.cnaf.infn.it", 15001);

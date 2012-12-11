@@ -40,7 +40,7 @@ public class ValidationExample {
 		
 		VOMSACValidator validator = VOMSValidators.newValidator();
 		
-		PEMCredential c = new PEMCredential(new FileInputStream("somefile"), null);
+		PEMCredential c = new PEMCredential(new FileInputStream("somefile"), (char[])null);
 		
 		X509Certificate[] chain = c.getCertificateChain();
 		

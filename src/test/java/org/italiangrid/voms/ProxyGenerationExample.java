@@ -72,7 +72,7 @@ public class ProxyGenerationExample {
 		PrivateKey pkey = cred.getKey();
 
 
-		PEMCredential pc = new PEMCredential(fvoms_proxy, null);
+		PEMCredential pc = new PEMCredential(fvoms_proxy, (char[])null);
 		X509Certificate voms_proxy = pc.getCertificate();
 
 		/* Get VOMS AC from the given proxy */

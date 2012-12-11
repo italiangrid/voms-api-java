@@ -116,10 +116,10 @@ public class TestACGeneration {
 	static public void classTestSetup() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
 		
 		aaCredential = new PEMCredential(new FileInputStream(aaKey),
-				new FileInputStream(aaCert), null);
+				new FileInputStream(aaCert), (char[])null);
 			
 		aaCredential2 = new PEMCredential(new FileInputStream(aaKey2),
-				new FileInputStream(aaCert2), null);
+				new FileInputStream(aaCert2), (char[])null);
 		
 		expiredCredential = new PEMCredential(new FileInputStream(expiredKey),
 				new FileInputStream(expiredCert), keyPassword.toCharArray());
