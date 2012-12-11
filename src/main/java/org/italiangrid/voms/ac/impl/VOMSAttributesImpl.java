@@ -23,15 +23,11 @@ import java.util.List;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
-import org.glite.voms.FQAN;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSGenericAttribute;
-import org.italiangrid.voms.util.FQANHelper;
 import org.italiangrid.voms.util.TimeUtils;
 
 import eu.emi.security.authn.x509.impl.X500NameUtils;
-
-@SuppressWarnings("deprecation")
 
 /**
  * The default implementation for voms attributes
@@ -194,14 +190,6 @@ public class VOMSAttributesImpl implements VOMSAttribute {
 
 	public void setVOMSAC(X509AttributeCertificateHolder ac) {
 		VOMSAC = ac;
-	}
-
-	public List<FQAN> getListOfFQAN() {
-		return FQANHelper.convert(getFQANs());
-	}
-
-	public List<String> getFullyQualifiedAttributes() {
-		return getFQANs();
 	}
 
 	public BigInteger getHolderSerialNumber() {

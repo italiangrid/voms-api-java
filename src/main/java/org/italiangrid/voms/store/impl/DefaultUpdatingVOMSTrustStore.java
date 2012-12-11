@@ -71,7 +71,7 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	 * 
 	 */
 	public DefaultUpdatingVOMSTrustStore(long updateFrequency) {
-		this(buildDefaultTrustedDirs(), updateFrequency, new NullListener());
+		this(buildDefaultTrustedDirs(), updateFrequency, NullListener.INSTANCE);
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	 * 
 	 */
 	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency) {
-		this(localTrustDirs, updateFrequency, new NullListener());
+		this(localTrustDirs, updateFrequency, NullListener.INSTANCE);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	 * @param localTrustDirs where VOMS trust information will be looked for
 	 */
 	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs){
-		this(localTrustDirs, DEFAULT_UPDATE_FREQUENCY, new NullListener());
+		this(localTrustDirs, DEFAULT_UPDATE_FREQUENCY, NullListener.INSTANCE);
 	}
 	
 	/**
@@ -99,7 +99,7 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	 * This store will be refreshed every {@value #DEFAULT_UPDATE_FREQUENCY} milliseconds.
 	 */
 	public DefaultUpdatingVOMSTrustStore(){
-		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, new NullListener());
+		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, NullListener.INSTANCE);
 	}
 	
 	

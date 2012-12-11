@@ -23,7 +23,6 @@ import java.util.List;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
-import org.glite.voms.FQAN;
 
 
 /**
@@ -126,20 +125,5 @@ public interface VOMSAttribute {
 	 * @return the underlying bouncycastle object for the VOMS attribute certificate.
 	 */
 	public X509AttributeCertificateHolder getVOMSAC();
-	
-	/**
-	 * @return a possibly-empty list of {@link FQAN} objects
-	 * @deprecated use {@link #getFQANs()} instead
-	 */
-	public List<FQAN> getListOfFQAN();
-	
-	/**
-	 * 
-	 * @return a possibly-empty list of FQAN strings
-	 * @deprecated use {@link #getFQANs()} instead
-	 */
-	public List<String> getFullyQualifiedAttributes();
-	
-	
 	
 }

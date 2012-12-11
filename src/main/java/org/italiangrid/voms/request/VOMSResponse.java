@@ -15,8 +15,6 @@
  */
 package org.italiangrid.voms.request;
 
-import java.io.OutputStream;
-import java.io.PrintWriter;
 
 
 /**

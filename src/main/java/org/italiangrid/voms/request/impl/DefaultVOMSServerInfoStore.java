@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSESParser;
+import org.italiangrid.voms.request.VOMSESParserFactory;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
 import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
@@ -48,30 +49,14 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 	protected Map<String, Set<VOMSServerInfo>> serverInfoStore = new TreeMap<String, Set<VOMSServerInfo>>();
 	private VOMSESParser vomsesParser;
 	
-	public DefaultVOMSServerInfoStore() {
-		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl(), new NullListener());
-	}
 	
-	public DefaultVOMSServerInfoStore(VOMSServerInfoStoreListener listener){
-		this(new DefaultVOMSESLookupStrategy(), new LegacyVOMSESParserImpl(), listener);
-	}
-	
-	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy){
-		this(lookupStrategy, new LegacyVOMSESParserImpl(), new NullListener());
-	}
-	
-	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy, VOMSServerInfoStoreListener listener) {
-		this.lookupStrategy = lookupStrategy;
-		this.vomsesParser = new LegacyVOMSESParserImpl();
-		this.listener = listener;
+	private DefaultVOMSServerInfoStore(Builder b){
+		
+		this.lookupStrategy = b.lookupStrategy;
+		this.listener = b.listener;
+		this.vomsesParser = b.vomsesParser;
 		initializeStore();
-	}
-	
-	public DefaultVOMSServerInfoStore(VOMSESLookupStrategy lookupStrategy, VOMSESParser parser, VOMSServerInfoStoreListener listener) {
-		this.lookupStrategy = lookupStrategy;
-		this.vomsesParser = parser;
-		this.listener = listener;
-		initializeStore();
+		
 	}
 
 	public void addVOMSServerInfo(VOMSServerInfo info) {
@@ -126,6 +111,56 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 				addVOMSServerInfo(si, f.getAbsolutePath());
 			}
 				
+		}
+	}
+	
+	public static class Builder{
+		
+		private List<String> vomsesPaths;
+		private VOMSESLookupStrategy lookupStrategy;
+		private VOMSServerInfoStoreListener listener = NullListener.INSTANCE;
+		private VOMSESParser vomsesParser =  VOMSESParserFactory.newVOMSESParser();
+		
+		public Builder() {
+			
+		}
+		
+		public Builder lookupStrategy(VOMSESLookupStrategy strategy){
+			this.lookupStrategy = strategy;
+			return this;
+		}
+		
+		public Builder storeListener(VOMSServerInfoStoreListener l){
+			this.listener = l;
+			return this;
+		}
+		
+		public Builder vomsesParser(VOMSESParser p){
+			this.vomsesParser = p;
+			return this;
+		}
+		
+		public Builder vomsesPaths(List<String> paths){
+			this.vomsesPaths = paths;
+			return this;
+		}
+		
+		
+		private void buildLookupStrategy(){
+			
+			if (lookupStrategy != null)
+				return;
+			
+			if (vomsesPaths != null)
+				lookupStrategy = new BaseVOMSESLookupStrategy(vomsesPaths);
+			else
+				lookupStrategy = new DefaultVOMSESLookupStrategy();
+		}
+		
+		public DefaultVOMSServerInfoStore build(){
+			buildLookupStrategy();
+			return new DefaultVOMSServerInfoStore(this);
+			
 		}
 	}
 }

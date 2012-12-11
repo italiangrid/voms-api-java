@@ -38,7 +38,7 @@ public class DefaultVOMSACParser implements VOMSACParser {
 	private X509Certificate[] certChain;
 	
 	public DefaultVOMSACParser() {
-		this(new LeafACLookupStrategy(new NullListener()));
+		this(new LeafACLookupStrategy(NullListener.INSTANCE));
 	}
 	
 	public DefaultVOMSACParser(VOMSACLookupStrategy strategy){

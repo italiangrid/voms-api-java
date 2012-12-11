@@ -80,12 +80,12 @@ public class DefaultLoadCredentialsStrategy  extends AbstractLoadCredentialsStra
 	}
 	
 	public DefaultLoadCredentialsStrategy(String homeFolder) {
-		this(homeFolder, System.getProperty(TMPDIR_PROPERTY), new NullListener());
+		this(homeFolder, System.getProperty(TMPDIR_PROPERTY), NullListener.INSTANCE);
 	}
 	
 	
 	public DefaultLoadCredentialsStrategy() {
-		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY), new NullListener());
+		this(System.getProperty(HOME_PROPERTY), System.getProperty(TMPDIR_PROPERTY), NullListener.INSTANCE);
 	}
 	
 	public DefaultLoadCredentialsStrategy(LoadCredentialsEventListener listener){

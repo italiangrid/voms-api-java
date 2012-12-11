@@ -16,6 +16,9 @@
 package org.italiangrid.voms;
 
 import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+
 import junit.framework.Assert;
 
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
@@ -28,9 +31,11 @@ public class TestVOMSServerInfoStore {
 	@Test
 	public void testExistingVOMSESParsingSuccess() {
 		
-		VOMSESLookupStrategy strategy = new BaseVOMSESLookupStrategy(new String[]{"src/test/resources/vomses"});
+		VOMSESLookupStrategy strategy = new BaseVOMSESLookupStrategy(Arrays.asList("src/test/resources/vomses"));
 		
-		DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore(strategy);
+		DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore.Builder()
+			.lookupStrategy(strategy)
+			.build();
 		
 		assertEquals(3, store.getVOMSServerInfo("atlas").size());
 		assertEquals(2, store.getVOMSServerInfo("eumed").size());

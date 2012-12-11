@@ -47,7 +47,7 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	 */
 	protected VOMSServerInfo serverInfo;
 	
-	protected VOMSProtocolListener listener = new NullListener();
+	protected VOMSProtocolListener listener = NullListener.INSTANCE;
 
 	/**
 	 * The CAnL validator used to manage SSL authentication.

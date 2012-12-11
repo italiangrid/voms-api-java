@@ -15,6 +15,8 @@
  */
 package org.italiangrid.voms.request.impl;
 
+import java.util.Arrays;
+
 /**
  * Default VOMSES information lookup strategy.
  * 
@@ -31,11 +33,11 @@ package org.italiangrid.voms.request.impl;
 public class DefaultVOMSESLookupStrategy extends BaseVOMSESLookupStrategy {
 
 	public static final String DEFAULT_VOMSES_DIR = "/etc/vomses";
-
+	
 	public DefaultVOMSESLookupStrategy() {
-		super(new String[] { DEFAULT_VOMSES_DIR,
+		super(Arrays.asList(DEFAULT_VOMSES_DIR, 
 				System.getProperty("user.home") + "/.glite/vomses",
-				System.getProperty("user.home") + "/.voms/vomses" });
+				System.getProperty("user.home") + "/.voms/vomses"
+				));
 	}
-
 }

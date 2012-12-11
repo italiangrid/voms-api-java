@@ -15,7 +15,6 @@
  */
 package org.italiangrid.voms.ac.impl;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 

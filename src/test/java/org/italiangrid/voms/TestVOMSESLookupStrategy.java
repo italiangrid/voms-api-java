@@ -16,6 +16,7 @@
 package org.italiangrid.voms;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -29,8 +30,8 @@ public class TestVOMSESLookupStrategy {
 	@Test
 	public void testLookupVomsesInfo() {
 		
-		VOMSESLookupStrategy strategy =  new BaseVOMSESLookupStrategy(new String[]{"src/test/resources/vomses", 
-				"/non/existent/path"});
+		VOMSESLookupStrategy strategy =  new BaseVOMSESLookupStrategy(Arrays.asList("src/test/resources/vomses", 
+				"/non/existent/path"));
 		
 		List<File> paths = strategy.lookupVomsesInfo();
 		

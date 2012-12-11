@@ -59,12 +59,12 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	public DefaultVOMSValidator() {
 		this (VOMSTrustStores.newTrustStore(), 
 				CertificateValidatorBuilder.buildCertificateValidator(DEFAULT_TRUST_ANCHORS_DIR),
-				new NullListener());
+				NullListener.INSTANCE);
 	}
 	
 	public DefaultVOMSValidator(VOMSTrustStore store, 
 			X509CertChainValidatorExt validator){
-		this(store, validator, new NullListener());
+		this(store, validator, NullListener.INSTANCE);
 	}
 	
 	public DefaultVOMSValidator(VOMSTrustStore store, 

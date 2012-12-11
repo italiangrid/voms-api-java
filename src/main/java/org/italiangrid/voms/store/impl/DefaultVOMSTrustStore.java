@@ -102,7 +102,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 	}
 	
 	public DefaultVOMSTrustStore(List<String> localTrustDirs){
-		this(localTrustDirs, new NullListener());
+		this(localTrustDirs, NullListener.INSTANCE);
 	}
 	/**  
 	 * Default constructor.

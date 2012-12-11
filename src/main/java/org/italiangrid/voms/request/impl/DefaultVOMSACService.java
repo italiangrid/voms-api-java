@@ -16,6 +16,7 @@
 package org.italiangrid.voms.request.impl;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -31,7 +32,6 @@ import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
 import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
-import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
@@ -67,44 +67,25 @@ public class DefaultVOMSACService implements VOMSACService {
 	 */
 	private VOMSServerInfoStore serverInfoStore;
 	
-	
 	/**
 	 * The connect timeout value 
 	 */
-	private int connectTimeout =  AbstractVOMSProtocol.DEFAULT_CONNECT_TIMEOUT;
+	private int connectTimeout;
 	
 	/** 
 	 * The read timeout used 
 	 */
-	private int readTimeout = AbstractVOMSProtocol.DEFAULT_READ_TIMEOUT;
-	
-	/**
-	 * Ctor. 
-	 * 
-	 * @param validator the validator used for the SSL handshake
-	 * @param listener the listener that will be informed about request events
-	 * @param serverInfoStoreListener the listener that will be informed about server info store events
-	 */
-	public DefaultVOMSACService(X509CertChainValidatorExt validator,
-			VOMSRequestListener listener, 
-			VOMSESLookupStrategy lookupStrategy,
-			VOMSServerInfoStoreListener serverInfoStoreListener,
-			VOMSProtocolListener protocolListener) {
-		
-		this.requestListener = listener;
-		this.validator = validator;
-		this.protocolListener = protocolListener;
-		serverInfoStore = new DefaultVOMSServerInfoStore(lookupStrategy,serverInfoStoreListener);
-	}
+	private int readTimeout;
 
-	public DefaultVOMSACService() {
-		this.validator = CertificateValidatorBuilder.buildCertificateValidator();
+	
+	private DefaultVOMSACService(Builder builder){
 		
-		NullListener listener =  new NullListener();
-		this.requestListener = listener;
-		this.protocolListener = listener;
-		
-		serverInfoStore = new DefaultVOMSServerInfoStore(listener);
+		this.validator = builder.validator;
+		this.requestListener = builder.requestListener;
+		this.protocolListener = builder.protocolListener;
+		this.serverInfoStore = builder.serverInfoStore;
+		this.connectTimeout = builder.connectTimeout;
+		this.readTimeout = builder.readTimeout;
 		
 	}
 	
@@ -270,5 +251,121 @@ public class DefaultVOMSACService implements VOMSACService {
 	public void setReadTimeout(int timeout) {
 		readTimeout = timeout;
 		
+	}
+	
+	/**
+	 * Provides easy creation of a {@link DefaultVOMSACService} object.
+	 * 
+	 * @author cecco
+	 *
+	 */
+	public static class Builder {
+		/**
+		 * The listener that will be informed about request events
+		 */
+		private VOMSRequestListener requestListener = NullListener.INSTANCE;
+			
+		/**
+		 * The listener that will be informed about  low-level protocol details
+		 */
+		private VOMSProtocolListener protocolListener = NullListener.INSTANCE;
+		
+		/**
+		 * The listener that will be informed about server info store events
+		 */
+		private VOMSServerInfoStoreListener storeListener = NullListener.INSTANCE;
+		
+		/**
+		 * The validator used for the SSL handshake
+		 */
+		private X509CertChainValidatorExt validator;
+		
+		/**
+		 * The store used to keep VOMS server contact information.
+		 */
+		private VOMSServerInfoStore serverInfoStore;
+		
+		/**
+		 * The provided strategy to lookup vomses information.
+		 */
+		private VOMSESLookupStrategy vomsesLookupStrategy;
+		
+		/**
+		 * A list of paths where vomses information will be looked for, used
+		 * to create the server info store.
+		 */
+		private List<String> vomsesLocations;
+		
+		/**
+		 * The connect timeout value 
+		 */
+		private int connectTimeout =  AbstractVOMSProtocol.DEFAULT_CONNECT_TIMEOUT;
+		
+		/** 
+		 * The read timeout used 
+		 */
+		private int readTimeout = AbstractVOMSProtocol.DEFAULT_READ_TIMEOUT;
+		
+		public Builder(X509CertChainValidatorExt certChainValidator) {
+			this.validator = certChainValidator;
+		}
+		
+		public Builder requestListener(VOMSRequestListener l){
+			this.requestListener = l;
+			return this;
+		}
+		
+		public Builder serverInfoStoreListener(VOMSServerInfoStoreListener sl){
+			this.storeListener = sl;
+			return this;
+		}
+		
+		public Builder serverInfoStore(VOMSServerInfoStore sis){
+			this.serverInfoStore = sis;
+			return this;
+		}
+		
+		public Builder protocolListener(VOMSProtocolListener pl){
+			this.protocolListener = pl;
+			return this;
+		}
+		
+		public Builder connectTimeout(int timeout){
+			this.connectTimeout = timeout;
+			return this;
+		}
+		
+		public Builder readTimeout(int timeout){
+			this.readTimeout = timeout;
+			return this;
+		}
+		
+		public Builder vomsesLookupStrategy(VOMSESLookupStrategy strategy){
+			this.vomsesLookupStrategy = strategy;
+			return this;
+		}
+		
+		public Builder vomsesLocations(List<String> vomsesLocations){
+			this.vomsesLocations = vomsesLocations;
+			return this;
+		}
+		
+		protected void buildServerInfoStore(){
+			
+			if (serverInfoStore != null)
+				return;
+			
+			serverInfoStore = new DefaultVOMSServerInfoStore.Builder()
+				.lookupStrategy(vomsesLookupStrategy)
+				.storeListener(storeListener)
+				.vomsesPaths(vomsesLocations)
+				.build();
+		}
+		
+		
+		public DefaultVOMSACService build(){
+			buildServerInfoStore();
+			return new DefaultVOMSACService(this);
+		}
 	}
 }

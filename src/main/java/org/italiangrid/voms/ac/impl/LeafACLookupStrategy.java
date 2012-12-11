@@ -47,7 +47,7 @@ public class LeafACLookupStrategy implements VOMSACLookupStrategy, VOMSConstants
 	}
 	
 	public LeafACLookupStrategy(){
-		this(new NullListener());
+		this(NullListener.INSTANCE);
 	}
 	
 	

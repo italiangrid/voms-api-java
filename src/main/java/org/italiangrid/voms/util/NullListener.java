@@ -20,7 +20,6 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.ACLookupListener;
 import org.italiangrid.voms.ac.VOMSValidationResult;
 import org.italiangrid.voms.ac.ValidationResultListener;
@@ -39,134 +38,136 @@ import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
 
 /**
  * 
- * A listener which swallows notification.
+ * A Singleton Listener which swallows notification.
  * 
  * @author andreaceccanti
  *
  */
-public class NullListener implements ACLookupListener,
+public enum NullListener implements ACLookupListener,
 		ValidationResultListener, VOMSServerInfoStoreListener,
 		LoadCredentialsEventListener, VOMSTrustStoreStatusListener,
 		UncaughtExceptionHandler, VOMSRequestListener, VOMSProtocolListener {
 
+	INSTANCE;
+	
 	public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyVOMSRequestSuccess(VOMSACRequest request,
 			VOMSServerInfo endpoint) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyVOMSRequestFailure(VOMSACRequest request,
 			VOMSServerInfo endpoint, Throwable error) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyErrorsInVOMSReponse(VOMSACRequest request,
 			VOMSServerInfo si, VOMSErrorMessage[] errors) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyWarningsInVOMSResponse(VOMSACRequest request,
 			VOMSServerInfo si, VOMSWarningMessage[] warnings) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void uncaughtException(Thread t, Throwable e) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyTrustStoreUpdate(VOMSTrustStore store) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyCertficateLookupEvent(String dir) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyLSCLookupEvent(String dir) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyCertificateLoadEvent(X509Certificate cert, File f) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyLSCLoadEvent(LSCInfo lsc, File f) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyCredentialLookup(String... locations) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyLoadCredentialSuccess(String... locations) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyLoadCredentialFailure(Throwable error,
 			String... locations) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyNoValidVOMSESError(List<String> searchedPaths) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyVOMSESlookup(String vomsesPath) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyVOMSESInformationLoaded(String vomsesPath,
 			VOMSServerInfo info) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyValidationResult(VOMSValidationResult result) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyACLookupEvent(X509Certificate[] chain, int chainLevel) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyACParseEvent(X509Certificate[] chain, int chainLevel) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	public void notifyHTTPRequest(String url) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	public void notifyLegacyRequest(String xmlLegacyRequest) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	public void notifyReceivedResponse(VOMSResponse r) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 

@@ -33,8 +33,10 @@ import org.italiangrid.voms.credential.UserCredentials;
 import org.italiangrid.voms.request.VOMSACService;
 import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
 import org.italiangrid.voms.request.impl.DefaultVOMSACService;
+import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.junit.Assert;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 import eu.emi.security.authn.x509.proxy.ProxyCertificateOptions;
@@ -64,7 +66,9 @@ public class ServerRequestExample {
     request.setLifetime(12);
     request.setVoName("voName");
     
-    VOMSACService service = new DefaultVOMSACService();
+    X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator();
+    
+    VOMSACService service = new DefaultVOMSACService.Builder(validator).build();
     
     AttributeCertificate attributeCertificate = service.getVOMSAttributeCertificate(credential, request);
   

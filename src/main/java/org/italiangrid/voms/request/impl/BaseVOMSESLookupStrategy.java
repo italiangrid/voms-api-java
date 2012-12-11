@@ -17,7 +17,6 @@ package org.italiangrid.voms.request.impl;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
@@ -31,9 +30,17 @@ import org.italiangrid.voms.request.VOMSESLookupStrategy;
  */
 public class BaseVOMSESLookupStrategy implements VOMSESLookupStrategy {
 
-	private final String[] checkedPaths;
+	private final List<String> checkedPaths;
 
-	public BaseVOMSESLookupStrategy(String[] checkedPaths) {
+	
+	public BaseVOMSESLookupStrategy() {
+		checkedPaths = new ArrayList<String>();
+	}
+	
+	public BaseVOMSESLookupStrategy(List<String> checkedPaths) {
+		if (checkedPaths == null)
+			throw new NullPointerException("Please provide a non-null list of paths.");
+		
 		this.checkedPaths = checkedPaths;
 	}
 
@@ -51,7 +58,10 @@ public class BaseVOMSESLookupStrategy implements VOMSESLookupStrategy {
 	}
 
 	public List<String> searchedPaths() {
-		return new ArrayList<String>(Arrays.asList(checkedPaths));
+		return checkedPaths;
 	}
-
+	
+	public void addPath(String vomsesPath){
+		checkedPaths.add(vomsesPath);
+	}
 }
