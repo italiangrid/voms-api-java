@@ -113,38 +113,86 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 				
 		}
 	}
-	
+	/**
+	 * Creates a {@link DefaultVOMSServerInfoStore}.
+	 * The {@link DefaultVOMSServerInfoStore} parameters can be set with the appropriate methods. Example:
+	 * 
+	 * <pre>
+	    {@code
+	    VOMSServerInfoStore serverInfoStore = new DefaultVOMSServerInfoStore.Builder()
+				.storeListener(storeListener)
+				.vomsesPaths(vomsesLocations)
+				.build();
+		};
+		</pre>
+	 *  
+	 */
 	public static class Builder{
 		
+		/**
+		 * A list of paths where vomses information will be looked for
+		 */
 		private List<String> vomsesPaths;
+		/**
+		 * The {@link VOMSESLookupStrategy} that will be used to lookup vomses information
+		 */
 		private VOMSESLookupStrategy lookupStrategy;
+		/**
+		 * The listener that will be notified of interesting store events
+		 */
 		private VOMSServerInfoStoreListener listener = NullListener.INSTANCE;
+		
+		/**
+		 * The parser implementation used to parse VOMSES files
+		 */
 		private VOMSESParser vomsesParser =  VOMSESParserFactory.newVOMSESParser();
 		
 		public Builder() {
 			
 		}
 		
+		/**
+		 * Sets the {@link VOMSESLookupStrategy} that will be used to lookup vomses information for the {@link DefaultVOMSServerInfoStore}
+		 * that this builder is creating 
+		 * @param strategy The strategy that will be used to lookup vomses information
+		 * @return this {@link Builder} instance
+		 */
 		public Builder lookupStrategy(VOMSESLookupStrategy strategy){
 			this.lookupStrategy = strategy;
 			return this;
 		}
 		
+		/**
+		 * Sets the {@link VOMSServerInfoStoreListener} that will receive store-related notifications for the
+		 * {@link DefaultVOMSServerInfoStore} that this builder is creating
+		 * @param l the listener 
+		 * @return this {@link Builder} instance
+		 */
 		public Builder storeListener(VOMSServerInfoStoreListener l){
 			this.listener = l;
 			return this;
 		}
 		
+		/**
+		 * Sets the {@link VOMSESParser} implementation that will be used to parse vomses files
+		 * @param p the parser
+		 * @return this {@link Builder} instance
+		 */
 		public Builder vomsesParser(VOMSESParser p){
 			this.vomsesParser = p;
 			return this;
 		}
 		
+		/**
+		 * Sets a list of paths where vomses files will be looked up by the {@link DefaultVOMSServerInfoStore}
+		 * that this builder is creating
+		 * @param paths a list of paths
+		 * @return this {@link Builder} instance
+		 */
 		public Builder vomsesPaths(List<String> paths){
 			this.vomsesPaths = paths;
 			return this;
 		}
-		
 		
 		private void buildLookupStrategy(){
 			
@@ -157,6 +205,10 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 				lookupStrategy = new DefaultVOMSESLookupStrategy();
 		}
 		
+		/**
+		 * Builds the {@link DefaultVOMSServerInfoStore}
+		 * @return a {@link DefaultVOMSServerInfoStore} configured as required by this builder
+		 */
 		public DefaultVOMSServerInfoStore build(){
 			buildLookupStrategy();
 			return new DefaultVOMSServerInfoStore(this);

@@ -254,9 +254,17 @@ public class DefaultVOMSACService implements VOMSACService {
 	}
 	
 	/**
-	 * Provides easy creation of a {@link DefaultVOMSACService} object.
+	 * Creates a {@link DefaultVOMSACService} object. 
+	 * The {@link DefaultVOMSACService} parameters can be set with the appropriate methods. Example:
+	 * <pre>
+	    {@code VOMSACService acService = new DefaultVOMSACService.Builder(certChainValidator)
+					.requestListener(requestListener)
+					.serverInfoStoreListener(serverInfoStoreListener)
+					.protocolListener(protocolListener)
+					.build();
+		}
+	 * </pre>
 	 * 
-	 * @author cecco
 	 *
 	 */
 	public static class Builder {
@@ -306,50 +314,102 @@ public class DefaultVOMSACService implements VOMSACService {
 		 */
 		private int readTimeout = AbstractVOMSProtocol.DEFAULT_READ_TIMEOUT;
 		
+		/**
+		 * Creates a Builder for a {@link DefaultVOMSACService}.
+		 * 
+		 * @param certChainValidator the validator to use to setup the SSL connection and validate the certificates
+		 */
 		public Builder(X509CertChainValidatorExt certChainValidator) {
+			if (certChainValidator == null)
+				throw new NullPointerException("Please provide a non-null certificate chain validator");
+			
 			this.validator = certChainValidator;
 		}
 		
+		/**
+		 * Sets the request listener for the {@link DefaultVOMSACService} that this builder is creating
+		 * @param l the request listener that will receive notifications about request events
+		 * @return this {@link Builder} instance
+		 */
 		public Builder requestListener(VOMSRequestListener l){
 			this.requestListener = l;
 			return this;
 		}
 		
+		/**
+		 * Sets the {@link VOMSServerInfoStoreListener} for the {@link DefaultVOMSACService} that this builder is creating
+		 * @param sl the store listener that will receive notifications about store events
+		 * @return this {@link Builder} instance
+		 */
 		public Builder serverInfoStoreListener(VOMSServerInfoStoreListener sl){
 			this.storeListener = sl;
 			return this;
 		}
 		
+		/**
+		 * Sets the {@link VOMSServerInfoStore} for the {@link DefaultVOMSACService} that this builder is creating
+		 * @param sis a {@link VOMSServerInfoStore} object
+		 * @return this {@link Builder} instance
+		 */
 		public Builder serverInfoStore(VOMSServerInfoStore sis){
 			this.serverInfoStore = sis;
 			return this;
 		}
 		
+		/**
+		 * Sets the {@link VOMSProtocolListener} for the {@link DefaultVOMSACService} that this builder is creating
+		 * @param pl the {@link VOMSProtocolListener} that will receive notifications about protocol events
+		 * @return this {@link Builder} instance
+		 */
 		public Builder protocolListener(VOMSProtocolListener pl){
 			this.protocolListener = pl;
 			return this;
 		}
 		
+		/**
+		 * Sets the connect timeout (in millisecods) for the {@link DefaultVOMSACService} that this builder is creating
+		 * @param timeout the timeout value in milliseconds
+		 * @return this {@link Builder} instance
+		 */
 		public Builder connectTimeout(int timeout){
 			this.connectTimeout = timeout;
 			return this;
 		}
 		
+		/**
+		 * Sets the read timeout (in milliseconds) for the {@link DefaultVOMSACService} that this builder is creating
+		 * @param timeout the timeout value in milliseconds
+		 * @return this {@link Builder} instance
+		 */
 		public Builder readTimeout(int timeout){
 			this.readTimeout = timeout;
 			return this;
 		}
 		
+		/**
+		 * Sets the vomses lookup strategy for the {@link DefaultVOMSACService} that this builder is creating
+		 * @param strategy the {@link VOMSESLookupStrategy} object
+		 * @return this {@link Builder} instance
+		 */
 		public Builder vomsesLookupStrategy(VOMSESLookupStrategy strategy){
 			this.vomsesLookupStrategy = strategy;
 			return this;
 		}
 		
+		/**
+		 * Sets a list of locations that will be used to build a {@link VOMSESLookupStrategy} for the {@link DefaultVOMSACService} that
+		 * this builder is creating
+		 * @param vomsesLocations a list of paths where vomses information will be looked for 
+		 * @return this {@link Builder} instance
+		 */
 		public Builder vomsesLocations(List<String> vomsesLocations){
 			this.vomsesLocations = vomsesLocations;
 			return this;
 		}
 		
+		/**
+		 * Builds the server info store 
+		 */
 		protected void buildServerInfoStore(){
 			
 			if (serverInfoStore != null)
@@ -362,7 +422,10 @@ public class DefaultVOMSACService implements VOMSACService {
 				.build();
 		}
 		
-		
+		/**
+		 * Builds the {@link DefaultVOMSACService}
+		 * @return a {@link DefaultVOMSACService} configured as required by this builder
+		 */
 		public DefaultVOMSACService build(){
 			buildServerInfoStore();
 			return new DefaultVOMSACService(this);
