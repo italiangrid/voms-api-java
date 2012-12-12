@@ -31,7 +31,7 @@ import org.italiangrid.voms.VOMSError;
  */
 public class VOMSFQANNamingScheme {
 
-	public static final String containerSyntax = "^(/[\\w.-]+)+|((/[\\w.-]+)+/)?(Role=[\\w.-]+)|(Capability=[\\w\\s.-]+)$";
+	public static final String fqanSyntax = "^(/[\\w.-]+)+|((/[\\w.-]+)+/)?(Role=[\\w.-]+)|(Capability=[\\w\\s.-]+)$";
 
 	public static final String groupSyntax = "^(/[\\w.-]+)+$";
 
@@ -41,8 +41,8 @@ public class VOMSFQANNamingScheme {
 
 	public static final String capabilitySyntax = "^Capability=[\\w\\s.-]+$";
 
-	public static final Pattern containerPattern = Pattern
-			.compile(containerSyntax);
+	public static final Pattern fqanPattern = Pattern
+			.compile(fqanSyntax);
 
 	public static final Pattern groupPattern = Pattern.compile(groupSyntax);
 
@@ -58,40 +58,40 @@ public class VOMSFQANNamingScheme {
 	 * This methods checks that the string passed as argument complies with the
 	 * voms FQAN syntax.
 	 * 
-	 * @param containerName
+	 * @param fqan
 	 *            the string that must be checked for compatibility with FQAN
 	 *            syntax.
 	 * @throws VOMSError
 	 *             If there's an error in the FQAN syntax.
 	 */
-	public static void checkSyntax(String containerName) {
+	public static void checkSyntax(String fqan) {
 
-		if (containerName.length() > 255)
-			throw new VOMSError("containerName.length() > 255");
+		if (fqan.length() > 255)
+			throw new VOMSError("fqan.length() > 255");
 
-		if (!containerPattern.matcher(containerName).matches())
+		if (!fqanPattern.matcher(fqan).matches())
 			throw new VOMSError("Syntax error in fqan: "
-					+ containerName);
+					+ fqan);
 	}
 
 	/**
 	 * 
-	 * This methods checks that the string passed as argument complies with the
+	 * This methods checks that the fqan passed as argument complies with the
 	 * syntax used by voms to identify groups.
 	 * 
-	 * @param groupName
+	 * @param fqan
 	 *            the string that has to be checked.
 	 * @throws VOMSError
 	 *             If the string passed as argument doens not comply with the
 	 *             voms sytax.
 	 */
-	public static void checkGroup(String groupName) {
+	public static void checkGroup(String fqan) {
 
-		checkSyntax(groupName);
+		checkSyntax(fqan);
 
-		if (!groupPattern.matcher(groupName).matches())
+		if (!groupPattern.matcher(fqan).matches())
 			throw new VOMSError("Syntax error in group name: "
-					+ groupName);
+					+ fqan);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class VOMSFQANNamingScheme {
 	 * This methods checks that the FQAN passed as argument identifies a
 	 * qualified voms role, i.e., a role defined in the context of a voms group.
 	 * 
-	 * @param roleName
+	 * @param fqan
 	 *            the string to check.
 	 * @return <ul>
 	 *         <li>true, if the string passed as argument identifies a qualified
@@ -163,10 +163,10 @@ public class VOMSFQANNamingScheme {
 	 *         <li>false, otherwise.
 	 *         </ul>
 	 */
-	public static boolean isQualifiedRole(String roleName) {
+	public static boolean isQualifiedRole(String fqan) {
 
-		checkSyntax(roleName);
-		return qualifiedRolePattern.matcher(roleName).matches();
+		checkSyntax(fqan);
+		return qualifiedRolePattern.matcher(fqan).matches();
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class VOMSFQANNamingScheme {
 			throw new VOMSError("No role specified in \""
 					+ containerName + "\" voms syntax.");
 
-		Matcher m = containerPattern.matcher(containerName);
+		Matcher m = fqanPattern.matcher(containerName);
 
 		if (m.matches()) {
 
@@ -222,7 +222,7 @@ public class VOMSFQANNamingScheme {
 		if (!isRole(containerName) && !isQualifiedRole(containerName))
 			return containerName;
 
-		Matcher m = containerPattern.matcher(containerName);
+		Matcher m = fqanPattern.matcher(containerName);
 
 		if (m.matches()) {
 			String groupName = m.group(2);
