@@ -50,35 +50,40 @@ public class DefaultVOMSACService implements VOMSACService {
 	/**
 	 * The listener that will be informed about request events
 	 */
-	private VOMSRequestListener requestListener;
+	protected VOMSRequestListener requestListener;
 		
 	/**
 	 * The listener that will be informed about  low-level protocol details
 	 */
-	private VOMSProtocolListener protocolListener;
+	protected VOMSProtocolListener protocolListener;
 	
 	/**
 	 * The validator used for the SSL handshake
 	 */
-	private X509CertChainValidatorExt validator;
+	protected X509CertChainValidatorExt validator;
 	
 	/**
 	 * The store used to keep VOMS server contact information.
 	 */
-	private VOMSServerInfoStore serverInfoStore;
+	protected VOMSServerInfoStore serverInfoStore;
 	
 	/**
 	 * The connect timeout value 
 	 */
-	private int connectTimeout;
+	protected int connectTimeout;
 	
 	/** 
 	 * The read timeout used 
 	 */
-	private int readTimeout;
+	protected int readTimeout;
 
 	
-	private DefaultVOMSACService(Builder builder){
+	/**
+	 * Constructor which builds a {@link DefaultVOMSACService} from a {@link Builder}
+	 *  
+	 * @param builder the builder object that provides the settings for this {@link VOMSACService} 
+	 */
+	protected DefaultVOMSACService(Builder builder){
 		
 		this.validator = builder.validator;
 		this.requestListener = builder.requestListener;
