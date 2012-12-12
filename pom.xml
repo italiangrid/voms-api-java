@@ -209,29 +209,37 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>local-staging</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>cnaf-releases</id>
+          <name>CNAF releases</name>
+          <url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases/</url>
+        </repository>
+
+        <snapshotRepository>
+          <id>cnaf-snapshots</id>
+          <name>CNAF snapshots</name>
+          <url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-snapshots/</url>
+        </snapshotRepository>
+
+      </distributionManagement>
+    </profile>
+    
+    <profile>
+      <id>central-staging</id>
+      <distributionManagement>
+        <repository>
+          <id>sonatype-nexus-staging</id>
+          <name>Nexus Release Repository</name>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+      </distributionManagement>
+    </profile>
   </profiles>
-  
-  <distributionManagement>
-    <!-- Sonatype nexus repo
-    <repository>
-        <id>sonatype-nexus-staging</id>
-        <name>Nexus Release Repository</name>
-        <url>
-            https://oss.sonatype.org/service/local/staging/deploy/maven2/
-        </url>
-    </repository>
-    -->
-    <repository>
-      <id>cnaf-releases</id>
-      <name>CNAF releases</name>
-      <url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases/</url>
-    </repository>
-
-    <snapshotRepository>
-      <id>cnaf-snapshots</id>
-      <name>CNAF snapshots</name>
-      <url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
-
 </project>
