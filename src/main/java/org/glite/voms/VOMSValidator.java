@@ -157,7 +157,6 @@ public class VOMSValidator {
     }
 
     private synchronized ACValidator initializeValidator(){
-    	
     	if (DEFAULT_VALIDATOR == null){
     	
     		try {
@@ -233,7 +232,7 @@ public class VOMSValidator {
      * @deprecated
      * @see org.glite.voms.ac.VOMSTrustStore
      */
-    public static void setTrustStore(VOMSTrustStore trustStore) {
+    public synchronized static void setTrustStore(VOMSTrustStore trustStore) {
         vomsStore = trustStore;
     }
 

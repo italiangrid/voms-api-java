@@ -31,9 +31,35 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 
 public class PKIStoreFactory {
-
+	
+	private static PKIStore getCAStore(String dir, boolean aggressive, boolean timer) throws CertificateException, CRLException, IOException{
+		String storeDir = dir == null ? PKIStore.DEFAULT_CADIR : dir;
+		
+		PKIStore s = PKIStoreCache.INSTANCE.getCAStore(storeDir);
+		
+		if (s == null)
+			PKIStoreCache.INSTANCE.addCAStore(storeDir, new PKIStore(dir, PKIStore.TYPE_CADIR, aggressive, timer));
+		
+		return PKIStoreCache.INSTANCE.getCAStore(storeDir);
+	}
+	
+	private static PKIStore getVOMSStore(String dir, boolean aggressive, boolean timer) throws CertificateException, CRLException, IOException{
+		String storeDir = dir == null ? PKIStore.DEFAULT_VOMSDIR : dir;
+		PKIStore s = PKIStoreCache.INSTANCE.getVOMSStore(storeDir);
+		if (s == null)
+			PKIStoreCache.INSTANCE.addVOMSStore(storeDir, new PKIStore(storeDir, PKIStore.TYPE_VOMSDIR, aggressive, timer));
+		
+		return PKIStoreCache.INSTANCE.getVOMSStore(storeDir);
+	}
+	
     public synchronized static PKIStore getStore(String dir, int type, boolean aggressive, boolean timer) throws IOException, CertificateException, CRLException {
-        return new PKIStore(dir, type, aggressive, timer);       
+    	
+    	if (type == PKIStore.TYPE_CADIR)
+    		return getCAStore(dir, aggressive, timer);
+    	else if (type == PKIStore.TYPE_VOMSDIR)
+    		return getVOMSStore(dir, aggressive, timer);
+    	else
+    		throw new IllegalArgumentException("Unsupported store type: "+type);       
     }
 
     public synchronized static PKIStore getStore(String dir, int type, boolean aggressive) throws IOException, CertificateException, CRLException {
