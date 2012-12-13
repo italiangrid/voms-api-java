@@ -31,8 +31,8 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
-import org.italiangrid.voms.credential.CredentialsUtils;
 import org.italiangrid.voms.credential.UserCredentials;
+import org.italiangrid.voms.util.CredentialsUtils;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -95,7 +95,7 @@ public class ProxyGenerationExample {
 
 		/* Save the proxy */
 		OutputStream os = new FileOutputStream("/tmp/savedProxy");
-		CredentialsUtils.saveCredentials(os, pxcert.getCredential());
+		CredentialsUtils.saveProxyCredentials(os, pxcert.getCredential());
 
 	}
 }

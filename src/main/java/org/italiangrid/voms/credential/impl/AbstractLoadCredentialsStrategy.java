@@ -23,6 +23,7 @@ import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
 import org.italiangrid.voms.credential.LoadCredentialsStrategy;
 import org.italiangrid.voms.credential.VOMSEnvironmentVariables;
+import org.italiangrid.voms.util.FilePermissionHelper;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.KeystoreCredential;
@@ -77,6 +78,8 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 		
 		try {
 						
+			FilePermissionHelper.checkPrivateKeyPermissions(privateKeyPath);
+			
 			cred = 	new PEMCredential(new FileInputStream(privateKeyPath),
 						new FileInputStream(certificatePath),
 						pf);
@@ -107,8 +110,12 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 		listener.notifyCredentialLookup(pkcs12FilePath);
 		
 		if (fileExistsAndIsReadable(pkcs12FilePath)){
+			
+			
 			char[] keyPassword = pf.getPassword();
 			try {
+			
+				FilePermissionHelper.checkPKCS12Permissions(pkcs12FilePath);
 				
 				cred = new KeystoreCredential(pkcs12FilePath, keyPassword, keyPassword, null, "PKCS12");
 				listener.notifyLoadCredentialSuccess(pkcs12FilePath);
@@ -138,6 +145,7 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 		
 		try {
 			
+			FilePermissionHelper.checkProxyPermissions(proxyPath);
 			cred = new PEMCredential(new FileInputStream(proxyPath), (char[])null);
 			listener.notifyLoadCredentialSuccess(proxyPath);
 		

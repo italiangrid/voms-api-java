@@ -18,6 +18,7 @@ package org.italiangrid.voms.credential;
 public interface VOMSEnvironmentVariables {
 
 	public static final String X509_CERT_DIR = "X509_CERT_DIR";
+	public static final String X509_VOMS_DIR = "X509_VOMS_DIR";
 	public static final String X509_USER_PROXY = "X509_USER_PROXY";
 	public static final String X509_USER_CERT = "X509_USER_CERT";
 	public static final String X509_USER_KEY = "X509_USER_KEY";
