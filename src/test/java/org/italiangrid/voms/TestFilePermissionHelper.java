@@ -1,9 +1,26 @@
+/**
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.italiangrid.voms;
 
 import java.io.IOException;
 
 import org.italiangrid.voms.credential.FilePermissionError;
 import org.italiangrid.voms.util.FilePermissionHelper;
+import org.italiangrid.voms.util.FilePermissionHelper.PosixFilePermission;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestFilePermissionHelper{
@@ -14,6 +31,15 @@ public class TestFilePermissionHelper{
 	public static final String keyWithWrongPerms = "src/test/resources/perm-test/test1.key.pem";
 	public static final String p12WithWrongPerms = "src/test/resources/perm-test/test1.p12";
 	
+	@BeforeClass
+	public static void setupPermissions(){
+		FilePermissionHelper.setPrivateKeyPermissions(keyWithRightPerms);
+		FilePermissionHelper.setPKCS12Permissions(p12WithRightPerms);
+		
+		FilePermissionHelper.setFilePermissions(keyWithWrongPerms, PosixFilePermission.ALL_PERMS);
+		FilePermissionHelper.setFilePermissions(p12WithWrongPerms, PosixFilePermission.ALL_PERMS);
+		
+	}
 	@Test
 	public void testFilePermissions() throws IOException {
 

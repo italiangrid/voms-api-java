@@ -18,7 +18,9 @@ package org.italiangrid.voms.cred;
 import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.credential.impl.AbstractLoadCredentialsStrategy;
 import org.italiangrid.voms.credential.impl.DefaultLoadCredentialsStrategy;
+import org.italiangrid.voms.util.FilePermissionHelper;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.emi.security.authn.x509.X509Credential;
@@ -39,6 +41,12 @@ public class TestLoadCredential {
 	public static final String emptyGlobusHome = "src/test/resources/homes/empty.globus";
 	public static final String pemCredsHome = "src/test/resources/homes/pem-creds";
 	public static final String pkcs12CredsHome = "src/test/resources/homes/pkcs12-creds";
+	
+	@BeforeClass
+	public static void setupFilePermissions(){
+		FilePermissionHelper.setPrivateKeyPermissions(pemCredsHome+"/.globus/userkey.pem");
+		FilePermissionHelper.setPKCS12Permissions(pkcs12CredsHome+"/.globus/usercred.p12");
+	}
 	
 	static class TestPasswordFinder implements PasswordFinder{
 

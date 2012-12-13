@@ -1,3 +1,18 @@
+/**
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.italiangrid.voms.util;
 
 import java.io.BufferedReader;
@@ -17,10 +32,11 @@ import org.italiangrid.voms.credential.FilePermissionError;
  */
 public class FilePermissionHelper {
 	
-	static enum PosixFilePermission{
+	public static enum PosixFilePermission{
 		
 		USER_RO("400", "-r--------"),
-		USER_RW("600", "-rw-------");
+		USER_RW("600", "-rw-------"),
+		ALL_PERMS("777", "-rwxrwxrwx");
 		
 		private PosixFilePermission(String chmodForm, String statForm){
 			this.chmodForm = chmodForm;
@@ -175,16 +191,22 @@ public class FilePermissionHelper {
 
 	public static void setProxyPermissions(String filename){
 		filenameSanityChecks(filename);
-		setFilePermissions(filename, PosixFilePermission.USER_RW.chmodForm());
+		setFilePermissions(filename, PosixFilePermission.USER_RW);
+	}
+	
+	
+	public static void setPKCS12Permissions(String filename){
+		filenameSanityChecks(filename);
+		setFilePermissions(filename, PosixFilePermission.USER_RW);
 	}
 	
 	public static void setPrivateKeyPermissions(String filename) {
 		filenameSanityChecks(filename);
-		setFilePermissions(filename, PosixFilePermission.USER_RO.chmodForm());
+		setFilePermissions(filename, PosixFilePermission.USER_RO);
 	}
 
-	private static void setFilePermissions(String filename, String mode) {
-		String cmd = String.format(CHMOD_CMD_TEMPLATE, mode, filename);
+	public static void setFilePermissions(String filename, PosixFilePermission perm) {
+		String cmd = String.format(CHMOD_CMD_TEMPLATE, perm.chmodForm(), filename);
 
 		ProcessBuilder pb = new ProcessBuilder(cmd.split(" "));
 		try {
