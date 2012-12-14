@@ -1,0 +1,69 @@
+package org.italiangrid.voms.test.ac;
+
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
+import java.util.Collections;
+import java.util.List;
+
+import junit.framework.Assert;
+
+import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSError;
+import org.italiangrid.voms.ac.impl.DefaultVOMSACParser;
+import org.italiangrid.voms.test.Fixture;
+import org.italiangrid.voms.test.Utils;
+import org.italiangrid.voms.test.VOMSAA;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import eu.emi.security.authn.x509.impl.PEMCredential;
+import eu.emi.security.authn.x509.proxy.ProxyCertificate;
+
+public class TestACParser implements Fixture{
+
+	static VOMSAA aa;
+	static PEMCredential holder;
+	
+	@BeforeClass
+	public static void setup() throws KeyStoreException, CertificateException, IOException{
+		aa = Utils.getVOMSAA();
+		
+	}
+	
+	@Test
+	public void test() throws Exception{
+		PEMCredential holder = Utils.getTestUserCredential();
+		ProxyCertificate proxy = aa.createVOMSProxy(holder, defaultVOFqans);
+		
+		DefaultVOMSACParser parser = new DefaultVOMSACParser();
+		List<VOMSAttribute> attrs = parser.parse(proxy.getCertificateChain());
+		Assert.assertFalse(attrs.isEmpty());
+		Assert.assertEquals(1,attrs.size());
+		Assert.assertEquals(defaultVOFqans, attrs.get(0).getFQANs());
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testParseNullChainFailure(){
+		DefaultVOMSACParser parser = new DefaultVOMSACParser();
+		List<VOMSAttribute> attrs = parser.parse(null);
+	}
+	
+	@Test
+	public void testEmptyFqansParsing() throws Exception{
+		PEMCredential holder = Utils.getTestUserCredential();
+		List<String> fqans = Collections.emptyList();
+		ProxyCertificate proxy = aa.createVOMSProxy(holder, fqans);
+		
+		DefaultVOMSACParser parser = new DefaultVOMSACParser();
+		
+		try{
+			List<VOMSAttribute> attrs = parser.parse(proxy.getCertificateChain());
+		}catch (VOMSError e) {
+			Assert.assertEquals("Non conformant VOMS Attribute certificate: unsupported attribute values encoding.", e.getMessage());
+			return;
+		}
+		
+		Assert.fail("No exception raised when parsing invalid VOMS AC!");
+	}
+}

@@ -50,10 +50,10 @@ public class DefaultVOMSACParser implements VOMSACParser {
 		return parse();
 	}
 	
-	public synchronized List<VOMSAttribute> parse() {
+	protected synchronized List<VOMSAttribute> parse() {
 		
 		if (certChain == null)
-			throw new IllegalArgumentException("Cannot parse a null certchain!");
+			throw new NullPointerException("Cannot parse a null certchain!");
 		
 		List<ACParsingContext> parsedACs = acLookupStrategy.lookupVOMSAttributeCertificates(certChain);
 		return acNormalizationStrategy.normalizeAttributes(parsedACs);
@@ -73,17 +73,4 @@ public class DefaultVOMSACParser implements VOMSACParser {
 		this.certChain = certChain;
 	}
 
-	/**
-	 * @return the acLookupStrategy
-	 */
-	protected synchronized VOMSACLookupStrategy getAcLookupStrategy() {
-		return acLookupStrategy;
-	}
-
-	/**
-	 * @return the acNormalizationStrategy
-	 */
-	protected synchronized VOMSAttributesNormalizationStrategy getAcNormalizationStrategy() {
-		return acNormalizationStrategy;
-	}
 }

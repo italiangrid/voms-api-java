@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms.test;
+package org.italiangrid.voms.test.ac;
 
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.aaCertNotFound;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.canlError;

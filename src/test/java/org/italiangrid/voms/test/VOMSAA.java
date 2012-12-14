@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
+import org.italiangrid.voms.VOMSGenericAttribute;
 import org.italiangrid.voms.asn1.VOMSACGenerator;
 
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -40,7 +41,9 @@ public class VOMSAA {
 	String voName;
 	String host;
 	int port;
-	VOMSACGenerator generator;
+	
+	Date acNotBefore;
+	Date acNotAfter;
 	
 	private volatile long serial = 0L;
 	
@@ -51,31 +54,46 @@ public class VOMSAA {
 		this.host = host;
 		this.port = port;
 		
-		generator = new VOMSACGenerator(credential, vo, host, port);
-		
 	}
 	
 	private synchronized BigInteger getAndIncrementSerial(){
 		return BigInteger.valueOf(serial++);
 	}
 	
-	public ProxyCertificate createVOMSProxy(PEMCredential holder, List<String> fqans) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
+	public ProxyCertificate createVOMSProxy(PEMCredential holder,
+			List<String> fqans) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
+		return createVOMSProxy(holder, holder, fqans, null, null);
+	}
+	
+	
+	public ProxyCertificate createVOMSProxy(PEMCredential holder,PEMCredential proxyHolder, 
+			List<String> fqans, 
+			List<VOMSGenericAttribute> attrs,
+			List<String> targets) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
 		
+		VOMSACGenerator generator = new VOMSACGenerator(credential, voName, host, port);
 		Calendar cal = Calendar.getInstance();
 		
-		Date now = cal.getTime();
-		cal.add(Calendar.HOUR, 12);
-		Date expiration = cal.getTime();
+		Date startDate = acNotBefore;
+		Date endDate = acNotAfter;
+		
+		if (startDate == null)
+			startDate = cal.getTime();
+		
+		if (endDate == null){
+			cal.add(Calendar.HOUR, 12);
+			endDate = cal.getTime();
+		}
 		
 		X509AttributeCertificateHolder acHolder = generator.generateVOMSAttributeCertificate(fqans, 
-				null, 
-				null, 
+				attrs, 
+				targets, 
 				holder.getCertificate(), 
 				getAndIncrementSerial(), 
-				now,
-				expiration);
+				startDate,
+				endDate);
 	
-		return createVOMSProxy(holder, new AttributeCertificate[]{acHolder.toASN1Structure()});
+		return createVOMSProxy(proxyHolder, new AttributeCertificate[]{acHolder.toASN1Structure()});
 	}
 	
 	private ProxyCertificate createVOMSProxy(PEMCredential holder, AttributeCertificate[] acs) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
@@ -86,4 +104,36 @@ public class VOMSAA {
 		
 		return proxy;
 	}
+
+	public VOMSAA setCredential(PEMCredential credential) {
+		this.credential = credential;
+		return this;
+	}
+
+	public VOMSAA setVoName(String voName) {
+		this.voName = voName;
+		return this;
+	}
+
+	public VOMSAA setHost(String host) {
+		this.host = host;
+		return this;
+	}
+
+	public VOMSAA setPort(int port) {
+		this.port = port;
+		return this;
+	}
+
+	public VOMSAA setAcNotBefore(Date acNotBefore) {
+		this.acNotBefore = acNotBefore;
+		return this;
+	}
+
+	public VOMSAA setAcNotAfter(Date acNotAfter) {
+		this.acNotAfter = acNotAfter;
+		return this;
+	}
+	
+	
 }

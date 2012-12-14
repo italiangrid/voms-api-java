@@ -144,7 +144,7 @@ public class VOMSACUtils implements VOMSConstants{
 	private static List<String> deserializeFQANs(IetfAttrSyntax attr){
 		
 		if (attr.getValueType() != IetfAttrSyntax.VALUE_OCTETS)
-			throw new VOMSError("Non conformant VOMS Attribute certificate: unsupported attribute values encoding.");
+			raiseACNonConformantError("unsupported attribute values encoding.");
 		
 		List<String> fqans = new ArrayList<String>();
 		
@@ -413,4 +413,6 @@ public class VOMSACUtils implements VOMSConstants{
 		
 		return certs.toArray(new X509Certificate[certs.size()]);
 	}
+	
+	private VOMSACUtils(){}
 }
