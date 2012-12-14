@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms.cred;
+package org.italiangrid.voms.test.cred;
 
 import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.credential.impl.AbstractLoadCredentialsStrategy;

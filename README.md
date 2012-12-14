@@ -221,9 +221,9 @@ With version 3.0 the name of the packages to import has changed:
 
 ```java
 /* 3.0.x API packages */
-import org.italiangrid.voms.VOMSAttribute;
-import org.italiangrid.voms.VOMSValidators;
-import org.italiangrid.voms.ac.VOMSACValidator;
+import org.italiangrid.voms.test.VOMSAttribute;
+import org.italiangrid.voms.test.VOMSValidators;
+import org.italiangrid.voms.test.ac.VOMSACValidator;
 
 // The VOMSACValidator interface provides access to VOMS AC validation logic.
 // In order to obtain a validator use the VOMSValidators factory

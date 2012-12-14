@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms;
+package org.italiangrid.voms.test;
 
 import java.io.File;
 import java.io.StringReader;
@@ -23,6 +23,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSESParserFactory;
 import org.italiangrid.voms.request.VOMSServerInfo;

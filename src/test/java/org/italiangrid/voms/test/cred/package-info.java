@@ -20,4 +20,4 @@
  * @author andreaceccanti
  *
  */
-package org.italiangrid.voms.cred;
+package org.italiangrid.voms.test.cred;

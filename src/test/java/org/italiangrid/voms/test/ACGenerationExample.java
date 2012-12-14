@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms;
+package org.italiangrid.voms.test;
 
-import java.util.Arrays;
 
-import org.italiangrid.voms.ac.VOMSACValidator;
-import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
-import org.italiangrid.voms.util.CertificateValidatorBuilder;
-
-import eu.emi.security.authn.x509.X509CertChainValidatorExt;
-
-public class Utils implements Fixture{
-
-	private Utils() {}
+public class ACGenerationExample {
+	String aaCert = "src/test/resources/certs/test_host_cnaf_infn_it.cert.pem";
+	String aaKey = "src/test/resources/certs/test_host_cnaf_infn_it.key.pem";
+	String holderCert ="src/test/resources/certs/test0.cert.pem";
 	
-	public static VOMSACValidator getVOMSValidator(){
-		X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
-		return VOMSValidators.newValidator(new DefaultVOMSTrustStore(Arrays.asList(vomsdir)), validator);
+	String vo = "test.vo";
+	String host = "localhost";
+	
+	
+	public ACGenerationExample() {
 		
+		
+	}
+	
+	public static void main(String[] args) {
+		new ACGenerationExample();
 	}
 
 }

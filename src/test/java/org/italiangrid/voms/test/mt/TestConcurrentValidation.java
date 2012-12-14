@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms.mt;
+package org.italiangrid.voms.test.mt;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,12 +36,12 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 
-import org.italiangrid.voms.VOMSAA;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultUpdatingVOMSTrustStore;
+import org.italiangrid.voms.test.VOMSAA;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

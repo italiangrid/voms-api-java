@@ -13,30 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms;
+package org.italiangrid.voms.test;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 
-import junit.framework.Assert;
+import org.italiangrid.voms.VOMSValidators;
+import org.italiangrid.voms.ac.VOMSACValidator;
+import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
+import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
-import org.italiangrid.voms.request.VOMSESLookupStrategy;
-import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;
-import org.junit.Test;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 
-public class TestVOMSESLookupStrategy {
+public class Utils implements Fixture{
 
-	@Test
-	public void testLookupVomsesInfo() {
-		
-		VOMSESLookupStrategy strategy =  new BaseVOMSESLookupStrategy(Arrays.asList("src/test/resources/vomses", 
-				"/non/existent/path"));
-		
-		List<File> paths = strategy.lookupVomsesInfo();
-		
-		Assert.assertEquals(1, paths.size());
-		Assert.assertTrue(paths.contains(new File("src/test/resources/vomses")));
+	private Utils() {}
+	
+	public static VOMSACValidator getVOMSValidator(){
+		X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
+		return VOMSValidators.newValidator(new DefaultVOMSTrustStore(Arrays.asList(vomsdir)), validator);
 		
 	}
 

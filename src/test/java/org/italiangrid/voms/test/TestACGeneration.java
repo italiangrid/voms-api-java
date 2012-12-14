@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms;
+package org.italiangrid.voms.test;
 
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.aaCertNotFound;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.canlError;
@@ -43,6 +43,10 @@ import java.util.logging.Logger;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSError;
+import org.italiangrid.voms.VOMSGenericAttribute;
+import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.ac.VOMSValidationResult;
 import org.italiangrid.voms.ac.ValidationResultListener;

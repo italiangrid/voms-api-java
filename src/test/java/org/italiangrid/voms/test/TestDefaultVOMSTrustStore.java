@@ -16,7 +16,7 @@
 /**
  * 
  */
-package org.italiangrid.voms;
+package org.italiangrid.voms.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.junit.Test;
 
