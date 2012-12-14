@@ -94,6 +94,7 @@ public class CredentialsUtils {
 		File f = new File(proxyFileName);
 		FileChannel channel = new RandomAccessFile(f, "rws").getChannel();
 		FilePermissionHelper.setProxyPermissions(proxyFileName);
+		channel.truncate(0);
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		saveProxyCredentials(baos, uc);

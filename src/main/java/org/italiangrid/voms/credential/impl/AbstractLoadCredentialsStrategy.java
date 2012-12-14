@@ -17,6 +17,7 @@ package org.italiangrid.voms.credential.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.bouncycastle.openssl.PasswordFinder;
@@ -126,7 +127,7 @@ public abstract class AbstractLoadCredentialsStrategy implements LoadCredentials
 			}
 		
 		}else
-			listener.notifyLoadCredentialFailure(new IOException(pkcs12FilePath+" (cannot read file)"), pkcs12FilePath);
+			listener.notifyLoadCredentialFailure(new FileNotFoundException(pkcs12FilePath+" (cannot read file)"), pkcs12FilePath);
 			
 		return cred;
 	}
