@@ -62,10 +62,10 @@ public class DefaultVOMSACRequest implements VOMSACRequest {
 	}
 	
 	private DefaultVOMSACRequest(Builder b) {
-		lifetime = b.lifetime;
-		voName = b.voName;
-		targets = b.targets;
-		requestedFQANs = b.requestedFQANs;
+		this.lifetime = b.lifetime;
+		this.voName = b.voName;
+		this.targets = b.targets;
+		this.requestedFQANs = b.requestedFQANs;
 	}
 
 	public static class Builder {
@@ -87,12 +87,14 @@ public class DefaultVOMSACRequest implements VOMSACRequest {
 		}
 
 		public Builder fqans(List<String> fqans) {
-			this.requestedFQANs = fqans;
+			if (fqans != null)
+				this.requestedFQANs = fqans;
 			return this;
 		}
 
 		public Builder targets(List<String> targets) {
-			this.targets = targets;
+			if (targets != null)
+				this.targets = targets;
 			return this;
 		}
 
