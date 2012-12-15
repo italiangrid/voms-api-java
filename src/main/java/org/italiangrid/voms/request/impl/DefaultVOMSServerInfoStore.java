@@ -88,8 +88,8 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 		return allEntries;
 	}
 
-	public Set<VOMSServerInfo> getVOMSServerInfo(String voAlias) {
-		Set<VOMSServerInfo> result = serverInfoStore.get(voAlias);
+	public Set<VOMSServerInfo> getVOMSServerInfo(String voName) {
+		Set<VOMSServerInfo> result = serverInfoStore.get(voName);
 		if (result == null)
 			return Collections.emptySet();
 		return result;
@@ -215,4 +215,5 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore{
 			
 		}
 	}
+	
 }

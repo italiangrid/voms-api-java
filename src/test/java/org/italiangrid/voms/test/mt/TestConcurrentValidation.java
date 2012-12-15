@@ -41,7 +41,7 @@ import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultUpdatingVOMSTrustStore;
-import org.italiangrid.voms.test.VOMSAA;
+import org.italiangrid.voms.test.utils.VOMSAA;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

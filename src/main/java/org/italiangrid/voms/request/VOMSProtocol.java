@@ -29,11 +29,12 @@ public interface VOMSProtocol {
   /**
    * Makes a request, get the response.
    * 
+   * @param endpoint the voms server endpoint information
    * @param credential the credentials.
    * @param request the request.
    * 
    * @return a {@link VOMSResponse} containing the response.
    */
-  public VOMSResponse doRequest(X509Credential credential, VOMSACRequest request);
+  public VOMSResponse doRequest(VOMSServerInfo endpoint, X509Credential credential, VOMSACRequest request);
   
 }

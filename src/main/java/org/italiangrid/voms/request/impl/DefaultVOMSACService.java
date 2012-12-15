@@ -15,7 +15,6 @@
  */
 package org.italiangrid.voms.request.impl;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -25,6 +24,7 @@ import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSACService;
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
+import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSProtocolError;
 import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.italiangrid.voms.request.VOMSRequestListener;
@@ -67,16 +67,16 @@ public class DefaultVOMSACService implements VOMSACService {
 	 */
 	protected VOMSServerInfoStore serverInfoStore;
 	
-	/**
-	 * The connect timeout value 
-	 */
-	protected int connectTimeout;
-	
-	/** 
-	 * The read timeout used 
-	 */
-	protected int readTimeout;
 
+	/**
+	 * The http protocol implementation
+	 */
+	protected VOMSProtocol httpProtocol;
+	
+	/**
+	 * The voms legacy protocol implementation
+	 */
+	protected VOMSProtocol legacyProtocol;
 	
 	/**
 	 * Constructor which builds a {@link DefaultVOMSACService} from a {@link Builder}
@@ -89,9 +89,8 @@ public class DefaultVOMSACService implements VOMSACService {
 		this.requestListener = builder.requestListener;
 		this.protocolListener = builder.protocolListener;
 		this.serverInfoStore = builder.serverInfoStore;
-		this.connectTimeout = builder.connectTimeout;
-		this.readTimeout = builder.readTimeout;
-		
+		this.httpProtocol = builder.httpProtocol;
+		this.legacyProtocol = builder.legacyProtocol;
 	}
 	
 	/**
@@ -119,57 +118,29 @@ public class DefaultVOMSACService implements VOMSACService {
 			asn1InputStream.close();
 			return attributeCertificate;
 
-		} catch (IOException e) {
+		} catch (Throwable e) {
 
-			requestListener.notifyVOMSRequestFailure(request, null, e);
+			requestListener.notifyVOMSRequestFailure(request, null, new VOMSError("Error unmarshalling VOMS AC. Cause: "+e.getMessage(),e));
+			
 			return null;
 		}
 	}
 	
-	/**
-	 * Executes the request using the VOMS REST protocol
-	 * 
-	 * @param request the request
-	 * @param serverInfo the VOMS server endpoint information
-	 * @param credential the credentials used to authenticate to the server
-	 * @return a {@link VOMSResponse}
-	 */
-	protected VOMSResponse doRESTRequest(VOMSACRequest request, VOMSServerInfo serverInfo, X509Credential credential){
-		
-		RESTProtocol restProtocol = new RESTProtocol(serverInfo, validator, protocolListener, connectTimeout, readTimeout);
-		
-		VOMSResponse response = null;
-		
-		try {
-			response = restProtocol.doRequest(credential, request);
-		
-		}catch(VOMSProtocolError e){
-			requestListener.notifyVOMSRequestFailure(request, serverInfo, e);
-		}
-		return response;
-		
-	}
 	
-	/**
-	 * Executes the request using the VOMS legacy protocol
-	 * @param request the request
-	 * @param serverInfo the VOMS server endpoint information
-	 * @param credential the credentials used to authenticate to the server
-	 * @return a {@link VOMSResponse}
-	 */
-	protected VOMSResponse doLegacyRequest(VOMSACRequest request, VOMSServerInfo serverInfo, X509Credential credential){
-		VOMSResponse response = null;
+	private VOMSResponse doRequest(VOMSProtocol protocol, VOMSServerInfo endpoint, X509Credential cred, VOMSACRequest req){
 		
-		LegacyProtocol legacyProtocol = new LegacyProtocol(serverInfo, validator, protocolListener, connectTimeout, readTimeout);
+		VOMSResponse response = null;
 		
 		try{
-			response = legacyProtocol.doRequest(credential, request);
+			
+			response = protocol.doRequest(endpoint, cred, req); 
 		
-		}catch (VOMSProtocolError e) {
-			requestListener.notifyVOMSRequestFailure(request, serverInfo, e);
+		}catch(VOMSProtocolError e){
+			requestListener.notifyVOMSRequestFailure(req, endpoint, e);
 		}
 		
 		return response;
+		
 	}
 	
 	/**
@@ -209,10 +180,12 @@ public class DefaultVOMSACService implements VOMSACService {
 
 			requestListener.notifyVOMSRequestStart(request,  vomsServerInfo);
 			
-			response = doRESTRequest(request, vomsServerInfo, credential);
+			// Try HTTP request first
+			response = doRequest(httpProtocol, vomsServerInfo, credential, request);
 
+			// If failed, try legacy protocol
 			if (response == null)
-				response = doLegacyRequest(request, vomsServerInfo, credential);
+				response = doRequest(legacyProtocol, vomsServerInfo, credential, request);
 
 			if (response != null){
 				requestListener.notifyVOMSRequestSuccess(request, vomsServerInfo);
@@ -246,16 +219,6 @@ public class DefaultVOMSACService implements VOMSACService {
 				.getVOMSServerInfo(request.getVoName());
 
 		return vomsServerInfos;
-	}
-
-	public void setConnectTimeout(int timeout) {
-		connectTimeout = timeout;
-		
-	}
-
-	public void setReadTimeout(int timeout) {
-		readTimeout = timeout;
-		
 	}
 	
 	/**
@@ -318,6 +281,17 @@ public class DefaultVOMSACService implements VOMSACService {
 		 * The read timeout used 
 		 */
 		private int readTimeout = AbstractVOMSProtocol.DEFAULT_READ_TIMEOUT;
+		
+		/**
+		 * The http protocol implementation
+		 */
+		protected VOMSProtocol httpProtocol;
+		
+		/**
+		 * The voms legacy protocol implementation
+		 */
+		protected VOMSProtocol legacyProtocol;
+		
 		
 		/**
 		 * Creates a Builder for a {@link DefaultVOMSACService}.
@@ -413,6 +387,24 @@ public class DefaultVOMSACService implements VOMSACService {
 		}
 		
 		/**
+		 * Sets the http protocol implementation 
+		 * @param httpProtocol the http protocol implementatino
+		 * @return this {@link Builder} instance
+		 */
+		public Builder httpProtocol(VOMSProtocol httpProtocol){
+			this.httpProtocol = httpProtocol;
+			return this;
+		}
+		
+		/**
+		 * Sets the legacy protocol implementation
+		 */
+		public Builder legacyProtocol(VOMSProtocol legacyProtocol){
+			this.legacyProtocol = legacyProtocol;
+			return this;
+		}
+		
+		/**
 		 * Builds the server info store 
 		 */
 		protected void buildServerInfoStore(){
@@ -428,11 +420,24 @@ public class DefaultVOMSACService implements VOMSACService {
 		}
 		
 		/**
+		 * Builds default protocols if needed
+		 */
+		protected void buildProtocols(){
+			
+			if (httpProtocol == null)
+				httpProtocol = new RESTProtocol(validator, protocolListener, connectTimeout, readTimeout);
+			
+			if (legacyProtocol == null)
+				legacyProtocol = new LegacyProtocol(validator, protocolListener, connectTimeout, readTimeout);
+		}
+		
+		/**
 		 * Builds the {@link DefaultVOMSACService}
 		 * @return a {@link DefaultVOMSACService} configured as required by this builder
 		 */
 		public DefaultVOMSACService build(){
 			buildServerInfoStore();
+			buildProtocols();
 			return new DefaultVOMSACService(this);
 		}
 	}

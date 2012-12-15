@@ -15,8 +15,9 @@
  */
 package org.italiangrid.voms.request.impl;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.italiangrid.voms.request.VOMSACRequest;
 
@@ -24,62 +25,81 @@ import org.italiangrid.voms.request.VOMSACRequest;
  * The default implementation for a {@link VOMSACRequest}.
  * 
  * @author Valerio Venturi
- *
+ * 
  */
 public class DefaultVOMSACRequest implements VOMSACRequest {
 
-  private int lifetime;
-  
-  private List<String> requestedFQANs;
-  
-  private List<String> targets;
+	public static final int DEFAULT_LIFETIME = (int) TimeUnit.HOURS.toSeconds(12);
+	
+	private int lifetime;
 
-  private String voName;
-  
-  public int getLifetime() {
+	private List<String> requestedFQANs;
 
-    return lifetime;
-  }
+	private List<String> targets;
 
-  public void setLifetime(int lifetime) {
+	private String voName;
 
-    this.lifetime = lifetime;
-  }
-  
-  public List<String> getRequestedFQANs() {
-    
-    if(requestedFQANs == null)
-      requestedFQANs = new ArrayList<String>();
-    
-    return requestedFQANs;
-  }
+	public int getLifetime() {
 
-  public void setRequestedFQANs(List<String> requestedFQANs) {
+		return lifetime;
+	}
 
-    this.requestedFQANs = requestedFQANs;
-  }
 
-  public void setTargets(List<String> targets) {
+	public List<String> getRequestedFQANs() {
+		
+		return requestedFQANs;
+	}
 
-    this.targets = targets;
-  }
+	
+	public List<String> getTargets() {
 
-  public List<String> getTargets() {
-    
-    if(targets == null)
-      targets = new ArrayList<String>();
-    
-    return targets;
-  }
+		return targets;
+	}
 
-  public void setVoName(String voName) {
+	public String getVoName() {
 
-    this.voName = voName;
-  }
+		return voName;
+	}
+	
+	private DefaultVOMSACRequest(Builder b) {
+		lifetime = b.lifetime;
+		voName = b.voName;
+		targets = b.targets;
+		requestedFQANs = b.requestedFQANs;
+	}
 
-  public String getVoName() {
-    
-    return voName;
-  }
+	public static class Builder {
+		private int lifetime = DEFAULT_LIFETIME;
+
+		private List<String> requestedFQANs = Collections.emptyList();
+
+		private List<String> targets = Collections.emptyList();
+
+		private String voName;
+
+		public Builder(String voName) {
+			this.voName = voName;
+		}
+
+		public Builder lifetime(int l) {
+			this.lifetime = l;
+			return this;
+		}
+
+		public Builder fqans(List<String> fqans) {
+			this.requestedFQANs = fqans;
+			return this;
+		}
+
+		public Builder targets(List<String> targets) {
+			this.targets = targets;
+			return this;
+		}
+
+		public DefaultVOMSACRequest build() {
+			return new DefaultVOMSACRequest(this);
+
+		}
+	}
 
 }

@@ -46,6 +46,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSGenericAttribute;
 
+import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.CertificateExtension;
 
@@ -58,7 +59,7 @@ import eu.emi.security.authn.x509.proxy.CertificateExtension;
  */
 public class VOMSACGenerator implements VOMSConstants{
 	
-	private final PEMCredential aaCredential;
+	private final X509Credential aaCredential;
 	private final String host;
 	private final int port;
 	private final String voName;
@@ -68,7 +69,7 @@ public class VOMSACGenerator implements VOMSConstants{
 	
 	private ContentSigner signer;
 	
-	public VOMSACGenerator(PEMCredential aaCredential, String voName, String host, int port) {
+	public VOMSACGenerator(X509Credential aaCredential, String voName, String host, int port) {
 		this.aaCredential = aaCredential;
 		this.voName = voName;
 		this.host = host;

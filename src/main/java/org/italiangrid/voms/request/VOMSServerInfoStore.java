@@ -35,7 +35,6 @@ public interface VOMSServerInfoStore {
 	 */
 	public Set<VOMSServerInfo> getVOMSServerInfo(String voName);
 	
-	
 	/**
 	 * Returns a set of all {@link VOMSServerInfo} objects in this
 	 * {@link VOMSServerInfoStore}.

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms.test;
+package org.italiangrid.voms.test.utils;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -30,6 +30,7 @@ import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.italiangrid.voms.VOMSGenericAttribute;
 import org.italiangrid.voms.asn1.VOMSACGenerator;
 
+import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 import eu.emi.security.authn.x509.proxy.ProxyCertificateOptions;
@@ -37,7 +38,7 @@ import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 
 public class VOMSAA {
 
-	PEMCredential credential;
+	X509Credential credential;
 	String voName;
 	String host;
 	int port;
@@ -47,7 +48,7 @@ public class VOMSAA {
 	
 	private volatile long serial = 0L;
 	
-	public VOMSAA(PEMCredential cred, String vo, String host, int port) {
+	public VOMSAA(X509Credential cred, String vo, String host, int port) {
 		
 		credential = cred;
 		voName = vo;
@@ -66,12 +67,56 @@ public class VOMSAA {
 	}
 	
 	
+	public AttributeCertificate getAC(X509Credential holder,
+			List<String> fqans, 
+			List<VOMSGenericAttribute> attrs,
+			List<String> targets,
+			Date notBefore,
+			Date notAfter
+			){
+		
+		return getAC(credential,
+				holder, 
+				voName, 
+				host,
+				port,
+				fqans,
+				attrs,
+				targets,
+				notBefore,
+				notAfter);
+	}
+	
+	public AttributeCertificate getAC(X509Credential aaCredential,
+			X509Credential holder,
+			String voName,
+			String host,
+			int port,
+			List<String> fqans, 
+			List<VOMSGenericAttribute> attrs,
+			List<String> targets, 
+			Date notBefore, 
+			Date notAfter){
+		
+		VOMSACGenerator generator = new VOMSACGenerator(aaCredential, voName, host, port);
+		
+		X509AttributeCertificateHolder acHolder = generator.generateVOMSAttributeCertificate(fqans, 
+				attrs, 
+				targets, 
+				holder.getCertificate(), 
+				getAndIncrementSerial(), 
+				notBefore,
+				notAfter);
+		
+		return acHolder.toASN1Structure();
+		
+	}
 	public ProxyCertificate createVOMSProxy(PEMCredential holder,PEMCredential proxyHolder, 
 			List<String> fqans, 
 			List<VOMSGenericAttribute> attrs,
 			List<String> targets) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
 		
-		VOMSACGenerator generator = new VOMSACGenerator(credential, voName, host, port);
+		
 		Calendar cal = Calendar.getInstance();
 		
 		Date startDate = acNotBefore;
@@ -85,15 +130,18 @@ public class VOMSAA {
 			endDate = cal.getTime();
 		}
 		
-		X509AttributeCertificateHolder acHolder = generator.generateVOMSAttributeCertificate(fqans, 
+		AttributeCertificate ac = getAC(credential, 
+				holder, 
+				voName, 
+				host, 
+				port, 
+				fqans, 
 				attrs, 
 				targets, 
-				holder.getCertificate(), 
-				getAndIncrementSerial(), 
-				startDate,
+				startDate, 
 				endDate);
-	
-		return createVOMSProxy(proxyHolder, new AttributeCertificate[]{acHolder.toASN1Structure()});
+
+		return createVOMSProxy(proxyHolder, new AttributeCertificate[]{ac});
 	}
 	
 	private ProxyCertificate createVOMSProxy(PEMCredential holder, AttributeCertificate[] acs) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{

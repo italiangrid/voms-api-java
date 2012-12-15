@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.ac.ACParsingContext;
-import org.italiangrid.voms.test.Fixture;
+import org.italiangrid.voms.test.utils.Fixture;
 import org.junit.Test;
 
 public class TestACParsingContext implements Fixture{

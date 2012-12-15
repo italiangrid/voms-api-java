@@ -35,17 +35,5 @@ public interface VOMSACService {
 	 */
 	public AttributeCertificate getVOMSAttributeCertificate(X509Credential credential, VOMSACRequest request);
 	
-	/**
-	 * Sets the socket timeout parameter for this service
-	 * @param timeout
-	 */
-	public void setConnectTimeout(int timeout);
-	
-	/**
-	 * Sets the read timeout parameter for this service
-	 * 
-	 * @param timeout
-	 */
-	public void setReadTimeout(int timeout);
 
 }

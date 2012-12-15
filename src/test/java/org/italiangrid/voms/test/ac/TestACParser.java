@@ -26,9 +26,9 @@ import junit.framework.Assert;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.impl.DefaultVOMSACParser;
-import org.italiangrid.voms.test.Fixture;
-import org.italiangrid.voms.test.Utils;
-import org.italiangrid.voms.test.VOMSAA;
+import org.italiangrid.voms.test.utils.Fixture;
+import org.italiangrid.voms.test.utils.Utils;
+import org.italiangrid.voms.test.utils.VOMSAA;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

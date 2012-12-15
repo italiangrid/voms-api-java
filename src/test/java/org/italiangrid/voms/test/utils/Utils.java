@@ -13,19 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms.test;
+package org.italiangrid.voms.test.utils;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
+import org.italiangrid.voms.request.VOMSACService;
+import org.italiangrid.voms.request.VOMSProtocol;
+import org.italiangrid.voms.request.VOMSServerInfo;
+import org.italiangrid.voms.request.VOMSServerInfoStore;
+import org.italiangrid.voms.request.impl.DefaultVOMSACService;
+import org.italiangrid.voms.request.impl.DefaultVOMSServerInfo;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
+import org.mockito.Mockito;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -34,6 +45,44 @@ public class Utils implements Fixture{
 
 	private Utils() {}
 	
+	
+	
+	public static VOMSACService buildACService(VOMSProtocol main, 
+			VOMSProtocol fallback) throws Exception{
+		
+		
+		VOMSServerInfoStore store = Mockito.mock(VOMSServerInfoStore.class);
+		
+		Set<VOMSServerInfo> testVOEndpoints = new HashSet<VOMSServerInfo>();
+		testVOEndpoints.add(getTestVOEndpoint());
+		
+		Mockito.when(store.getVOMSServerInfo("test.vo")).thenReturn(testVOEndpoints);
+		
+		DefaultVOMSACService acService = new DefaultVOMSACService.Builder(getCertificateValidator())
+			.serverInfoStore(store)
+			.requestListener(LogListener.INSTANCE)
+			.httpProtocol(main)
+			.legacyProtocol(fallback)
+			.build();
+		
+		return acService;
+		
+	}
+
+	public static VOMSACService buildACService(VOMSProtocol protocol) throws Exception{
+		
+		return buildACService(protocol, null);
+	}
+	
+	
+	public static VOMSServerInfo getTestVOEndpoint() throws URISyntaxException{
+		DefaultVOMSServerInfo si = new DefaultVOMSServerInfo();
+		si.setAlias("test.vo");
+		si.setVoName("test.vo");
+		si.setURL(new URI("http://localhost:15000"));
+		si.setVOMSServerDN("Not checked");
+		return si;
+	}
 	public static X509CertChainValidatorExt getCertificateValidator(){
 		return CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
 	}

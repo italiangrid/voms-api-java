@@ -42,27 +42,18 @@ import eu.emi.security.authn.x509.X509Credential;
  */
 public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 
-	public RESTProtocol(VOMSServerInfo vomsServerInfo, 
-			X509CertChainValidatorExt validator, 
+	public RESTProtocol(X509CertChainValidatorExt validator, 
 			VOMSProtocolListener listener, 
 			int connectTimeout, 
 			int readTimeout) {
-		super(vomsServerInfo, validator, listener, connectTimeout, readTimeout);
+		super(validator, listener, connectTimeout, readTimeout);
 	}
 	
-	public RESTProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator) {
-		super(vomsServerInfo, validator);
-	}
 
-	public RESTProtocol(VOMSServerInfo vomsServerInfo) {
-		this(vomsServerInfo, CertificateValidatorBuilder.buildCertificateValidator(
-				DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, 60000L));
-	}
-
-	public VOMSResponse doRequest(X509Credential credential, VOMSACRequest request) {
+	public VOMSResponse doRequest(VOMSServerInfo endpoint, X509Credential credential, VOMSACRequest request) {
 
 		RESTServiceURLBuilder restQueryBuilder = new RESTServiceURLBuilder();
-		URL serviceUrl = restQueryBuilder.build(serverInfo.getURL(), request);
+		URL serviceUrl = restQueryBuilder.build(endpoint.getURL(), request);
 		RESTVOMSResponseParsingStrategy responseParsingStrategy = new RESTVOMSResponseParsingStrategy();
 
 		HttpsURLConnection connection = null;
@@ -76,7 +67,7 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 
 		} catch (IOException e) {
 			
-			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
+			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
 		}
 
 		connection.setSSLSocketFactory(getSSLSocketFactory(credential));
@@ -89,7 +80,7 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 
 		} catch (IOException e) {
 			
-			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
+			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
 			
 		}
 		

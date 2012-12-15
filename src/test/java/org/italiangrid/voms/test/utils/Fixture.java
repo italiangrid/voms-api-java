@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms.test;
+package org.italiangrid.voms.test.utils;
 
 import java.util.Arrays;
 import java.util.List;

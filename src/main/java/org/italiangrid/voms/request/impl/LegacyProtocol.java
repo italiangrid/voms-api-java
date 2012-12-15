@@ -26,14 +26,12 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSProtocolError;
 import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
-import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
@@ -49,21 +47,14 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
  */
 public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol, HostnameMismatchCallback{
 	
-	public LegacyProtocol(VOMSServerInfo vomsServerInfo) {
-		super(vomsServerInfo, CertificateValidatorBuilder.buildCertificateValidator(
-				DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, 60000L));
+	public LegacyProtocol(X509CertChainValidatorExt validator, 
+			VOMSProtocolListener listener, 
+			int connectTimeout, 
+			int readTimeout) {
+		super(validator, listener, connectTimeout, readTimeout);
 	}
 
-	public LegacyProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator) {
-		super(vomsServerInfo, validator);
-	}
-	
-	public LegacyProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator, 
-			VOMSProtocolListener listener, int connectTimeout, int readTimeout) {
-		super(vomsServerInfo, validator, listener, connectTimeout, readTimeout);
-	}
-
-	public synchronized VOMSResponse doRequest(X509Credential credential, VOMSACRequest request) {
+	public synchronized VOMSResponse doRequest(VOMSServerInfo endpoint, X509Credential credential, VOMSACRequest request) {
 
 		SSLSocketFactory sslSocketFactory = getSSLSocketFactory(credential);
 
@@ -76,8 +67,8 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 			sslSocket.setSoTimeout(readTimeout);
 			sslSocket.setEnabledProtocols(VOMS_LEGACY_PROTOCOLS);
 			
-			SocketAddress sa = new InetSocketAddress(serverInfo.getURL().getHost(),
-					serverInfo.getURL().getPort()); 
+			SocketAddress sa = new InetSocketAddress(endpoint.getURL().getHost(),
+					endpoint.getURL().getPort()); 
 			
 			sslSocket.connect(sa, connectTimeout);
 			SocketFactoryCreator.connectWithHostnameChecking(sslSocket, this);
@@ -86,11 +77,11 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 
 		} catch (UnknownHostException e) {
 			
-			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
+			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
 
 		} catch (IOException e) {
 			
-			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
+			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
 		}
 		
 		
@@ -110,7 +101,7 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 
 		} catch (IOException e) {
 
-			throw new VOMSProtocolError(e.getMessage(), serverInfo, request, credential, e);
+			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
 		}
 
 		listener.notifyReceivedResponse(response);
@@ -121,7 +112,7 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol
 			throws SSLException {
 		
 		String peerCertString  = CertificateUtils.format(peerCertificate, FormatMode.MEDIUM_ONE_LINE);
-		String message = String.format("Hostname verificate failed for host: %s. Peer certificate : %s", hostName, peerCertString);
+		String message = String.format("Hostname does not match cerificate failed for host: %s. Peer certificate : %s", hostName, peerCertString);
 		throw new SSLException(message);
 	}
 

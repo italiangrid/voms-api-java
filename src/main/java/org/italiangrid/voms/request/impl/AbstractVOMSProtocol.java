@@ -42,10 +42,6 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	 */
 	public static final int DEFAULT_READ_TIMEOUT = 5000;
 	
-	/**
-	 * The remote server endpoint information
-	 */
-	protected VOMSServerInfo serverInfo;
 	
 	protected VOMSProtocolListener listener = NullListener.INSTANCE;
 
@@ -64,30 +60,15 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	 */
 	protected int readTimeout = DEFAULT_READ_TIMEOUT;
 	
-	
-	/**
-	 * Ctor.
-	 * 
-	 * @param vomsServerInfo
-	 *            the info for the endpoint.
-	 */
-	public AbstractVOMSProtocol(VOMSServerInfo vomsServerInfo) {
-
-		this(vomsServerInfo, CertificateValidatorBuilder.buildCertificateValidator(
-				DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, 60000L));
-	}
 
 	/**
 	 * Ctor.
 	 * 
-	 * @param vomsServerInfo
-	 *            the info for the remote VOMS server endpoint
 	 * @param validator
 	 *            the validator used to manage the SSL authentication
 	 */
-	public AbstractVOMSProtocol(VOMSServerInfo vomsServerInfo, X509CertChainValidatorExt validator) {
-
-		this.serverInfo = vomsServerInfo;
+	public AbstractVOMSProtocol(X509CertChainValidatorExt validator) {
+		
 		this.validator = validator;
 	}
 	
@@ -105,14 +86,12 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	 * @param readTimeout
 	 * 			  sets the socket read timeout	
 	 */
-	public AbstractVOMSProtocol(VOMSServerInfo vomsServerInfo, 
-			X509CertChainValidatorExt validator,
+	public AbstractVOMSProtocol(X509CertChainValidatorExt validator,
 			VOMSProtocolListener listener,
 			int connectTimeout, 
 			int readTimeout)
 			{
-
-		this.serverInfo = vomsServerInfo;
+		
 		this.validator = validator;
 		this.connectTimeout = connectTimeout;
 		this.readTimeout = readTimeout;

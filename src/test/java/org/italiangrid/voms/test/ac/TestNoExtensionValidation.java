@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.italiangrid.voms.test;
+package org.italiangrid.voms.test.ac;
 
 import static org.junit.Assert.*;
 
@@ -27,6 +27,8 @@ import junit.framework.Assert;
 
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.VOMSACValidator;
+import org.italiangrid.voms.test.utils.Fixture;
+import org.italiangrid.voms.test.utils.Utils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
