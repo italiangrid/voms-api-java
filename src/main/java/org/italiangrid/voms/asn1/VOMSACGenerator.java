@@ -16,21 +16,28 @@
 package org.italiangrid.voms.asn1;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509Extension;
@@ -41,13 +48,13 @@ import org.bouncycastle.cert.X509v2AttributeCertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSGenericAttribute;
 
 import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.CertificateExtension;
 
 /** 
@@ -59,34 +66,120 @@ import eu.emi.security.authn.x509.proxy.CertificateExtension;
  */
 public class VOMSACGenerator implements VOMSConstants{
 	
-	private final X509Credential aaCredential;
-	private final String host;
-	private final int port;
-	private final String voName;
-	private final String voURI;
+	static class RandomContentSigner implements ContentSigner{
+
+		public static int SIG_LENGHT = 1024;
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		
+		AlgorithmIdentifier sigAlgId;
+		
+		public RandomContentSigner(String sigAlgName) {
+			this.sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find(sigAlgName);
+		}
+
+		public AlgorithmIdentifier getAlgorithmIdentifier() {
+			return sigAlgId;
+		}
+
+		public OutputStream getOutputStream() {
+			
+			return bos;
+		}
+
+		public byte[] getSignature() {
+			
+			try {
+				bos.close();
+			} catch (IOException e) {
+
+			}
+			
+			Random r = new Random();
+			
+			byte[] sigBytes = new byte[SIG_LENGHT];
+			r.nextBytes(sigBytes);
+			
+			return sigBytes;
+		}
+		
+	}
 	
-	private final boolean vomsCompatibility = true;
+	public static final ASN1ObjectIdentifier FAKE_EXT_OID = new ASN1ObjectIdentifier("1.3.6.1.4.1.8005.100.120.82");
+	
+	private X509Credential aaCredential;
+	private String host;
+	private int port;
+	private String voName;
+	
+	private String voURI;
+	
+	private boolean vomsCompatibility = true;
+	
+	private boolean includeEmptyACCertsExtension = false;
+	
+	private boolean skipACCertsExtension = false;
+	
+	private boolean useFakeSignatureBits = false;
+	
+	private boolean includeFakeCriticalExtensions = false;
+	
+	private boolean includeCriticalNoRevAvail = false;
+	
+	private boolean includeCriticalAKID = false;
 	
 	private ContentSigner signer;
+	
+	private ContentSigner getSigner(){
+		if (signer == null){
+			
+			JcaContentSignerBuilder builder = new JcaContentSignerBuilder(aaCredential.getCertificate().getSigAlgName());
+			builder.setProvider(BouncyCastleProvider.PROVIDER_NAME);	
+			try {
+				if (useFakeSignatureBits)
+					signer = new RandomContentSigner(aaCredential.getCertificate().getSigAlgName());
+				else
+					signer = builder.build(aaCredential.getKey());
+				
+			} catch (OperatorCreationException e) {
+				throw new VOMSError(e.getMessage(),e);
+			}
+		}
+		return signer;
+	}
+	
 	
 	public VOMSACGenerator(X509Credential aaCredential, String voName, String host, int port) {
 		this.aaCredential = aaCredential;
 		this.voName = voName;
 		this.host = host;
 		this.port = port;
-		
-		JcaContentSignerBuilder builder = new JcaContentSignerBuilder(aaCredential.getCertificate().getSigAlgName());
-		builder.setProvider(BouncyCastleProvider.PROVIDER_NAME);	
-		try {
-			signer = builder.build(aaCredential.getKey());
-		} catch (OperatorCreationException e) {
-			throw new VOMSError(e.getMessage(),e);
-		}
-		
 		voURI = String.format("%s://%s:%d",this.voName,this.host,this.port);
-		
 	}
 	
+	private ASN1Encodable buildACCertsExtensionContent(){
+		
+		ASN1EncodableVector issuerCertsContainer = new ASN1EncodableVector();
+		
+		if (includeEmptyACCertsExtension)
+			issuerCertsContainer.add(new DERSequence());
+		else
+			issuerCertsContainer.add( new DERSequence(getCertAsDEREncodable( aaCredential.getCertificate() )));
+		
+		return new DERSequence(issuerCertsContainer);
+	}
+	
+	
+	private AuthorityKeyIdentifier buildAuthorityKeyIdentifier(){
+		
+		byte[] authKeyId = aaCredential.getCertificate().getExtensionValue(X509Extension.authorityKeyIdentifier.toString());
+		
+		if (authKeyId != null){
+			return new AuthorityKeyIdentifier(authKeyId);
+		}
+		
+		return null;
+	}
 	
 	private ASN1Encodable buildFQANsAttributeContent(List<String> fqans){
 		
@@ -104,22 +197,6 @@ public class VOMSACGenerator implements VOMSConstants{
 		
 		return new DERSequence(container);
 	}
-	
-	private DEROctetString getDEROctetString(String s){
-		return new DEROctetString(s.getBytes());
-	}
-	
-	private DERSequence buildTagSequence( VOMSGenericAttribute ga ) {
-
-        ASN1EncodableVector tagSequence = new ASN1EncodableVector();
-
-        tagSequence.add( getDEROctetString( ga.getName() ) );
-        tagSequence.add( getDEROctetString( ga.getValue() ) );
-        tagSequence.add( getDEROctetString( ga.getContext() ) );
-
-        return new DERSequence( tagSequence );
-
-    }
 	
 	
 	private ASN1Encodable buildGAExtensionContent(List<VOMSGenericAttribute> gas){
@@ -144,35 +221,36 @@ public class VOMSACGenerator implements VOMSConstants{
 		return finalSequence;
 	}
 	
+	private AttributeCertificateHolder buildHolder(X509Certificate holderCert) throws CertificateEncodingException{
+		
+		JcaX509CertificateHolder holderWrappedCert = new JcaX509CertificateHolder(holderCert);
+		AttributeCertificateHolder acHolder = new AttributeCertificateHolder(holderWrappedCert.getSubject(),
+				holderCert.getSerialNumber());
+		
+		return acHolder;
+	}
+
+
+	private AttributeCertificateIssuer buildIssuer() throws CertificateEncodingException{
+		
+		JcaX509CertificateHolder issuer = new JcaX509CertificateHolder(aaCredential.getCertificate());
+		return new AttributeCertificateIssuer(issuer.getSubject());
+	}
 	private GeneralName buildPolicyAuthorityInfo() {
 		return new GeneralName(GeneralName.uniformResourceIdentifier, voURI);
 	}
+	
+	private DERSequence buildTagSequence( VOMSGenericAttribute ga ) {
 
+        ASN1EncodableVector tagSequence = new ASN1EncodableVector();
 
-	private DEREncodable getCertAsDEREncodable(X509Certificate cert){
-        
-        try {
-            byte[] certBytes = cert.getEncoded();
-            
-            ByteArrayInputStream bais = new ByteArrayInputStream(certBytes);
-            ASN1InputStream is = new ASN1InputStream(bais);
-            DERObject derCert = is.readObject();
-            is.close();
-            return derCert;
-        
-        } catch ( CertificateEncodingException e ) {
-            throw new VOMSError("Error encoding X509 certificate: "+ e.getMessage(),e);
-        } catch ( IOException e ) {
-            throw new VOMSError("Error encoding X509 certificate: "+ e.getMessage(),e);
-        }
-        
+        tagSequence.add( getDEROctetString( ga.getName() ) );
+        tagSequence.add( getDEROctetString( ga.getValue() ) );
+        tagSequence.add( getDEROctetString( ga.getContext() ) );
+
+        return new DERSequence( tagSequence );
+
     }
-	private ASN1Encodable buildACCertsExtensionContent(){
-		
-		ASN1EncodableVector issuerCertsContainer = new ASN1EncodableVector();
-        issuerCertsContainer.add( new DERSequence(getCertAsDEREncodable( aaCredential.getCertificate() )));
-		return new DERSequence(issuerCertsContainer);
-	}
 	
 	private ASN1Encodable buildTargetsExtensionContent(List<String> targets){
 		
@@ -190,21 +268,6 @@ public class VOMSACGenerator implements VOMSConstants{
 		
 		DERSequence targetExtensionContent = new DERSequence( new DERSequence(targetSeq));
 		return targetExtensionContent;
-	}
-	
-	private AttributeCertificateHolder buildHolder(X509Certificate holderCert) throws CertificateEncodingException{
-		
-		JcaX509CertificateHolder holderWrappedCert = new JcaX509CertificateHolder(holderCert);
-		AttributeCertificateHolder acHolder = new AttributeCertificateHolder(holderWrappedCert.getSubject(),
-				holderCert.getSerialNumber());
-		
-		return acHolder;
-	}
-	
-	private AttributeCertificateIssuer buildIssuer() throws CertificateEncodingException{
-		
-		JcaX509CertificateHolder issuer = new JcaX509CertificateHolder(aaCredential.getCertificate());
-		return new AttributeCertificateIssuer(issuer.getSubject());
 	}
 	
 	public synchronized X509AttributeCertificateHolder generateVOMSAttributeCertificate(
@@ -237,10 +300,21 @@ public class VOMSACGenerator implements VOMSConstants{
 		if (targets != null && !targets.isEmpty())
 			builder.addExtension(X509Extension.targetInformation , true, buildTargetsExtensionContent(targets));
 		
-		builder.addExtension(VOMS_CERTS_OID, false, buildACCertsExtensionContent());
+		if (!skipACCertsExtension)
+			builder.addExtension(VOMS_CERTS_OID, false, buildACCertsExtensionContent());
 		
+		if (includeFakeCriticalExtensions)
+			builder.addExtension(FAKE_EXT_OID, true, new DERSequence());
 		
-		return builder.build(signer);
+		if (includeCriticalNoRevAvail)
+			builder.addExtension(X509Extension.noRevAvail, true, new DERNull());
+		
+		if (includeCriticalAKID){
+			AuthorityKeyIdentifier akid = buildAuthorityKeyIdentifier();
+			builder.addExtension(X509Extension.authorityKeyIdentifier, true, akid != null ? akid : new DERNull());
+		}
+		
+		return builder.build(getSigner());
 	}
 	
 	public synchronized CertificateExtension generateVOMSExtension(List<X509AttributeCertificateHolder> acs){
@@ -254,5 +328,76 @@ public class VOMSACGenerator implements VOMSConstants{
 		CertificateExtension ext = new CertificateExtension(VOMS_EXTENSION_OID.getId(), acSeq.toASN1Object(), false);
 		
 		return ext;
+	}
+	
+	private DEREncodable getCertAsDEREncodable(X509Certificate cert){
+        
+        try {
+            byte[] certBytes = cert.getEncoded();
+            
+            ByteArrayInputStream bais = new ByteArrayInputStream(certBytes);
+            ASN1InputStream is = new ASN1InputStream(bais);
+            DERObject derCert = is.readObject();
+            is.close();
+            return derCert;
+        
+        } catch ( CertificateEncodingException e ) {
+            throw new VOMSError("Error encoding X509 certificate: "+ e.getMessage(),e);
+        } catch ( IOException e ) {
+            throw new VOMSError("Error encoding X509 certificate: "+ e.getMessage(),e);
+        }
+        
+    }
+
+
+	private DEROctetString getDEROctetString(String s){
+		return new DEROctetString(s.getBytes());
+	}
+
+
+	/**
+	 * @param includeEmptyACCertsExtension the includeEmptyACCertsExtension to set
+	 */
+	public synchronized void setIncludeEmptyACCertsExtension(
+			boolean includeEmptyACCertsExtension) {
+		this.includeEmptyACCertsExtension = includeEmptyACCertsExtension;
+	}
+	
+	/**
+	 * @param skipACCertsExtension the skipACCertsExtension to set
+	 */
+	public synchronized void setSkipACCertsExtension(boolean skipACCertsExtension) {
+		this.skipACCertsExtension = skipACCertsExtension;
+	}
+
+	/**
+	 * @param useFakeSignatureBits the useFakeSignatureBits to set
+	 */
+	public synchronized void setUseFakeSignatureBits(boolean useFakeSignatureBits) {
+		this.useFakeSignatureBits = useFakeSignatureBits;
+	}
+
+	/**
+	 * @param includeFakeCriticalExtensions the includeFakeCriticalExtensions to set
+	 */
+	public synchronized void setIncludeFakeCriticalExtensions(
+			boolean includeFakeCriticalExtensions) {
+		this.includeFakeCriticalExtensions = includeFakeCriticalExtensions;
+	}
+
+
+	/**
+	 * @param includeCriticalNoRevAvail the includeCriticalNoRevAvail to set
+	 */
+	public synchronized void setIncludeCriticalNoRevAvail(
+			boolean includeCriticalNoRevAvail) {
+		this.includeCriticalNoRevAvail = includeCriticalNoRevAvail;
+	}
+
+	/**
+	 * @param includeCriticalAKID the includeCriticalAKID to set
+	 */
+	public synchronized void setIncludeCriticalAKID(boolean includeCriticalAKID) {
+		this.includeCriticalAKID = includeCriticalAKID;
 	}
 }

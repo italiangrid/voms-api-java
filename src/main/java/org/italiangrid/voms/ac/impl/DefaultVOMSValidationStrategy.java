@@ -30,7 +30,6 @@ import static org.italiangrid.voms.error.VOMSValidationErrorCode.lscFileNotFound
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.other;
 import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -70,12 +69,17 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 
 	private final VOMSTrustStore store;
 	private final X509CertChainValidatorExt certChainValidator;
+	private final LocalHostnameResolver hostnameResolver;
 	
-	
-	public DefaultVOMSValidationStrategy(VOMSTrustStore store, X509CertChainValidatorExt validator) {
+	public DefaultVOMSValidationStrategy(VOMSTrustStore store, X509CertChainValidatorExt validator, LocalHostnameResolver resolver) {
 		this.store = store;
 		this.certChainValidator = validator;
+		this.hostnameResolver = resolver;
 		
+	}
+	
+	public DefaultVOMSValidationStrategy(VOMSTrustStore store, X509CertChainValidatorExt validator) {
+		this(store, validator,new DefaultLocalHostnameResolver());
 	}
 	
 	private boolean checkACHolder(VOMSAttribute attributes, X509Certificate[] chain, List<VOMSValidationErrorMessage> validationErrors){
@@ -194,7 +198,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 		String localhostName;
 		
 		try {
-			localhostName = InetAddress.getLocalHost().getCanonicalHostName();
+			localhostName = hostnameResolver.resolveLocalHostname();
 		
 		} catch (UnknownHostException e) {
 			validationErrors.add(newErrorMessage(other, "Error resolving localhost name: "+e.getMessage()));

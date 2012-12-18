@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
 
 import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
@@ -126,7 +127,7 @@ public class TestConcurrentValidation {
 	
 		loadHolderCredentials();
 		initVOs();	
-		sharedValidator = new DefaultVOMSValidator(sharedVOMSTrustStore, sharedCertificateValidator);
+		sharedValidator = VOMSValidators.newValidator(sharedVOMSTrustStore, sharedCertificateValidator);
 	}
 	
 	@AfterClass

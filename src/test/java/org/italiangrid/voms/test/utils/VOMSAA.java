@@ -48,6 +48,15 @@ public class VOMSAA {
 	
 	private volatile long serial = 0L;
 	
+	private boolean includeEmptyACCertsExtension = false;
+	private boolean skipACCertsExtension = false;
+	private boolean useFakeSignatureBits = false;
+	private boolean includeFakeCriticalExtension = false;
+	private boolean includeCriticalNoRevAvail = false;
+	private boolean includeCriticalAKID = false;
+	
+	
+	
 	public VOMSAA(X509Credential cred, String vo, String host, int port) {
 		
 		credential = cred;
@@ -59,6 +68,15 @@ public class VOMSAA {
 	
 	private synchronized BigInteger getAndIncrementSerial(){
 		return BigInteger.valueOf(serial++);
+	}
+	
+	
+	public ProxyCertificate createVOMSProxy(PEMCredential holder,
+			List<String> fqans,
+			List<VOMSGenericAttribute> gas,
+			List<String> targets) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
+		
+		return createVOMSProxy(holder, holder, fqans, gas, targets);
 	}
 	
 	public ProxyCertificate createVOMSProxy(PEMCredential holder,
@@ -99,6 +117,13 @@ public class VOMSAA {
 			Date notAfter){
 		
 		VOMSACGenerator generator = new VOMSACGenerator(aaCredential, voName, host, port);
+		
+		generator.setSkipACCertsExtension(skipACCertsExtension);
+		generator.setIncludeEmptyACCertsExtension(includeEmptyACCertsExtension);
+		generator.setUseFakeSignatureBits(useFakeSignatureBits);
+		generator.setIncludeFakeCriticalExtensions(includeFakeCriticalExtension);
+		generator.setIncludeCriticalAKID(includeCriticalAKID);
+		generator.setIncludeCriticalNoRevAvail(includeCriticalNoRevAvail);
 		
 		X509AttributeCertificateHolder acHolder = generator.generateVOMSAttributeCertificate(fqans, 
 				attrs, 
@@ -144,7 +169,7 @@ public class VOMSAA {
 		return createVOMSProxy(proxyHolder, new AttributeCertificate[]{ac});
 	}
 	
-	private ProxyCertificate createVOMSProxy(PEMCredential holder, AttributeCertificate[] acs) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
+	public ProxyCertificate createVOMSProxy(PEMCredential holder, AttributeCertificate[] acs) throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
 		ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(holder.getCertificateChain());
 		
 		proxyOptions.setAttributeCertificates(acs);
@@ -181,6 +206,79 @@ public class VOMSAA {
 	public VOMSAA setAcNotAfter(Date acNotAfter) {
 		this.acNotAfter = acNotAfter;
 		return this;
+	}
+
+	/**
+	 * @return the includeEmptyACCertsExtension
+	 */
+	public synchronized boolean isIncludeEmptyACCertsExtension() {
+		return includeEmptyACCertsExtension;
+	}
+
+	/**
+	 * @param includeEmptyACCertsExtension the includeEmptyACCertsExtension to set
+	 */
+	public synchronized void setIncludeEmptyACCertsExtension(
+			boolean includeEmptyACCertsExtension) {
+		this.includeEmptyACCertsExtension = includeEmptyACCertsExtension;
+	}
+
+	/**
+	 * @return the skipACCertsExtension
+	 */
+	public synchronized boolean isSkipACCertsExtension() {
+		return skipACCertsExtension;
+	}
+
+	/**
+	 * @param skipACCertsExtension the skipACCertsExtension to set
+	 */
+	public synchronized void setSkipACCertsExtension(boolean skipACCertsExtension) {
+		this.skipACCertsExtension = skipACCertsExtension;
+	}
+
+	/**
+	 * @return the useFakeSignatureBits
+	 */
+	public synchronized boolean isUseFakeSignatureBits() {
+		return useFakeSignatureBits;
+	}
+
+	/**
+	 * @param useFakeSignatureBits the useFakeSignatureBits to set
+	 */
+	public synchronized void setUseFakeSignatureBits(boolean useFakeSignatureBits) {
+		this.useFakeSignatureBits = useFakeSignatureBits;
+	}
+
+	/**
+	 * @return the includeFakeCriticalExtension
+	 */
+	public synchronized boolean isIncludeFakeCriticalExtension() {
+		return includeFakeCriticalExtension;
+	}
+
+	/**
+	 * @param includeFakeCriticalExtension the includeFakeCriticalExtension to set
+	 */
+	public synchronized void setIncludeFakeCriticalExtension(
+			boolean includeFakeCriticalExtension) {
+		this.includeFakeCriticalExtension = includeFakeCriticalExtension;
+	}
+
+	/**
+	 * @param includeCriticalNoRevAvail the includeCriticalNoRevAvail to set
+	 */
+	public synchronized void setIncludeCriticalNoRevAvail(
+			boolean includeCriticalNoRevAvail) {
+		this.includeCriticalNoRevAvail = includeCriticalNoRevAvail;
+	}
+
+	/**
+	 * @param includeCriticalAKID the includeCriticalAKID to set
+	 */
+	public synchronized void setIncludeCriticalAKID(boolean includeCriticalAKID) {
+		this.includeCriticalAKID = includeCriticalAKID;
 	}
 	
 	

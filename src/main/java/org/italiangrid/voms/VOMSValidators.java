@@ -37,35 +37,43 @@ public class VOMSValidators {
 	private VOMSValidators(){}
 	
 	public static VOMSACValidator newValidator(ValidationResultListener listener){
-		return new DefaultVOMSValidator(listener);
+		return new DefaultVOMSValidator.Builder().validationListener(listener).build();
 	}
 	
 	public static VOMSACValidator newValidator(VOMSTrustStore trustStore, 
 			X509CertChainValidatorExt validator,
 			ValidationResultListener vrListener){
 		
-		return new DefaultVOMSValidator(trustStore, validator, vrListener);
+		return new DefaultVOMSValidator.Builder()
+			.trustStore(trustStore)
+			.certChainValidator(validator)
+			.validationListener(vrListener).build();
 		
 	}
 	
 	public static VOMSACValidator newValidator(VOMSTrustStore store,
 			X509CertChainValidatorExt validator,
-			ValidationResultListener resultHandler,
+			ValidationResultListener vrListener,
 			VOMSACLookupStrategy strategy) {
 		
-		return new DefaultVOMSValidator(store, validator, resultHandler,
-				strategy);
+		return new DefaultVOMSValidator.Builder()
+			.trustStore(store)
+			.certChainValidator(validator)
+			.validationListener(vrListener)
+			.acLookupStrategy(strategy).build();
 	}
 	
 	public static VOMSACValidator newValidator(VOMSTrustStore trustStore, 
 			X509CertChainValidatorExt validator){
 		
-		return new DefaultVOMSValidator(trustStore, validator);
-		
+		return new DefaultVOMSValidator.Builder()
+			.trustStore(trustStore)
+			.certChainValidator(validator)
+			.build();
 	}
 	
 	public static VOMSACValidator newValidator(){
-		return new DefaultVOMSValidator();
+		return new DefaultVOMSValidator.Builder().build();
 	}
 	
 	public static VOMSACParser newParser(){

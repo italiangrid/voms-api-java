@@ -29,9 +29,12 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.List;
 
 
 import eu.emi.security.authn.x509.X509Credential;
+import eu.emi.security.authn.x509.helpers.CertificateHelpers;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
 
@@ -61,11 +64,16 @@ public class CredentialsUtils {
 			throws UnrecoverableKeyException, KeyStoreException, IllegalArgumentException,
 			NoSuchAlgorithmException, IOException, NoSuchProviderException, CertificateException {
 
-		X509Certificate[] chain = uc.getCertificateChain();
+		X509Certificate[] chain = CertificateHelpers.sortChain(Arrays.asList(uc.getCertificateChain()));
 
-		for (X509Certificate c : chain)
-			CertificateUtils.saveCertificate(os, c, Encoding.PEM);
-
+		for (X509Certificate c : chain){
+			
+			int basicConstraints = c.getBasicConstraints();
+			
+			// Only save non-CA certs to proxy file
+			if (basicConstraints < 0)
+				CertificateUtils.saveCertificate(os, c, Encoding.PEM);
+		}
 		PrivateKey key = uc.getKey();
 
 		if (key != null)

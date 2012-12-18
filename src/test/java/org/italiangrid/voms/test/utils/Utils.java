@@ -28,12 +28,16 @@ import java.util.Set;
 
 import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
+import org.italiangrid.voms.ac.impl.DefaultVOMSValidationStrategy;
+import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
+import org.italiangrid.voms.ac.impl.LocalHostnameResolver;
 import org.italiangrid.voms.request.VOMSACService;
 import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
 import org.italiangrid.voms.request.impl.DefaultVOMSACService;
 import org.italiangrid.voms.request.impl.DefaultVOMSServerInfo;
+import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.mockito.Mockito;
@@ -87,6 +91,13 @@ public class Utils implements Fixture{
 		return CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
 	}
 	
+	public static VOMSACValidator getVOMSValidator(LocalHostnameResolver resolver){
+		X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
+		VOMSTrustStore ts  = new DefaultVOMSTrustStore(Arrays.asList(vomsdir)); 
+		return new DefaultVOMSValidator.Builder()
+			.validationStrategy(new DefaultVOMSValidationStrategy(ts, validator, resolver))
+			.build();
+	}
 	public static VOMSACValidator getVOMSValidator(){
 		X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
 		return VOMSValidators.newValidator(new DefaultVOMSTrustStore(Arrays.asList(vomsdir)), validator);
@@ -101,6 +112,10 @@ public class Utils implements Fixture{
 
 	public static PEMCredential getAACredential() throws KeyStoreException, CertificateException, IOException{
 		return new PEMCredential(aaKey, aaCert, keyPassword.toCharArray());	
+	}
+	
+	public static PEMCredential getAACredential2() throws KeyStoreException, CertificateException, IOException{
+		return new PEMCredential(aaKey2, aaCert2, keyPassword.toCharArray());	
 	}
 	
 	public static PEMCredential getTestUserCredential() throws KeyStoreException, CertificateException, IOException{
@@ -130,4 +145,6 @@ public class Utils implements Fixture{
 		cal.set(year,month,day);
 		return cal.getTime();
 	}
+	
+	
 }

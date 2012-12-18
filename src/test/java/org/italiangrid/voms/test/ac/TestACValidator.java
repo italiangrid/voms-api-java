@@ -15,29 +15,42 @@
  */
 package org.italiangrid.voms.test.ac;
 
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.other;
+import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.Assert;
 
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.x509.AttributeCertificate;
+import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSValidators;
+import org.italiangrid.voms.ac.VOMSACParser;
 import org.italiangrid.voms.ac.VOMSACValidator;
+import org.italiangrid.voms.ac.VOMSAttributesNormalizationStrategy;
 import org.italiangrid.voms.ac.VOMSValidationResult;
+import org.italiangrid.voms.ac.impl.LocalHostnameResolver;
 import org.italiangrid.voms.error.VOMSValidationErrorCode;
 import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
-import org.italiangrid.voms.util.CertificateValidatorBuilder;
+import org.italiangrid.voms.test.utils.VOMSAA;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -143,7 +156,7 @@ public class TestACValidator implements Fixture{
 		assertTrue(results.size() == 1);
 		VOMSValidationResult result = results.get(0);
 		Assert.assertFalse(result.isValid());
-		// System.out.println(result.getValidationErrors());
+		
 		
 		Assert.assertEquals(4, result.getValidationErrors().size());
 		
@@ -162,5 +175,237 @@ public class TestACValidator implements Fixture{
 				result.getValidationErrors().get(3).getErrorCode());
 		
 	}
+	
+	@Test
+	public void testEmptyACCertsExtensionSuccess() throws Exception{
+		
+		VOMSAA aa = Utils.getVOMSAA();
+		aa.setIncludeEmptyACCertsExtension(true);
+		VOMSACValidator validator = Utils.getVOMSValidator();
+		
+		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
+					Arrays.asList("/test.vo"));
+		
+		List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
+		
+		Assert.assertEquals(1, results.size());
+		VOMSValidationResult r = results.get(0);
+		
+		Assert.assertTrue(r.isValid());
+		Assert.assertEquals(1,
+				r.getValidationErrors().size());
+		
+		Assert.assertEquals(VOMSValidationErrorCode.emptyAcCertsExtension, 
+				r.getValidationErrors().get(0).getErrorCode());
+	}
+	
+	@Test
+	public void testMissingACCertsExtensionFailure() throws Exception{
+		
+		VOMSAA aa = Utils.getVOMSAA();
 
+		aa.setSkipACCertsExtension(true);
+		aa.setVoName("test.vo.2");
+		aa.setHost("wilco.cnaf.infn.it");
+		aa.setCredential(Utils.getAACredential2());
+		
+		VOMSACValidator validator = Utils.getVOMSValidator();
+		
+		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
+					Arrays.asList("/test.vo.2"));
+		
+		List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
+		
+		Assert.assertEquals(1, results.size());
+		VOMSValidationResult r = results.get(0);
+		
+		Assert.assertFalse(r.isValid());
+		
+		Assert.assertEquals(2,
+				r.getValidationErrors().size());
+		
+		Assert.assertEquals(VOMSValidationErrorCode.emptyAcCertsExtension, 
+				r.getValidationErrors().get(0).getErrorCode());
+		
+		Assert.assertEquals(VOMSValidationErrorCode.aaCertNotFound, 
+				r.getValidationErrors().get(1).getErrorCode());
+		
+	}
+	
+	
+	@Test
+	public void testInvalidLSCSignatureFailure() throws Exception {
+		VOMSAA aa = Utils.getVOMSAA();
+		aa.setVoName("test.vo.2");
+		aa.setHost("wilco.cnaf.infn.it");
+		aa.setCredential(Utils.getAACredential2());
+		aa.setUseFakeSignatureBits(true);
+		
+		VOMSACValidator validator = Utils.getVOMSValidator();
+		
+		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
+					Arrays.asList("/test.vo.2"));
+		
+		List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
+		
+		Assert.assertEquals(1, results.size());
+		VOMSValidationResult r = results.get(0);
+		
+		Assert.assertFalse(r.isValid());
+		Assert.assertEquals(2, r.getValidationErrors().size());
+		
+		Assert.assertEquals(VOMSValidationErrorCode.acCertFailsSignatureVerification,
+				r.getValidationErrors().get(0).getErrorCode());
+		
+		Assert.assertEquals(VOMSValidationErrorCode.aaCertNotFound,
+				r.getValidationErrors().get(1).getErrorCode());
+	}
+	
+	@Test
+	public void testUnknownCriticalExtensionFailure() throws Exception {
+		VOMSAA aa = Utils.getVOMSAA();
+		aa.setIncludeFakeCriticalExtension(true);
+		
+		VOMSACValidator validator = Utils.getVOMSValidator();
+		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
+				Arrays.asList("/test.vo"));
+		
+		List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
+		Assert.assertEquals(1, results.size());
+		VOMSValidationResult r = results.get(0);
+		
+		Assert.assertFalse(r.isValid());
+		Assert.assertEquals(1, r.getValidationErrors().size());
+		
+		Assert.assertEquals(VOMSValidationErrorCode.other,
+				r.getValidationErrors().get(0).getErrorCode());
+		
+		Assert.assertEquals("Validation error: unknown critical extension found in VOMS AC: 1.3.6.1.4.1.8005.100.120.82",
+				r.getValidationErrors().get(0).getMessage());
+	}
+	
+	@Test
+	public void testCriticalAKIDFailure() throws Exception {
+		VOMSAA aa = Utils.getVOMSAA();
+		aa.setIncludeCriticalAKID(true);
+		
+		VOMSACValidator validator = Utils.getVOMSValidator();
+		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
+				Arrays.asList("/test.vo"));
+		
+		List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
+		Assert.assertEquals(1, results.size());
+		VOMSValidationResult r = results.get(0);
+		
+		Assert.assertFalse(r.isValid());
+		
+		Assert.assertEquals(VOMSValidationErrorCode.other,
+				r.getValidationErrors().get(0).getErrorCode());
+		
+		Assert.assertEquals("Validation error: AuthorityKeyIdentifier AC extension cannot be critical!",
+				r.getValidationErrors().get(0).getMessage());
+	}
+	
+	@Test
+	public void testCriticalNoRevAvailFailure() throws Exception {
+		VOMSAA aa = Utils.getVOMSAA();
+		aa.setIncludeCriticalNoRevAvail(true);
+		
+		VOMSACValidator validator = Utils.getVOMSValidator();
+		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
+				Arrays.asList("/test.vo"));
+		
+		List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
+		Assert.assertEquals(1, results.size());
+		VOMSValidationResult r = results.get(0);
+		
+		Assert.assertFalse(r.isValid());
+		
+		Assert.assertEquals(VOMSValidationErrorCode.other,
+				r.getValidationErrors().get(0).getErrorCode());
+		
+		Assert.assertEquals("Validation error: NoRevAvail AC extension cannot be critical!",
+				r.getValidationErrors().get(0).getMessage());
+	}
+	
+	@Test
+	public void testTargetValidationSuccess() throws Exception {
+		VOMSAA aa = Utils.getVOMSAA();
+		
+		String localhostName;
+		
+		try {
+			
+			localhostName = InetAddress.getLocalHost().getCanonicalHostName();
+		
+		} catch (UnknownHostException e) {
+			throw new VOMSError("Error resolving local hostname: "+e.getMessage(),e);
+		}
+		
+		VOMSACValidator validator = Utils.getVOMSValidator();
+		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
+				Arrays.asList("/test.vo"),
+				null,
+				Arrays.asList(localhostName));
+		
+		List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
+		Assert.assertEquals(1, results.size());
+		VOMSValidationResult r = results.get(0);
+		
+		Assert.assertTrue(r.isValid());
+	}
+	
+	@Test
+	public void testTargetValidationFailure() throws Exception {
+		VOMSAA aa = Utils.getVOMSAA();
+		
+		
+		VOMSACValidator validator = Utils.getVOMSValidator();
+		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
+				Arrays.asList("/test.vo"),
+				null,
+				Arrays.asList("camaghe.cnaf.infn.it"));
+		
+		List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
+		Assert.assertEquals(1, results.size());
+		VOMSValidationResult r = results.get(0);
+		
+		
+		Assert.assertFalse(r.isValid());
+		Assert.assertEquals(1, r.getValidationErrors().size());
+		Assert.assertEquals(VOMSValidationErrorCode.localhostDoesntMatchAcTarget,
+				r.getValidationErrors().get(0).getErrorCode());
+		
+	}
+	
+	@Test
+	public void testResolveHostnameException() throws Exception{
+		VOMSAA aa = Utils.getVOMSAA();
+		
+		VOMSACValidator validator = Utils.getVOMSValidator(new LocalHostnameResolver() {
+			
+			public String resolveLocalHostname() throws UnknownHostException {
+				
+				throw new UnknownHostException("misconfigured machine!");
+			}
+		});
+		
+		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
+				Arrays.asList("/test.vo"),
+				null,
+				Arrays.asList("camaghe.cnaf.infn.it"));
+		
+		List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
+		Assert.assertEquals(1, results.size());
+		VOMSValidationResult r = results.get(0);
+		
+		
+		Assert.assertFalse(r.isValid());
+		Assert.assertEquals(1, r.getValidationErrors().size());
+		Assert.assertEquals(VOMSValidationErrorCode.other,
+				r.getValidationErrors().get(0).getErrorCode());
+		
+		Assert.assertEquals("Validation error: Error resolving localhost name: misconfigured machine!", 
+				r.getValidationErrors().get(0).getMessage());
+	}
 }

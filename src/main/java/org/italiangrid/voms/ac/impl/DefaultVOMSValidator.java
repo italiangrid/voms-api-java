@@ -47,42 +47,76 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	public static final String DEFAULT_TRUST_ANCHORS_DIR = "/etc/grid-security/certificates";
 	
 	private final VOMSACValidationStrategy validationStrategy;
-	private ValidationResultListener validationResultListener;
 	private final VOMSTrustStore trustStore;
+	private ValidationResultListener validationResultListener;
  
-	public DefaultVOMSValidator(ValidationResultListener resultHandler){
-		this(VOMSTrustStores.newTrustStore(), 
-				CertificateValidatorBuilder.buildCertificateValidator(DEFAULT_TRUST_ANCHORS_DIR),
-				resultHandler);
+	public static class Builder{
+		
+		private VOMSACValidationStrategy validationStrategy;
+		private VOMSTrustStore trustStore;
+		private ValidationResultListener validationResultListener;
+		
+		private X509CertChainValidatorExt certChainValidator;
+		private VOMSACLookupStrategy acLookupStrategy;
+		
+		public Builder() {
+		}
+		
+		public Builder validationStrategy(VOMSACValidationStrategy s){
+			this.validationStrategy = s;
+			return this;
+		}
+		
+		public Builder trustStore(VOMSTrustStore ts){
+			this.trustStore = ts;
+			return this;
+		}
+		
+		public Builder validationListener(ValidationResultListener l){
+			this.validationResultListener = l;
+			return this;
+		}
+		
+		public Builder certChainValidator(X509CertChainValidatorExt v){
+			this.certChainValidator = v;
+			return this;
+		}
+		
+		public Builder acLookupStrategy(VOMSACLookupStrategy ls){
+			this.acLookupStrategy = ls;
+			return this;
+		}
+		
+		private void sanityChecks(){
+			if (validationStrategy == null){
+				if (trustStore == null)
+					trustStore = VOMSTrustStores.newTrustStore();
+				
+				if (certChainValidator == null)
+					certChainValidator = CertificateValidatorBuilder.buildCertificateValidator(DEFAULT_TRUST_ANCHORS_DIR);
+				
+				validationStrategy = new DefaultVOMSValidationStrategy(trustStore, certChainValidator);
+			}
+			
+			if (validationResultListener == null)
+				validationResultListener = NullListener.INSTANCE;
+				
+			if (acLookupStrategy == null)
+				acLookupStrategy = new LeafACLookupStrategy();
+		}
+		
+		public DefaultVOMSValidator build(){
+			sanityChecks();
+			return new DefaultVOMSValidator(this);
+		}
 	}
 	
-	public DefaultVOMSValidator() {
-		this (VOMSTrustStores.newTrustStore(), 
-				CertificateValidatorBuilder.buildCertificateValidator(DEFAULT_TRUST_ANCHORS_DIR),
-				NullListener.INSTANCE);
-	}
-	
-	public DefaultVOMSValidator(VOMSTrustStore store, 
-			X509CertChainValidatorExt validator){
-		this(store, validator, NullListener.INSTANCE);
-	}
-	
-	public DefaultVOMSValidator(VOMSTrustStore store, 
-			X509CertChainValidatorExt validator,
-			ValidationResultListener resultHandler){
-		trustStore = store;
-		validationStrategy = new DefaultVOMSValidationStrategy(trustStore, validator);
-		this.validationResultListener = resultHandler;
-	}
-	
-	public DefaultVOMSValidator(VOMSTrustStore store, 
-			X509CertChainValidatorExt validator,
-			ValidationResultListener resultHandler,
-			VOMSACLookupStrategy strategy){
-		super(strategy);
-		trustStore = store;
-		validationStrategy = new DefaultVOMSValidationStrategy(trustStore, validator);
-		this.validationResultListener = resultHandler;
+	private DefaultVOMSValidator(Builder b){
+		super(b.acLookupStrategy);
+		
+		this.validationStrategy = b.validationStrategy;
+		this.trustStore = b.trustStore;
+		this.validationResultListener = b.validationResultListener;
 	}
 	
 	public synchronized List<VOMSValidationResult> validateWithResult(X509Certificate[] validatedChain){
