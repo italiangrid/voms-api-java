@@ -162,6 +162,38 @@ public class CertificateValidatorBuilder {
 	 * @param validationErrorListener
 	 *            the listener that will receive notification about validation
 	 *            errors
+	 * @param storeListener
+	 *            the listener that will be informed of trust store load errors
+	 * 
+	 * @param updateInterval
+	 *            the trust anchor store update interval
+	 *            
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 * 
+	 */
+	public static X509CertChainValidatorExt buildCertificateValidator(
+			String trustAnchorsDir,
+			ValidationErrorListener validationErrorListener,
+			StoreUpdateListener storeListener,
+			long updateInterval) {
+
+		return buildCertificateValidator(trustAnchorsDir,
+				validationErrorListener, storeListener, 
+				updateInterval, 
+				DEFAULT_NS_CHECKS,
+				DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
+	}
+	
+	/**
+	 * Builds an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 * 
+	 * @param trustAnchorsDir
+	 *            the directory where trust anchors are loaded from
+	 * @param validationErrorListener
+	 *            the listener that will receive notification about validation
+	 *            errors
 	 * @param updateInterval
 	 *            the trust anchor store update interval
 	 * 

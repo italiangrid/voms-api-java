@@ -36,6 +36,9 @@ public class VOMSTrustStores {
 		return new DefaultUpdatingVOMSTrustStore();
 	}
 	
+	
+	
+	
 	/**
 	 * Creates a {@link VOMSTrustStore} configured according to the parameters
 	 * passed as argument
