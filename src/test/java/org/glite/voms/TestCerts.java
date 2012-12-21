@@ -1,23 +1,22 @@
 package org.glite.voms;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.glite.voms.contact.cli.VomsProxyInitClient;
+import org.glite.voms.contact.UserCredentials;
+import org.glite.voms.contact.VOMSProxyInit;
+import org.glite.voms.contact.VOMSRequestOptions;
 
 public class TestCerts extends TestCase implements TestFixture {
 
 	public static final Logger log = Logger.getLogger(TestCerts.class);
-
-	private final String proxyFileName = File.separator + "tmp"
-			+ File.separator + "x509up_u_" + System.getProperty("user.name");
 
 	private final String password = "pass";
 
@@ -26,15 +25,20 @@ public class TestCerts extends TestCase implements TestFixture {
 
 		final String voName = "test.vo";
 
-		final String fqan = "/test.vo";
-
-		String[] args = { "-usercert", dnWithParenthesisCert, "-userkey",
-				dnWithParenthesisKey, "-voms", voName + ":" + fqan,
-				"-password", password };
-
 		log.info("TestCerts.testProxyWithParenthesesInDN");
 
-		new VomsProxyInitClient(args);
+		UserCredentials credentials = UserCredentials.instance(
+				dnWithParenthesisCert, dnWithParenthesisKey, password);
+
+		VOMSProxyInit proxyInit = VOMSProxyInit.instance(credentials);
+
+		Map<String, VOMSRequestOptions> vomsOptions = new HashMap<String, VOMSRequestOptions>();
+
+		VOMSRequestOptions requestOptions = new VOMSRequestOptions();
+		requestOptions.setVoName(voName);
+		vomsOptions.put(voName, requestOptions);
+
+		UserCredentials proxy = proxyInit.getVomsProxy(vomsOptions.values());
 
 		PKIStore caStore = new PKIStore(trustDir, PKIStore.TYPE_CADIR, true);
 		PKIStore vomsTrustStore = new PKIStore(vomsDir, PKIStore.TYPE_VOMSDIR,
@@ -42,8 +46,7 @@ public class TestCerts extends TestCase implements TestFixture {
 
 		PKIVerifier verifier = new PKIVerifier(vomsTrustStore, caStore);
 
-		X509Certificate[] proxyCertificateChain = PKIUtils
-				.loadCertificates(proxyFileName);
+		X509Certificate[] proxyCertificateChain = proxy.getUserChain();
 
 		boolean validChain = verifier.verify(proxyCertificateChain);
 
@@ -52,8 +55,6 @@ public class TestCerts extends TestCase implements TestFixture {
 		assertTrue("Certificate validation failed", validChain);
 
 		verifier.cleanup();
-
-		FileUtils.deleteQuietly(new File(proxyFileName));
 
 	}
 }
