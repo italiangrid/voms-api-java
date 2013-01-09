@@ -13,12 +13,21 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
 		<assembly.java.dir>/usr/share/java</assembly.java.dir>
 		<assembly.doc.dir>/usr/share/doc/${project.name}-${project.version}</assembly.doc.dir>
 		<assembly.javadoc.dir>/usr/share/javadoc/${project.name}</assembly.javadoc.dir>
 		<bouncycastle.version>1.45</bouncycastle.version>
+		<excludedTests>nothing</excludedTests>
 	</properties>
+
+	<profiles>
+		<profile>
+			<id>skipLoadTests</id>
+			<properties>
+				<excludedTests>LoadTest.java</excludedTests>
+			</properties>
+		</profile>
+	</profiles>
 
 	<developers>
 		<developer>
@@ -43,6 +52,7 @@
 
 	<build>
 		<plugins>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -82,6 +92,20 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.13</version>
+				<configuration>
+					<excludes>
+						<exclude>${excludedTests}</exclude>
+					</excludes>
+					<forkMode>always</forkMode>
+					<argLine>-Xmx128M</argLine>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 
