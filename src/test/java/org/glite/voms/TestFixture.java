@@ -6,9 +6,18 @@ public interface TestFixture {
 	public static final String noCRLsTrustDir = "src/test/resources/no-crls-trust-anchors";
 
 	public static final String vomsDir = "src/test/resources/vomsdir";
+	
 	public static final String testCert = "src/test/resources/certs/quasi_revoked.cert.pem";
 	public static final String revokedCert = "src/test/resources/certs/revoked.cert.pem";
+
+	public static final String passphrase = "pass";
+	
 	public static final String validCert = "src/test/resources/certs/test0.cert.pem";
+	public static final String validCertKey = "src/test/resources/certs/test0.key.pem";
+	
+	public static final String anotherValidCert = "src/test/resources/certs/test1.cert.pem";
+	public static final String anotherValidCertKey = "src/test/resources/certs/test1.key.pem";
+	
 	public static final String dnWithParenthesisCert = "src/test/resources/certs/dn_with_parenthesis.cert.pem";
 	public static final String dnWithParenthesisKey = "src/test/resources/certs/dn_with_parenthesis.key.pem";
 
