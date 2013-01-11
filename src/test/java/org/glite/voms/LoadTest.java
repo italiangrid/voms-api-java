@@ -21,7 +21,7 @@ public class LoadTest extends TestCase {
 
 	private List<X509Certificate[]> chains = new ArrayList<X509Certificate[]>();
 	
-	private int NUM_ITERATIONS = 10000;
+	private int NUM_ITERATIONS = 100000;
 	
 	private String VO_NAME = "test.vo";
 	

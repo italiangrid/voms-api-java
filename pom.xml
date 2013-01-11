@@ -17,14 +17,14 @@
 		<assembly.doc.dir>/usr/share/doc/${project.name}-${project.version}</assembly.doc.dir>
 		<assembly.javadoc.dir>/usr/share/javadoc/${project.name}</assembly.javadoc.dir>
 		<bouncycastle.version>1.45</bouncycastle.version>
-		<excludedTests>nothing</excludedTests>
+		<excludedTests>**/LoadTest.java</excludedTests>
 	</properties>
 
 	<profiles>
 		<profile>
-			<id>skipLoadTests</id>
+			<id>enableLoadTests</id>
 			<properties>
-				<excludedTests>LoadTest.java</excludedTests>
+				<excludedTests>none</excludedTests>
 			</properties>
 		</profile>
 	</profiles>
