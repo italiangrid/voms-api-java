@@ -71,7 +71,8 @@ public class TestRequests implements Fixture{
 		PEMCredential holder = Utils.getTestUserCredential();
 		
 		try{
-			AttributeCertificate ac = acService.getVOMSAttributeCertificate(holder, req);
+			
+			acService.getVOMSAttributeCertificate(holder, req);
 			
 		}catch (VOMSError e) {
 			Assert.assertEquals("VOMS server for VO test.unknown.vo is not known! Check your vomses configuration.", e.getMessage());

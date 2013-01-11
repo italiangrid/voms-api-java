@@ -30,8 +30,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.List;
-
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.CertificateHelpers;
@@ -100,7 +98,8 @@ public class CredentialsUtils {
 	public static void saveProxyCredentials(String proxyFileName, X509Credential uc) throws IOException, UnrecoverableKeyException, KeyStoreException, IllegalArgumentException, NoSuchAlgorithmException, NoSuchProviderException, CertificateException{
 			
 		File f = new File(proxyFileName);
-		FileChannel channel = new RandomAccessFile(f, "rws").getChannel();
+		RandomAccessFile raf = new RandomAccessFile(f, "rws");
+		FileChannel channel = raf.getChannel();
 		FilePermissionHelper.setProxyPermissions(proxyFileName);
 		channel.truncate(0);
 		
@@ -111,6 +110,7 @@ public class CredentialsUtils {
 		channel.write(ByteBuffer.wrap(baos.toByteArray()));
 		
 		channel.close();		
+		raf.close();
 		
 	}
 }

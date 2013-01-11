@@ -15,8 +15,6 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.italiangrid.voms.error.VOMSValidationErrorCode.other;
-import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -28,18 +26,12 @@ import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import junit.framework.Assert;
 
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.x509.AttributeCertificate;
-import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSValidators;
-import org.italiangrid.voms.ac.VOMSACParser;
 import org.italiangrid.voms.ac.VOMSACValidator;
-import org.italiangrid.voms.ac.VOMSAttributesNormalizationStrategy;
 import org.italiangrid.voms.ac.VOMSValidationResult;
 import org.italiangrid.voms.ac.impl.LocalHostnameResolver;
 import org.italiangrid.voms.error.VOMSValidationErrorCode;
@@ -50,7 +42,6 @@ import org.italiangrid.voms.test.utils.Utils;
 import org.italiangrid.voms.test.utils.VOMSAA;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.PEMCredential;

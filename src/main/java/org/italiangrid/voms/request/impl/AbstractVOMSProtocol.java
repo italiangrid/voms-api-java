@@ -17,12 +17,9 @@ package org.italiangrid.voms.request.impl;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.request.SSLSocketFactoryProvider;
 import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSProtocolListener;
-import org.italiangrid.voms.request.VOMSServerInfo;
-import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;

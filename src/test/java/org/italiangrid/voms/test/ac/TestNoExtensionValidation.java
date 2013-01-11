@@ -15,8 +15,6 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.junit.Assert.*;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;

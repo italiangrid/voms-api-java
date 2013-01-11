@@ -22,14 +22,12 @@ import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.italiangrid.voms.VOMSError;
-import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSProtocolError;
 import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
-import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;

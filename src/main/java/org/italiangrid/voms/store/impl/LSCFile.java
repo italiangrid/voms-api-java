@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.italiangrid.voms.store.LSCInfo;
 
-import eu.emi.security.authn.x509.helpers.CertificateHelpers;
 import eu.emi.security.authn.x509.impl.OpensslNameUtils;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 

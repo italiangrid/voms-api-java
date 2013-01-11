@@ -61,7 +61,7 @@ public class TestACParser implements Fixture{
 	@Test(expected=NullPointerException.class)
 	public void testParseNullChainFailure(){
 		DefaultVOMSACParser parser = new DefaultVOMSACParser();
-		List<VOMSAttribute> attrs = parser.parse(null);
+		parser.parse(null);
 	}
 	
 	@Test
@@ -73,7 +73,7 @@ public class TestACParser implements Fixture{
 		DefaultVOMSACParser parser = new DefaultVOMSACParser();
 		
 		try{
-			List<VOMSAttribute> attrs = parser.parse(proxy.getCertificateChain());
+			parser.parse(proxy.getCertificateChain());
 		}catch (VOMSError e) {
 			Assert.assertEquals("Non conformant VOMS Attribute certificate: unsupported attribute values encoding.", e.getMessage());
 			return;

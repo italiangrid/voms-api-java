@@ -18,7 +18,6 @@ package org.italiangrid.voms.credential.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import org.bouncycastle.openssl.PasswordFinder;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
