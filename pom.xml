@@ -17,7 +17,7 @@
 		<assembly.doc.dir>/usr/share/doc/${project.name}-${project.version}</assembly.doc.dir>
 		<assembly.javadoc.dir>/usr/share/javadoc/${project.name}</assembly.javadoc.dir>
 		<bouncycastle.version>1.45</bouncycastle.version>
-		<excludedTests>**/LoadTest.java</excludedTests>
+		<excludedTests>**/LoadTest.java,**/TestCerts.java</excludedTests>
 	</properties>
 
 	<profiles>
