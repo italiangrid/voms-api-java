@@ -190,7 +190,7 @@ you use maven).
 <dependency>
   <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
-  <version>3.0-SNAPSHOT</version>
+  <version>3.0.0</version>
 </dependency>
 ```
 
