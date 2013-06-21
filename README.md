@@ -151,10 +151,7 @@ You can easily build one with the `CertificateValidatorBuilder` VOMS helper clas
 X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator();
 VOMSACService service = new DefaultVOMSACService.Builder(validator).build();
 
-DefaultVOMSACRequest request = new DefaultVOMSACRequest();
-request.setLifetime(12);
-request.setVoName("atlas");
-
+DefaultVOMSACRequest request = new DefaultVOMSACRequest.Builder("atlas").lifetime(10).build();
     
 AttributeCertificate attributeCertificate = service.getVOMSAttributeCertificate(cred, request);
 ```
