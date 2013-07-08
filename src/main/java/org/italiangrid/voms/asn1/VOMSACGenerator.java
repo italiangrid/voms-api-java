@@ -43,6 +43,7 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.AttributeCertificateHolder;
 import org.bouncycastle.cert.AttributeCertificateIssuer;
+import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.cert.X509v2AttributeCertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
@@ -293,28 +294,32 @@ public class VOMSACGenerator implements VOMSConstants{
 		
 		X509v2AttributeCertificateBuilder builder = new X509v2AttributeCertificateBuilder(holder, issuer, serialNumber, notBefore, notAfter);
 		builder.addAttribute(VOMS_FQANS_OID, buildFQANsAttributeContent(fqans));
-		
-		if (gas != null && !gas.isEmpty())
-			builder.addExtension(VOMS_GENERIC_ATTRS_OID, false, buildGAExtensionContent(gas));
-		
-		if (targets != null && !targets.isEmpty())
-			builder.addExtension(X509Extension.targetInformation , true, buildTargetsExtensionContent(targets));
-		
-		if (!skipACCertsExtension)
-			builder.addExtension(VOMS_CERTS_OID, false, buildACCertsExtensionContent());
-		
-		if (includeFakeCriticalExtensions)
-			builder.addExtension(FAKE_EXT_OID, true, new DERSequence());
-		
-		if (includeCriticalNoRevAvail)
-			builder.addExtension(X509Extension.noRevAvail, true, new DERNull());
-		
-		if (includeCriticalAKID){
-			AuthorityKeyIdentifier akid = buildAuthorityKeyIdentifier();
-			builder.addExtension(X509Extension.authorityKeyIdentifier, true, akid != null ? akid : new DERNull());
-		}
-		
-		return builder.build(getSigner());
+
+        try {
+            if (gas != null && !gas.isEmpty())
+                builder.addExtension(VOMS_GENERIC_ATTRS_OID, false, buildGAExtensionContent(gas));
+
+            if (targets != null && !targets.isEmpty())
+                builder.addExtension(X509Extension.targetInformation , true, buildTargetsExtensionContent(targets));
+
+            if (!skipACCertsExtension)
+                builder.addExtension(VOMS_CERTS_OID, false, buildACCertsExtensionContent());
+
+            if (includeFakeCriticalExtensions)
+                builder.addExtension(FAKE_EXT_OID, true, new DERSequence());
+
+            if (includeCriticalNoRevAvail)
+                builder.addExtension(X509Extension.noRevAvail, true, new DERNull());
+
+            if (includeCriticalAKID){
+                AuthorityKeyIdentifier akid = buildAuthorityKeyIdentifier();
+                builder.addExtension(X509Extension.authorityKeyIdentifier, true, akid != null ? akid : new DERNull());
+            }
+        } catch (CertIOException e) {
+            throw new VOMSError(e.getMessage(), e);
+        }
+
+        return builder.build(getSigner());
 	}
 	
 	public synchronized CertificateExtension generateVOMSExtension(List<X509AttributeCertificateHolder> acs){
