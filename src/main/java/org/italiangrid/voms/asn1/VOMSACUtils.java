@@ -39,6 +39,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.Attribute;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.IetfAttrSyntax;
 import org.bouncycastle.asn1.x509.Target;
@@ -159,7 +160,7 @@ public class VOMSACUtils implements VOMSConstants{
 	private static List<String> deserializeACTargets(X509AttributeCertificateHolder ac){
 		List<String> targets = new ArrayList<String>();
 		
-		X509Extension targetExtension = ac.getExtension(X509Extension.targetInformation);
+		Extension targetExtension = ac.getExtension(X509Extension.targetInformation);
 		
 		if (targetExtension == null)
 			return targets;
@@ -306,7 +307,7 @@ public class VOMSACUtils implements VOMSConstants{
 		
 		List<VOMSGenericAttribute> gas = new ArrayList<VOMSGenericAttribute>();
 		
-		X509Extension gasExtension = ac.getExtension(VOMS_GENERIC_ATTRS_OID);
+		Extension gasExtension = ac.getExtension(VOMS_GENERIC_ATTRS_OID);
 		
 		if (gasExtension == null)
 			return gas;
@@ -364,7 +365,7 @@ public class VOMSACUtils implements VOMSConstants{
 	private static X509Certificate[] deserializeACCerts(X509AttributeCertificateHolder ac){
 		List<X509Certificate> certs = new ArrayList<X509Certificate>();
 		
-		X509Extension e = ac.getExtension(VOMS_CERTS_OID);
+		Extension e = ac.getExtension(VOMS_CERTS_OID);
 		
 		if (e == null)
 			return null;

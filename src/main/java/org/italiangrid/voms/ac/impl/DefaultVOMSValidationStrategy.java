@@ -39,6 +39,7 @@ import java.util.List;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
@@ -215,7 +216,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 	
 	private boolean checkNoRevAvailExtension(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		
-		X509Extension noRevAvail = attributes.getVOMSAC().getExtension(X509Extension.noRevAvail);
+		Extension noRevAvail = attributes.getVOMSAC().getExtension(X509Extension.noRevAvail);
 		if (noRevAvail != null && noRevAvail.isCritical()){
 			validationErrors.add(newErrorMessage(other, "NoRevAvail AC extension cannot be critical!"));
 			return false;
@@ -225,7 +226,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 	
 	private boolean checkAuthorityKeyIdentifierExtension(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		
-		X509Extension authKeyId = attributes.getVOMSAC().getExtension(X509Extension.authorityKeyIdentifier);
+		Extension authKeyId = attributes.getVOMSAC().getExtension(X509Extension.authorityKeyIdentifier);
 		if (authKeyId != null && authKeyId.isCritical()){
 			validationErrors.add(newErrorMessage(other, "AuthorityKeyIdentifier AC extension cannot be critical!"));
 			return false;
