@@ -64,18 +64,26 @@ public class CredentialsUtils {
 
 		X509Certificate[] chain = CertificateHelpers.sortChain(Arrays.asList(uc.getCertificateChain()));
 
-		for (X509Certificate c : chain){
-			
-			int basicConstraints = c.getBasicConstraints();
-			
-			// Only save non-CA certs to proxy file
-			if (basicConstraints < 0)
-				CertificateUtils.saveCertificate(os, c, Encoding.PEM);
-		}
 		PrivateKey key = uc.getKey();
-
+		X509Certificate cert = uc.getCertificate();
+				
+		CertificateUtils.saveCertificate(os, cert, Encoding.PEM);
+				
 		if (key != null)
 			CertificateUtils.savePrivateKey(os, key, Encoding.PEM, null, null);
+				
+		X509Certificate c=null;
+		for (int index=1;index<chain.length;index++){
+					
+			c=chain[index];
+					
+			int basicConstraints = c.getBasicConstraints();
+					
+			// Only save non-CA certs to proxy file
+			if (basicConstraints < 0)
+				CertificateUtils.saveCertificate(os,c, Encoding.PEM);
+					
+		}
 
 		os.flush();
 	}
