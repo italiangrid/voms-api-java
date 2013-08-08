@@ -110,6 +110,7 @@ public class TestACGeneration {
 	static OpensslCertChainValidator certValidator = null;
 	
 	static VOMSValidationErrorMessage expiredCertErrorMessage;
+	static VOMSValidationErrorMessage expiredCertCRLErrorMessage;
 	static VOMSValidationErrorMessage revokedCertErrorMessage;
 	
 	static VOMSACGenerator defaultGenerator;
@@ -138,6 +139,7 @@ public class TestACGeneration {
 		certValidator = new OpensslCertChainValidator(trustAnchorsDir);
 		
 		expiredCertErrorMessage = newErrorMessage(canlError, "Certificate has expired on: Fri Dec 02 01:00:00 CET 2011");
+		expiredCertCRLErrorMessage = newErrorMessage(canlError, "CRL for an expired certificate was not resolved Cause: No CRLs found for issuer \"CN=Test CA, O=IGI, C=IT\"");
 		revokedCertErrorMessage = newErrorMessage(canlError, "Certificate was revoked at: Wed Sep 26 17:25:24 CEST 2012, the reason reported is: unspecified");
 		
 		defaultGenerator = new VOMSACGenerator(aaCredential, defaultVO, defaultHost, port);
@@ -257,6 +259,7 @@ public class TestACGeneration {
 		
 		ValidationResultChecker c = new ValidationResultChecker(false,
 				expiredCertErrorMessage,
+				expiredCertCRLErrorMessage,
 				newErrorMessage(invalidAcCert),
 				newErrorMessage(aaCertNotFound));
 				
@@ -275,7 +278,7 @@ public class TestACGeneration {
 	@Test
 	public void testRevokedAACertValidationFailure(){
 		ValidationResultChecker c = new ValidationResultChecker(false, 
-				revokedCertErrorMessage, 
+				revokedCertErrorMessage,
 				newErrorMessage(invalidAcCert),
 				newErrorMessage(aaCertNotFound));
 		
