@@ -7,7 +7,7 @@
 
   <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
+  <version>3.0.1.canl130-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>voms-api-java</name>
