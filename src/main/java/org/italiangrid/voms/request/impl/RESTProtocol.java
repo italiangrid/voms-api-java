@@ -21,7 +21,6 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSProtocolError;
@@ -92,7 +91,11 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 		
 		}catch (IOException e) {
 			
-			throw new VOMSError(e.getMessage(),e);
+			throw new VOMSProtocolError(e.getMessage(),
+				endpoint,
+				request,
+				credential,
+				e);
 		}
 		
 		VOMSResponse response = responseParsingStrategy.parse(is);
