@@ -36,7 +36,7 @@
     <assembly.doc.dir>/usr/share/doc/${project.name}</assembly.doc.dir>
     <assembly.javadoc.dir>/usr/share/javadoc/${project.name}</assembly.javadoc.dir>
     <junitVersion>4.10</junitVersion>
-    <canlVersion>1.1.0</canlVersion>
+    <canlVersion>1.2.0</canlVersion>
     <bcVersion>1.46</bcVersion>
     <licensePluginVersion>1.9.0</licensePluginVersion>
     <releasePluginVersion>2.2.2</releasePluginVersion>
