@@ -67,7 +67,7 @@ import eu.emi.security.authn.x509.proxy.CertificateExtension;
  * 
  */
 public class VOMSACGenerator implements VOMSConstants {
-	
+
 	public static enum ACGenerationProperties {
 		SKIP_AC_CERTS_EXTENSION,
 		FAKE_SIGNATURE_BITS,
@@ -78,7 +78,7 @@ public class VOMSACGenerator implements VOMSConstants {
 	}
 
 	public static final EnumSet<ACGenerationProperties> 
-		defaultGenerationProperties = EnumSet.noneOf(ACGenerationProperties.class);
+	defaultGenerationProperties = EnumSet.noneOf(ACGenerationProperties.class);
 
 	static class RandomContentSigner implements ContentSigner {
 
@@ -91,7 +91,7 @@ public class VOMSACGenerator implements VOMSConstants {
 		public RandomContentSigner(String sigAlgName) {
 
 			this.sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder()
-				.find(sigAlgName);
+			.find(sigAlgName);
 		}
 
 		public AlgorithmIdentifier getAlgorithmIdentifier() {
@@ -284,13 +284,13 @@ public class VOMSACGenerator implements VOMSConstants {
 		return targetExtensionContent;
 	}
 
-	
+
 	public X509AttributeCertificateHolder generateVOMSAttributeCertificate(
 		List<String> fqans,
 		List<VOMSGenericAttribute> gas, List<String> targets,
 		X509Certificate holderCert, BigInteger serialNumber, Date notBefore,
 		Date notAfter, String voName, String host, int port){
-		
+
 		return generateVOMSAttributeCertificate(defaultGenerationProperties, 
 			fqans, 
 			gas, 
@@ -303,8 +303,8 @@ public class VOMSACGenerator implements VOMSConstants {
 			host, 
 			port);
 	}
-	
-	
+
+
 	public X509AttributeCertificateHolder generateVOMSAttributeCertificate(
 		EnumSet<ACGenerationProperties> generationProperties, List<String> fqans,
 		List<VOMSGenericAttribute> gas, List<String> targets,
@@ -334,11 +334,11 @@ public class VOMSACGenerator implements VOMSConstants {
 
 		if (gas != null && !gas.isEmpty())
 			builder
-				.addExtension(
-					VOMS_GENERIC_ATTRS_OID,
-					false,
-					buildGAExtensionContent(generationProperties, gas,
-						policyAuthorityInfo));
+			.addExtension(
+				VOMS_GENERIC_ATTRS_OID,
+				false,
+				buildGAExtensionContent(generationProperties, gas,
+					policyAuthorityInfo));
 
 		if (targets != null && !targets.isEmpty())
 			builder.addExtension(X509Extension.targetInformation, true,
@@ -353,16 +353,27 @@ public class VOMSACGenerator implements VOMSConstants {
 			.contains(ACGenerationProperties.INCLUDE_FAKE_CRITICAL_EXTENSION))
 			builder.addExtension(FAKE_EXT_OID, true, new DERSequence());
 
-		if (generationProperties
-			.contains(ACGenerationProperties.INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION))
-			builder.addExtension(X509Extension.noRevAvail, true, new DERNull());
+		boolean noRevAvailIsCritical = false;
+		boolean akidIsCritical = false;
+
 
 		if (generationProperties
-			.contains(ACGenerationProperties.INCLUDE_CRITICAL_AKID_EXTENSION)) {
-			AuthorityKeyIdentifier akid = buildAuthorityKeyIdentifier();
-			builder.addExtension(X509Extension.authorityKeyIdentifier, true,
-				akid != null ? akid : new DERNull());
-		}
+			.contains(ACGenerationProperties.INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION))
+			noRevAvailIsCritical = true;
+
+		if (generationProperties
+			.contains(ACGenerationProperties.INCLUDE_CRITICAL_AKID_EXTENSION)) 
+			akidIsCritical = true;
+
+		builder.addExtension(X509Extension.noRevAvail, 
+			noRevAvailIsCritical, 
+			new DERNull());
+
+		AuthorityKeyIdentifier akid = buildAuthorityKeyIdentifier();
+
+		builder.addExtension(X509Extension.authorityKeyIdentifier, 
+			akidIsCritical,
+			akid != null ? akid : new DERNull());
 
 		return builder.build(getSigner(generationProperties));
 
