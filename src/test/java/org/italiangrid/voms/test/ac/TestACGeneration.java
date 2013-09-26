@@ -283,7 +283,7 @@ public class TestACGeneration {
 	@Test
 	public void testRevokedAACertValidationFailure(){
 		ValidationResultChecker c = new ValidationResultChecker(false, 
-				revokedCertErrorMessage, 
+				revokedCertErrorMessage,
 				newErrorMessage(invalidAcCert),
 				newErrorMessage(aaCertNotFound));
 		

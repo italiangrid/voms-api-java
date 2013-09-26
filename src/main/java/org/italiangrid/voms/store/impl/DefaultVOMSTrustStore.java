@@ -37,7 +37,7 @@ import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
 import org.italiangrid.voms.util.NullListener;
 
-import eu.emi.security.authn.x509.helpers.trust.OpensslTrustAnchorStore;
+import eu.emi.security.authn.x509.helpers.trust.OpensslTruststoreHelper;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
 
@@ -177,9 +177,10 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 			
 			X509Certificate aaCert = CertificateUtils.loadCertificate(new FileInputStream(file), Encoding.PEM);
 			
-			// Get certificate subject hash, using the CANL implementation for CA files (this 
-			String aaCertHash = OpensslTrustAnchorStore.getOpenSSLCAHash(aaCert.getSubjectX500Principal());
-			
+			// Get certificate subject hash, using the CANL implementation for CA files 
+			String aaCertHash =
+				getOpensslCAHash(aaCert.getSubjectX500Principal());
+
 			// Store certificate in the local map 
 			localAACertificatesByHash.put(aaCertHash, aaCert);
 			
@@ -330,9 +331,16 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		checkStoreIsNotEmpty();
 	}
 
+	private String getOpensslCAHash(X500Principal principal){
+		
+		return OpensslTruststoreHelper.getOpenSSLCAHash(principal, 
+			false); 
+			
+	}
+	
 	public synchronized X509Certificate getAACertificateBySubject(X500Principal aaCertSubject) {
 		
-		String theCertHash = OpensslTrustAnchorStore.getOpenSSLCAHash(aaCertSubject);
+		String theCertHash = getOpensslCAHash(aaCertSubject);
 		
 		return localAACertificatesByHash.get(theCertHash);	
 	}
