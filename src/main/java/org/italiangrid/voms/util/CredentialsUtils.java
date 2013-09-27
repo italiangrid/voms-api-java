@@ -45,6 +45,60 @@ import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
  */
 public class CredentialsUtils {
 
+	enum PrivateKeyEncoding {
+		PKCS_1,
+		PKCS_8
+	}
+	
+	/**
+	 * Serializes a private key to an output stream
+	 * following the pkcs8 encoding.
+	 * 
+	 * This method just delegates to canl, but provides a much
+	 * more understandable signature.
+	 * 
+	 * @param os
+	 * @param key
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
+	private static void savePrivateKeyPKCS8(OutputStream os,
+		PrivateKey key) throws IllegalArgumentException, IOException{
+		
+		CertificateUtils.savePrivateKey(os, 
+			key, 
+			Encoding.PEM, 
+			null, 
+			null);
+		
+	}
+	
+	/**
+	 * Serializes a private key to an output stream
+	 * following the pkcs1 encoding.
+	 * 
+	 * This method just delegates to canl, but provides a much
+	 * more understandable signature.
+	 * 
+	 * @param os 
+	 * @param key
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
+	private static void savePrivateKeyPKCS1(OutputStream os, 
+		PrivateKey key) throws 
+		IllegalArgumentException, IOException{
+			
+			CertificateUtils.savePrivateKey(os, 
+				key, 
+				Encoding.PEM, 
+				null, 
+				new char[0],
+				true);
+		
+	}
+	
+	
 	/**
 	 * Saves user credentials as a plain text PEM data. <br>
 	 * Writes the user certificate chain first, then the user key.
@@ -70,9 +124,10 @@ public class CredentialsUtils {
 		CertificateUtils.saveCertificate(os, cert, Encoding.PEM);
 				
 		if (key != null)
-			CertificateUtils.savePrivateKey(os, key, Encoding.PEM, null, null);
+			// Defaults to pkcs1 to avoid breaking dCache clients.
+			savePrivateKeyPKCS1(os, key);
 				
-		X509Certificate c=null;
+		X509Certificate c = null;
 		for (int index=1;index<chain.length;index++){
 					
 			c=chain[index];
