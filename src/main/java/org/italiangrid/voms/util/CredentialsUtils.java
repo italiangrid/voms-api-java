@@ -44,11 +44,6 @@ import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
  * 
  */
 public class CredentialsUtils {
-
-	enum PrivateKeyEncoding {
-		PKCS_1,
-		PKCS_8
-	}
 	
 	/**
 	 * Serializes a private key to an output stream
