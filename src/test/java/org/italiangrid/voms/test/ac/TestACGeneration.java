@@ -142,7 +142,7 @@ public class TestACGeneration {
 		expiredCertCRLErrorMessage = newErrorMessage(canlError, "CRL for an expired certificate was not resolved Cause: No CRLs found for issuer \"CN=Test CA, O=IGI, C=IT\"");
 		revokedCertErrorMessage = newErrorMessage(canlError, "Certificate was revoked at: Wed Sep 26 17:25:24 CEST 2012, the reason reported is: unspecified");
 		
-		defaultGenerator = new VOMSACGenerator(aaCredential, defaultVO, defaultHost, port);
+		defaultGenerator = new VOMSACGenerator(aaCredential);
 	}
 	
 	
@@ -156,7 +156,9 @@ public class TestACGeneration {
 			String vo,
 			String host){
 		
-		VOMSACGenerator gen = new VOMSACGenerator(aaCredential, vo, host, port);
+		// VOMSACGenerator gen = new VOMSACGenerator(aaCredential, vo, host, port);
+		
+		VOMSACGenerator gen = new VOMSACGenerator(aaCredential);
 		
 		Calendar cal = Calendar.getInstance();
 		
@@ -170,7 +172,10 @@ public class TestACGeneration {
 				holderCredential.getCertificate(), 
 				BigInteger.ONE, 
 				now, 
-				expiration);
+				expiration,
+				vo, 
+				host,
+				port);
 		
 		return ac.toASN1Structure();
 	}
@@ -278,7 +283,7 @@ public class TestACGeneration {
 	@Test
 	public void testRevokedAACertValidationFailure(){
 		ValidationResultChecker c = new ValidationResultChecker(false, 
-				revokedCertErrorMessage, 
+				revokedCertErrorMessage,
 				newErrorMessage(invalidAcCert),
 				newErrorMessage(aaCertNotFound));
 		

@@ -25,6 +25,7 @@ import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -34,6 +35,7 @@ import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.ac.VOMSValidationResult;
 import org.italiangrid.voms.ac.impl.LocalHostnameResolver;
+import org.italiangrid.voms.asn1.VOMSACGenerator.ACGenerationProperties;
 import org.italiangrid.voms.error.VOMSValidationErrorCode;
 import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
@@ -171,7 +173,9 @@ public class TestACValidator implements Fixture{
 	public void testEmptyACCertsExtensionSuccess() throws Exception{
 		
 		VOMSAA aa = Utils.getVOMSAA();
-		aa.setIncludeEmptyACCertsExtension(true);
+		aa.setGenerationProperties(
+			EnumSet.of(ACGenerationProperties.INCLUDE_EMPTY_AC_CERTS_EXTENSION));
+		
 		VOMSACValidator validator = Utils.getVOMSValidator();
 		
 		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
@@ -194,8 +198,9 @@ public class TestACValidator implements Fixture{
 	public void testMissingACCertsExtensionFailure() throws Exception{
 		
 		VOMSAA aa = Utils.getVOMSAA();
-
-		aa.setSkipACCertsExtension(true);
+		aa.setGenerationProperties(
+			EnumSet.of(ACGenerationProperties.SKIP_AC_CERTS_EXTENSION));
+	
 		aa.setVoName("test.vo.2");
 		aa.setHost("wilco.cnaf.infn.it");
 		aa.setCredential(Utils.getAACredential2());
@@ -230,7 +235,8 @@ public class TestACValidator implements Fixture{
 		aa.setVoName("test.vo.2");
 		aa.setHost("wilco.cnaf.infn.it");
 		aa.setCredential(Utils.getAACredential2());
-		aa.setUseFakeSignatureBits(true);
+		aa.setGenerationProperties(
+			EnumSet.of(ACGenerationProperties.FAKE_SIGNATURE_BITS));
 		
 		VOMSACValidator validator = Utils.getVOMSValidator();
 		
@@ -255,7 +261,8 @@ public class TestACValidator implements Fixture{
 	@Test
 	public void testUnknownCriticalExtensionFailure() throws Exception {
 		VOMSAA aa = Utils.getVOMSAA();
-		aa.setIncludeFakeCriticalExtension(true);
+		aa.setGenerationProperties(
+			EnumSet.of(ACGenerationProperties.INCLUDE_FAKE_CRITICAL_EXTENSION));
 		
 		VOMSACValidator validator = Utils.getVOMSValidator();
 		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
@@ -278,7 +285,8 @@ public class TestACValidator implements Fixture{
 	@Test
 	public void testCriticalAKIDFailure() throws Exception {
 		VOMSAA aa = Utils.getVOMSAA();
-		aa.setIncludeCriticalAKID(true);
+		aa.setGenerationProperties(
+			EnumSet.of(ACGenerationProperties.INCLUDE_CRITICAL_AKID_EXTENSION));
 		
 		VOMSACValidator validator = Utils.getVOMSValidator();
 		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  
@@ -300,7 +308,10 @@ public class TestACValidator implements Fixture{
 	@Test
 	public void testCriticalNoRevAvailFailure() throws Exception {
 		VOMSAA aa = Utils.getVOMSAA();
-		aa.setIncludeCriticalNoRevAvail(true);
+		
+		aa.setGenerationProperties(
+			EnumSet.of(ACGenerationProperties
+				.INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION));
 		
 		VOMSACValidator validator = Utils.getVOMSValidator();
 		ProxyCertificate proxy = aa.createVOMSProxy(Utils.getTestUserCredential(),  

@@ -44,21 +44,113 @@ import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
  * 
  */
 public class CredentialsUtils {
-
+	
+	/**
+	 * 
+	 * The encoding used to serialize proxy credentials private key.
+	 *
+	 */
+	public enum PrivateKeyEncoding{
+		PKCS_1,
+		PKCS_8
+	}
+	
+	/**
+	 * The default encoding used when no encoding is specified
+	 * by callers.
+	 */
+	public static final PrivateKeyEncoding DEFAULT_ENCONDING =
+		PrivateKeyEncoding.PKCS_1;
+	
+	
+	/**
+	 * Serializes a private key to an output stream according to an encoding.
+	 * 
+	 * @param os
+	 * @param key
+	 * @param encoding
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
+	public static void savePrivateKey(OutputStream os, PrivateKey key, 
+		PrivateKeyEncoding encoding) throws IllegalArgumentException, IOException{
+		
+		switch(encoding){
+			case PKCS_1:
+				savePrivateKeyPKCS1(os, key);
+				break;
+			case PKCS_8:
+				savePrivateKeyPKCS8(os, key);
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported private key encoding: "
+					+encoding.name());
+		}
+	}
+	/**
+	 * Serializes a private key to an output stream
+	 * following the pkcs8 encoding.
+	 * 
+	 * This method just delegates to canl, but provides a much
+	 * more understandable signature.
+	 * 
+	 * @param os
+	 * @param key
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
+	private static void savePrivateKeyPKCS8(OutputStream os,
+		PrivateKey key) throws IllegalArgumentException, IOException{
+		
+		CertificateUtils.savePrivateKey(os, 
+			key, 
+			Encoding.PEM, 
+			null, 
+			null);
+		
+	}
+	
+	/**
+	 * Serializes a private key to an output stream
+	 * following the pkcs1 encoding.
+	 * 
+	 * This method just delegates to canl, but provides a much
+	 * more understandable signature.
+	 * 
+	 * @param os 
+	 * @param key
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
+	private static void savePrivateKeyPKCS1(OutputStream os, 
+		PrivateKey key) throws 
+		IllegalArgumentException, IOException{
+			
+			CertificateUtils.savePrivateKey(os, 
+				key, 
+				Encoding.PEM, 
+				null, 
+				new char[0],
+				true);
+		
+	}
+	
 	/**
 	 * Saves user credentials as a plain text PEM data. <br>
 	 * Writes the user certificate chain first, then the user key.
 	 * 
-	 * 
-	 * @throws IOException
-	 * @throws NoSuchAlgorithmException
-	 * @throws IllegalArgumentException
-	 * @throws KeyStoreException
+	 * @param os
+	 * @param uc
+	 * @param encoding
 	 * @throws UnrecoverableKeyException
+	 * @throws KeyStoreException
+	 * @throws IllegalArgumentException
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
 	 * @throws NoSuchProviderException
 	 * @throws CertificateException
 	 */
-	public static void saveProxyCredentials(OutputStream os, X509Credential uc)
+	public static void saveProxyCredentials(OutputStream os, X509Credential uc, PrivateKeyEncoding encoding)
 			throws UnrecoverableKeyException, KeyStoreException, IllegalArgumentException,
 			NoSuchAlgorithmException, IOException, NoSuchProviderException, CertificateException {
 
@@ -70,9 +162,9 @@ public class CredentialsUtils {
 		CertificateUtils.saveCertificate(os, cert, Encoding.PEM);
 				
 		if (key != null)
-			CertificateUtils.savePrivateKey(os, key, Encoding.PEM, null, null);
+			savePrivateKey(os, key, encoding);
 				
-		X509Certificate c=null;
+		X509Certificate c = null;
 		for (int index=1;index<chain.length;index++){
 					
 			c=chain[index];
@@ -88,13 +180,36 @@ public class CredentialsUtils {
 		os.flush();
 	}
 	
+	/**
+	 * 
+	 * Saves user credentials as a plain text PEM data. <br>
+	 * Writes the user certificate chain first, then the user key, using the
+	 * default encoding specified in {@link #DEFAULT_ENCONDING} = 
+	 * {@value #DEFAULT_ENCONDING}.
+	 *
+	 * @param os
+	 * @param uc
+	 * @throws UnrecoverableKeyException
+	 * @throws KeyStoreException
+	 * @throws IllegalArgumentException
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
+	 * @throws NoSuchProviderException
+	 * @throws CertificateException
+	 */
+	public static void saveProxyCredentials(OutputStream os, X509Credential uc)
+		throws UnrecoverableKeyException, KeyStoreException, IllegalArgumentException,
+		NoSuchAlgorithmException, IOException, NoSuchProviderException, CertificateException {
+		saveProxyCredentials(os, uc, DEFAULT_ENCONDING);
+	}
 	
 	/**
-	 * Saves proxy credentials to a file. This method ensures that the stored proxy is saved with the
-	 * appropriate file permissions.
+	 * Saves proxy credentials to a file. This method ensures that the stored 
+	 * proxy is saved with the appropriate file permissions.
 	 * 
-	 * @param proxyFileName
-	 * @param uc
+	 * @param proxyFileName the file where the proxy will be saved
+	 * @param uc the credential to be saved
+	 * @param encoding the private key encoding 
 	 * @throws IOException
 	 * @throws UnrecoverableKeyException
 	 * @throws KeyStoreException
@@ -103,7 +218,11 @@ public class CredentialsUtils {
 	 * @throws NoSuchProviderException
 	 * @throws CertificateException
 	 */
-	public static void saveProxyCredentials(String proxyFileName, X509Credential uc) throws IOException, UnrecoverableKeyException, KeyStoreException, IllegalArgumentException, NoSuchAlgorithmException, NoSuchProviderException, CertificateException{
+	public static void saveProxyCredentials(String proxyFileName, 
+		X509Credential uc, PrivateKeyEncoding encoding) 
+			throws IOException, UnrecoverableKeyException, KeyStoreException, 
+			IllegalArgumentException, NoSuchAlgorithmException, 
+			NoSuchProviderException, CertificateException{
 			
 		File f = new File(proxyFileName);
 		RandomAccessFile raf = new RandomAccessFile(f, "rws");
@@ -112,13 +231,37 @@ public class CredentialsUtils {
 		channel.truncate(0);
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		saveProxyCredentials(baos, uc);
+		saveProxyCredentials(baos, uc, encoding);
 		
 		baos.close();
 		channel.write(ByteBuffer.wrap(baos.toByteArray()));
 		
 		channel.close();		
 		raf.close();
+	}
+	
+	/**
+	 * 
+	 * Saves proxy credentials to a file. This method ensures that the stored 
+	 * proxy is saved with the appropriate file permissions, using the
+	 * default encoding specified in {@link #DEFAULT_ENCONDING} = 
+	 * {@value #DEFAULT_ENCONDING}.
+	 * 
+	 * @param proxyFileName
+	 * @param uc
+	 * @throws UnrecoverableKeyException
+	 * @throws KeyStoreException
+	 * @throws IllegalArgumentException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws CertificateException
+	 * @throws IOException
+	 */
+	public static void saveProxyCredentials(String proxyFileName, 
+		X509Credential uc) throws UnrecoverableKeyException, KeyStoreException, 
+		IllegalArgumentException, NoSuchAlgorithmException, NoSuchProviderException, 
+		CertificateException, IOException{
 		
+		saveProxyCredentials(proxyFileName, uc, DEFAULT_ENCONDING);
 	}
 }
