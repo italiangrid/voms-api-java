@@ -30,6 +30,7 @@ import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.CRLParameters;
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.RevocationParametersExt;
+import eu.emi.security.authn.x509.impl.ValidatorParams;
 import eu.emi.security.authn.x509.impl.ValidatorParamsExt;
 
 /**
@@ -57,7 +58,7 @@ public class CertificateValidatorBuilder {
 	/** Private constructor which prevents object instantiation **/
 	private CertificateValidatorBuilder() {
 	}
-
+	
 	/**
 	 * Builds an Openssl-style certificate validator configured as specified in
 	 * the parameters
@@ -80,11 +81,53 @@ public class CertificateValidatorBuilder {
 	 * the parameters
 	 */
 	public static X509CertChainValidatorExt buildCertificateValidator(
+		String trustAnchorsDir,
+		ValidationErrorListener validationErrorListener,
+		StoreUpdateListener storeUpdateListener, long updateInterval,
+		NamespaceCheckingMode namespaceChecks, CrlCheckingMode crlChecks,
+		OCSPCheckingMode ocspChecks) {
+		
+		return buildCertificateValidator(trustAnchorsDir,
+			validationErrorListener,
+			storeUpdateListener,
+			updateInterval,
+			namespaceChecks,
+			crlChecks,
+			ocspChecks,
+			true);
+	}
+
+	/**
+	 * Builds an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 * 
+	 * @param trustAnchorsDir
+	 *            the directory where trust anchors are loaded from
+	 * @param validationErrorListener
+	 *            the listener that will receive notification about validation
+	 *            errors
+	 * @param updateInterval
+	 *            the trust anchor store update interval
+	 * @param namespaceChecks
+	 *            the namespace checking policy
+	 * @param crlChecks
+	 *            the crl checking policy
+	 * @param ocspChecks
+	 *            the ocsp checking policy
+	 * @param lazy
+	 * 						whether the validator should be lazy in loading
+	 * 						crls and certificates
+	 * 
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 */
+	public static X509CertChainValidatorExt buildCertificateValidator(
 			String trustAnchorsDir,
 			ValidationErrorListener validationErrorListener,
 			StoreUpdateListener storeUpdateListener, long updateInterval,
 			NamespaceCheckingMode namespaceChecks, CrlCheckingMode crlChecks,
-			OCSPCheckingMode ocspChecks) {
+			OCSPCheckingMode ocspChecks,
+			boolean lazy) {
 
 		RevocationParametersExt revocationParameters = new RevocationParametersExt(
 				crlChecks, new CRLParameters(), new OCSPParametes(ocspChecks));
@@ -97,8 +140,8 @@ public class CertificateValidatorBuilder {
 					.asList(storeUpdateListener));
 
 		OpensslCertChainValidator validator = new OpensslCertChainValidator(
-				trustAnchorsDir, namespaceChecks, updateInterval,
-				validationParams);
+				trustAnchorsDir, false, namespaceChecks, updateInterval,
+				validationParams, lazy);
 
 		if (validationErrorListener != null)
 			validator.addValidationListener(validationErrorListener);
@@ -168,6 +211,43 @@ public class CertificateValidatorBuilder {
 	 * @param updateInterval
 	 *            the trust anchor store update interval
 	 *            
+	 * @param lazy
+	 * 						whether the certificate validator should be lazy in loading
+	 * 					  crls and CAs
+	 * 
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 * 
+	 */
+	public static X509CertChainValidatorExt buildCertificateValidator(
+			String trustAnchorsDir,
+			ValidationErrorListener validationErrorListener,
+			StoreUpdateListener storeListener,
+			long updateInterval,
+			boolean lazy) {
+
+		return buildCertificateValidator(trustAnchorsDir,
+				validationErrorListener, storeListener, 
+				updateInterval, 
+				DEFAULT_NS_CHECKS,
+				DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS, lazy);
+	}
+	
+	/**
+	 * Builds an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 * 
+	 * @param trustAnchorsDir
+	 *            the directory where trust anchors are loaded from
+	 * @param validationErrorListener
+	 *            the listener that will receive notification about validation
+	 *            errors
+	 * @param storeListener
+	 *            the listener that will be informed of trust store load errors
+	 * 
+	 * @param updateInterval
+	 *            the trust anchor store update interval
+	 *            
 	 * @return an Openssl-style certificate validator configured as specified in
 	 * the parameters
 	 * 
@@ -185,6 +265,35 @@ public class CertificateValidatorBuilder {
 				DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS);
 	}
 	
+	/**
+	 * Builds an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 * 
+	 * @param trustAnchorsDir
+	 *            the directory where trust anchors are loaded from
+	 * @param validationErrorListener
+	 *            the listener that will receive notification about validation
+	 *            errors
+	 * @param updateInterval
+	 *            the trust anchor store update interval
+	 * @param lazy
+	 * 						whether the certificate validator should be lazy in loading
+	 * 					  crls and CAs
+	 * 
+	 * @return an Openssl-style certificate validator configured as specified in
+	 * the parameters
+	 * 
+	 */
+	public static X509CertChainValidatorExt buildCertificateValidator(
+			String trustAnchorsDir,
+			ValidationErrorListener validationErrorListener, 
+			long updateInterval,
+			boolean lazy) {
+
+		return buildCertificateValidator(trustAnchorsDir,
+				validationErrorListener, null, updateInterval,
+				DEFAULT_NS_CHECKS, DEFAULT_CRL_CHECKS, DEFAULT_OCSP_CHECKS, lazy);
+	}
 	/**
 	 * Builds an Openssl-style certificate validator configured as specified in
 	 * the parameters
