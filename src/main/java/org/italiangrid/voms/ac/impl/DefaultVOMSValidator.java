@@ -49,6 +49,7 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 	private final VOMSACValidationStrategy validationStrategy;
 	private final VOMSTrustStore trustStore;
 	private ValidationResultListener validationResultListener;
+	private final Object listenerLock = new Object();
  
 	public static class Builder{
 		
@@ -119,20 +120,23 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 		this.validationResultListener = b.validationResultListener;
 	}
 	
-	public synchronized List<VOMSValidationResult> validateWithResult(X509Certificate[] validatedChain){
-		setCertChain(validatedChain);
-		return validate();
+	public List<VOMSValidationResult> validateWithResult(X509Certificate[] validatedChain){
+		return internalValidate(validatedChain);
 	}
-	protected synchronized List<VOMSValidationResult> validate() {
+
+	protected List<VOMSValidationResult> internalValidate(X509Certificate[] validatedChain) {
 		
-		List<VOMSAttribute> parsedAttrs = parse();
+		List<VOMSAttribute> parsedAttrs = parse(validatedChain);
 		List<VOMSValidationResult> results = new ArrayList<VOMSValidationResult>();
-		
 		
 		for (VOMSAttribute a: parsedAttrs){
 			
-			VOMSValidationResult result = validationStrategy.validateAC(a, getCertChain());
-			validationResultListener.notifyValidationResult(result);
+			VOMSValidationResult result = validationStrategy.validateAC(a, validatedChain);
+
+			synchronized (listenerLock) {
+				validationResultListener.notifyValidationResult(result);
+			}
+
 			results.add(result);
 			
 		}
@@ -140,23 +144,21 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 		return results;
 	}
 
-	public synchronized List<VOMSAttribute> validate(X509Certificate[] validatedChain) {
-		setCertChain(validatedChain);
+	public List<VOMSAttribute> validate(X509Certificate[] validatedChain) {
 		List<VOMSAttribute> validAttributes = new ArrayList<VOMSAttribute>();
-		for (VOMSValidationResult result: validate()){
+		for (VOMSValidationResult result: internalValidate(validatedChain)){
 			if (result.isValid())
 				validAttributes.add(result.getAttributes());
 		}
 		return validAttributes;
 	}
 
-	public synchronized void shutdown() {
-		// Shut down eventual truststore refresh thread.
+	public void shutdown() {
 		if (trustStore instanceof UpdatingVOMSTrustStore)
 			((UpdatingVOMSTrustStore)trustStore).cancel();
 	}
 
-	public synchronized List<AttributeCertificate> validateACs(List<AttributeCertificate> acs) {
+	public List<AttributeCertificate> validateACs(List<AttributeCertificate> acs) {
 		
 		List<AttributeCertificate> validatedAcs = new ArrayList<AttributeCertificate>();
 		
@@ -165,8 +167,11 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 			VOMSAttribute vomsAttrs = VOMSACUtils.deserializeVOMSAttributes(ac);
 		
 			VOMSValidationResult result = validationStrategy.validateAC(vomsAttrs);
-			validationResultListener.notifyValidationResult(result);
-			
+
+			synchronized(listenerLock){
+				validationResultListener.notifyValidationResult(result);
+			}
+
 			if (result.isValid())
 				validatedAcs.add(ac);
 		}
@@ -174,10 +179,10 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 		return validatedAcs;
 	}
 
-	public synchronized void setValidationResultListener(ValidationResultListener listener) {
-		if (listener != null)
-			this.validationResultListener= listener; 
-		
+	public void setValidationResultListener(ValidationResultListener listener) {
+		synchronized (listenerLock) {
+			if (listener != null)
+				this.validationResultListener= listener; 
+		}
 	}
-	
 }

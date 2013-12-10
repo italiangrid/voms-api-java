@@ -108,42 +108,56 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 			throw new VOMSError("Please provide a positive value for this store update frequency!");
 	}
 	
-	protected synchronized void scheduleUpdate(){
+	protected void scheduleUpdate(){
 		
-		long frequency = getUpdateFrequency();
-		
-		scheduler.scheduleWithFixedDelay(new Runnable() {
-			// Just run update on the VOMS trust store and log any error
-			public void run() {
-				update();
-			}
-		}, 
-		frequency, // First execution delay 
-		frequency, // Next iterations delay 
-		TimeUnit.MILLISECONDS);
-		
+		write.lock();
+		try{
+
+			long frequency = getUpdateFrequency();
+
+			scheduler.scheduleWithFixedDelay(new Runnable() {
+				// Just run update on the VOMS trust store and log any error
+				public void run() {
+					update();
+				}
+			}, 
+			frequency, // First execution delay 
+			frequency, // Next iterations delay 
+			TimeUnit.MILLISECONDS);
+
+		}finally{
+			write.unlock();
+		}
 	}
 	
 	/**
 	 * Returns the update frequency, in milliseconds, for this store.
 	 */
-	public synchronized long getUpdateFrequency() {
-		return updateFrequency;
+	public long getUpdateFrequency() {
+		read.lock();
+		try{
+			return updateFrequency;
+		}finally{
+			read.unlock();
+		}
 	}
-
 	/**
 	 * Updates the information in this store
 	 */
-	public synchronized void update() {
+	public void update() {
 		loadTrustInformation();
 	}
 
 	/**
 	 * Cancel the background tasks which updates this store.
 	 */
-	public synchronized void cancel() {
-		scheduler.shutdownNow();
-
+	public void cancel() {
+		write.lock();
+		try{
+			scheduler.shutdownNow();
+		}finally{
+			write.unlock();
+		}
 	}
 
 }

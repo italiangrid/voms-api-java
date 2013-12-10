@@ -25,6 +25,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -58,10 +59,10 @@ public class TestConcurrentValidation {
 	static UpdatingVOMSTrustStore sharedVOMSTrustStore;
 	
 	static final String trustAnchorsDir = "src/test/resources/trust-anchors";
-	static final long trustAnchorsRefreshInterval = TimeUnit.MINUTES.toMillis(5);
+	static final long trustAnchorsRefreshInterval = TimeUnit.SECONDS.toMillis(15);
 	
 	static final String vomsTrustStoreDir = "src/test/resources/vomsdir";
-	static final long trustStoreRefreshInterval = TimeUnit.SECONDS.toMillis(10);
+	static final long trustStoreRefreshInterval = TimeUnit.SECONDS.toMillis(5);
 	
 	static final int numHolderCredentials = 5;
 	
@@ -75,8 +76,8 @@ public class TestConcurrentValidation {
 	static final String aaCert2 = "src/test/resources/certs/wilco_cnaf_infn_it.cert.pem";
 	static final String aaKey2 = "src/test/resources/certs/wilco_cnaf_infn_it.key.pem";
 	
-	static final long NUM_ITERATIONS = 5;
-	static final int NUM_WORKERS = 2;
+	static final long NUM_ITERATIONS = 1000;
+	static final int NUM_WORKERS = 10;
 	
 	static final CyclicBarrier barrier = new CyclicBarrier(NUM_WORKERS+1);
 	
@@ -86,6 +87,10 @@ public class TestConcurrentValidation {
 		{"/test.vo.2"}};
 	
 	static VOMSACValidator sharedValidator;
+	
+	static List<ProxyCertificate> testProxies;
+	
+	static final Random r = new Random();
 	
 	static void loadHolderCredentials() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
 		
@@ -114,8 +119,26 @@ public class TestConcurrentValidation {
 		
 	}
 	
+	static void initVOMSProxies() throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException, IOException{
+		testProxies = new ArrayList<ProxyCertificate>();
+		
+		for (int i=0; i < numHolderCredentials; i++)
+			for (int j=0; j < 2; j++){
+				VOMSAA vo = (j == 0 ? testVO_1 : testVO_2);
+				PEMCredential cert = holderCerts[i];
+				
+				ProxyCertificate proxy = vo.createVOMSProxy(cert, Arrays.asList(fqans[j]));
+				testProxies.add(proxy);
+				
+			}
+	}
+	
+	static X509Certificate[] getRandomProxy(){
+		int randomIndex = r.nextInt(testProxies.size());
+		return testProxies.get(randomIndex).getCertificateChain();
+	}
 	@BeforeClass
-	public static void setup() throws KeyStoreException, CertificateException, FileNotFoundException, IOException{
+	public static void setup() throws KeyStoreException, CertificateException, FileNotFoundException, IOException, InvalidKeyException, SignatureException, NoSuchAlgorithmException{
 	
 		sharedVOMSTrustStore = new DefaultUpdatingVOMSTrustStore(Arrays.asList(vomsTrustStoreDir), 
 				trustStoreRefreshInterval);
@@ -126,7 +149,9 @@ public class TestConcurrentValidation {
 	
 		loadHolderCredentials();
 		initVOs();	
+		initVOMSProxies();
 		sharedValidator = VOMSValidators.newValidator(sharedVOMSTrustStore, sharedCertificateValidator);
+		System.out.println("Setup done.");
 	}
 	
 	@AfterClass
@@ -138,6 +163,10 @@ public class TestConcurrentValidation {
 	@Test
 	public void test() throws InterruptedException, BrokenBarrierException {
 		
+		long start = System.currentTimeMillis();
+		
+		System.out.format("Workers: %d. Iterations: %d\n", NUM_WORKERS, NUM_ITERATIONS);
+
 		for (int i=0; i < NUM_WORKERS; i++)
 			pool.execute(new ValidatorWorker());
 		
@@ -148,7 +177,11 @@ public class TestConcurrentValidation {
 		sharedVOMSTrustStore.cancel();
 		sharedCertificateValidator.dispose();
 		
-		System.out.println("Done.");
+		long duration = System.currentTimeMillis() - start;
+		
+		System.out.format("Done. Test duration: %d milliseconds. Avg validation duration: %d milliseconds.\n", 
+			duration,
+			duration / (NUM_WORKERS * NUM_ITERATIONS));
 	}
 
 	
@@ -182,14 +215,9 @@ public class TestConcurrentValidation {
 				
 				VOMSACValidator validator = getValidator();
 				
-				Random r = new Random();
-				
-				int credentialIndex = r.nextInt(numHolderCredentials);
-				int voIndex = r.nextInt(2);
-				
 				try {
 					
-					X509Certificate[] chain = buildProxy(credentialIndex, voIndex);
+					X509Certificate[] chain = getRandomProxy();
 					List<VOMSAttribute> attrs = validator.validate(chain);
 					Assert.assertEquals(1, attrs.size());
 					
@@ -225,7 +253,6 @@ public class TestConcurrentValidation {
 	}
 	
 	static VOMSACValidator getValidator(){
-		// return new DefaultVOMSValidator(sharedVOMSTrustStore, sharedCertificateValidator);
 		return sharedValidator;
 	}
 }
