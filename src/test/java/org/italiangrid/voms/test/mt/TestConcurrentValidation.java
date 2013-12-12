@@ -76,7 +76,7 @@ public class TestConcurrentValidation {
 	static final String aaCert2 = "src/test/resources/certs/wilco_cnaf_infn_it.cert.pem";
 	static final String aaKey2 = "src/test/resources/certs/wilco_cnaf_infn_it.key.pem";
 	
-	static final long NUM_ITERATIONS = 1000;
+	static final long NUM_ITERATIONS = 10;
 	static final int NUM_WORKERS = 10;
 	
 	static final CyclicBarrier barrier = new CyclicBarrier(NUM_WORKERS+1);
