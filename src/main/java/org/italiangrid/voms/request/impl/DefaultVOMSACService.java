@@ -15,8 +15,9 @@
  */
 package org.italiangrid.voms.request.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
@@ -169,13 +170,14 @@ public class DefaultVOMSACService implements VOMSACService {
 	public AttributeCertificate getVOMSAttributeCertificate(
 			X509Credential credential, VOMSACRequest request) {
 
-		Set<VOMSServerInfo> vomsServerInfos = getVOMSServerInfos(request);
+		List<VOMSServerInfo> vomsServerInfos = getVOMSServerInfos(request);
 		
 		if (vomsServerInfos.isEmpty())
-			throw new VOMSError("VOMS server for VO "+request.getVoName()+" is not known! Check your vomses configuration.");
+			throw new VOMSError("VOMS server for VO "+request.getVoName()+" " +
+					"is not known! Check your vomses configuration.");
 		
 		VOMSResponse response = null;
-
+		
 		for (VOMSServerInfo vomsServerInfo : vomsServerInfos) {
 
 			requestListener.notifyVOMSRequestStart(request,  vomsServerInfo);
@@ -196,7 +198,8 @@ public class DefaultVOMSACService implements VOMSACService {
 				break;
 			}
 			
-			requestListener.notifyVOMSRequestFailure(request, vomsServerInfo, new VOMSError("REST and legacy VOMS endpoints failed."));
+			requestListener.notifyVOMSRequestFailure(request, vomsServerInfo, 
+			  new VOMSError("REST and legacy VOMS endpoints failed."));
 		}
 
 		if (response == null) {
@@ -208,16 +211,24 @@ public class DefaultVOMSACService implements VOMSACService {
 	}
 
 	/**
-	 * Get VOMS server endpoint information that matches with the {@link VOMSACRequest} passed
-	 * as argument
+	 * Get VOMS server endpoint information that matches with the 
+	 * {@link VOMSACRequest} passed as argument.
+	 * 
+	 * This method returns a random shuffle of the {@link VOMSServerInfo} objects
+	 * that match the input request.    
+	 * 
 	 * @param request the request
-	 * @return a possibly empty {@link Set} of {@link VOMSServerInfo} objects
+	 * @return a possibly empty {@link List} of {@link VOMSServerInfo} objects
 	 */
-	protected Set<VOMSServerInfo> getVOMSServerInfos(VOMSACRequest request) {
+	protected List<VOMSServerInfo> getVOMSServerInfos(VOMSACRequest request) {
 
-		Set<VOMSServerInfo> vomsServerInfos = serverInfoStore
-				.getVOMSServerInfo(request.getVoName());
-
+	  List<VOMSServerInfo> vomsServerInfos = 
+	    new ArrayList<VOMSServerInfo>(serverInfoStore
+	      .getVOMSServerInfo(request.getVoName()));
+		
+	  if (!vomsServerInfos.isEmpty()){
+	    Collections.shuffle(vomsServerInfos);
+	  }
 		return vomsServerInfos;
 	}
 	
