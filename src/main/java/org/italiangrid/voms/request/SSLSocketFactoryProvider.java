@@ -26,7 +26,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.italiangrid.voms.VOMSError;
-import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
@@ -52,8 +51,10 @@ public class SSLSocketFactoryProvider {
 	}
 
 	public SSLSocketFactoryProvider(X509Credential credential) {
-		this(credential, CertificateValidatorBuilder.buildCertificateValidator(
-				DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, 60000L));
+		this(credential, 
+		  new CertificateValidatorBuilder()
+		  .trustAnchorsUpdateInterval(60000L)
+		  .build());
 	}
 
 	/**

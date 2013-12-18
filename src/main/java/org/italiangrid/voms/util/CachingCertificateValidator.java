@@ -31,6 +31,18 @@ import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.FormatMode;
 
+/**
+ * A Certificate validator that caches validation results for a 
+ * configurable period of time.
+ * 
+ * The cache is keyed by the fingerprint of the certificate at the 
+ * top of the chain (likely the EEC).
+ *  
+ * 
+ * @author andreaceccanti
+ *
+ */
+
 public class CachingCertificateValidator implements X509CertChainValidatorExt {
 
 	/**
