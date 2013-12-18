@@ -18,7 +18,6 @@ package org.italiangrid.voms.util;
 import java.security.cert.CertPath;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 import org.italiangrid.voms.VOMSError;
 
@@ -31,21 +30,60 @@ import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.FormatMode;
 
+/**
+ * A certificate validator that caches validation results for a configurable
+ * time. 
+ * 
+ */
 public class CachingCertificateValidator implements X509CertChainValidatorExt {
 
 	/**
-	 * Cache for
+	 * Simple concurrent cache for validation results
 	 */
-	ConcurrentHashMap<String, CachedValidationResult> validationResultsCache;
-	X509CertChainValidatorExt validator;
+	protected final ConcurrentHashMap<String, CachedValidationResult> validationResultsCache;
+	
+	/**
+	 * The wrapped CANL certificate validator
+	 */
+	protected final X509CertChainValidatorExt validator;
+	
+	/**
+	 * The cache entry lifetime for this validator
+	 */
+	protected final long cacheEntryLifetimeMsec;
 
-	public CachingCertificateValidator(X509CertChainValidatorExt val) {
-
+	/**
+	 * Builds a caching validator wrapping the validator passed as argument.
+	 * 
+	 * @param val The CANL validator to be wrapped.
+	 * @param maxCacheEntryLifetime the maximum cache entry lifetime (in msecs)
+	 */
+	public CachingCertificateValidator(X509CertChainValidatorExt val, long maxCacheEntryLifetime) {
+		cacheEntryLifetimeMsec = maxCacheEntryLifetime;
 		validator = val;
 		validationResultsCache = 
 			new ConcurrentHashMap<String, CachedValidationResult>();
 	}
 
+	/**
+	 * Checks whether the {@link CachedValidationResult} passed as argument has expired with
+	 * respect to the {@link #cacheEntryLifetimeMsec} defined for this validator and
+	 * the reference time passed as argument.
+	 * 
+	 * @param cvr a {@link CachedValidationResult} object
+	 * @param referenceTime the reference time (msecs since the epoch)
+	 * @return <code>true</code> when expired,  <code>false</code> otherwise
+	 */
+	public boolean cachedValidationResultHasExpired(CachedValidationResult cvr, long referenceTime){
+		return (referenceTime - cvr.getTimestamp() > cacheEntryLifetimeMsec);
+	}
+	
+	/**
+	 * Gets a validation result from the memory cache
+	 * @param certFingerprint the certificate fingerprint for the certificate
+	 * at the top of the chain 
+	 * @return the validation result, if found. <code>null</code> otherwise.
+	 */
 	protected ValidationResult getCachedResult(String certFingerprint) {
 
 			CachedValidationResult cvr = validationResultsCache.get(certFingerprint);
@@ -53,7 +91,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 			if (cvr == null)
 				return null;
 			
-			if (!cvr.isExpired(System.currentTimeMillis())){
+			if (!cachedValidationResultHasExpired(cvr, System.currentTimeMillis())){
 				return cvr.getResult();
 			}
 
@@ -61,6 +99,10 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 			return null;
 	}
 	
+	/**
+	 * Obvious sanity checks on input certificate chain
+	 * @param certChain the chain to be checked
+	 */
 	private void certChainSanityChecks(X509Certificate[] certChain){
 		if (certChain == null)
 			throw new IllegalArgumentException("Cannot validate a null cert chain.");
@@ -70,6 +112,10 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 				"Cannot validate a cert chain of length 0.");
 	}
 	/**
+	 * 
+	 * Validates a certificate chain using the wrapped validator, caching the result
+	 * for future validation calls.
+	 * 
 	 * @param certChain
 	 * @return
 	 * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.X509Certificate[])
@@ -81,9 +127,8 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 		String certFingerprint = null;
 		
 		try{
-
 			certFingerprint = 
-				FingerprintHelper.getFingerprint(	certChain[certChain.length-1]);
+				FingerprintHelper.getFingerprint(certChain[certChain.length-1]);
 			
 		}catch (Throwable t){
 			
@@ -191,11 +236,20 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 	}
 
 }
-
+/**
+ * A validation result cache entry.
+ * 
+ * @author cecco
+ *
+ */
 class CachedValidationResult {
 
-	public static long MAX_CACHE_ENTRY_AGE_IN_MSEC = TimeUnit.MINUTES.toMillis(5);
-
+	/**
+	 * Default constructor. 
+	 * 
+	 * @param certificateFingerprint the certificate fingerprint for this entry
+	 * @param res the validation result
+	 */
 	public CachedValidationResult(String certificateFingerprint,
 		ValidationResult res) {
 
@@ -204,43 +258,84 @@ class CachedValidationResult {
 		timestamp = System.currentTimeMillis();
 	}
 
+	/** The certificate fingerprint for this cache entry **/
 	private String certFingerprint;
+	
+	/** The validation result for this cache entry **/
 	private ValidationResult result;
+	
+	/** The cache entry creation timestamp **/
 	private long timestamp;
 
+	/**
+	 * Returns the validation result for this entry.
+	 *  
+	 * @return a {@link ValidationResult} 
+	 */
 	public ValidationResult getResult() {
 
 		return result;
 	}
 
+	/**
+	 * Sets the validation result for this entry
+	 * 
+	 * @param result a {@link ValidationResult}
+	 */
 	public void setResult(ValidationResult result) {
 
 		this.result = result;
 	}
 
+	/** 
+	 * Returns this entry creation timestamp.
+	 * 
+	 * @return the timestamp expressed as milliseconds since epoch
+	 */
 	public long getTimestamp() {
 
 		return timestamp;
 	}
 
+	/**
+	 * Sets this entry creation timestamp (in milliseconds since the epoch).
+	 * 
+	 * @param timestamp 
+	 */
 	public void setTimestamp(long timestamp) {
 
 		this.timestamp = timestamp;
 	}
 
+	/**
+	 * Returns the certificate fingerprint for this entry.
+	 * 
+	 * The certificate fingerprint is the SHA1 hash of the DER encoding of the
+	 * certificate.
+	 * 
+	 * 
+	 * 
+	 * @return the fingerprint for this entry
+	 * @see FingerprintHelper
+	 */
 	public String getCertFingerprint() {
 
 		return certFingerprint;
 	}
 
+	/**
+	 * 
+	 * Sets the certificate finger for this entry. The certificate 
+	 * fingerprint is the SHA1 hash of the DER encoding of the
+	 * certificate.
+	 * 
+	 * It can be computed with the {@link FingerprintHelper#getFingerprint(X509Certificate)} method.
+	 * 
+	 * @param certFingerprint
+	 */
 	public void setCertFingerprint(String certFingerprint) {
 
 		this.certFingerprint = certFingerprint;
-	}
-
-	boolean isExpired(long referenceTime) {
-
-		return (referenceTime - timestamp > MAX_CACHE_ENTRY_AGE_IN_MSEC);
 	}
 
 	@Override
