@@ -1,17 +1,17 @@
 /**
  * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.italiangrid.voms.util;
 
@@ -31,339 +31,358 @@ import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.FormatMode;
 
 /**
- * A certificate validator that caches validation results for a configurable
- * time. 
- * 
+ * A Certificate validator that caches validation results for a configurable
+ * period of time.
+ * The cache is keyed by the fingerprint of the certificate at the top of the
+ * chain (likely the EEC).
+ *
+ *
+ * @author andreaceccanti
+ *
  */
 public class CachingCertificateValidator implements X509CertChainValidatorExt {
 
-	/**
-	 * Simple concurrent cache for validation results
-	 */
-	protected final ConcurrentHashMap<String, CachedValidationResult> validationResultsCache;
-	
-	/**
-	 * The wrapped CANL certificate validator
-	 */
-	protected final X509CertChainValidatorExt validator;
-	
-	/**
-	 * The cache entry lifetime for this validator
-	 */
-	protected final long cacheEntryLifetimeMsec;
+  /**
+   * Simple concurrent cache for validation results
+   */
+  protected final ConcurrentHashMap<String, CachedValidationResult> validationResultsCache;
 
-	/**
-	 * Builds a caching validator wrapping the validator passed as argument.
-	 * 
-	 * @param val The CANL validator to be wrapped.
-	 * @param maxCacheEntryLifetime the maximum cache entry lifetime (in msecs)
-	 */
-	public CachingCertificateValidator(X509CertChainValidatorExt val, long maxCacheEntryLifetime) {
-		cacheEntryLifetimeMsec = maxCacheEntryLifetime;
-		validator = val;
-		validationResultsCache = 
-			new ConcurrentHashMap<String, CachedValidationResult>();
-	}
+  /**
+   * The wrapped CANL certificate validator
+   */
+  protected final X509CertChainValidatorExt validator;
 
-	/**
-	 * Checks whether the {@link CachedValidationResult} passed as argument has expired with
-	 * respect to the {@link #cacheEntryLifetimeMsec} defined for this validator and
-	 * the reference time passed as argument.
-	 * 
-	 * @param cvr a {@link CachedValidationResult} object
-	 * @param referenceTime the reference time (msecs since the epoch)
-	 * @return <code>true</code> when expired,  <code>false</code> otherwise
-	 */
-	public boolean cachedValidationResultHasExpired(CachedValidationResult cvr, long referenceTime){
-		return (referenceTime - cvr.getTimestamp() > cacheEntryLifetimeMsec);
-	}
-	
-	/**
-	 * Gets a validation result from the memory cache
-	 * @param certFingerprint the certificate fingerprint for the certificate
-	 * at the top of the chain 
-	 * @return the validation result, if found. <code>null</code> otherwise.
-	 */
-	protected ValidationResult getCachedResult(String certFingerprint) {
+  /**
+   * The cache entry lifetime for this validator
+   */
+  protected final long cacheEntryLifetimeMsec;
 
-			CachedValidationResult cvr = validationResultsCache.get(certFingerprint);
-			
-			if (cvr == null)
-				return null;
-			
-			if (!cachedValidationResultHasExpired(cvr, System.currentTimeMillis())){
-				return cvr.getResult();
-			}
+  /**
+   * Builds a caching validator wrapping the validator passed as argument.
+   *
+   * @param val
+   *          The CANL validator to be wrapped.
+   * @param maxCacheEntryLifetime
+   *          the maximum cache entry lifetime (in msecs)
+   */
+  public CachingCertificateValidator(X509CertChainValidatorExt val,
+    long maxCacheEntryLifetime) {
 
-			validationResultsCache.remove(certFingerprint, cvr);
-			return null;
-	}
-	
-	/**
-	 * Obvious sanity checks on input certificate chain
-	 * @param certChain the chain to be checked
-	 */
-	private void certChainSanityChecks(X509Certificate[] certChain){
-		if (certChain == null)
-			throw new IllegalArgumentException("Cannot validate a null cert chain.");
-		
-		if (certChain.length == 0)
-			throw new IllegalArgumentException(
-				"Cannot validate a cert chain of length 0.");
-	}
-	/**
-	 * 
-	 * Validates a certificate chain using the wrapped validator, caching the result
-	 * for future validation calls.
-	 * 
-	 * @param certChain
-	 * @return
-	 * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.X509Certificate[])
-	 */
-	public ValidationResult validate(X509Certificate[] certChain) {
-		
-		certChainSanityChecks(certChain);
+    cacheEntryLifetimeMsec = maxCacheEntryLifetime;
+    validator = val;
+    validationResultsCache = new ConcurrentHashMap<String, CachedValidationResult>();
+  }
 
-		String certFingerprint = null;
-		
-		try{
-			certFingerprint = 
-				FingerprintHelper.getFingerprint(certChain[certChain.length-1]);
-			
-		}catch (Throwable t){
-			
-			String errorMsg = String.format("Error computing fingerprint for "
-				+ "certificate: %s. Cause: %s",
-				CertificateUtils.format(certChain[0], FormatMode.COMPACT_ONE_LINE),
-				t.getMessage());
+  /**
+   * Checks whether the {@link CachedValidationResult} passed as argument has
+   * expired with respect to the {@link #cacheEntryLifetimeMsec} defined for
+   * this validator and the reference time passed as argument.
+   *
+   * @param cvr
+   *          a {@link CachedValidationResult} object
+   * @param referenceTime
+   *          the reference time (msecs since the epoch)
+   * @return <code>true</code> when expired, <code>false</code> otherwise
+   */
+  public boolean cachedValidationResultHasExpired(CachedValidationResult cvr,
+    long referenceTime) {
 
-			throw new VOMSError(errorMsg, t);		
+    return (referenceTime - cvr.getTimestamp() > cacheEntryLifetimeMsec);
+  }
 
-		}
+  /**
+   * Gets a validation result from the memory cache
+   *
+   * @param certFingerprint
+   *          the certificate fingerprint for the certificate at the top of the
+   *          chain
+   * @return the validation result, if found. <code>null</code> otherwise.
+   */
+  protected ValidationResult getCachedResult(String certFingerprint) {
 
-		ValidationResult res = getCachedResult(certFingerprint);
+    CachedValidationResult cvr = validationResultsCache.get(certFingerprint);
 
-		if (res == null){
-			res = validator.validate(certChain);
-			validationResultsCache.putIfAbsent(certFingerprint,
-				new CachedValidationResult(certFingerprint, res));
-		}
+    if (cvr == null)
+      return null;
 
-		return res;
-			
-	}
+    if (!cachedValidationResultHasExpired(cvr, System.currentTimeMillis())) {
+      return cvr.getResult();
+    }
 
-	/**
-	 * 
-	 * @see eu.emi.security.authn.x509.X509CertChainValidatorExt#dispose()
-	 */
-	public void dispose() {
+    validationResultsCache.remove(certFingerprint, cvr);
+    return null;
+  }
 
-		validator.dispose();
-	}
+  /**
+   * Obvious sanity checks on input certificate chain
+   *
+   * @param certChain
+   *          the chain to be checked
+   */
+  private void certChainSanityChecks(X509Certificate[] certChain) {
 
-	/**
-	 * @return
-	 * @see eu.emi.security.authn.x509.X509CertChainValidatorExt#getProxySupport()
-	 */
-	public ProxySupport getProxySupport() {
+    if (certChain == null)
+      throw new IllegalArgumentException("Cannot validate a null cert chain.");
 
-		return validator.getProxySupport();
-	}
+    if (certChain.length == 0)
+      throw new IllegalArgumentException(
+        "Cannot validate a cert chain of length 0.");
+  }
 
-	/**
-	 * @param certPath
-	 * @return
-	 * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.CertPath)
-	 */
-	public ValidationResult validate(CertPath certPath) {
+  /**
+   * Validates a certificate chain using the wrapped validator, caching the
+   * result for future validation calls.
+   *
+   * @param certChain
+   * @return
+   * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.X509Certificate[])
+   */
+  public ValidationResult validate(X509Certificate[] certChain) {
 
-		return validator.validate(certPath);
-	}
+    certChainSanityChecks(certChain);
 
-	/**
-	 * @return
-	 * @see eu.emi.security.authn.x509.X509CertChainValidatorExt#getRevocationCheckingMode()
-	 */
-	public RevocationParameters getRevocationCheckingMode() {
+    String certFingerprint = null;
 
-		return validator.getRevocationCheckingMode();
-	}
+    try {
+      certFingerprint = FingerprintHelper
+        .getFingerprint(certChain[certChain.length - 1]);
 
-	/**
-	 * @return
-	 * @see eu.emi.security.authn.x509.X509CertChainValidator#getTrustedIssuers()
-	 */
-	public X509Certificate[] getTrustedIssuers() {
+    } catch (Throwable t) {
 
-		return validator.getTrustedIssuers();
-	}
+      String errorMsg = String.format("Error computing fingerprint for "
+        + "certificate: %s. Cause: %s",
+        CertificateUtils.format(certChain[0], FormatMode.COMPACT_ONE_LINE),
+        t.getMessage());
 
-	/**
-	 * @param listener
-	 * @see eu.emi.security.authn.x509.X509CertChainValidator#addValidationListener(eu.emi.security.authn.x509.ValidationErrorListener)
-	 */
-	public void addValidationListener(ValidationErrorListener listener) {
+      throw new VOMSError(errorMsg, t);
 
-		validator.addValidationListener(listener);
-	}
+    }
 
-	/**
-	 * @param listener
-	 * @see eu.emi.security.authn.x509.X509CertChainValidator#removeValidationListener(eu.emi.security.authn.x509.ValidationErrorListener)
-	 */
-	public void removeValidationListener(ValidationErrorListener listener) {
+    ValidationResult res = getCachedResult(certFingerprint);
 
-		validator.removeValidationListener(listener);
-	}
+    if (res == null) {
+      res = validator.validate(certChain);
+      validationResultsCache.putIfAbsent(certFingerprint,
+        new CachedValidationResult(certFingerprint, res));
+    }
 
-	/**
-	 * @param listener
-	 * @see eu.emi.security.authn.x509.X509CertChainValidator#addUpdateListener(eu.emi.security.authn.x509.StoreUpdateListener)
-	 */
-	public void addUpdateListener(StoreUpdateListener listener) {
+    return res;
 
-		validator.addUpdateListener(listener);
-	}
+  }
 
-	/**
-	 * @param listener
-	 * @see eu.emi.security.authn.x509.X509CertChainValidator#removeUpdateListener(eu.emi.security.authn.x509.StoreUpdateListener)
-	 */
-	public void removeUpdateListener(StoreUpdateListener listener) {
+  /**
+   * @see eu.emi.security.authn.x509.X509CertChainValidatorExt#dispose()
+   */
+  public void dispose() {
 
-		validator.removeUpdateListener(listener);
-	}
+    validator.dispose();
+  }
+
+  /**
+   * @return
+   * @see eu.emi.security.authn.x509.X509CertChainValidatorExt#getProxySupport()
+   */
+  public ProxySupport getProxySupport() {
+
+    return validator.getProxySupport();
+  }
+
+  /**
+   * @param certPath
+   * @return
+   * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.CertPath)
+   */
+  public ValidationResult validate(CertPath certPath) {
+
+    return validator.validate(certPath);
+  }
+
+  /**
+   * @return
+   * @see eu.emi.security.authn.x509.X509CertChainValidatorExt#getRevocationCheckingMode()
+   */
+  public RevocationParameters getRevocationCheckingMode() {
+
+    return validator.getRevocationCheckingMode();
+  }
+
+  /**
+   * @return
+   * @see eu.emi.security.authn.x509.X509CertChainValidator#getTrustedIssuers()
+   */
+  public X509Certificate[] getTrustedIssuers() {
+
+    return validator.getTrustedIssuers();
+  }
+
+  /**
+   * @param listener
+   * @see eu.emi.security.authn.x509.X509CertChainValidator#addValidationListener(eu.emi.security.authn.x509.ValidationErrorListener)
+   */
+  public void addValidationListener(ValidationErrorListener listener) {
+
+    validator.addValidationListener(listener);
+  }
+
+  /**
+   * @param listener
+   * @see eu.emi.security.authn.x509.X509CertChainValidator#removeValidationListener(eu.emi.security.authn.x509.ValidationErrorListener)
+   */
+  public void removeValidationListener(ValidationErrorListener listener) {
+
+    validator.removeValidationListener(listener);
+  }
+
+  /**
+   * @param listener
+   * @see eu.emi.security.authn.x509.X509CertChainValidator#addUpdateListener(eu.emi.security.authn.x509.StoreUpdateListener)
+   */
+  public void addUpdateListener(StoreUpdateListener listener) {
+
+    validator.addUpdateListener(listener);
+  }
+
+  /**
+   * @param listener
+   * @see eu.emi.security.authn.x509.X509CertChainValidator#removeUpdateListener(eu.emi.security.authn.x509.StoreUpdateListener)
+   */
+  public void removeUpdateListener(StoreUpdateListener listener) {
+
+    validator.removeUpdateListener(listener);
+  }
 
 }
+
 /**
  * A validation result cache entry.
- * 
+ *
  * @author cecco
  *
  */
 class CachedValidationResult {
 
-	/**
-	 * Default constructor. 
-	 * 
-	 * @param certificateFingerprint the certificate fingerprint for this entry
-	 * @param res the validation result
-	 */
-	public CachedValidationResult(String certificateFingerprint,
-		ValidationResult res) {
+  /**
+   * Default constructor.
+   *
+   * @param certificateFingerprint
+   *          the certificate fingerprint for this entry
+   * @param res
+   *          the validation result
+   */
+  public CachedValidationResult(String certificateFingerprint,
+    ValidationResult res) {
 
-		certFingerprint = certificateFingerprint;
-		result = res;
-		timestamp = System.currentTimeMillis();
-	}
+    certFingerprint = certificateFingerprint;
+    result = res;
+    timestamp = System.currentTimeMillis();
+  }
 
-	/** The certificate fingerprint for this cache entry **/
-	private String certFingerprint;
-	
-	/** The validation result for this cache entry **/
-	private ValidationResult result;
-	
-	/** The cache entry creation timestamp **/
-	private long timestamp;
+  /** The certificate fingerprint for this cache entry **/
+  private String certFingerprint;
 
-	/**
-	 * Returns the validation result for this entry.
-	 *  
-	 * @return a {@link ValidationResult} 
-	 */
-	public ValidationResult getResult() {
+  /** The validation result for this cache entry **/
+  private ValidationResult result;
 
-		return result;
-	}
+  /** The cache entry creation timestamp **/
+  private long timestamp;
 
-	/**
-	 * Sets the validation result for this entry
-	 * 
-	 * @param result a {@link ValidationResult}
-	 */
-	public void setResult(ValidationResult result) {
+  /**
+   * Returns the validation result for this entry.
+   *
+   * @return a {@link ValidationResult}
+   */
+  public ValidationResult getResult() {
 
-		this.result = result;
-	}
+    return result;
+  }
 
-	/** 
-	 * Returns this entry creation timestamp.
-	 * 
-	 * @return the timestamp expressed as milliseconds since epoch
-	 */
-	public long getTimestamp() {
+  /**
+   * Sets the validation result for this entry
+   *
+   * @param result
+   *          a {@link ValidationResult}
+   */
+  public void setResult(ValidationResult result) {
 
-		return timestamp;
-	}
+    this.result = result;
+  }
 
-	/**
-	 * Sets this entry creation timestamp (in milliseconds since the epoch).
-	 * 
-	 * @param timestamp 
-	 */
-	public void setTimestamp(long timestamp) {
+  /**
+   * Returns this entry creation timestamp.
+   *
+   * @return the timestamp expressed as milliseconds since epoch
+   */
+  public long getTimestamp() {
 
-		this.timestamp = timestamp;
-	}
+    return timestamp;
+  }
 
-	/**
-	 * Returns the certificate fingerprint for this entry.
-	 * 
-	 * The certificate fingerprint is the SHA1 hash of the DER encoding of the
-	 * certificate.
-	 * 
-	 * 
-	 * 
-	 * @return the fingerprint for this entry
-	 * @see FingerprintHelper
-	 */
-	public String getCertFingerprint() {
+  /**
+   * Sets this entry creation timestamp (in milliseconds since the epoch).
+   *
+   * @param timestamp
+   */
+  public void setTimestamp(long timestamp) {
 
-		return certFingerprint;
-	}
+    this.timestamp = timestamp;
+  }
 
-	/**
-	 * 
-	 * Sets the certificate finger for this entry. The certificate 
-	 * fingerprint is the SHA1 hash of the DER encoding of the
-	 * certificate.
-	 * 
-	 * It can be computed with the {@link FingerprintHelper#getFingerprint(X509Certificate)} method.
-	 * 
-	 * @param certFingerprint
-	 */
-	public void setCertFingerprint(String certFingerprint) {
+  /**
+   * Returns the certificate fingerprint for this entry.
+   *
+   * The certificate fingerprint is the SHA1 hash of the DER encoding of the
+   * certificate.
+   *
+   *
+   *
+   * @return the fingerprint for this entry
+   * @see FingerprintHelper
+   */
+  public String getCertFingerprint() {
 
-		this.certFingerprint = certFingerprint;
-	}
+    return certFingerprint;
+  }
 
-	@Override
-	public int hashCode() {
+  /**
+   *
+   * Sets the certificate finger for this entry. The certificate fingerprint is
+   * the SHA1 hash of the DER encoding of the certificate.
+   *
+   * It can be computed with the
+   * {@link FingerprintHelper#getFingerprint(X509Certificate)} method.
+   *
+   * @param certFingerprint
+   */
+  public void setCertFingerprint(String certFingerprint) {
 
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-			+ ((certFingerprint == null) ? 0 : certFingerprint.hashCode());
-		return result;
-	}
+    this.certFingerprint = certFingerprint;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
+  @Override
+  public int hashCode() {
 
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CachedValidationResult other = (CachedValidationResult) obj;
-		if (certFingerprint == null) {
-			if (other.certFingerprint != null)
-				return false;
-		} else if (!certFingerprint.equals(other.certFingerprint))
-			return false;
-		return true;
-	}
+    final int prime = 31;
+    int result = 1;
+    result = prime * result
+      + ((certFingerprint == null) ? 0 : certFingerprint.hashCode());
+    return result;
+  }
 
+  @Override
+  public boolean equals(Object obj) {
+
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    CachedValidationResult other = (CachedValidationResult) obj;
+    if (certFingerprint == null) {
+      if (other.certFingerprint != null)
+        return false;
+    } else if (!certFingerprint.equals(other.certFingerprint))
+      return false;
+    return true;
+  }
 }
