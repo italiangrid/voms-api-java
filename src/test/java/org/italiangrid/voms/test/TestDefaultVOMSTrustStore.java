@@ -69,11 +69,11 @@ public class TestDefaultVOMSTrustStore {
 		assertEquals(DefaultVOMSTrustStore.DEFAULT_VOMS_DIR, trustDirs.get(0));
 		
 	}
-	
-	@Test(expected=VOMSError.class)
+
+	@Test
 	public void testEmptyTrustDir(){
 		
-		List<String> trustDirs = Arrays.asList(new String[]{"src/test/resources/empty-voms-dir"});
+		List<String> trustDirs = Arrays.asList("src/test/resources/empty-vomsdir");
 		
 		@SuppressWarnings("unused")
 		DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
