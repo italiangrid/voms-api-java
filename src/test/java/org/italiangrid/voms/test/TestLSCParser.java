@@ -64,9 +64,8 @@ public class TestLSCParser {
       + "/C=it/O=org/CN=commonName\n";
 
     String errorMessage = "LSC file parsing error: "
-      + "Malformed LSC file. It should contain an even number of "
-      + "distinguished name entries expressed in OpenSSL slash-separated"
-      + "format.";
+      + "Malformed LSC file (vo=vo, host=host): "
+      + "Odd number of distinguished name entries.";
 
     DefaultLSCFileParser parser = new DefaultLSCFileParser();
 
@@ -93,8 +92,10 @@ public class TestLSCParser {
     DefaultLSCFileParser parser = new DefaultLSCFileParser();
 
     String emptyLSCContent = "# This is a comment";
+    
     String errorMessage = "LSC file parsing error: "
-      + "Malformed LSC file. No distinguished name entries found.";
+      + "Malformed LSC file (vo=vo, host=host): "
+      + "No distinguished name entries found.";
 
     try {
 

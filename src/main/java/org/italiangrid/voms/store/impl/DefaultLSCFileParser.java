@@ -36,6 +36,8 @@ import org.italiangrid.voms.store.LSCFileParser;
 public class DefaultLSCFileParser implements LSCFileParser {
 	
 	public static final String EMPTY_LINE_REGEX = "(?m)^\\s*?$";
+	public static final String MALFORMED_LSC_FILE_ERROR_TEMPLATE = 
+	  "LSC file parsing error: Malformed LSC file (vo=%s, host=%s): %s";
 	
 	private void checkFileExistanceAndReadabilty(File f){
 		
@@ -111,16 +113,25 @@ public class DefaultLSCFileParser implements LSCFileParser {
 				
 			lscReader.close();
 			
-			if (certificateChainDescription.size() % 2 != 0){
-			  throw new VOMSError("LSC file parsing error: "
-			    + "Malformed LSC file. It should contain an even number of "
-			    + "distinguished name entries expressed in OpenSSL slash-separated "
-			    + "format.");
+			if (certificateChainDescription.size() % 2 != 0) {
+			  String errorMessage = 
+			    String.format(MALFORMED_LSC_FILE_ERROR_TEMPLATE, 
+			      vo,
+			      hostname,
+			      "Odd number of distinguished name entries.");
+
+			  throw new VOMSError(errorMessage);
+
 			}
 			
-			if (certificateChainDescription.size() == 0){
-			  throw new VOMSError("LSC file parsing error: "
-			    + "Malformed LSC file. No distinguished name entries found.");
+			if (certificateChainDescription.size() == 0) {
+			  String errorMessage = 
+			    String.format(MALFORMED_LSC_FILE_ERROR_TEMPLATE, 
+			      vo,
+			      hostname,
+			      "No distinguished name entries found.");
+			  
+			  throw new VOMSError(errorMessage);
 			}
 			
 			lsc.setCertificateChainDescription(certificateChainDescription);
