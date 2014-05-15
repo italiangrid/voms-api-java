@@ -111,6 +111,18 @@ public class DefaultLSCFileParser implements LSCFileParser {
 				
 			lscReader.close();
 			
+			if (certificateChainDescription.size() % 2 != 0){
+			  throw new VOMSError("LSC file parsing error: "
+			    + "Malformed LSC file. It should contain an even number of "
+			    + "distinguished name entries expressed in OpenSSL slash-separated"
+			    + "format.");
+			}
+			
+			if (certificateChainDescription.size() == 0){
+			  throw new VOMSError("LSC file parsing error: "
+			    + "Malformed LSC file. No distinguished name entries found.");
+			}
+			
 			lsc.setCertificateChainDescription(certificateChainDescription);
 		
 		} catch (IOException e) {

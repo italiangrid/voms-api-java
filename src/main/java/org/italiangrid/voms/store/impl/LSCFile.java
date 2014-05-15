@@ -157,6 +157,9 @@ public class LSCFile implements LSCInfo{
 					return false;
 				
 			}
+		} else {
+		  // Cert chain description does not match certificate chain length
+		  return false;
 		}
 		
 		return true;
