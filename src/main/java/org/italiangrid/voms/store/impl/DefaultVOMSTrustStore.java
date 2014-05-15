@@ -319,17 +319,6 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		
 	}
 	
-	/**
-	 * Checks that the certificate and LSC stores are not empty
-	 * @throws VOMSError if the stores are empty
-	 */
-	private void checkStoreIsNotEmpty(){
-		
-		if (localAACertificatesByHash.values().isEmpty() && localLSCInfo.values().isEmpty())	
-			throw new VOMSError("No VOMS trust information loaded from the given trust dirs: "+localTrustedDirs);
-				
-	}
-	
 	
 	private void cleanupStores(){
 		
@@ -369,7 +358,6 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 				}
 			}
 
-			checkStoreIsNotEmpty();
 		} finally{
 			write.unlock();
 		}
