@@ -92,7 +92,7 @@ public class TestLSCParser {
     DefaultLSCFileParser parser = new DefaultLSCFileParser();
 
     String emptyLSCContent = "# This is a comment";
-    
+
     String errorMessage = "LSC file parsing error: "
       + "Malformed LSC file (vo=vo, host=host): "
       + "No distinguished name entries found.";
