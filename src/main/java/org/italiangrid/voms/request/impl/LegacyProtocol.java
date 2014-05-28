@@ -1,17 +1,17 @@
 /**
  * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.italiangrid.voms.request.impl;
 
@@ -45,75 +45,79 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
  * 
  * 
  */
-public class LegacyProtocol extends AbstractVOMSProtocol implements VOMSProtocol, HostnameMismatchCallback{
-	
-	public LegacyProtocol(X509CertChainValidatorExt validator, 
-			VOMSProtocolListener listener, 
-			int connectTimeout, 
-			int readTimeout) {
-		super(validator, listener, connectTimeout, readTimeout);
-	}
+public class LegacyProtocol extends AbstractVOMSProtocol implements
+  VOMSProtocol, HostnameMismatchCallback {
 
-	public synchronized VOMSResponse doRequest(VOMSServerInfo endpoint, X509Credential credential, VOMSACRequest request) {
+  public LegacyProtocol(X509CertChainValidatorExt validator,
+    VOMSProtocolListener listener, int connectTimeout, int readTimeout) {
 
-		SSLSocketFactory sslSocketFactory = getSSLSocketFactory(credential);
+    super(validator, listener, connectTimeout, readTimeout);
+  }
 
-		SSLSocket sslSocket = null;
+  public synchronized VOMSResponse doRequest(VOMSServerInfo endpoint,
+    X509Credential credential, VOMSACRequest request) {
 
-		try {
+    SSLSocketFactory sslSocketFactory = getSSLSocketFactory(credential);
 
-			
-			sslSocket = (SSLSocket) sslSocketFactory.createSocket();
-			sslSocket.setSoTimeout(readTimeout);
-			sslSocket.setEnabledProtocols(VOMS_LEGACY_PROTOCOLS);
-			
-			SocketAddress sa = new InetSocketAddress(endpoint.getURL().getHost(),
-					endpoint.getURL().getPort()); 
-			
-			sslSocket.connect(sa, connectTimeout);
-			SocketFactoryCreator.connectWithHostnameChecking(sslSocket, this);
-			
-			
+    SSLSocket sslSocket = null;
 
-		} catch (UnknownHostException e) {
-			
-			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
+    try {
 
-		} catch (IOException e) {
-			
-			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
-		}
-		
-		
-		LegacyRequestSender protocol = LegacyRequestSender.instance(listener);
+      sslSocket = (SSLSocket) sslSocketFactory.createSocket();
+      sslSocket.setSoTimeout(readTimeout);
+      sslSocket.setEnabledProtocols(VOMS_LEGACY_PROTOCOLS);
 
-		VOMSResponse response = null;
+      SocketAddress sa = new InetSocketAddress(endpoint.getURL().getHost(),
+        endpoint.getURL().getPort());
 
-		try {
+      sslSocket.connect(sa, connectTimeout);
+      SocketFactoryCreator.connectWithHostnameChecking(sslSocket, this);
 
-			protocol.sendRequest(request, sslSocket.getOutputStream());
+    } catch (UnknownHostException e) {
 
-			InputStream inputStream = sslSocket.getInputStream();
+      throw new VOMSProtocolError(e.getMessage(), endpoint, request,
+        credential, e);
 
-			response = new LegacyVOMSResponseParsingStrategy().parse(inputStream);
+    } catch (IOException e) {
 
-			sslSocket.close();
+      throw new VOMSProtocolError(e.getMessage(), endpoint, request,
+        credential, e);
+    }
 
-		} catch (IOException e) {
+    LegacyRequestSender protocol = LegacyRequestSender.instance(listener);
 
-			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
-		}
+    VOMSResponse response = null;
 
-		listener.notifyReceivedResponse(response);
-		return response;
-	}
+    try {
 
-	public void nameMismatch(SSLSocket socket, X509Certificate peerCertificate, String hostName)
-			throws SSLException {
-		
-		String peerCertString  = CertificateUtils.format(peerCertificate, FormatMode.MEDIUM_ONE_LINE);
-		String message = String.format("Hostname does not match cerificate failed for host: %s. Peer certificate : %s", hostName, peerCertString);
-		throw new SSLException(message);
-	}
+      protocol.sendRequest(request, endpoint, sslSocket.getOutputStream());
+
+      InputStream inputStream = sslSocket.getInputStream();
+
+      response = new LegacyVOMSResponseParsingStrategy().parse(inputStream);
+
+      sslSocket.close();
+
+    } catch (IOException e) {
+
+      throw new VOMSProtocolError(e.getMessage(), endpoint, request,
+        credential, e);
+    }
+
+    listener.notifyReceivedResponse(response);
+    return response;
+  }
+
+  public void nameMismatch(SSLSocket socket, X509Certificate peerCertificate,
+    String hostName) throws SSLException {
+
+    String peerCertString = CertificateUtils.format(peerCertificate,
+      FormatMode.MEDIUM_ONE_LINE);
+    String message = String
+      .format(
+        "Hostname does not match cerificate failed for host: %s. Peer certificate : %s",
+        hostName, peerCertString);
+    throw new SSLException(message);
+  }
 
 }

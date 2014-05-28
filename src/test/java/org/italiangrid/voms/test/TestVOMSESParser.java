@@ -92,8 +92,5 @@ public class TestVOMSESParser {
 		VOMSESParser parser = VOMSESParserFactory.newVOMSESParser();
 		List<VOMSServerInfo> info = parser.parse(new File(vomsesDir));
 		Assert.assertEquals(5, info.size());
-		
-		System.out.println(info);
-		
 	}
 }

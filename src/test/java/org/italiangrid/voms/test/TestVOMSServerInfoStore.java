@@ -18,10 +18,12 @@ package org.italiangrid.voms.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import junit.framework.Assert;
 
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
+import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;
 import org.italiangrid.voms.request.impl.DefaultVOMSServerInfoStore;
 import org.junit.Test;
@@ -43,4 +45,48 @@ public class TestVOMSServerInfoStore {
 		
 		assertEquals(5, store.getVOMSServerInfo().size());
 	}
+	
+	@Test
+	public void testVOMSESAliasLookup() {
+		
+		VOMSESLookupStrategy strategy = new BaseVOMSESLookupStrategy(Arrays.asList("src/test/resources/vomses-alias"));
+		
+		DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore.Builder()
+			.lookupStrategy(strategy)
+			.build();
+		
+		assertEquals(5, store.getVOMSServerInfo("atlas").size());
+		assertEquals(2, store.getVOMSServerInfo("eumed").size());
+		
+		Assert.assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
+		
+		Set<VOMSServerInfo> infos = store.getVOMSServerInfo("my-atlas");
+		
+		Assert.assertFalse(infos.isEmpty());
+		
+		Assert.assertEquals(2, infos.size());
+		
+	}
+	
+	@Test
+    public void testVOMSESSingleCharAliasLookup() {
+        
+        VOMSESLookupStrategy strategy = new BaseVOMSESLookupStrategy(Arrays.asList("src/test/resources/vomses-alias-singlechar"));
+        
+        DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore.Builder()
+            .lookupStrategy(strategy)
+            .build();
+        
+        assertEquals(2, store.getVOMSServerInfo("atlas").size());
+        
+        
+        Assert.assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
+        
+        Set<VOMSServerInfo> infos = store.getVOMSServerInfo("a");
+        
+        Assert.assertFalse(infos.isEmpty());
+        
+        Assert.assertEquals(1, infos.size());
+        
+    }
 }

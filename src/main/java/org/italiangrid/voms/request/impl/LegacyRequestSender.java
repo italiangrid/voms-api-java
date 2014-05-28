@@ -1,17 +1,17 @@
 /**
  * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.italiangrid.voms.request.impl;
 
@@ -28,6 +28,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocolListener;
+import org.italiangrid.voms.request.VOMSServerInfo;
 import org.w3c.dom.Document;
 
 /**
@@ -39,96 +40,97 @@ import org.w3c.dom.Document;
  */
 public class LegacyRequestSender {
 
-	private VOMSRequestFactory requestFactory = VOMSRequestFactory.instance();
-	private TransformerFactory transformerFactory;
+  private VOMSRequestFactory requestFactory = VOMSRequestFactory.instance();
+  private TransformerFactory transformerFactory;
 
-	private VOMSProtocolListener listener;
-	
-	private LegacyRequestSender(VOMSProtocolListener listener) {
-	  
-		transformerFactory = TransformerFactory.newInstance();
-		this.listener = listener;
-	}
+  private VOMSProtocolListener listener;
 
-	public static LegacyRequestSender instance(VOMSProtocolListener listener) {
-		
-	  return new LegacyRequestSender(listener);
-	}
+  private LegacyRequestSender(VOMSProtocolListener listener) {
 
-	protected String xmlDocAsString(Document doc) {
+    transformerFactory = TransformerFactory.newInstance();
+    this.listener = listener;
+  }
 
-		Transformer transformer;
+  public static LegacyRequestSender instance(VOMSProtocolListener listener) {
 
-		try {
+    return new LegacyRequestSender(listener);
+  }
 
-			transformer = transformerFactory.newTransformer();
+  protected String xmlDocAsString(Document doc) {
 
-		} catch (TransformerConfigurationException e) {
+    Transformer transformer;
 
-			throw new VOMSError(e.getMessage(), e);
+    try {
 
-		}
-		
-		StringWriter writer = new StringWriter();
+      transformer = transformerFactory.newTransformer();
 
-		DOMSource source = new DOMSource(doc);
-		
-		StreamResult res = new StreamResult(writer);
+    } catch (TransformerConfigurationException e) {
 
-		try {
+      throw new VOMSError(e.getMessage(), e);
 
-			transformer.transform(source, res);
+    }
 
-		} catch (TransformerException e) {
-			
-			throw new VOMSError(e.getMessage(), e);
+    StringWriter writer = new StringWriter();
 
-		}
-		
-		writer.flush();
+    DOMSource source = new DOMSource(doc);
 
-		return writer.toString();
-	}
+    StreamResult res = new StreamResult(writer);
 
-	/**
-	 * 
-	 * This method is used to send a request to a VOMS server.
-	 * 
-	 * @param acRequest
-	 *            the AC request parameters. See {@link VOMSACRequest}.
-	 * @param stream
-	 *            an output stream.
-	 */
-	public void sendRequest(VOMSACRequest acRequest, OutputStream stream) {
+    try {
 
-		Document request = requestFactory.buildRequest(acRequest);
+      transformer.transform(source, res);
 
-		Transformer transformer;
+    } catch (TransformerException e) {
 
-		try {
+      throw new VOMSError(e.getMessage(), e);
 
-			transformer = transformerFactory.newTransformer();
+    }
 
-		} catch (TransformerConfigurationException e) {
+    writer.flush();
 
-			throw new VOMSError(e.getMessage(), e);
-		}
+    return writer.toString();
+  }
 
-		listener.notifyLegacyRequest(xmlDocAsString(request));
-		
-		DOMSource source = new DOMSource(request);
-		
-		StreamResult res = new StreamResult(stream);
+  /**
+   * 
+   * This method is used to send a request to a VOMS server.
+   * 
+   * @param acRequest
+   *          the AC request parameters. See {@link VOMSACRequest}.
+   * @param stream
+   *          an output stream.
+   */
+  public void sendRequest(VOMSACRequest acRequest, VOMSServerInfo endpoint,
+    OutputStream stream) {
 
-		try {
+    Document request = requestFactory.buildRequest(acRequest, endpoint);
 
-			transformer.transform(source, res);
-			stream.flush();
+    Transformer transformer;
 
-		} catch (Exception e) {
+    try {
 
-			throw new VOMSError(e.getMessage(), e);
+      transformer = transformerFactory.newTransformer();
 
-		}
-	}
+    } catch (TransformerConfigurationException e) {
+
+      throw new VOMSError(e.getMessage(), e);
+    }
+
+    listener.notifyLegacyRequest(xmlDocAsString(request));
+
+    DOMSource source = new DOMSource(request);
+
+    StreamResult res = new StreamResult(stream);
+
+    try {
+
+      transformer.transform(source, res);
+      stream.flush();
+
+    } catch (Exception e) {
+
+      throw new VOMSError(e.getMessage(), e);
+
+    }
+  }
 }
