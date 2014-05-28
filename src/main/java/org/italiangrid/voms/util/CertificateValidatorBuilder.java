@@ -45,7 +45,7 @@ public class CertificateValidatorBuilder {
 	 * The default CRL checking policy.
 	 */
 	public static final CrlCheckingMode DEFAULT_CRL_CHECKS = 
-		CrlCheckingMode.REQUIRE;
+		CrlCheckingMode.IF_VALID;
 	
 	/**
 	 * The default OCSP checking policy.
