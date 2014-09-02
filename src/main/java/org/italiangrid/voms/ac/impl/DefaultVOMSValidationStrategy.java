@@ -59,6 +59,7 @@ import eu.emi.security.authn.x509.ValidationResult;
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.emi.security.authn.x509.proxy.ProxyUtils;
+import org.bouncycastle.asn1.x509.Extension;
 
 /**
  * The Default VOMS validation strategy.
@@ -215,7 +216,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 	
 	private boolean checkNoRevAvailExtension(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		
-		X509Extension noRevAvail = attributes.getVOMSAC().getExtension(X509Extension.noRevAvail);
+		Extension noRevAvail = attributes.getVOMSAC().getExtension(X509Extension.noRevAvail);
 		if (noRevAvail != null && noRevAvail.isCritical()){
 			validationErrors.add(newErrorMessage(other, "NoRevAvail AC extension cannot be critical!"));
 			return false;
@@ -225,7 +226,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy{
 	
 	private boolean checkAuthorityKeyIdentifierExtension(VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors){
 		
-		X509Extension authKeyId = attributes.getVOMSAC().getExtension(X509Extension.authorityKeyIdentifier);
+		Extension authKeyId = attributes.getVOMSAC().getExtension(X509Extension.authorityKeyIdentifier);
 		if (authKeyId != null && authKeyId.isCritical()){
 			validationErrors.add(newErrorMessage(other, "AuthorityKeyIdentifier AC extension cannot be critical!"));
 			return false;
