@@ -36,8 +36,8 @@
     <assembly.doc.dir>/usr/share/doc/${project.name}</assembly.doc.dir>
     <assembly.javadoc.dir>/usr/share/javadoc/${project.name}</assembly.javadoc.dir>
     <junitVersion>4.10</junitVersion>
-    <canlVersion>1.3.0</canlVersion>
-    <bcVersion>1.46</bcVersion>
+    <canlVersion>2.1.1</canlVersion>
+    <bcVersion>1.50</bcVersion>
     <licensePluginVersion>1.9.0</licensePluginVersion>
     <releasePluginVersion>2.2.2</releasePluginVersion>
     <coberturaPluginVersion>2.5.2</coberturaPluginVersion>
@@ -189,7 +189,7 @@
 
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcmail-jdk16</artifactId>
+      <artifactId>bcmail-jdk15on</artifactId>
       <version>${bcVersion}</version>
     </dependency>
 
