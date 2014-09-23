@@ -30,6 +30,9 @@ public class TestFilePermissionHelper {
 
   public static final String keyWithWrongPerms = "src/test/resources/perm-test/test1.key.pem";
   public static final String p12WithWrongPerms = "src/test/resources/perm-test/test1.p12";
+  
+  public static final String keyWithAcceptedPerms = "src/test/resources/perm-test/test2.key.pem";
+
 
   @BeforeClass
   public static void setupPermissions() {
@@ -41,6 +44,9 @@ public class TestFilePermissionHelper {
       PosixFilePermission.ALL_PERMS);
     FilePermissionHelper.setFilePermissions(p12WithWrongPerms,
       PosixFilePermission.ALL_PERMS);
+    
+    FilePermissionHelper.setFilePermissions(keyWithAcceptedPerms,
+    		PosixFilePermission.USER_RW);
 
   }
 
@@ -48,6 +54,7 @@ public class TestFilePermissionHelper {
   public void testFilePermissions() throws IOException {
 
     FilePermissionHelper.checkPrivateKeyPermissions(keyWithRightPerms);
+    FilePermissionHelper.checkPrivateKeyPermissions(keyWithAcceptedPerms);
     FilePermissionHelper.checkPKCS12Permissions(p12WithRightPerms);
 
   }
