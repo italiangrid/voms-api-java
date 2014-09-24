@@ -19,8 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumSet;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.credential.FilePermissionError;
@@ -40,6 +39,12 @@ public class FilePermissionHelper {
 		USER_RW("600", "-rw-------"),
 		USER_ALL("700", "-rwx------"),
 		ALL_PERMS("777", "-rwxrwxrwx");
+		
+		/**
+		 * File permissions valid for the private key file 
+		 */
+		public static final EnumSet<PosixFilePermission> PRIVATE_KEY_PERMS =
+				EnumSet.range(USER_RO, USER_RW);
 		
 		private PosixFilePermission(String chmodForm, String statForm){
 			this.chmodForm = chmodForm;
@@ -69,16 +74,6 @@ public class FilePermissionHelper {
 	public static final String CHMOD_CMD_TEMPLATE = "chmod %s %s";
 
 	/**
-	 * The accepted file permissions for the private key file 
-	 */
-	private static final ArrayList<PosixFilePermission> PRIVATE_KEY_PERMS = new ArrayList<PosixFilePermission>() {
-		private static final long serialVersionUID = 1L;
-	{
-		add(PosixFilePermission.USER_RW);
-		add(PosixFilePermission.USER_RO);
-	}};
-
-	/**
 	 * Checks whether a proxy file has the right permissions
 	 * 
 	 * @param proxyFile
@@ -102,7 +97,7 @@ public class FilePermissionHelper {
 	 *             if the permissions are not correct
 	 */
 	public static void checkPrivateKeyPermissions(String privateKeyFile) throws IOException {
-		matchesFilePermissions(privateKeyFile, PRIVATE_KEY_PERMS);
+		matchesFilePermissions(privateKeyFile, PosixFilePermission.PRIVATE_KEY_PERMS);
 	}
 
 	/**
@@ -142,25 +137,10 @@ public class FilePermissionHelper {
 	public static void matchesFilePermissions(String filename, PosixFilePermission p)
 			throws IOException {
 
+		filenameSanityChecks(filename);
+
 		if (p == null)
 			throw new NullPointerException("null permission passed as argument");
-		
-		List<PosixFilePermission> p_list = new ArrayList<PosixFilePermission>();
-		p_list.add(p);
-		matchesFilePermissions(filename, p_list);
-	}
-	
-	
-	public static void matchesFilePermissions(String filename, List<PosixFilePermission> p_list) 
-			throws IOException {
-		
-		if (p_list == null)
-			throw new NullPointerException("null permission list passed as argument");
-		
-		if (p_list.size() == 0)
-			throw new IllegalArgumentException("empty permission list passed as argument");
-		
-		filenameSanityChecks(filename);
 
 		File f = new File(filename);
 
@@ -168,17 +148,34 @@ public class FilePermissionHelper {
 		String canonicalPath = f.getCanonicalPath();
 		
 		String filePerms = getFilePermissions(canonicalPath);
-		
-		StringBuilder accepted_permission = new StringBuilder();
-		
-		for (PosixFilePermission p : p_list) {
 
-			if (filePerms.startsWith(p.statForm)) {
+		if (!filePerms.startsWith(p.statForm))
+			throw new FilePermissionError("Wrong file permissions on file " + filename +
+					". Required permissions are: "+p.chmodForm());
+
+	}
+	
+	public static void matchesFilePermissions(String filename, EnumSet <PosixFilePermission> pSet) 
+			throws IOException {
+		
+		if (pSet == null)
+			throw new NullPointerException("null permission set passed as argument");
+		
+		if (pSet.isEmpty())
+			throw new IllegalArgumentException("empty permission set passed as argument");
+		
+		StringBuilder validPermission = new StringBuilder();
+		
+		for (PosixFilePermission p : pSet) {
+			try {
+				matchesFilePermissions(filename, p);
 				return;
+			} catch (FilePermissionError e) {
+				validPermission.append(p.chmodForm + " ");
 			}
-			accepted_permission.append(p.chmodForm);
 		}
-		throw new FilePermissionError("Wrong file permissions on file " + filename + ". Required permissions are: " + accepted_permission);
+		throw new FilePermissionError("Wrong file permissions on file " + filename +
+				". Required permissions are: " + validPermission);
 	}
 
 	private static void filenameSanityChecks(String filename) {
