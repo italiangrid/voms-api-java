@@ -40,12 +40,6 @@ public class FilePermissionHelper {
 		USER_ALL("700", "-rwx------"),
 		ALL_PERMS("777", "-rwxrwxrwx");
 		
-		/**
-		 * File permissions valid for the private key file 
-		 */
-		public static final EnumSet<PosixFilePermission> PRIVATE_KEY_PERMS =
-				EnumSet.range(USER_RO, USER_RW);
-		
 		private PosixFilePermission(String chmodForm, String statForm){
 			this.chmodForm = chmodForm;
 			this.statForm = statForm;
@@ -62,6 +56,18 @@ public class FilePermissionHelper {
 			return chmodForm;
 		}
 	}
+
+	/**
+	 * File permissions valid for the private key file 
+	 */
+	public static final EnumSet<PosixFilePermission> PRIVATE_KEY_PERMS =
+			EnumSet.of(PosixFilePermission.USER_RO, PosixFilePermission.USER_RW);
+	
+	/**
+	 * Convenience string for log
+	 */
+	public static final String PRIVATE_KEY_PERMS_STR = PosixFilePermission.USER_RO.chmodForm() +
+			", " + PosixFilePermission.USER_RW.chmodForm();
 	
 	/**
 	 * The command used to retrieve file permissions for a given file
@@ -96,8 +102,18 @@ public class FilePermissionHelper {
 	 * @throws FilePermissionError
 	 *             if the permissions are not correct
 	 */
-	public static void checkPrivateKeyPermissions(String privateKeyFile) throws IOException {
-		matchesFilePermissions(privateKeyFile, PosixFilePermission.PRIVATE_KEY_PERMS);
+	public static void checkPrivateKeyPermissions(String privateKeyFile)
+		throws IOException {
+	
+	for (PosixFilePermission p : PRIVATE_KEY_PERMS) {
+		try {
+			matchesFilePermissions(privateKeyFile, p);
+			return;
+		} catch (FilePermissionError e) {
+		}
+	}
+	throw new FilePermissionError("Wrong file permissions on file " + privateKeyFile + 
+			". Required permissions are: " + PRIVATE_KEY_PERMS_STR);
 	}
 
 	/**
@@ -155,29 +171,6 @@ public class FilePermissionHelper {
 
 	}
 	
-	public static void matchesFilePermissions(String filename, EnumSet <PosixFilePermission> pSet) 
-			throws IOException {
-		
-		if (pSet == null)
-			throw new NullPointerException("null permission set passed as argument");
-		
-		if (pSet.isEmpty())
-			throw new IllegalArgumentException("empty permission set passed as argument");
-		
-		StringBuilder validPermission = new StringBuilder();
-		
-		for (PosixFilePermission p : pSet) {
-			try {
-				matchesFilePermissions(filename, p);
-				return;
-			} catch (FilePermissionError e) {
-				validPermission.append(p.chmodForm + " ");
-			}
-		}
-		throw new FilePermissionError("Wrong file permissions on file " + filename +
-				". Required permissions are: " + validPermission);
-	}
-
 	private static void filenameSanityChecks(String filename) {
 		if (filename == null)
 			throw new NullPointerException("null filename passed as argument");
