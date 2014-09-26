@@ -58,7 +58,7 @@ public class FilePermissionHelper {
 	}
 
 	/**
-	 * File permissions valid for the private key file 
+	 * Required file permissions for the private key file 
 	 */
 	public static final EnumSet<PosixFilePermission> PRIVATE_KEY_PERMS =
 			EnumSet.of(PosixFilePermission.USER_RO, PosixFilePermission.USER_RW);
