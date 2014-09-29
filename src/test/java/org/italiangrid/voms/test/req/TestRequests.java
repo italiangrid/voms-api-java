@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import junit.framework.Assert;
-
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.VOMSACValidator;
@@ -34,6 +32,7 @@ import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
 import org.italiangrid.voms.test.utils.EchoVOMSProtocol;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 

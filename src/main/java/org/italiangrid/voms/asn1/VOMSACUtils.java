@@ -176,7 +176,8 @@ public class VOMSACUtils implements VOMSConstants{
 		
 		int count = 0;
         
-		for (Enumeration e = targetSequence.getObjects(); e.hasMoreElements();){
+		for (@SuppressWarnings("rawtypes")
+    Enumeration e = targetSequence.getObjects(); e.hasMoreElements();){
         	
         	// There's one sequence more than expected here that makes
         	// the bc constructor fail...

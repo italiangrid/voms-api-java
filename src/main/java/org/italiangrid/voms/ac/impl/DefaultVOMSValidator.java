@@ -94,7 +94,8 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
 					trustStore = VOMSTrustStores.newTrustStore();
 				
 				if (certChainValidator == null)
-					certChainValidator = CertificateValidatorBuilder.buildCertificateValidator(DEFAULT_TRUST_ANCHORS_DIR);
+					certChainValidator = new CertificateValidatorBuilder().
+					trustAnchorsDir(DEFAULT_TRUST_ANCHORS_DIR).build();
 				
 				validationStrategy = new DefaultVOMSValidationStrategy(trustStore, certChainValidator);
 			}

@@ -21,7 +21,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateParsingException;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.VOMSACValidator;

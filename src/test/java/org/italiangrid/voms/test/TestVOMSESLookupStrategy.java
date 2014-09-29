@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;

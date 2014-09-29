@@ -20,12 +20,11 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;
 import org.italiangrid.voms.request.impl.DefaultVOMSServerInfoStore;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestVOMSServerInfoStore {

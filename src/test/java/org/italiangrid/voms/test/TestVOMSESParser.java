@@ -21,12 +21,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSESParserFactory;
 import org.italiangrid.voms.request.VOMSServerInfo;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestVOMSESParser {

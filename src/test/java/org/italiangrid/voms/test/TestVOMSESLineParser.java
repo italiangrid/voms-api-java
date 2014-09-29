@@ -64,7 +64,7 @@ public class TestVOMSESLineParser {
     String line = "\"\"";
     try {
       VOMSESLineParser p = new VOMSESLineParser();
-      VOMSServerInfo i = p.parse(line);
+      p.parse(line);
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
@@ -80,7 +80,7 @@ public class TestVOMSESLineParser {
     String line = "\"incomplete-alias";
     try {
       VOMSESLineParser p = new VOMSESLineParser();
-      VOMSServerInfo i = p.parse(line);
+      p.parse(line);
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
@@ -96,7 +96,7 @@ public class TestVOMSESLineParser {
     String line = "\"alias\" \"voms.cnaf.infn.it";
     try {
       VOMSESLineParser p = new VOMSESLineParser();
-      VOMSServerInfo i = p.parse(line);
+      p.parse(line);
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
@@ -112,7 +112,7 @@ public class TestVOMSESLineParser {
     String line = "\"ciccio\" ";
     try {
       VOMSESLineParser p = new VOMSESLineParser();
-      VOMSServerInfo i = p.parse(line);
+      p.parse(line);
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
@@ -129,7 +129,7 @@ public class TestVOMSESLineParser {
 
     try {
       VOMSESLineParser p = new VOMSESLineParser();
-      VOMSServerInfo i = p.parse(line);
+      p.parse(line);
       fail("No error raised.");
     } catch (VOMSError e) {
 
@@ -183,7 +183,7 @@ public class TestVOMSESLineParser {
 
     try {
       VOMSESLineParser p = new VOMSESLineParser();
-      VOMSServerInfo i = p.parse(line);
+      p.parse(line);
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
@@ -200,7 +200,7 @@ public class TestVOMSESLineParser {
 
     try {
       VOMSESLineParser p = new VOMSESLineParser();
-      VOMSServerInfo i = p.parse(line);
+      p.parse(line);
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
@@ -218,7 +218,7 @@ public class TestVOMSESLineParser {
 
     try {
       VOMSESLineParser p = new VOMSESLineParser();
-      VOMSServerInfo i = p.parse(line);
+      p.parse(line);
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
@@ -235,7 +235,7 @@ public class TestVOMSESLineParser {
 
     try {
       VOMSESLineParser p = new VOMSESLineParser();
-      VOMSServerInfo i = p.parse(line);
+      p.parse(line);
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());

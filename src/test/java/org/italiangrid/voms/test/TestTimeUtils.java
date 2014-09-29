@@ -18,7 +18,7 @@ package org.italiangrid.voms.test;
 import java.util.Calendar;
 import java.util.Date;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.italiangrid.voms.util.TimeUtils;
 import org.junit.Test;
