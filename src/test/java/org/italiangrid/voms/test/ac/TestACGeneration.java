@@ -135,14 +135,23 @@ public class TestACGeneration {
     trustStore = new DefaultVOMSTrustStore(Arrays.asList(vomsdir));
     certValidator = new OpensslCertChainValidator(trustAnchorsDir);
 
-    expiredCertErrorMessage = newErrorMessage(canlError,
-      "Certificate has expired on: Fri Dec 02 01:00:00 CET 2011");
+    final String expirationMessage = String.format(
+      "Certificate has expired on: %s", expiredCredential.getCertificate()
+        .getNotAfter());
+
+    expiredCertErrorMessage = newErrorMessage(canlError, expirationMessage);
+
     expiredCertCRLErrorMessage = newErrorMessage(
       canlError,
       "CRL for an expired certificate was not resolved Cause: No CRLs found for issuer \"CN=Test CA, O=IGI, C=IT\"");
-    revokedCertErrorMessage = newErrorMessage(
-      canlError,
-      "Certificate was revoked at: Wed Sep 26 17:25:24 CEST 2012, the reason reported is: unspecified");
+
+    final Date revocationDate = new Date(1348673124000L);
+
+    final String revocationMessage = String.format(
+      "Certificate was revoked at: "
+        + "%s, the reason reported is: unspecified", revocationDate);
+
+    revokedCertErrorMessage = newErrorMessage(canlError, revocationMessage);
 
     defaultGenerator = new VOMSACGenerator(aaCredential);
   }
@@ -261,8 +270,7 @@ public class TestACGeneration {
 
     ValidationResultChecker c = new ValidationResultChecker(false,
       expiredCertErrorMessage, expiredCertCRLErrorMessage,
-      newErrorMessage(invalidAcCert),
-      newErrorMessage(aaCertNotFound));
+      newErrorMessage(invalidAcCert), newErrorMessage(aaCertNotFound));
 
     VOMSACValidator validator = VOMSValidators.newValidator(trustStore,
       certValidator, c);
@@ -343,25 +351,27 @@ class ValidationResultChecker implements ValidationResultListener {
 
     expectedValidationResult = valid;
     expectedErrorMessages = Arrays.asList(expectedMessages);
-    
+
   }
 
-  private String errorMessage(String message, VOMSValidationResult result){
+  private String errorMessage(String message, VOMSValidationResult result) {
+
     return String.format("%s. VOMSValidationResult: <%s>", message, result);
   }
-  
+
   public void notifyValidationResult(VOMSValidationResult result) {
 
-    assertEquals(errorMessage("ValidationResult validity check failed.", result),
+    assertEquals(
+      errorMessage("ValidationResult validity check failed.", result),
       expectedValidationResult, result.isValid());
 
     assertEquals(errorMessage("ValidationResult error message size check "
-      + "failed.", result),
-      expectedErrorMessages.size(), result.getValidationErrors().size());
-    
-    List<VOMSValidationErrorMessage> errorMessages = 
-      new ArrayList<VOMSValidationErrorMessage>(result.getValidationErrors());
-    
+      + "failed.", result), expectedErrorMessages.size(), result
+      .getValidationErrors().size());
+
+    List<VOMSValidationErrorMessage> errorMessages = new ArrayList<VOMSValidationErrorMessage>(
+      result.getValidationErrors());
+
     for (VOMSValidationErrorMessage expectedMessage : expectedErrorMessages) {
 
       String failureMessage = errorMessage(String.format(
@@ -371,14 +381,14 @@ class ValidationResultChecker implements ValidationResultListener {
       assertTrue(failureMessage,
         result.getValidationErrors().contains(expectedMessage));
     }
-    
-    if (errorMessages.size() > 0){
+
+    if (errorMessages.size() > 0) {
       errorMessages.removeAll(expectedErrorMessages);
-    
+
       assertTrue(errorMessage("ValidationResult check failed. "
-        + "Got more error messages than expected.",result),
+        + "Got more error messages than expected.", result),
         errorMessages.isEmpty());
     }
-      
+
   }
 }
