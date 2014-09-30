@@ -156,7 +156,8 @@ public class VOMSACUtils implements VOMSConstants{
 		return fqans;
 	}
 	
-	private static List<String> deserializeACTargets(X509AttributeCertificateHolder ac){
+	@SuppressWarnings("rawtypes")
+  private static List<String> deserializeACTargets(X509AttributeCertificateHolder ac){
 		List<String> targets = new ArrayList<String>();
 		
 		X509Extension targetExtension = ac.getExtension(X509Extension.targetInformation);
@@ -176,8 +177,7 @@ public class VOMSACUtils implements VOMSConstants{
 		
 		int count = 0;
         
-		for (@SuppressWarnings("rawtypes")
-    Enumeration e = targetSequence.getObjects(); e.hasMoreElements();){
+		for (Enumeration e = targetSequence.getObjects(); e.hasMoreElements();){
         	
         	// There's one sequence more than expected here that makes
         	// the bc constructor fail...
