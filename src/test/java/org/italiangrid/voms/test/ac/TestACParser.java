@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.security.cert.CertificateException;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSError;

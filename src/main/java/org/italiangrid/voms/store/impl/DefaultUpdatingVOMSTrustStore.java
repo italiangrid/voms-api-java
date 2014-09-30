@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,10 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 		UpdatingVOMSTrustStore {
 	
 	/**
-	 * Default trust store update frequency. 
+	 * Default trust store update frequency (10 minutes). 
 	 */
-	public static final long DEFAULT_UPDATE_FREQUENCY = TimeUnit.MINUTES.toMillis(10);
+	public static final long DEFAULT_UPDATE_FREQUENCY = TimeUnit
+	  .MINUTES.toMillis(10);
 	
 	/**
 	 * This trust store update frequency in milliseconds.
@@ -49,7 +50,8 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	/**
 	 * The scheduler used to schedule the update tasks.
 	 */
-	private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new VOMSNamedThreadFactory());
+	private final ScheduledExecutorService scheduler = 
+	  Executors.newSingleThreadScheduledExecutor(new VOMSNamedThreadFactory());
 	
 	/**
 	 * Builds a trust store configured as defined in the parameters.
@@ -95,8 +97,11 @@ public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore impleme
 	}
 	
 	/**
-	 * Builds a trust store. VOMS information will be searched in {@value DefaultVOMSTrustStore#DEFAULT_VOMS_DIR}.
-	 * This store will be refreshed every {@value #DEFAULT_UPDATE_FREQUENCY} milliseconds.
+	 * Builds a trust store. VOMS information will be searched in 
+	 * the default VOMS dir location ({@link DefaultVOMSTrustStore#DEFAULT_VOMS_DIR}).
+	 * 
+	 * This store will be refreshed according to the value of 
+	 * {@link #DEFAULT_UPDATE_FREQUENCY}.
 	 */
 	public DefaultUpdatingVOMSTrustStore(){
 		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, NullListener.INSTANCE);

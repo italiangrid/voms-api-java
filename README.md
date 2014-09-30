@@ -1,5 +1,7 @@
 # VOMS Java API
 
+[![Build Status](https://travis-ci.org/italiangrid/voms-api-java.svg)](https://travis-ci.org/italiangrid/voms-api-java)
+
 Java binding for the Virtual Organization Membership Service (VOMS) API.
 
 The VOMS API can be used for 

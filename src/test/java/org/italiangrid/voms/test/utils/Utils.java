@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,24 +88,28 @@ public class Utils implements Fixture{
 		return si;
 	}
 	public static X509CertChainValidatorExt getCertificateValidator(){
-		return CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
+	  return new CertificateValidatorBuilder()
+	    .trustAnchorsDir(trustAnchorsDir).build();
 	}
 	
 	public static VOMSACValidator getVOMSValidator(LocalHostnameResolver resolver){
-		X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
+		X509CertChainValidatorExt validator = new CertificateValidatorBuilder()
+      .trustAnchorsDir(trustAnchorsDir).build();
 		VOMSTrustStore ts  = new DefaultVOMSTrustStore(Arrays.asList(vomsdir)); 
 		return new DefaultVOMSValidator.Builder()
 			.validationStrategy(new DefaultVOMSValidationStrategy(ts, validator, resolver))
 			.build();
 	}
 	public static VOMSACValidator getVOMSValidator(){
-		X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
+		X509CertChainValidatorExt validator = new CertificateValidatorBuilder()
+      .trustAnchorsDir(trustAnchorsDir).build();
 		return VOMSValidators.newValidator(new DefaultVOMSTrustStore(Arrays.asList(vomsdir)), validator);
 		
 	}
 	
 	public static VOMSACValidator getVOMSValidator(String vomsDir){
-		X509CertChainValidatorExt validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir);
+		X509CertChainValidatorExt validator = new CertificateValidatorBuilder()
+      .trustAnchorsDir(trustAnchorsDir).build();
 		return VOMSValidators.newValidator(new DefaultVOMSTrustStore(Arrays.asList(vomsDir)), validator);
 		
 	}

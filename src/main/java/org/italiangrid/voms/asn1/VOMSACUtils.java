@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,7 +156,8 @@ public class VOMSACUtils implements VOMSConstants{
 		return fqans;
 	}
 	
-	private static List<String> deserializeACTargets(X509AttributeCertificateHolder ac){
+	@SuppressWarnings("rawtypes")
+  private static List<String> deserializeACTargets(X509AttributeCertificateHolder ac){
 		List<String> targets = new ArrayList<String>();
 		
 		X509Extension targetExtension = ac.getExtension(X509Extension.targetInformation);

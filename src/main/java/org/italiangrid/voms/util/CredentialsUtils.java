@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,8 +184,7 @@ public class CredentialsUtils {
 	 * 
 	 * Saves user credentials as a plain text PEM data. <br>
 	 * Writes the user certificate chain first, then the user key, using the
-	 * default encoding specified in {@link #DEFAULT_ENCONDING} = 
-	 * {@value #DEFAULT_ENCONDING}.
+	 * default encoding specified in {@link #DEFAULT_ENCONDING}.
 	 *
 	 * @param os
 	 * @param uc
@@ -244,8 +243,7 @@ public class CredentialsUtils {
 	 * 
 	 * Saves proxy credentials to a file. This method ensures that the stored 
 	 * proxy is saved with the appropriate file permissions, using the
-	 * default encoding specified in {@link #DEFAULT_ENCONDING} = 
-	 * {@value #DEFAULT_ENCONDING}.
+	 * default encoding specified in {@link #DEFAULT_ENCONDING}.
 	 * 
 	 * @param proxyFileName
 	 * @param uc
