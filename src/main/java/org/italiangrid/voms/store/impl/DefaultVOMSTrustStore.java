@@ -54,7 +54,8 @@ import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
  */
 public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
-	/** The default directory where local VOMS trust information is rooted **/
+	/** The default directory where local VOMS trust information is rooted: 
+	 * {@value #DEFAULT_VOMS_DIR}**/
 	public static final String DEFAULT_VOMS_DIR = "/etc/grid-security/vomsdir";
 	
 	/** The filename suffix used to match certificates in the VOMS local trust directories **/

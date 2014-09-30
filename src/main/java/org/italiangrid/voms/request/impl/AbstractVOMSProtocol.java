@@ -72,8 +72,6 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 	/**
 	 * Ctor.
 	 * 
-	 * @param vomsServerInfo
-	 *            the info for the remote VOMS server endpoint
 	 * @param validator
 	 *            the validator used to manage the SSL authentication
 	 * @param listener 

@@ -71,8 +71,7 @@ public class FilePermissionHelper {
 	 * 
 	 * @param proxyFile
 	 *            the file to be checked
-	 * @return code>true</code> if the permissions are correct,
-	 *         <code>false</code> otherwise
+	 * 
 	 * @throws IOException if an error occurs checking file attributes
 	 * @throws FilePermissionError if permissions are not as expected
 	 */
@@ -120,7 +119,7 @@ public class FilePermissionHelper {
 	 * 
 	 * @param filename
 	 *            the filename to be checked
-	 * @param permissionString
+	 * @param p
 	 *            the permission string that must be matched
 	 * @throws IOException
 	 *             if an error occurs checking file attributes

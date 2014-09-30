@@ -134,7 +134,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
    * result for future validation calls.
    *
    * @param certChain
-   * @return
+   * @return a possibly cached {@link ValidationResult}
    * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.X509Certificate[])
    */
   public ValidationResult validate(X509Certificate[] certChain) {
@@ -179,7 +179,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
   }
 
   /**
-   * @return
+   * @return the proxy support information
    * @see eu.emi.security.authn.x509.X509CertChainValidatorExt#getProxySupport()
    */
   public ProxySupport getProxySupport() {
@@ -189,7 +189,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 
   /**
    * @param certPath
-   * @return
+   * @return the {@link ValidationResult}
    * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.CertPath)
    */
   public ValidationResult validate(CertPath certPath) {
@@ -198,7 +198,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
   }
 
   /**
-   * @return
+   * @return revocation parameters for the wrapped validator
    * @see eu.emi.security.authn.x509.X509CertChainValidatorExt#getRevocationCheckingMode()
    */
   public RevocationParameters getRevocationCheckingMode() {
@@ -207,7 +207,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
   }
 
   /**
-   * @return
+   * @return trusted issuers from the wrapped validator
    * @see eu.emi.security.authn.x509.X509CertChainValidator#getTrustedIssuers()
    */
   public X509Certificate[] getTrustedIssuers() {
