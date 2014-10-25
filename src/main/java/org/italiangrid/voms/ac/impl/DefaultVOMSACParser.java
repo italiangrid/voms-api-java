@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,8 @@ import org.italiangrid.voms.util.NullListener;
  */
 public class DefaultVOMSACParser implements VOMSACParser {
 	
-	private VOMSACLookupStrategy acLookupStrategy;
+	private final VOMSACLookupStrategy acLookupStrategy;
 	private final VOMSAttributesNormalizationStrategy acNormalizationStrategy = new LeafVOMSExtensionNormalizationStrategy();
-	private X509Certificate[] certChain;
 	
 	public DefaultVOMSACParser() {
 		this(new LeafACLookupStrategy(NullListener.INSTANCE));
@@ -45,32 +44,10 @@ public class DefaultVOMSACParser implements VOMSACParser {
 		this.acLookupStrategy = strategy;
 	}
 	
-	public synchronized List<VOMSAttribute> parse(X509Certificate[] validatedChain) {
-		this.certChain = validatedChain;
-		return parse();
-	}
-	
-	protected synchronized List<VOMSAttribute> parse() {
-		
-		if (certChain == null)
+	public List<VOMSAttribute> parse(X509Certificate[] validatedChain) {
+		if (validatedChain == null)
 			throw new NullPointerException("Cannot parse a null certchain!");
-		
-		List<ACParsingContext> parsedACs = acLookupStrategy.lookupVOMSAttributeCertificates(certChain);
+		List<ACParsingContext> parsedACs = acLookupStrategy.lookupVOMSAttributeCertificates(validatedChain);
 		return acNormalizationStrategy.normalizeAttributes(parsedACs);
 	}
-
-	/**
-	 * @return the certChain
-	 */
-	protected synchronized X509Certificate[] getCertChain() {
-		return certChain;
-	}
-
-	/**
-	 * @param certChain the certChain to set
-	 */
-	protected synchronized void setCertChain(X509Certificate[] certChain) {
-		this.certChain = certChain;
-	}
-
 }

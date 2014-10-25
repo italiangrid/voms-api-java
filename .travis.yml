@@ -1,0 +1,13 @@
+language: java
+jdk:
+- openjdk6
+- openjdk7
+- oraclejdk7
+- oraclejdk8
+os:
+- linux
+- osx
+
+notifications:
+  slack:
+    secure: NEqqRKfphFroJt3420x+ojawfPQqQFk4mw17z4/RwpGxlR3kftW17s198TCFVyiBn0OF55BA6w7s/JL4PqG5BCH10B8/+ulbKrQh3LNSr3cQxvPs4AhI+BIq4pvK01sLS/wNxCzj0LI1mOg7L8BnJlioOJyHHBCeadqxdyPf5Uk=

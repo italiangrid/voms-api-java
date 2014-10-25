@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -51,7 +54,8 @@ import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
  */
 public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
-	/** The default directory where local VOMS trust information is rooted **/
+	/** The default directory where local VOMS trust information is rooted: 
+	 * {@value #DEFAULT_VOMS_DIR}**/
 	public static final String DEFAULT_VOMS_DIR = "/etc/grid-security/vomsdir";
 	
 	/** The filename suffix used to match certificates in the VOMS local trust directories **/
@@ -64,7 +68,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 	 * The list of local trusted directories that is searched for trust
 	 * information (certs or LSC files)
 	 **/
-	private List<String> localTrustedDirs;
+	private final List<String> localTrustedDirs;
 
 	/** Map of local parsed AA certificates keyed by certificate subject hash **/
 	private Map<String, X509Certificate> localAACertificatesByHash = new HashMap<String, X509Certificate>();
@@ -74,6 +78,18 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 	
 	/** The trust store status listener that will be notified of changes in this trust store **/
 	private VOMSTrustStoreStatusListener listener;
+	
+	/** The read/write lock that implements thread safety for this store **/
+	protected final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+	
+	/** A reference to the read lock **/ 
+	protected final Lock read = rwLock.readLock();
+	
+	/** A reference to the write lock **/
+	protected final Lock write = rwLock.writeLock();
+	
+	/** A lock to guard the setting of the status listener **/
+	protected final Object listenerLock = new Object();
 	
 	/** Builds a list of trusted directories containing only {@link #DEFAULT_VOMS_DIR}. **/
 	protected static List<String> buildDefaultTrustedDirs(){
@@ -115,31 +131,48 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		this(buildDefaultTrustedDirs());
 	}
 	
-	public synchronized List<String> getLocalTrustedDirectories() {
-
-		return localTrustedDirs;
+	public List<String> getLocalTrustedDirectories() {
+		read.lock();
+		try{
+			return localTrustedDirs;
+		}finally{
+			read.unlock();
+		}
 	}
 
-	public synchronized List<X509Certificate> getLocalAACertificates() {
+	public List<X509Certificate> getLocalAACertificates() {
+		read.lock();
 
-		return Collections.unmodifiableList(new ArrayList<X509Certificate>(localAACertificatesByHash.values()));
+		try{
+			return Collections.unmodifiableList(new ArrayList<X509Certificate>(localAACertificatesByHash.values()));
+		}finally{
+			read.unlock();
+		}
 	}
 	
-	public synchronized LSCInfo getLSC(String voName, String hostname) {
+	public LSCInfo getLSC(String voName, String hostname) {
 
-		Set<LSCInfo> candidates = localLSCInfo.get(voName);
-		
-		if (candidates == null)
+		read.lock();
+
+		try{
+
+			Set<LSCInfo> candidates = localLSCInfo.get(voName);
+
+			if (candidates == null)
+				return null;
+
+			for (LSCInfo lsc : candidates) {
+
+				if (lsc.getHostname().equals(hostname))
+					return lsc;
+
+			}
+
 			return null;
 
-		for (LSCInfo lsc : candidates) {
-
-			if (lsc.getHostname().equals(hostname))
-				return lsc;
-
+		} finally {
+			read.unlock();
 		}
-
-		return null;
 	}
 	
 	/**
@@ -151,7 +184,9 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 	
 		directorySanityChecks(directory);
 		
-		listener.notifyCertficateLookupEvent(directory.getAbsolutePath());
+		synchronized (listenerLock) {
+			listener.notifyCertficateLookupEvent(directory.getAbsolutePath());
+		}
 		
 		File[] certFiles = directory.listFiles(new FilenameFilter() {	
 			public boolean accept(File dir, String name) {
@@ -184,7 +219,9 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 			// Store certificate in the local map 
 			localAACertificatesByHash.put(aaCertHash, aaCert);
 			
-			listener.notifyCertificateLoadEvent(aaCert, file);
+			synchronized (listenerLock) {
+				listener.notifyCertificateLoadEvent(aaCert, file);
+			}
 		
 		} catch (IOException e) {
 			String errorMessage = String.format("Error parsing VOMS trusted certificate from %s. Reason: %s",  file.getAbsolutePath(),e.getMessage());
@@ -201,7 +238,9 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		
 		directorySanityChecks(directory);
 		
-		listener.notifyLSCLookupEvent(directory.getAbsolutePath());
+		synchronized (listenerLock) {
+			listener.notifyLSCLookupEvent(directory.getAbsolutePath());
+		}
 		
 		File[] lscFiles = directory.listFiles(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
@@ -281,17 +320,6 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		
 	}
 	
-	/**
-	 * Checks that the certificate and LSC stores are not empty
-	 * @throws VOMSError if the stores are empty
-	 */
-	private void checkStoreIsNotEmpty(){
-		
-		if (localAACertificatesByHash.values().isEmpty() && localLSCInfo.values().isEmpty())	
-			throw new VOMSError("No VOMS trust information loaded from the given trust dirs: "+localTrustedDirs);
-				
-	}
-	
 	
 	private void cleanupStores(){
 		
@@ -299,36 +327,41 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 		localLSCInfo.clear();
 		
 	}
-	public synchronized void loadTrustInformation() {
+	public void loadTrustInformation() {
+		write.lock();
 
-		if (localTrustedDirs.isEmpty()) {
-			throw new VOMSError(
-					"No local trust directory was specified for this trust store. Please provide at least one path where LSC and VOMS service certificates will be searched for.");
-		}
+		try{
 
-		cleanupStores();
-
-		for (String localDir : localTrustedDirs) {
-
-			File baseTrustDir = new File(localDir);
-			
-			// Legacy VOMS dir structure put all the certificates in the base trust directory
-			loadCertificatesFromDirectory(baseTrustDir);
-			
-			// Load LSC and certificates files starting from each of the sub-directory of the starting trust info directory
-			File[] voDirs = baseTrustDir.listFiles(new FileFilter() {
-				public boolean accept(File pathname) {
-					return pathname.isDirectory();
-				}
-			});
-			
-			for (File voDir: voDirs){
-				loadLSCFromDirectory(voDir);
-				loadCertificatesFromDirectory(voDir);
+			if (localTrustedDirs.isEmpty()) {
+				throw new VOMSError(
+						"No local trust directory was specified for this trust store. Please provide at least one path where LSC and VOMS service certificates will be searched for.");
 			}
+
+			cleanupStores();
+
+			for (String localDir : localTrustedDirs) {
+
+				File baseTrustDir = new File(localDir);
+
+				// Legacy VOMS dir structure put all the certificates in the base trust directory
+				loadCertificatesFromDirectory(baseTrustDir);
+
+				// Load LSC and certificates files starting from each of the sub-directory of the starting trust info directory
+				File[] voDirs = baseTrustDir.listFiles(new FileFilter() {
+					public boolean accept(File pathname) {
+						return pathname.isDirectory();
+					}
+				});
+
+				for (File voDir: voDirs){
+					loadLSCFromDirectory(voDir);
+					loadCertificatesFromDirectory(voDir);
+				}
+			}
+
+		} finally{
+			write.unlock();
 		}
-		
-		checkStoreIsNotEmpty();
 	}
 
 	private String getOpensslCAHash(X500Principal principal){
@@ -338,18 +371,29 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 			
 	}
 	
-	public synchronized X509Certificate getAACertificateBySubject(X500Principal aaCertSubject) {
+	public X509Certificate getAACertificateBySubject(X500Principal aaCertSubject) {
 		
-		String theCertHash = getOpensslCAHash(aaCertSubject);
-		
-		return localAACertificatesByHash.get(theCertHash);	
+		read.lock();
+		try{
+			String theCertHash = getOpensslCAHash(aaCertSubject);
+			return localAACertificatesByHash.get(theCertHash);
+		}finally{
+			read.unlock();
+		}
 	}
 
-	public synchronized Map<String,Set<LSCInfo>> getAllLSCInfo() {
-		return Collections.unmodifiableMap(localLSCInfo);
+	public Map<String,Set<LSCInfo>> getAllLSCInfo() {
+		read.lock();
+		try{
+			return Collections.unmodifiableMap(localLSCInfo); 
+		}finally{
+			read.unlock();
+		}
 	}
 
-	public synchronized void setStatusListener(VOMSTrustStoreStatusListener statusListener) {
-		this.listener = statusListener;
+	public void setStatusListener(VOMSTrustStoreStatusListener statusListener) {
+		synchronized (listenerLock) {
+			this.listener = statusListener;
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.italiangrid.voms.VOMSError;
-import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
@@ -52,8 +51,10 @@ public class SSLSocketFactoryProvider {
 	}
 
 	public SSLSocketFactoryProvider(X509Credential credential) {
-		this(credential, CertificateValidatorBuilder.buildCertificateValidator(
-				DefaultVOMSValidator.DEFAULT_TRUST_ANCHORS_DIR, null, 60000L));
+		this(credential, 
+		  new CertificateValidatorBuilder()
+		  .trustAnchorsUpdateInterval(60000L)
+		  .build());
 	}
 
 	/**

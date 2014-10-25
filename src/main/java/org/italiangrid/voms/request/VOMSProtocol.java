@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,27 @@ package org.italiangrid.voms.request;
 import eu.emi.security.authn.x509.X509Credential;
 
 /**
- * The request/response protocol for VOMS, with a methods accepting a rerquest and 
- * returning a response. 
+ * The request/response protocol for VOMS, with a methods accepting a rerquest
+ * and returning a response.
  * 
  * @author valerioventuri
- *
+ * 
  */
 public interface VOMSProtocol {
 
   /**
    * Makes a request, get the response.
    * 
-   * @param endpoint the voms server endpoint information
-   * @param credential the credentials.
-   * @param request the request.
+   * @param endpoint
+   *          the voms server endpoint information
+   * @param credential
+   *          the credentials.
+   * @param request
+   *          the request.
    * 
    * @return a {@link VOMSResponse} containing the response.
    */
-  public VOMSResponse doRequest(VOMSServerInfo endpoint, X509Credential credential, VOMSACRequest request);
-  
+  public VOMSResponse doRequest(VOMSServerInfo endpoint,
+    X509Credential credential, VOMSACRequest request);
+
 }

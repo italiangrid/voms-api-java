@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,71 +39,69 @@ import eu.emi.security.authn.x509.X509Credential;
  */
 public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
 
-	public RESTProtocol(X509CertChainValidatorExt validator, 
-			VOMSProtocolListener listener, 
-			int connectTimeout, 
-			int readTimeout) {
-		super(validator, listener, connectTimeout, readTimeout);
-	}
-	
+  public RESTProtocol(X509CertChainValidatorExt validator,
+    VOMSProtocolListener listener, int connectTimeout, int readTimeout) {
 
-	public VOMSResponse doRequest(VOMSServerInfo endpoint, X509Credential credential, VOMSACRequest request) {
+    super(validator, listener, connectTimeout, readTimeout);
+  }
 
-		RESTServiceURLBuilder restQueryBuilder = new RESTServiceURLBuilder();
-		URL serviceUrl = restQueryBuilder.build(endpoint.getURL(), request);
-		RESTVOMSResponseParsingStrategy responseParsingStrategy = new RESTVOMSResponseParsingStrategy();
+  public VOMSResponse doRequest(VOMSServerInfo endpoint,
+    X509Credential credential, VOMSACRequest request) {
 
-		HttpsURLConnection connection = null;
+    RESTServiceURLBuilder restQueryBuilder = new RESTServiceURLBuilder();
+    URL serviceUrl = restQueryBuilder.build(endpoint, request);
+    RESTVOMSResponseParsingStrategy responseParsingStrategy = new RESTVOMSResponseParsingStrategy();
 
-		try {
+    HttpsURLConnection connection = null;
 
-			connection = (HttpsURLConnection) serviceUrl.openConnection();
-			
-			connection.setConnectTimeout(connectTimeout);
-			connection.setReadTimeout(readTimeout);
+    try {
 
-		} catch (IOException e) {
-			
-			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
-		}
+      connection = (HttpsURLConnection) serviceUrl.openConnection();
 
-		connection.setSSLSocketFactory(getSSLSocketFactory(credential));
+      connection.setConnectTimeout(connectTimeout);
+      connection.setReadTimeout(readTimeout);
 
-		listener.notifyHTTPRequest(serviceUrl.toExternalForm());
-		
-		try {
+    } catch (IOException e) {
 
-			connection.connect();
+      throw new VOMSProtocolError(e.getMessage(), endpoint, request,
+        credential, e);
+    }
 
-		} catch (IOException e) {
-			
-			throw new VOMSProtocolError(e.getMessage(), endpoint, request, credential, e);
-			
-		}
-		
-		InputStream is = null;
+    connection.setSSLSocketFactory(getSSLSocketFactory(credential));
 
-		try{
-			if (connection.getResponseCode() != 200){
-				is = connection.getErrorStream();
-			}else
-				is = connection.getInputStream();
-		
-		}catch (IOException e) {
-			
-			throw new VOMSProtocolError(e.getMessage(),
-				endpoint,
-				request,
-				credential,
-				e);
-		}
-		
-		VOMSResponse response = responseParsingStrategy.parse(is);
+    listener.notifyHTTPRequest(serviceUrl.toExternalForm());
 
-		listener.notifyReceivedResponse(response);
-		connection.disconnect();
+    try {
 
-		return response;
-	}
+      connection.connect();
+
+    } catch (IOException e) {
+
+      throw new VOMSProtocolError(e.getMessage(), endpoint, request,
+        credential, e);
+
+    }
+
+    InputStream is = null;
+
+    try {
+      if (connection.getResponseCode() != 200) {
+        is = connection.getErrorStream();
+      } else
+        is = connection.getInputStream();
+
+    } catch (IOException e) {
+
+      throw new VOMSProtocolError(e.getMessage(), endpoint, request,
+        credential, e);
+    }
+
+    VOMSResponse response = responseParsingStrategy.parse(is);
+
+    listener.notifyReceivedResponse(response);
+    connection.disconnect();
+
+    return response;
+  }
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2012.
+ * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,6 +157,9 @@ public class LSCFile implements LSCInfo{
 					return false;
 				
 			}
+		} else {
+		  // Cert chain description does not match certificate chain length
+		  return false;
 		}
 		
 		return true;
