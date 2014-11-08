@@ -30,21 +30,23 @@ import java.util.List;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DLSequence;
 import org.bouncycastle.asn1.x509.Attribute;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.IetfAttrSyntax;
 import org.bouncycastle.asn1.x509.Target;
 import org.bouncycastle.asn1.x509.TargetInformation;
 import org.bouncycastle.asn1.x509.Targets;
-import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -160,7 +162,7 @@ public class VOMSACUtils implements VOMSConstants{
   private static List<String> deserializeACTargets(X509AttributeCertificateHolder ac){
 		List<String> targets = new ArrayList<String>();
 		
-		X509Extension targetExtension = ac.getExtension(X509Extension.targetInformation);
+		Extension targetExtension = ac.getExtension(X509Extension.targetInformation);
 		
 		if (targetExtension == null)
 			return targets;
@@ -172,7 +174,7 @@ public class VOMSACUtils implements VOMSConstants{
 		
 		// The deserialization has to be done by hand since it seems VOMS
 		// does not correctly encode the ACTargets extension...
-		ASN1Sequence targetSequence = (ASN1Sequence) asn1TargetContainer.getDERObject();
+		ASN1Sequence targetSequence = (ASN1Sequence) asn1TargetContainer.toASN1Primitive();
 		Target[] asn1Targets = new Target[targetSequence.size()];
 		
 		int count = 0;
@@ -257,8 +259,8 @@ public class VOMSACUtils implements VOMSConstants{
 		Attribute[] asn1Attrs = acHolder.getAttributes(VOMS_FQANS_OID);
 		
 		for (Attribute a: asn1Attrs){
-			DERObject theVOMSDerObject = a.getAttributeValues()[0].getDERObject();
-			IetfAttrSyntax attrSyntax = new IetfAttrSyntax(ASN1Sequence.getInstance(theVOMSDerObject));
+                        ASN1Object theVOMSDerObject = a.getAttributeValues()[0].toASN1Primitive();
+			IetfAttrSyntax attrSyntax = IetfAttrSyntax.getInstance(ASN1Sequence.getInstance(theVOMSDerObject));
 			
 			
 			String policyAuthority = policyAuthoritySanityChecks(attrSyntax);
@@ -307,7 +309,7 @@ public class VOMSACUtils implements VOMSConstants{
 		
 		List<VOMSGenericAttribute> gas = new ArrayList<VOMSGenericAttribute>();
 		
-		X509Extension gasExtension = ac.getExtension(VOMS_GENERIC_ATTRS_OID);
+		Extension gasExtension = ac.getExtension(VOMS_GENERIC_ATTRS_OID);
 		
 		if (gasExtension == null)
 			return gas;
@@ -365,7 +367,7 @@ public class VOMSACUtils implements VOMSConstants{
 	private static X509Certificate[] deserializeACCerts(X509AttributeCertificateHolder ac){
 		List<X509Certificate> certs = new ArrayList<X509Certificate>();
 		
-		X509Extension e = ac.getExtension(VOMS_CERTS_OID);
+		Extension e = ac.getExtension(VOMS_CERTS_OID);
 		
 		if (e == null)
 			return null;
@@ -378,7 +380,7 @@ public class VOMSACUtils implements VOMSConstants{
 		certSeq = (ASN1Sequence)certSeq.getObjectAt(0);
 		
 		@SuppressWarnings("unchecked")
-		Enumeration<DERSequence> encodedCerts = certSeq.getObjects();
+		Enumeration<DLSequence> encodedCerts = certSeq.getObjects();
 		
 		CertificateFactory cf = null;
 		
@@ -390,14 +392,14 @@ public class VOMSACUtils implements VOMSConstants{
 		
 		while (encodedCerts.hasMoreElements()){
 			
-			DERSequence s  = encodedCerts.nextElement();
+                        DLSequence s  = encodedCerts.nextElement();
 			X509CertificateObject certObj = null;
 			byte[] certData = null;
 			X509Certificate theCert = null;
 			
 			try {
 				
-				certObj = new X509CertificateObject(X509CertificateStructure.getInstance(ASN1Sequence.getInstance(s)));
+				certObj = new X509CertificateObject(Certificate.getInstance(ASN1Sequence.getInstance(s)));
 				certData = certObj.getEncoded();
 				theCert = (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(certData));
 				

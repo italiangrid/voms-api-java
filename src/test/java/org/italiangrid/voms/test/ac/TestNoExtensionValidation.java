@@ -36,6 +36,7 @@ import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 import eu.emi.security.authn.x509.proxy.ProxyCertificateOptions;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyType;
+import java.io.IOException;
 
 public class TestNoExtensionValidation implements Fixture{
 	
@@ -52,8 +53,10 @@ public class TestNoExtensionValidation implements Fixture{
 	}
 
 	@Test
-	public void testNoExtensionValidation() throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException {
-		ProxyCertificateOptions options = new ProxyCertificateOptions(cred.getCertificateChain());
+	public void testNoExtensionValidation() throws InvalidKeyException, CertificateParsingException,
+                SignatureException, NoSuchAlgorithmException, IOException {
+
+                ProxyCertificateOptions options = new ProxyCertificateOptions(cred.getCertificateChain());
 		options.setType(ProxyType.LEGACY);
 		
 		ProxyCertificate proxy = ProxyGenerator.generate(options, cred.getKey());
