@@ -38,6 +38,11 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
    * The default value for the socket read timeout
    */
   public static final int DEFAULT_READ_TIMEOUT = 5000;
+  
+  /**
+   * The default hostname checking policy.
+   */
+  public static final boolean DEFAULT_SKIP_HOSTNAME_CHECKS = false;
 
   protected VOMSProtocolListener listener = NullListener.INSTANCE;
 
@@ -55,6 +60,11 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
    * The socket read timeout (in milliseconds)
    */
   protected int readTimeout = DEFAULT_READ_TIMEOUT;
+  
+  /**
+   * Whether to skip hostname checks
+   */
+  protected boolean skipHostnameChecks = DEFAULT_SKIP_HOSTNAME_CHECKS;
 
   /**
    * Ctor.
@@ -142,4 +152,24 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
     this.readTimeout = readTimeout;
   }
 
+  
+  /**
+   * @return whether this protocol will skip hostname checks
+   */
+  public boolean isSkipHostnameChecks() {
+  
+    return skipHostnameChecks;
+  }
+
+  /**
+   * Sets whether this protocol will skip SSL hostname checks
+   * 
+   * @param skipHostnameChecks 
+   */
+  public void setSkipHostnameChecks(boolean skipHostnameChecks) {
+  
+    this.skipHostnameChecks = skipHostnameChecks;
+  }
+
+  
 }
