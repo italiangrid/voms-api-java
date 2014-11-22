@@ -26,13 +26,13 @@ import java.util.Set;
 public interface VOMSServerInfoStore {
 
   /**
-   * Returns a set of {@link VOMSServerInfo} object matching a vo name passed as
-   * argument.
+   * Returns a set of {@link VOMSServerInfo} object matching a vo name or alias
+   * passed as argument.
    * 
    * @param voName
    *          a VO name
    * @return a possibly empty set of {@link VOMSServerInfo} object matching the
-   *         vo name passed as argument
+   *         vo name or alias passed as argument
    */
   public Set<VOMSServerInfo> getVOMSServerInfo(String voName);
 

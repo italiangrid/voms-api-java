@@ -16,6 +16,7 @@
 package org.italiangrid.voms.request.impl;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -65,15 +66,15 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 
   private void addVOMSServerInfo(VOMSServerInfo info, String path) {
 
-    if (serverInfoStore.containsKey(info.getVoName())) {
+    if (serverInfoStore.containsKey(info.getAlias())) {
 
-      serverInfoStore.get(info.getVoName()).add(info);
+      serverInfoStore.get(info.getAlias()).add(info);
 
     } else {
 
       Set<VOMSServerInfo> siCont = new HashSet<VOMSServerInfo>();
       siCont.add(info);
-      serverInfoStore.put(info.getVoName(), siCont);
+      serverInfoStore.put(info.getAlias(), siCont);
     }
 
     listener.notifyVOMSESInformationLoaded(path, info);
@@ -90,27 +91,14 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
     return allEntries;
   }
 
-  private Set<VOMSServerInfo> getVOMSServerInfoByAlias(String alias) {
-
-    Set<VOMSServerInfo> result = getVOMSServerInfo();
-    Iterator<VOMSServerInfo> it = result.iterator();
-
-    while (it.hasNext()) {
-      VOMSServerInfo i = it.next();
-      if (!i.getAlias().equals(alias))
-        it.remove();
-    }
-
-    return result;
-
-  }
-
   public Set<VOMSServerInfo> getVOMSServerInfo(String voName) {
 
     Set<VOMSServerInfo> result = serverInfoStore.get(voName);
+    
     if (result == null) {
-      result = getVOMSServerInfoByAlias(voName);
+      result = Collections.emptySet(); 
     }
+    
     return result;
   }
 

@@ -54,7 +54,7 @@ public class TestVOMSServerInfoStore {
     DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore.Builder()
       .lookupStrategy(strategy).build();
 
-    assertEquals(5, store.getVOMSServerInfo("atlas").size());
+    assertEquals(3, store.getVOMSServerInfo("atlas").size());
     assertEquals(2, store.getVOMSServerInfo("eumed").size());
 
     Assert.assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
@@ -76,7 +76,7 @@ public class TestVOMSServerInfoStore {
     DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore.Builder()
       .lookupStrategy(strategy).build();
 
-    assertEquals(2, store.getVOMSServerInfo("atlas").size());
+    assertEquals(1, store.getVOMSServerInfo("atlas").size());
 
     Assert.assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
 
