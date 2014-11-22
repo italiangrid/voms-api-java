@@ -4,7 +4,7 @@
 
   <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
-  <version>3.0.4</version>
+  <version>3.0.5.rc0</version>
   <packaging>jar</packaging>
 
   <name>voms-api-java</name>
@@ -87,6 +87,7 @@
   </developers>
 
   <build>
+    
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -208,6 +209,19 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
         <version>${plugin.deploy.version}</version>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${plugin.jar.version}</version>
+        <configuration>
+          <archive>
+            <manifest>
+               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
     </plugins>
   </build>
