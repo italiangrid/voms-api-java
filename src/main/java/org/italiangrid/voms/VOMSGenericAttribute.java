@@ -16,7 +16,8 @@
 package org.italiangrid.voms;
 
 /**
- * A VOMS generic attribute is a name=value pair attribute augmented with a context.
+ * A VOMS generic attribute is a name=value pair attribute augmented with a
+ * context.
  * 
  * 
  * @author Andrea Ceccanti
@@ -24,19 +25,19 @@ package org.italiangrid.voms;
  */
 public interface VOMSGenericAttribute {
 
-	/**
-	 * @return the name of this generic attribute
-	 */
-	public String getName();
-	
-	/**
-	 * @return the value of this generic attribute
-	 */
-	public String getValue();
-	
-	/**
-	 * @return the context of this generic attribute
-	 */
-	public String getContext();
-	
+  /**
+   * @return the name of this generic attribute
+   */
+  public String getName();
+
+  /**
+   * @return the value of this generic attribute
+   */
+  public String getValue();
+
+  /**
+   * @return the context of this generic attribute
+   */
+  public String getContext();
+
 }

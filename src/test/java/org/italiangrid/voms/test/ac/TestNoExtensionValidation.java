@@ -37,33 +37,38 @@ import eu.emi.security.authn.x509.proxy.ProxyCertificateOptions;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyType;
 
-public class TestNoExtensionValidation implements Fixture{
-	
-	PEMCredential cred;
-	
-	@Before
-	public void setUp() throws Exception {
-		cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
-	}
+public class TestNoExtensionValidation implements Fixture {
 
-	@After
-	public void tearDown() throws Exception {
-		cred = null;
-	}
+  PEMCredential cred;
 
-	@Test
-	public void testNoExtensionValidation() throws InvalidKeyException, CertificateParsingException, SignatureException, NoSuchAlgorithmException {
-		ProxyCertificateOptions options = new ProxyCertificateOptions(cred.getCertificateChain());
-		options.setType(ProxyType.LEGACY);
-		
-		ProxyCertificate proxy = ProxyGenerator.generate(options, cred.getKey());
-		
-		VOMSACValidator validator = Utils.getVOMSValidator();
-		List<VOMSAttribute> attrs = validator.validate(proxy.getCertificateChain());
-		
-		Assert.assertNotNull(attrs);
-		Assert.assertTrue(attrs.isEmpty());
-		
-	}
+  @Before
+  public void setUp() throws Exception {
+
+    cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
+  }
+
+  @After
+  public void tearDown() throws Exception {
+
+    cred = null;
+  }
+
+  @Test
+  public void testNoExtensionValidation() throws InvalidKeyException,
+    CertificateParsingException, SignatureException, NoSuchAlgorithmException {
+
+    ProxyCertificateOptions options = new ProxyCertificateOptions(
+      cred.getCertificateChain());
+    options.setType(ProxyType.LEGACY);
+
+    ProxyCertificate proxy = ProxyGenerator.generate(options, cred.getKey());
+
+    VOMSACValidator validator = Utils.getVOMSValidator();
+    List<VOMSAttribute> attrs = validator.validate(proxy.getCertificateChain());
+
+    Assert.assertNotNull(attrs);
+    Assert.assertTrue(attrs.isEmpty());
+
+  }
 
 }

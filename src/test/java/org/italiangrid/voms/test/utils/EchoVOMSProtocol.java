@@ -34,57 +34,48 @@ import eu.emi.security.authn.x509.impl.PEMCredential;
 
 public class EchoVOMSProtocol implements VOMSProtocol {
 
-	PEMCredential aaCredential;
-	
-	public EchoVOMSProtocol(PEMCredential aaCredential) {
-		this.aaCredential = aaCredential; 
-	}
-	
-	
-	
-	public VOMSResponse doRequest(VOMSServerInfo endpoint, 
-			X509Credential credential,
-			VOMSACRequest request) {
-		
-		VOMSAA aa = new VOMSAA(aaCredential, 
-				endpoint.getVoName(), 
-				endpoint.getURL().getHost(),
-				endpoint.getURL().getPort());
-		
-		
-		int lifetimeInSeconds = request.getLifetime();
-		
-		Calendar cal = Calendar.getInstance();
-		Date now = cal.getTime();
-		
-		cal.add(Calendar.SECOND, lifetimeInSeconds);
-		Date endTime = cal.getTime();
-		
-		List<String> fqans;
-		
-		if (request.getRequestedFQANs().isEmpty()){
-			fqans = new ArrayList<String>();
-			fqans.add("/"+request.getVoName());
-		}else
-			fqans = request.getRequestedFQANs();
-		
-		AttributeCertificate ac = aa.getAC(credential,
-				fqans,
-				null,
-				request.getTargets(),
-				now,
-				endTime);
-		
-		VOMSResponse r = Mockito.mock(VOMSResponse.class);
-		try {
-			
-			Mockito.when(r.getAC()).thenReturn(ac.getEncoded());
-		
-		} catch (IOException e) {
-			throw new VOMSError(e.getMessage(),e);
-		}
-		
-		return r;
-	}
+  PEMCredential aaCredential;
+
+  public EchoVOMSProtocol(PEMCredential aaCredential) {
+
+    this.aaCredential = aaCredential;
+  }
+
+  public VOMSResponse doRequest(VOMSServerInfo endpoint,
+    X509Credential credential, VOMSACRequest request) {
+
+    VOMSAA aa = new VOMSAA(aaCredential, endpoint.getVoName(), endpoint
+      .getURL().getHost(), endpoint.getURL().getPort());
+
+    int lifetimeInSeconds = request.getLifetime();
+
+    Calendar cal = Calendar.getInstance();
+    Date now = cal.getTime();
+
+    cal.add(Calendar.SECOND, lifetimeInSeconds);
+    Date endTime = cal.getTime();
+
+    List<String> fqans;
+
+    if (request.getRequestedFQANs().isEmpty()) {
+      fqans = new ArrayList<String>();
+      fqans.add("/" + request.getVoName());
+    } else
+      fqans = request.getRequestedFQANs();
+
+    AttributeCertificate ac = aa.getAC(credential, fqans, null,
+      request.getTargets(), now, endTime);
+
+    VOMSResponse r = Mockito.mock(VOMSResponse.class);
+    try {
+
+      Mockito.when(r.getAC()).thenReturn(ac.getEncoded());
+
+    } catch (IOException e) {
+      throw new VOMSError(e.getMessage(), e);
+    }
+
+    return r;
+  }
 
 }

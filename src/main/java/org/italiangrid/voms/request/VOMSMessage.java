@@ -25,36 +25,37 @@ package org.italiangrid.voms.request;
  */
 public class VOMSMessage {
 
-	int code;
-	String message;
+  int code;
+  String message;
 
-	public int getCode() {
+  public int getCode() {
 
-		return code;
-	}
+    return code;
+  }
 
-	public void setCode(int code) {
+  public void setCode(int code) {
 
-		this.code = code;
-	}
+    this.code = code;
+  }
 
-	public String getMessage() {
+  public String getMessage() {
 
-		return message;
-	}
+    return message;
+  }
 
-	public void setMessage(String message) {
+  public void setMessage(String message) {
 
-		this.message = message;
-	}
+    this.message = message;
+  }
 
-	public VOMSMessage(int code, String message) {
+  public VOMSMessage(int code, String message) {
 
-		this.code = code;
-		this.message = message;
-	}
+    this.code = code;
+    this.message = message;
+  }
 
-	public String toString() {
-		return "voms message " + code + ": " + message;
-	}
+  public String toString() {
+
+    return "voms message " + code + ": " + message;
+  }
 }

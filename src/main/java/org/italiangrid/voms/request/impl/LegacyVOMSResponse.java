@@ -29,143 +29,153 @@ import org.w3c.dom.NodeList;
 
 public class LegacyVOMSResponse implements VOMSResponse {
 
-	private static int ERROR_OFFSET = 1000;
+  private static int ERROR_OFFSET = 1000;
 
-	protected Document xmlResponse;
+  protected Document xmlResponse;
 
-	/**
-	 * Builds a VOMSResponse starting from a DOM an XML document (see
-	 * {@link Document}).
-	 * 
-	 * @param res
-	 */
-	public LegacyVOMSResponse(Document res) {
+  /**
+   * Builds a VOMSResponse starting from a DOM an XML document (see
+   * {@link Document}).
+   * 
+   * @param res
+   */
+  public LegacyVOMSResponse(Document res) {
 
-		xmlResponse = res;
-	}
+    xmlResponse = res;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.glite.voms.contact.VOMSResponseIF#getVersion()
-	 */
-	public int getVersion() {
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.glite.voms.contact.VOMSResponseIF#getVersion()
+   */
+  public int getVersion() {
 
-		Element versionElement = (Element) xmlResponse.getElementsByTagName("version").item(0);
+    Element versionElement = (Element) xmlResponse.getElementsByTagName(
+      "version").item(0);
 
-		if (versionElement == null) {
+    if (versionElement == null) {
 
-			return 0;
-		}
+      return 0;
+    }
 
-		return Integer.parseInt(versionElement.getFirstChild().getNodeValue());
-	}
+    return Integer.parseInt(versionElement.getFirstChild().getNodeValue());
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.glite.voms.contact.VOMSResponseIF#hasErrors()
-	 */
-	public boolean hasErrors() {
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.glite.voms.contact.VOMSResponseIF#hasErrors()
+   */
+  public boolean hasErrors() {
 
-		return errorMessages() != null;
-	}
+    return errorMessages() != null;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.glite.voms.contact.VOMSResponseIF#hasWarnings()
-	 */
-	public boolean hasWarnings() {
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.glite.voms.contact.VOMSResponseIF#hasWarnings()
+   */
+  public boolean hasWarnings() {
 
-		return warningMessages() != null;
-	}
+    return warningMessages() != null;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.glite.voms.contact.VOMSResponseIF#getAC()
-	 */
-	public byte[] getAC() {
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.glite.voms.contact.VOMSResponseIF#getAC()
+   */
+  public byte[] getAC() {
 
-		Element acElement = (Element) xmlResponse.getElementsByTagName("ac").item(0);
+    Element acElement = (Element) xmlResponse.getElementsByTagName("ac")
+      .item(0);
 
-		byte[] ac = VOMSBase64Decoder.decode(acElement.getFirstChild().getNodeValue());
+    byte[] ac = VOMSBase64Decoder.decode(acElement.getFirstChild()
+      .getNodeValue());
 
-		if (ac == null)
-			ac = new GoodACDecodingStrategy().decode(acElement.getFirstChild().getNodeValue());
+    if (ac == null)
+      ac = new GoodACDecodingStrategy().decode(acElement.getFirstChild()
+        .getNodeValue());
 
-		return ac;
-	}
+    return ac;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.glite.voms.contact.VOMSResponseIF#errorMessages()
-	 */
-	public VOMSErrorMessage[] errorMessages() {
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.glite.voms.contact.VOMSResponseIF#errorMessages()
+   */
+  public VOMSErrorMessage[] errorMessages() {
 
-		NodeList nodes = xmlResponse.getElementsByTagName("item");
+    NodeList nodes = xmlResponse.getElementsByTagName("item");
 
-		if (nodes.getLength() == 0)
-			return null;
+    if (nodes.getLength() == 0)
+      return null;
 
-		List<VOMSErrorMessage> errorList = new ArrayList<VOMSErrorMessage>();
+    List<VOMSErrorMessage> errorList = new ArrayList<VOMSErrorMessage>();
 
-		for (int i = 0; i < nodes.getLength(); i++) {
+    for (int i = 0; i < nodes.getLength(); i++) {
 
-			Element itemElement = (Element) nodes.item(i);
+      Element itemElement = (Element) nodes.item(i);
 
-			Element numberElement = (Element) itemElement.getElementsByTagName("number").item(0);
-			Element messageElement = (Element) itemElement.getElementsByTagName("message").item(0);
+      Element numberElement = (Element) itemElement.getElementsByTagName(
+        "number").item(0);
+      Element messageElement = (Element) itemElement.getElementsByTagName(
+        "message").item(0);
 
-			int number = Integer.parseInt(numberElement.getFirstChild().getNodeValue());
-			if (number >= ERROR_OFFSET)
-				errorList.add(new VOMSErrorMessage(number, messageElement.getFirstChild()
-						.getNodeValue()));
+      int number = Integer.parseInt(numberElement.getFirstChild()
+        .getNodeValue());
+      if (number >= ERROR_OFFSET)
+        errorList.add(new VOMSErrorMessage(number, messageElement
+          .getFirstChild().getNodeValue()));
 
-		}
-		
-		if (errorList.isEmpty())
-			return null;
+    }
 
-		return errorList.toArray(new VOMSErrorMessage[errorList.size()]);
-	}
+    if (errorList.isEmpty())
+      return null;
 
-	public VOMSWarningMessage[] warningMessages() {
+    return errorList.toArray(new VOMSErrorMessage[errorList.size()]);
+  }
 
-		NodeList nodes = xmlResponse.getElementsByTagName("item");
+  public VOMSWarningMessage[] warningMessages() {
 
-		if (nodes.getLength() == 0)
-			return null;
+    NodeList nodes = xmlResponse.getElementsByTagName("item");
 
-		List<VOMSWarningMessage> warningList = new ArrayList<VOMSWarningMessage>();
+    if (nodes.getLength() == 0)
+      return null;
 
-		for (int i = 0; i < nodes.getLength(); i++) {
+    List<VOMSWarningMessage> warningList = new ArrayList<VOMSWarningMessage>();
 
-			Element itemElement = (Element) nodes.item(i);
+    for (int i = 0; i < nodes.getLength(); i++) {
 
-			Element numberElement = (Element) itemElement.getElementsByTagName("number").item(0);
-			Element messageElement = (Element) itemElement.getElementsByTagName("message").item(0);
+      Element itemElement = (Element) nodes.item(i);
 
-			int number = Integer.parseInt(numberElement.getFirstChild().getNodeValue());
+      Element numberElement = (Element) itemElement.getElementsByTagName(
+        "number").item(0);
+      Element messageElement = (Element) itemElement.getElementsByTagName(
+        "message").item(0);
 
-			if (number < ERROR_OFFSET)
-				warningList.add(new VOMSWarningMessage(number, messageElement.getFirstChild()
-						.getNodeValue()));
+      int number = Integer.parseInt(numberElement.getFirstChild()
+        .getNodeValue());
 
-		}
+      if (number < ERROR_OFFSET)
+        warningList.add(new VOMSWarningMessage(number, messageElement
+          .getFirstChild().getNodeValue()));
 
-		if (warningList.isEmpty())
-			return null;
-		
-		return warningList.toArray(new VOMSWarningMessage[warningList.size()]);
-	}
+    }
 
-	public String getXMLAsString() {
+    if (warningList.isEmpty())
+      return null;
 
-		return XMLUtils.documentAsString(xmlResponse);
+    return warningList.toArray(new VOMSWarningMessage[warningList.size()]);
+  }
 
-	}
+  public String getXMLAsString() {
+
+    return XMLUtils.documentAsString(xmlResponse);
+
+  }
 
 }

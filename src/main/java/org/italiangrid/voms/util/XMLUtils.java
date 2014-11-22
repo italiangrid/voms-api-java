@@ -28,19 +28,20 @@ import org.w3c.dom.Document;
 
 public class XMLUtils {
 
-	public static String documentAsString(Document doc){
-	
-		try {
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StreamResult result = new StreamResult(new StringWriter());
-			DOMSource source = new DOMSource(doc);
-			transformer.transform(source, result);
-			return result.getWriter().toString();
-		
-		} catch (Throwable e) {
-			throw new VOMSError(e.getMessage(), e);
-		}
-		
-	}
+  public static String documentAsString(Document doc) {
+
+    try {
+      Transformer transformer = TransformerFactory.newInstance()
+        .newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      StreamResult result = new StreamResult(new StringWriter());
+      DOMSource source = new DOMSource(doc);
+      transformer.transform(source, result);
+      return result.getWriter().toString();
+
+    } catch (Throwable e) {
+      throw new VOMSError(e.getMessage(), e);
+    }
+
+  }
 }

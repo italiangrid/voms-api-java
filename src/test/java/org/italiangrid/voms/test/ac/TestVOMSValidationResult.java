@@ -22,16 +22,19 @@ import org.junit.Test;
 
 public class TestVOMSValidationResult {
 
-	@Test
-	public void testGettersAndSetters() {
-		VOMSValidationResult r  = new VOMSValidationResult(null, false);
-		
-		assertFalse(r.isValid());
-		assertNull(r.getAttributes());
-		assertTrue(r.getValidationErrors().isEmpty());
-		
-		assertEquals("VOMSValidationResult [valid=false, validationErrors=[], attributes=null]", r.toString());
-		
-	}
+  @Test
+  public void testGettersAndSetters() {
+
+    VOMSValidationResult r = new VOMSValidationResult(null, false);
+
+    assertFalse(r.isValid());
+    assertNull(r.getAttributes());
+    assertTrue(r.getValidationErrors().isEmpty());
+
+    assertEquals(
+      "VOMSValidationResult [valid=false, validationErrors=[], attributes=null]",
+      r.toString());
+
+  }
 
 }

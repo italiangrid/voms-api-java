@@ -35,10 +35,8 @@ public class FilePermissionHelper {
 
   public static enum PosixFilePermission {
 
-    USER_RO("400", "-r--------"),
-    USER_RW("600", "-rw-------"),
-    USER_ALL("700","-rwx------"),
-    ALL_PERMS("777", "-rwxrwxrwx");
+    USER_RO("400", "-r--------"), USER_RW("600", "-rw-------"), USER_ALL("700",
+      "-rwx------"), ALL_PERMS("777", "-rwxrwxrwx");
 
     private PosixFilePermission(String chmodForm, String statForm) {
 
@@ -118,11 +116,11 @@ public class FilePermissionHelper {
       } catch (FilePermissionError e) {
       }
     }
-    
-    final String errorMessage = String
-      .format("Wrong file permissions on file %s. Required permissions are: %s ",
-        privateKeyFile, PRIVATE_KEY_PERMS_STR);
-    
+
+    final String errorMessage = String.format(
+      "Wrong file permissions on file %s. Required permissions are: %s ",
+      privateKeyFile, PRIVATE_KEY_PERMS_STR);
+
     throw new FilePermissionError(errorMessage);
   }
 

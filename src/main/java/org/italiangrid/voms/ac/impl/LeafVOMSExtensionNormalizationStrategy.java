@@ -24,26 +24,27 @@ import org.italiangrid.voms.ac.ACParsingContext;
 import org.italiangrid.voms.ac.VOMSAttributesNormalizationStrategy;
 import org.italiangrid.voms.asn1.VOMSACUtils;
 import org.italiangrid.voms.asn1.VOMSConstants;
+
 /**
  * 
- * This strategy extracts the VOMS attributes from the top VOMS extension found 
+ * This strategy extracts the VOMS attributes from the top VOMS extension found
  * in the parsing context passed as argument.
  * 
  * @author Andrea Ceccanti
  *
  */
 public class LeafVOMSExtensionNormalizationStrategy implements
-		VOMSAttributesNormalizationStrategy, VOMSConstants {
+  VOMSAttributesNormalizationStrategy, VOMSConstants {
 
-	public List<VOMSAttribute> normalizeAttributes(List<ACParsingContext> acs) {
-		
-		if (acs == null || acs.isEmpty())
-			return Collections.emptyList();
-		
-		List<AttributeCertificate> attrs = acs.get(0).getACs();
-		
-		return VOMSACUtils.deserializeVOMSAttributes(attrs);
-		
-	}
+  public List<VOMSAttribute> normalizeAttributes(List<ACParsingContext> acs) {
+
+    if (acs == null || acs.isEmpty())
+      return Collections.emptyList();
+
+    List<AttributeCertificate> attrs = acs.get(0).getACs();
+
+    return VOMSACUtils.deserializeVOMSAttributes(attrs);
+
+  }
 
 }

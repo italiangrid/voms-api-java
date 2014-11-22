@@ -32,52 +32,54 @@ import org.w3c.dom.Document;
  * @author valerioventuri
  *
  */
-public class RESTVOMSResponseParsingStrategy implements VOMSResponseParsingStrategy {
-  
+public class RESTVOMSResponseParsingStrategy implements
+  VOMSResponseParsingStrategy {
+
   private DocumentBuilder docBuilder;
-  
+
   /**
    * 
    */
   public RESTVOMSResponseParsingStrategy() {
-    
+
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setIgnoringComments(true);
     factory.setNamespaceAware(false);
     factory.setValidating(false);
 
     try {
-    
+
       docBuilder = factory.newDocumentBuilder();
-    
+
     } catch (ParserConfigurationException e) {
-      
+
       throw new VOMSError(e.getMessage(), e);
     }
-    
+
   }
 
   /**
-   * Parse a response coming from a RESTFul VOMS service and builds a {@link VOMSResponse} object
-   * representing the response.
+   * Parse a response coming from a RESTFul VOMS service and builds a
+   * {@link VOMSResponse} object representing the response.
    * 
-   * @param inputStream the response coming from the service
+   * @param inputStream
+   *          the response coming from the service
    * @return a {@link VOMSResponse} object representing the response.
    * 
    */
   public VOMSResponse parse(InputStream inputStream) {
-    
+
     try {
 
       Document document = docBuilder.parse(inputStream);
-      
+
       return new RESTVOMSResponse(document);
 
     } catch (Exception e) {
 
       throw new VOMSError(e.getMessage());
 
-    } 
+    }
   }
 
 }

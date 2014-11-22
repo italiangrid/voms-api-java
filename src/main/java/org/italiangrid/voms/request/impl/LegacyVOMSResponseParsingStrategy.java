@@ -32,19 +32,20 @@ import org.w3c.dom.Document;
  * @author valerioventuri
  *
  */
-public class LegacyVOMSResponseParsingStrategy implements VOMSResponseParsingStrategy {
+public class LegacyVOMSResponseParsingStrategy implements
+  VOMSResponseParsingStrategy {
 
   protected DocumentBuilder documentBuilder;
-  
+
   public LegacyVOMSResponseParsingStrategy() {
-    
+
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setIgnoringComments(true);
     factory.setNamespaceAware(false);
     factory.setValidating(false);
 
     try {
-    
+
       documentBuilder = factory.newDocumentBuilder();
 
     } catch (ParserConfigurationException e) {
@@ -52,13 +53,13 @@ public class LegacyVOMSResponseParsingStrategy implements VOMSResponseParsingStr
       throw new VOMSError(e.getMessage(), e);
     }
   }
-  
+
   public VOMSResponse parse(InputStream inputStream) {
-    
+
     try {
 
       Document document = documentBuilder.parse(inputStream);
-      
+
       return new LegacyVOMSResponse(document);
 
     } catch (Exception e) {
@@ -67,5 +68,5 @@ public class LegacyVOMSResponseParsingStrategy implements VOMSResponseParsingStr
 
     }
 
-  }  
+  }
 }
