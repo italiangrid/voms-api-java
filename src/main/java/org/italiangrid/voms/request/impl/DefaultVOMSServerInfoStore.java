@@ -18,7 +18,6 @@ package org.italiangrid.voms.request.impl;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +34,7 @@ import org.italiangrid.voms.util.NullListener;
 /**
  * 
  * A {@link DefaultVOMSServerInfoStore} organizes voms servers found in vomses
- * configuration files in map keyed by vo. This way is easy to know which
+ * configuration files in map keyed by vo alias. This way is easy to know which
  * servers acts as replicas for the same vos.
  * 
  * @author Andrea Ceccanti

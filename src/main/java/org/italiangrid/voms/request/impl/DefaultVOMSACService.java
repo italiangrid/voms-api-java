@@ -199,6 +199,8 @@ public class DefaultVOMSACService implements VOMSACService {
 
     VOMSResponse response = null;
 
+    AttributeCertificate vomsAC = null;
+
     for (VOMSServerInfo vomsServerInfo : vomsServerInfos) {
 
       requestListener.notifyVOMSRequestStart(request, vomsServerInfo);
@@ -206,30 +208,45 @@ public class DefaultVOMSACService implements VOMSACService {
       // Try HTTP request first
       response = doRequest(httpProtocol, vomsServerInfo, credential, request);
 
-      // If failed, try legacy protocol
-      if (response == null)
+      // If failed, try legacy request
+      if (response == null) {
         response = doRequest(legacyProtocol, vomsServerInfo, credential,
           request);
-
-      if (response != null) {
-        requestListener.notifyVOMSRequestSuccess(request, vomsServerInfo);
-
-        handleErrorsInResponse(request, vomsServerInfo, response);
-        handleWarningsInResponse(request, vomsServerInfo, response);
-
-        break;
       }
 
-      requestListener.notifyVOMSRequestFailure(request, vomsServerInfo,
-        new VOMSError("REST and legacy VOMS endpoints failed."));
+      // We had failures with both requests
+      if (response == null) {
+        requestListener.notifyVOMSRequestFailure(request, vomsServerInfo,
+          new VOMSError("REST and legacy VOMS endpoints failed."));
+
+        // continue to next server
+        continue;
+      }
+
+      // Notify that the server was contacted successfully
+      requestListener.notifyVOMSRequestSuccess(request, vomsServerInfo);
+
+      // Notify errors
+      handleErrorsInResponse(request, vomsServerInfo, response);
+
+      // Notify warnings
+      handleWarningsInResponse(request, vomsServerInfo, response);
+
+      vomsAC = getACFromResponse(request, response);
+
+      // Exit the loop only when succesfully get an AC
+      // out of the VOMS server
+      if (!response.hasErrors() && vomsAC != null) {
+        return vomsAC;
+      }
+
     }
 
-    if (response == null) {
-      requestListener.notifyVOMSRequestFailure(request, null, null);
-      return null;
-    }
-
-    return getACFromResponse(request, response);
+    // if we reach this point we had failures in contacting
+    // all known voms server for the VO
+    requestListener.notifyVOMSRequestFailure(request, null, null);
+    return null;
+    
   }
 
   /**
@@ -260,6 +277,12 @@ public class DefaultVOMSACService implements VOMSACService {
    * methods. Example:
    * 
    * <pre>
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
    * 
    * 
    * 
