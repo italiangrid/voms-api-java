@@ -199,6 +199,8 @@ public class DefaultVOMSACService implements VOMSACService {
 
     VOMSResponse response = null;
 
+    AttributeCertificate vomsAC = null;
+
     for (VOMSServerInfo vomsServerInfo : vomsServerInfos) {
 
       requestListener.notifyVOMSRequestStart(request, vomsServerInfo);
@@ -206,30 +208,45 @@ public class DefaultVOMSACService implements VOMSACService {
       // Try HTTP request first
       response = doRequest(httpProtocol, vomsServerInfo, credential, request);
 
-      // If failed, try legacy protocol
-      if (response == null)
+      // If failed, try legacy request
+      if (response == null) {
         response = doRequest(legacyProtocol, vomsServerInfo, credential,
           request);
-
-      if (response != null) {
-        requestListener.notifyVOMSRequestSuccess(request, vomsServerInfo);
-
-        handleErrorsInResponse(request, vomsServerInfo, response);
-        handleWarningsInResponse(request, vomsServerInfo, response);
-
-        break;
       }
 
-      requestListener.notifyVOMSRequestFailure(request, vomsServerInfo,
-        new VOMSError("REST and legacy VOMS endpoints failed."));
+      // We had failures with both requests
+      if (response == null) {
+        requestListener.notifyVOMSRequestFailure(request, vomsServerInfo,
+          new VOMSError("REST and legacy VOMS endpoints failed."));
+
+        // continue to next server
+        continue;
+      }
+
+      // Notify that the server was contacted successfully
+      requestListener.notifyVOMSRequestSuccess(request, vomsServerInfo);
+
+      // Notify errors
+      handleErrorsInResponse(request, vomsServerInfo, response);
+
+      // Notify warnings
+      handleWarningsInResponse(request, vomsServerInfo, response);
+
+      vomsAC = getACFromResponse(request, response);
+
+      // Exit the loop only when succesfully get an AC
+      // out of the VOMS server
+      if (!response.hasErrors() && vomsAC != null) {
+        return vomsAC;
+      }
+
     }
 
-    if (response == null) {
-      requestListener.notifyVOMSRequestFailure(request, null, null);
-      return null;
-    }
-
-    return getACFromResponse(request, response);
+    // if we reach this point we had failures in contacting
+    // all known voms server for the VO
+    requestListener.notifyVOMSRequestFailure(request, null, null);
+    return null;
+    
   }
 
   /**
@@ -260,6 +277,15 @@ public class DefaultVOMSACService implements VOMSACService {
    * methods. Example:
    * 
    * <pre>
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
    * 
    * {
    *   &#064;code
@@ -319,6 +345,11 @@ public class DefaultVOMSACService implements VOMSACService {
      * The read timeout used
      */
     private int readTimeout = AbstractVOMSProtocol.DEFAULT_READ_TIMEOUT;
+
+    /**
+     * Whether the client should skip hostname checking
+     */
+    private boolean skipHostnameChecks = true;
 
     /**
      * The http protocol implementation
@@ -434,6 +465,22 @@ public class DefaultVOMSACService implements VOMSACService {
     }
 
     /**
+     * Sets a flag to skip VOMS hostname checking. Allows for creative VOMS
+     * server side certificate configuration.
+     * 
+     * @param s
+     *          <code>true</code> to skip the checks, <code>false</code>
+     *          otherwise
+     * 
+     * @return this {@link Builder} instance
+     */
+    public Builder skipHostnameChecks(boolean s) {
+
+      this.skipHostnameChecks = s;
+      return this;
+    }
+
+    /**
      * Sets the vomses lookup strategy for the {@link DefaultVOMSACService} that
      * this builder is creating
      * 
@@ -502,13 +549,27 @@ public class DefaultVOMSACService implements VOMSACService {
      */
     protected void buildProtocols() {
 
-      if (httpProtocol == null)
-        httpProtocol = new RESTProtocol(validator, protocolListener,
+      if (httpProtocol == null) {
+
+        RESTProtocol p = new RESTProtocol(validator, protocolListener,
           connectTimeout, readTimeout);
 
-      if (legacyProtocol == null)
-        legacyProtocol = new LegacyProtocol(validator, protocolListener,
+        p.setSkipHostnameChecks(skipHostnameChecks);
+
+        httpProtocol = p;
+
+      }
+
+      if (legacyProtocol == null) {
+
+        LegacyProtocol p = new LegacyProtocol(validator, protocolListener,
           connectTimeout, readTimeout);
+
+        p.setSkipHostnameChecks(skipHostnameChecks);
+
+        legacyProtocol = p;
+
+      }
     }
 
     /**

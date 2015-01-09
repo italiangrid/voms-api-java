@@ -65,9 +65,8 @@ public class VOMSESLineParser {
     }
   };
 
-  static final String VOMSES_FIELD_NAMES[] =
-    { "vo alias", "voms host", "voms port", "voms server DN", "vo name",
-      "globus version" };
+  static final String VOMSES_FIELD_NAMES[] = { "vo alias", "voms host",
+    "voms port", "voms server DN", "vo name", "globus version" };
 
   static final int VO_ALIAS = 0, VOMS_HOST = 1, VOMS_PORT = 2,
     VOMS_SERVER_DN = 3, VO_NAME = 4, GLOBUS_VERSION = 5;

@@ -15,8 +15,6 @@
  */
 package org.italiangrid.voms.request;
 
-
-
 /**
  * 
  * @author Andrea Ceccanti
@@ -24,49 +22,52 @@ package org.italiangrid.voms.request;
  */
 public interface VOMSResponse {
 
-	/**
-	 * @return <code>true</code> if this {@link VOMSResponse} has errors, <code>false</code> otherwise
-	 */
-	public boolean hasErrors();
+  /**
+   * @return <code>true</code> if this {@link VOMSResponse} has errors,
+   *         <code>false</code> otherwise
+   */
+  public boolean hasErrors();
 
-	/**
-	 * @return <code>true</code> if this {@link VOMSResponse} has warnings, <code>false</code> otherwise
-	 */
-	public boolean hasWarnings();
+  /**
+   * @return <code>true</code> if this {@link VOMSResponse} has warnings,
+   *         <code>false</code> otherwise
+   */
+  public boolean hasWarnings();
 
-	/**
-	 * 
-	 * Extracts the AC from the VOMS response.
-	 * 
-	 * @return an array of bytes containing the AC.
-	 */
-	public byte[] getAC();
+  /**
+   * 
+   * Extracts the AC from the VOMS response.
+   * 
+   * @return an array of bytes containing the AC.
+   */
+  public byte[] getAC();
 
-	/**
-	 * Extracts the version from the VOMS response.
-	 * 
-	 * @return an integer containing the AC.
-	 */
-	public abstract int getVersion();
+  /**
+   * Extracts the version from the VOMS response.
+   * 
+   * @return an integer containing the AC.
+   */
+  public abstract int getVersion();
 
-	/**
-	 * 
-	 * Extracts the error messages from the VOMS response.
-	 * 
-	 * @return an array of {@link VOMSErrorMessage} objects.
-	 */
-	public VOMSErrorMessage[] errorMessages();
+  /**
+   * 
+   * Extracts the error messages from the VOMS response.
+   * 
+   * @return an array of {@link VOMSErrorMessage} objects.
+   */
+  public VOMSErrorMessage[] errorMessages();
 
-	/**
-	 * Extracts the warning messags from the VOMS response.
-	 * @return an array of {@link VOMSWarningMessage} objects.
-	 */
-	public VOMSWarningMessage[] warningMessages();
-	
-	/**
-	 * 
-	 * @return Returns the XML representation of the response as a string.
-	 */
-	public String getXMLAsString();
+  /**
+   * Extracts the warning messags from the VOMS response.
+   * 
+   * @return an array of {@link VOMSWarningMessage} objects.
+   */
+  public VOMSWarningMessage[] warningMessages();
+
+  /**
+   * 
+   * @return Returns the XML representation of the response as a string.
+   */
+  public String getXMLAsString();
 
 }

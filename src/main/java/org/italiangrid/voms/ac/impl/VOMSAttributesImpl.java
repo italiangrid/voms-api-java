@@ -36,167 +36,191 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
  *
  */
 public class VOMSAttributesImpl implements VOMSAttribute {
-	public static final int DEFAULT_CLOCK_SKEW_IN_MINUTES = 5;
-	
-	private String VO;
-	private String host;
-	private int port;
-	private List<String> FQANs;
-	private X500Principal issuer;
-	private X500Principal holder;
-	private BigInteger holderSerialNumber;
-	private Date notAfter;
-	private Date notBefore;
-	private byte[] signature;
-	private List<VOMSGenericAttribute> genericAttributes;
-	private List<String> acTargets;
-	private X509Certificate[] aaCerts;
-	private X509AttributeCertificateHolder VOMSAC;
-	
-	public VOMSAttributesImpl() {
-	
-	}
 
-	public X500Principal getIssuer() {
-		return issuer;
-	}
+  public static final int DEFAULT_CLOCK_SKEW_IN_MINUTES = 5;
 
-	public String getPrimaryFQAN() {
-		return FQANs.get(0);
-	}
+  private String VO;
+  private String host;
+  private int port;
+  private List<String> FQANs;
+  private X500Principal issuer;
+  private X500Principal holder;
+  private BigInteger holderSerialNumber;
+  private Date notAfter;
+  private Date notBefore;
+  private byte[] signature;
+  private List<VOMSGenericAttribute> genericAttributes;
+  private List<String> acTargets;
+  private X509Certificate[] aaCerts;
+  private X509AttributeCertificateHolder VOMSAC;
 
-	public String getVO() {
-		return VO;
-	}
+  public VOMSAttributesImpl() {
 
-	
-	public void setIssuer(X500Principal issuer) {
-		this.issuer = issuer;
-	}
+  }
 
-	public void setVO(String vO) {
-		VO = vO;
-	}
-	
+  public X500Principal getIssuer() {
 
-	public List<String> getFQANs() {
-		return FQANs;
-	}
+    return issuer;
+  }
 
+  public String getPrimaryFQAN() {
 
-	public void setFQANs(List<String> fQANs) {
-		FQANs = fQANs;
-	}
+    return FQANs.get(0);
+  }
 
-	public String getHost() {
-		return host;
-	}
+  public String getVO() {
 
-	public int getPort() {
-		
-		return port;
-	}
+    return VO;
+  }
 
-	public X500Principal getHolder() {
-		
-		return holder;
-	}
+  public void setIssuer(X500Principal issuer) {
 
-	public Date getNotBefore() {
-		return notBefore;
-	}
+    this.issuer = issuer;
+  }
 
-	public Date getNotAfter() {
-		
-		return notAfter;
-	}
+  public void setVO(String vO) {
 
-	public byte[] getSignature() {
-		return signature;
-	}
+    VO = vO;
+  }
 
-	public void setHost(String host) {
-		this.host = host;
-	}
+  public List<String> getFQANs() {
 
-	public void setPort(int port) {
-		this.port = port;
-	}
+    return FQANs;
+  }
 
-	public void setHolder(X500Principal holder) {
-		this.holder = holder;
-	}
+  public void setFQANs(List<String> fQANs) {
 
-	public void setNotAfter(Date notAfter) {
-		this.notAfter = notAfter;
-	}
+    FQANs = fQANs;
+  }
 
-	public void setNotBefore(Date notBefore) {
-		this.notBefore = notBefore;
-	}
+  public String getHost() {
 
-	public void setSignature(byte[] signature) {
-		this.signature = signature;
-	}
+    return host;
+  }
 
-	@Override
-	public String toString() {
-		return "VOMSAttributesImpl [VO=" + VO + ", host=" + host + ", port="
-				+ port + ", FQANs=" + FQANs + ", gas=" + genericAttributes+ ", issuer='" + X500NameUtils.getReadableForm(issuer)
-				+ "', holder='" + X500NameUtils.getReadableForm(holder) + "', notAfter=" + notAfter
-				+ ", notBefore=" + notBefore 
-				+ ", targets=" + acTargets + " ]";
-	}
+  public int getPort() {
 
-	public List<VOMSGenericAttribute> getGenericAttributes() {
-		return genericAttributes;
-	}
+    return port;
+  }
 
-	public void setGenericAttributes(List<VOMSGenericAttribute> genericAttributes) {
-		this.genericAttributes = genericAttributes;
-	}
+  public X500Principal getHolder() {
 
-	public List<String> getTargets() {
-		return acTargets;
-	}
+    return holder;
+  }
 
-	public void setTargets(List<String> targets){
-		acTargets = targets;
-	}
-	
-	public X509Certificate[] getAACertificates() {
-		return aaCerts;
-	}
+  public Date getNotBefore() {
 
-	public void setAACertificates(X509Certificate[] aaCerts) {
-		this.aaCerts = aaCerts;
-	}
+    return notBefore;
+  }
 
-	public boolean isValid() {
-		return validAt(new Date());
-	}
+  public Date getNotAfter() {
 
-	public boolean validAt(Date date) {
-		return TimeUtils.checkTimeInRangeWithSkew(date, 
-				getNotBefore(), 
-				getNotAfter(), 
-				DEFAULT_CLOCK_SKEW_IN_MINUTES);
-	}
+    return notAfter;
+  }
 
-	public X509AttributeCertificateHolder getVOMSAC() {
-		
-		return VOMSAC;
-	}
+  public byte[] getSignature() {
 
-	public void setVOMSAC(X509AttributeCertificateHolder ac) {
-		VOMSAC = ac;
-	}
+    return signature;
+  }
 
-	public BigInteger getHolderSerialNumber() {
-		return holderSerialNumber;
-	}
+  public void setHost(String host) {
 
-	public void setHolderSerialNumber(BigInteger holderSerialNumber) {
-		this.holderSerialNumber = holderSerialNumber;
-	}
+    this.host = host;
+  }
+
+  public void setPort(int port) {
+
+    this.port = port;
+  }
+
+  public void setHolder(X500Principal holder) {
+
+    this.holder = holder;
+  }
+
+  public void setNotAfter(Date notAfter) {
+
+    this.notAfter = notAfter;
+  }
+
+  public void setNotBefore(Date notBefore) {
+
+    this.notBefore = notBefore;
+  }
+
+  public void setSignature(byte[] signature) {
+
+    this.signature = signature;
+  }
+
+  @Override
+  public String toString() {
+
+    return "VOMSAttributesImpl [VO=" + VO + ", host=" + host + ", port=" + port
+      + ", FQANs=" + FQANs + ", gas=" + genericAttributes + ", issuer='"
+      + X500NameUtils.getReadableForm(issuer) + "', holder='"
+      + X500NameUtils.getReadableForm(holder) + "', notAfter=" + notAfter
+      + ", notBefore=" + notBefore + ", targets=" + acTargets + " ]";
+  }
+
+  public List<VOMSGenericAttribute> getGenericAttributes() {
+
+    return genericAttributes;
+  }
+
+  public void setGenericAttributes(List<VOMSGenericAttribute> genericAttributes) {
+
+    this.genericAttributes = genericAttributes;
+  }
+
+  public List<String> getTargets() {
+
+    return acTargets;
+  }
+
+  public void setTargets(List<String> targets) {
+
+    acTargets = targets;
+  }
+
+  public X509Certificate[] getAACertificates() {
+
+    return aaCerts;
+  }
+
+  public void setAACertificates(X509Certificate[] aaCerts) {
+
+    this.aaCerts = aaCerts;
+  }
+
+  public boolean isValid() {
+
+    return validAt(new Date());
+  }
+
+  public boolean validAt(Date date) {
+
+    return TimeUtils.checkTimeInRangeWithSkew(date, getNotBefore(),
+      getNotAfter(), DEFAULT_CLOCK_SKEW_IN_MINUTES);
+  }
+
+  public X509AttributeCertificateHolder getVOMSAC() {
+
+    return VOMSAC;
+  }
+
+  public void setVOMSAC(X509AttributeCertificateHolder ac) {
+
+    VOMSAC = ac;
+  }
+
+  public BigInteger getHolderSerialNumber() {
+
+    return holderSerialNumber;
+  }
+
+  public void setHolderSerialNumber(BigInteger holderSerialNumber) {
+
+    this.holderSerialNumber = holderSerialNumber;
+  }
 }

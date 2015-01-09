@@ -32,88 +32,94 @@ import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSServerInfo;
 
 public class LegacyVOMSESParserImpl implements VOMSESParser {
-	
+
   private final VOMSESLineParser lineParser = new VOMSESLineParser();
-	
-	protected void fileSanityChecks(File f){
-		if (!f.exists())
-			throw new VOMSError("VOMSES file does not exist: "+f.getAbsolutePath());
-		if (!f.canRead())
-			throw new VOMSError("VOMSES file is not readable: "+f.getAbsolutePath());
-	}
-	
-	protected VOMSServerInfo parseLine(String vomsesLine) throws URISyntaxException {
-	  return lineParser.parse(vomsesLine);
-	}
-	
-	public List<VOMSServerInfo> parse(Reader vomsesReader) {
 
-		BufferedReader reader = new BufferedReader(vomsesReader);
+  protected void fileSanityChecks(File f) {
 
-		String line = null;
-		List<VOMSServerInfo> result = new ArrayList<VOMSServerInfo>();
-		
-		try {
-			
-			while ((line = reader.readLine()) != null) {
+    if (!f.exists())
+      throw new VOMSError("VOMSES file does not exist: " + f.getAbsolutePath());
+    if (!f.canRead())
+      throw new VOMSError("VOMSES file is not readable: " + f.getAbsolutePath());
+  }
 
-				// Ignore comments
-				if (line.startsWith("#"))
-					continue;
+  protected VOMSServerInfo parseLine(String vomsesLine)
+    throws URISyntaxException {
 
-				// skip empty lines
-				if (line.matches("\\s*$"))
-					continue;
-				
-				VOMSServerInfo parsedInfo = parseLine(line);
-				
-				if (parsedInfo != null)
-					result.add(parsedInfo);
-				
-			}
-			
-		} catch (Exception e) {
-			
-			throw new VOMSError("Error parsing VOMSES information...",e);
-		} 
-		return result;
-	}
+    return lineParser.parse(vomsesLine);
+  }
 
-	protected List<VOMSServerInfo> parseDirectory(File directory){
-		Set<VOMSServerInfo> joinedServerInfo = new HashSet<VOMSServerInfo>();
-		
-		File[] certFiles = directory.listFiles(new FileFilter() {
-			
-			public boolean accept(File pathname) {
-				return pathname.isFile() && !pathname.getName().startsWith(".");
-			}
-		});
-		
-		for (File f: certFiles)
-			joinedServerInfo.addAll(parse(f));
-		
-		return new ArrayList<VOMSServerInfo>(joinedServerInfo);
-	}
-	
-	
-	public List<VOMSServerInfo> parse(File f) {
-		fileSanityChecks(f);
-		
-		if (f.isDirectory())
-			return parseDirectory(f);
-		
-		try {
-			
-			BufferedReader r = new BufferedReader(new FileReader(f));
-			return parse(r);
-		
-		} catch (FileNotFoundException e) {
-			throw new VOMSError("VOMSES file not found: "+f.getAbsolutePath(),e);
-		
-		} catch (VOMSError e) {
-			throw new VOMSError("Error parsing VOMSES file: "+f.getAbsolutePath(),e);
-		}
-		
-	}
+  public List<VOMSServerInfo> parse(Reader vomsesReader) {
+
+    BufferedReader reader = new BufferedReader(vomsesReader);
+
+    String line = null;
+    List<VOMSServerInfo> result = new ArrayList<VOMSServerInfo>();
+
+    try {
+
+      while ((line = reader.readLine()) != null) {
+
+        // Ignore comments
+        if (line.startsWith("#"))
+          continue;
+
+        // skip empty lines
+        if (line.matches("\\s*$"))
+          continue;
+
+        VOMSServerInfo parsedInfo = parseLine(line);
+
+        if (parsedInfo != null)
+          result.add(parsedInfo);
+
+      }
+
+    } catch (Exception e) {
+
+      throw new VOMSError("Error parsing VOMSES information...", e);
+    }
+    return result;
+  }
+
+  protected List<VOMSServerInfo> parseDirectory(File directory) {
+
+    Set<VOMSServerInfo> joinedServerInfo = new HashSet<VOMSServerInfo>();
+
+    File[] certFiles = directory.listFiles(new FileFilter() {
+
+      public boolean accept(File pathname) {
+
+        return pathname.isFile() && !pathname.getName().startsWith(".");
+      }
+    });
+
+    for (File f : certFiles)
+      joinedServerInfo.addAll(parse(f));
+
+    return new ArrayList<VOMSServerInfo>(joinedServerInfo);
+  }
+
+  public List<VOMSServerInfo> parse(File f) {
+
+    fileSanityChecks(f);
+
+    if (f.isDirectory())
+      return parseDirectory(f);
+
+    try {
+
+      BufferedReader r = new BufferedReader(new FileReader(f));
+      return parse(r);
+
+    } catch (FileNotFoundException e) {
+      throw new VOMSError("VOMSES file not found: " + f.getAbsolutePath(), e);
+
+    } catch (VOMSError e) {
+      throw new VOMSError("Error parsing VOMSES file: " + f.getAbsolutePath(),
+        e);
+    }
+
+  }
 
 }

@@ -30,38 +30,41 @@ import org.italiangrid.voms.request.VOMSESLookupStrategy;
  */
 public class BaseVOMSESLookupStrategy implements VOMSESLookupStrategy {
 
-	private final List<String> checkedPaths;
+  private final List<String> checkedPaths;
 
-	
-	public BaseVOMSESLookupStrategy() {
-		checkedPaths = new ArrayList<String>();
-	}
-	
-	public BaseVOMSESLookupStrategy(List<String> checkedPaths) {
-		if (checkedPaths == null)
-			throw new NullPointerException("Please provide a non-null list of paths.");
-		
-		this.checkedPaths = checkedPaths;
-	}
+  public BaseVOMSESLookupStrategy() {
 
-	public List<File> lookupVomsesInfo() {
+    checkedPaths = new ArrayList<String>();
+  }
 
-		List<File> vomsesPaths = new ArrayList<File>();
+  public BaseVOMSESLookupStrategy(List<String> checkedPaths) {
 
-		for (String p : checkedPaths) {
-			File f = new File(p);
-			if (f.exists())
-				vomsesPaths.add(f);
-		}
+    if (checkedPaths == null)
+      throw new NullPointerException("Please provide a non-null list of paths.");
 
-		return vomsesPaths;
-	}
+    this.checkedPaths = checkedPaths;
+  }
 
-	public List<String> searchedPaths() {
-		return checkedPaths;
-	}
-	
-	public void addPath(String vomsesPath){
-		checkedPaths.add(vomsesPath);
-	}
+  public List<File> lookupVomsesInfo() {
+
+    List<File> vomsesPaths = new ArrayList<File>();
+
+    for (String p : checkedPaths) {
+      File f = new File(p);
+      if (f.exists())
+        vomsesPaths.add(f);
+    }
+
+    return vomsesPaths;
+  }
+
+  public List<String> searchedPaths() {
+
+    return checkedPaths;
+  }
+
+  public void addPath(String vomsesPath) {
+
+    checkedPaths.add(vomsesPath);
+  }
 }

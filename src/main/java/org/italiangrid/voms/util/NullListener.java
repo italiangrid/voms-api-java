@@ -43,132 +43,108 @@ import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
  * @author andreaceccanti
  *
  */
-public enum NullListener implements ACLookupListener,
-		ValidationResultListener, VOMSServerInfoStoreListener,
-		LoadCredentialsEventListener, VOMSTrustStoreStatusListener,
-		UncaughtExceptionHandler, VOMSRequestListener, VOMSProtocolListener {
+public enum NullListener implements ACLookupListener, ValidationResultListener,
+  VOMSServerInfoStoreListener, LoadCredentialsEventListener,
+  VOMSTrustStoreStatusListener, UncaughtExceptionHandler, VOMSRequestListener,
+  VOMSProtocolListener {
 
-	INSTANCE;
-	
-	public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
-		
+  INSTANCE;
 
-	}
+  public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
 
-	public void notifyVOMSRequestSuccess(VOMSACRequest request,
-			VOMSServerInfo endpoint) {
-		
+  }
 
-	}
+  public void notifyVOMSRequestSuccess(VOMSACRequest request,
+    VOMSServerInfo endpoint) {
 
-	public void notifyVOMSRequestFailure(VOMSACRequest request,
-			VOMSServerInfo endpoint, Throwable error) {
-		
+  }
 
-	}
+  public void notifyVOMSRequestFailure(VOMSACRequest request,
+    VOMSServerInfo endpoint, Throwable error) {
 
-	public void notifyErrorsInVOMSReponse(VOMSACRequest request,
-			VOMSServerInfo si, VOMSErrorMessage[] errors) {
-		
+  }
 
-	}
+  public void notifyErrorsInVOMSReponse(VOMSACRequest request,
+    VOMSServerInfo si, VOMSErrorMessage[] errors) {
 
-	public void notifyWarningsInVOMSResponse(VOMSACRequest request,
-			VOMSServerInfo si, VOMSWarningMessage[] warnings) {
-		
+  }
 
-	}
+  public void notifyWarningsInVOMSResponse(VOMSACRequest request,
+    VOMSServerInfo si, VOMSWarningMessage[] warnings) {
 
-	public void uncaughtException(Thread t, Throwable e) {
-		
+  }
 
-	}
+  public void uncaughtException(Thread t, Throwable e) {
 
-	public void notifyTrustStoreUpdate(VOMSTrustStore store) {
-		
+  }
 
-	}
+  public void notifyTrustStoreUpdate(VOMSTrustStore store) {
 
-	public void notifyCertficateLookupEvent(String dir) {
-		
+  }
 
-	}
+  public void notifyCertficateLookupEvent(String dir) {
 
-	public void notifyLSCLookupEvent(String dir) {
-		
+  }
 
-	}
+  public void notifyLSCLookupEvent(String dir) {
 
-	public void notifyCertificateLoadEvent(X509Certificate cert, File f) {
-		
+  }
 
-	}
+  public void notifyCertificateLoadEvent(X509Certificate cert, File f) {
 
-	public void notifyLSCLoadEvent(LSCInfo lsc, File f) {
-		
+  }
 
-	}
+  public void notifyLSCLoadEvent(LSCInfo lsc, File f) {
 
-	public void notifyCredentialLookup(String... locations) {
-		
+  }
 
-	}
+  public void notifyCredentialLookup(String... locations) {
 
-	public void notifyLoadCredentialSuccess(String... locations) {
-		
+  }
 
-	}
+  public void notifyLoadCredentialSuccess(String... locations) {
 
-	public void notifyLoadCredentialFailure(Throwable error,
-			String... locations) {
-		
+  }
 
-	}
+  public void notifyLoadCredentialFailure(Throwable error, String... locations) {
 
-	public void notifyNoValidVOMSESError(List<String> searchedPaths) {
-		
+  }
 
-	}
+  public void notifyNoValidVOMSESError(List<String> searchedPaths) {
 
-	public void notifyVOMSESlookup(String vomsesPath) {
-		
+  }
 
-	}
+  public void notifyVOMSESlookup(String vomsesPath) {
 
-	public void notifyVOMSESInformationLoaded(String vomsesPath,
-			VOMSServerInfo info) {
-		
+  }
 
-	}
+  public void notifyVOMSESInformationLoaded(String vomsesPath,
+    VOMSServerInfo info) {
 
-	public void notifyValidationResult(VOMSValidationResult result) {
-		
+  }
 
-	}
+  public void notifyValidationResult(VOMSValidationResult result) {
 
-	public void notifyACLookupEvent(X509Certificate[] chain, int chainLevel) {
-		
+  }
 
-	}
+  public void notifyACLookupEvent(X509Certificate[] chain, int chainLevel) {
 
-	public void notifyACParseEvent(X509Certificate[] chain, int chainLevel) {
-		
+  }
 
-	}
+  public void notifyACParseEvent(X509Certificate[] chain, int chainLevel) {
 
-	public void notifyHTTPRequest(String url) {
-		
-		
-	}
+  }
 
-	public void notifyLegacyRequest(String xmlLegacyRequest) {
-		
-		
-	}
+  public void notifyHTTPRequest(String url) {
 
-	public void notifyReceivedResponse(VOMSResponse r) {
-		
-		
-	}
+  }
+
+  public void notifyLegacyRequest(String xmlLegacyRequest) {
+
+  }
+
+  public void notifyReceivedResponse(VOMSResponse r) {
+
+  }
 
 }

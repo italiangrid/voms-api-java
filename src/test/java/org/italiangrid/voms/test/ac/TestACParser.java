@@ -35,50 +35,58 @@ import org.junit.Test;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 
-public class TestACParser implements Fixture{
+public class TestACParser implements Fixture {
 
-	static VOMSAA aa;
-	static PEMCredential holder;
-	
-	@BeforeClass
-	public static void setup() throws KeyStoreException, CertificateException, IOException{
-		aa = Utils.getVOMSAA();
-		
-	}
-	
-	@Test
-	public void test() throws Exception{
-		PEMCredential holder = Utils.getTestUserCredential();
-		ProxyCertificate proxy = aa.createVOMSProxy(holder, defaultVOFqans);
-		
-		DefaultVOMSACParser parser = new DefaultVOMSACParser();
-		List<VOMSAttribute> attrs = parser.parse(proxy.getCertificateChain());
-		Assert.assertFalse(attrs.isEmpty());
-		Assert.assertEquals(1,attrs.size());
-		Assert.assertEquals(defaultVOFqans, attrs.get(0).getFQANs());
-	}
+  static VOMSAA aa;
+  static PEMCredential holder;
 
-	@Test(expected=NullPointerException.class)
-	public void testParseNullChainFailure(){
-		DefaultVOMSACParser parser = new DefaultVOMSACParser();
-		parser.parse(null);
-	}
-	
-	@Test
-	public void testEmptyFqansParsing() throws Exception{
-		PEMCredential holder = Utils.getTestUserCredential();
-		List<String> fqans = Collections.emptyList();
-		ProxyCertificate proxy = aa.createVOMSProxy(holder, fqans);
-		
-		DefaultVOMSACParser parser = new DefaultVOMSACParser();
-		
-		try{
-			parser.parse(proxy.getCertificateChain());
-		}catch (VOMSError e) {
-			Assert.assertEquals("Non conformant VOMS Attribute certificate: unsupported attribute values encoding.", e.getMessage());
-			return;
-		}
-		
-		Assert.fail("No exception raised when parsing invalid VOMS AC!");
-	}
+  @BeforeClass
+  public static void setup() throws KeyStoreException, CertificateException,
+    IOException {
+
+    aa = Utils.getVOMSAA();
+
+  }
+
+  @Test
+  public void test() throws Exception {
+
+    PEMCredential holder = Utils.getTestUserCredential();
+    ProxyCertificate proxy = aa.createVOMSProxy(holder, defaultVOFqans);
+
+    DefaultVOMSACParser parser = new DefaultVOMSACParser();
+    List<VOMSAttribute> attrs = parser.parse(proxy.getCertificateChain());
+    Assert.assertFalse(attrs.isEmpty());
+    Assert.assertEquals(1, attrs.size());
+    Assert.assertEquals(defaultVOFqans, attrs.get(0).getFQANs());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testParseNullChainFailure() {
+
+    DefaultVOMSACParser parser = new DefaultVOMSACParser();
+    parser.parse(null);
+  }
+
+  @Test
+  public void testEmptyFqansParsing() throws Exception {
+
+    PEMCredential holder = Utils.getTestUserCredential();
+    List<String> fqans = Collections.emptyList();
+    ProxyCertificate proxy = aa.createVOMSProxy(holder, fqans);
+
+    DefaultVOMSACParser parser = new DefaultVOMSACParser();
+
+    try {
+      parser.parse(proxy.getCertificateChain());
+    } catch (VOMSError e) {
+      Assert
+        .assertEquals(
+          "Non conformant VOMS Attribute certificate: unsupported attribute values encoding.",
+          e.getMessage());
+      return;
+    }
+
+    Assert.fail("No exception raised when parsing invalid VOMS AC!");
+  }
 }

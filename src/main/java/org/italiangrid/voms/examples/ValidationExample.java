@@ -29,40 +29,46 @@ import org.italiangrid.voms.ac.VOMSACValidator;
 
 import eu.emi.security.authn.x509.impl.PEMCredential;
 
-/** 
- * A simple example showing how VOMS attributes validation is done with the new API
+/**
+ * A simple example showing how VOMS attributes validation is done with the new
+ * API
+ * 
  * @author Andrea Ceccanti
  *
  */
 public class ValidationExample {
 
-	public ValidationExample() throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
-		
-		VOMSACValidator validator = VOMSValidators.newValidator();
-		
-		PEMCredential c = new PEMCredential(new FileInputStream("somefile"), (char[])null);
-		
-		X509Certificate[] chain = c.getCertificateChain();
-		
-		List<VOMSAttribute> attrs = validator.validate(chain);
-		
-		for (VOMSAttribute a: attrs)
-			System.out.println(a);
+  public ValidationExample() throws KeyStoreException, CertificateException,
+    FileNotFoundException, IOException {
 
-		validator.shutdown();
-		
-	}
+    VOMSACValidator validator = VOMSValidators.newValidator();
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 * @throws CertificateException 
-	 * @throws KeyStoreException 
-	 */
-	public static void main(String[] args) throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
-		new ValidationExample();
+    PEMCredential c = new PEMCredential(new FileInputStream("somefile"),
+      (char[]) null);
 
-	}
+    X509Certificate[] chain = c.getCertificateChain();
+
+    List<VOMSAttribute> attrs = validator.validate(chain);
+
+    for (VOMSAttribute a : attrs)
+      System.out.println(a);
+
+    validator.shutdown();
+
+  }
+
+  /**
+   * @param args
+   * @throws IOException
+   * @throws FileNotFoundException
+   * @throws CertificateException
+   * @throws KeyStoreException
+   */
+  public static void main(String[] args) throws KeyStoreException,
+    CertificateException, FileNotFoundException, IOException {
+
+    new ValidationExample();
+
+  }
 
 }

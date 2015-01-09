@@ -68,356 +68,339 @@ import eu.emi.security.authn.x509.proxy.CertificateExtension;
  */
 public class VOMSACGenerator implements VOMSConstants {
 
-	public static enum ACGenerationProperties {
-		SKIP_AC_CERTS_EXTENSION,
-		FAKE_SIGNATURE_BITS,
-		INCLUDE_FAKE_CRITICAL_EXTENSION,
-		INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION,
-		INCLUDE_CRITICAL_AKID_EXTENSION,
-		INCLUDE_EMPTY_AC_CERTS_EXTENSION
-	}
+  public static enum ACGenerationProperties {
+    SKIP_AC_CERTS_EXTENSION, FAKE_SIGNATURE_BITS, INCLUDE_FAKE_CRITICAL_EXTENSION, INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION, INCLUDE_CRITICAL_AKID_EXTENSION, INCLUDE_EMPTY_AC_CERTS_EXTENSION
+  }
 
-	public static final EnumSet<ACGenerationProperties> 
-	defaultGenerationProperties = EnumSet.noneOf(ACGenerationProperties.class);
+  public static final EnumSet<ACGenerationProperties> defaultGenerationProperties = EnumSet
+    .noneOf(ACGenerationProperties.class);
 
-	static class RandomContentSigner implements ContentSigner {
+  static class RandomContentSigner implements ContentSigner {
 
-		public static int SIG_LENGHT = 1024;
+    public static int SIG_LENGHT = 1024;
 
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-		AlgorithmIdentifier sigAlgId;
+    AlgorithmIdentifier sigAlgId;
 
-		public RandomContentSigner(String sigAlgName) {
+    public RandomContentSigner(String sigAlgName) {
 
-			this.sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder()
-			.find(sigAlgName);
-		}
+      this.sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder()
+        .find(sigAlgName);
+    }
 
-		public AlgorithmIdentifier getAlgorithmIdentifier() {
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
 
-			return sigAlgId;
-		}
+      return sigAlgId;
+    }
 
-		public OutputStream getOutputStream() {
+    public OutputStream getOutputStream() {
 
-			return bos;
-		}
+      return bos;
+    }
 
-		public byte[] getSignature() {
+    public byte[] getSignature() {
 
-			try {
-				bos.close();
-			} catch (IOException e) {
+      try {
+        bos.close();
+      } catch (IOException e) {
 
-			}
+      }
 
-			Random r = new Random();
+      Random r = new Random();
 
-			byte[] sigBytes = new byte[SIG_LENGHT];
-			r.nextBytes(sigBytes);
+      byte[] sigBytes = new byte[SIG_LENGHT];
+      r.nextBytes(sigBytes);
 
-			return sigBytes;
-		}
+      return sigBytes;
+    }
 
-	}
+  }
 
-	public static final ASN1ObjectIdentifier FAKE_EXT_OID = new ASN1ObjectIdentifier(
-		"1.3.6.1.4.1.8005.100.120.82");
+  public static final ASN1ObjectIdentifier FAKE_EXT_OID = new ASN1ObjectIdentifier(
+    "1.3.6.1.4.1.8005.100.120.82");
 
-	private X509Credential aaCredential;
-	private ContentSigner signer;
+  private X509Credential aaCredential;
+  private ContentSigner signer;
 
-	private ContentSigner getSigner(EnumSet<ACGenerationProperties> properties) {
+  private ContentSigner getSigner(EnumSet<ACGenerationProperties> properties) {
 
-		if (signer == null) {
+    if (signer == null) {
 
-			JcaContentSignerBuilder builder = new JcaContentSignerBuilder(
-				aaCredential.getCertificate().getSigAlgName());
+      JcaContentSignerBuilder builder = new JcaContentSignerBuilder(
+        aaCredential.getCertificate().getSigAlgName());
 
-			builder.setProvider(BouncyCastleProvider.PROVIDER_NAME);
-			try {
+      builder.setProvider(BouncyCastleProvider.PROVIDER_NAME);
+      try {
 
-				if (properties.contains(ACGenerationProperties.FAKE_SIGNATURE_BITS))
-					signer = new RandomContentSigner(aaCredential.getCertificate()
-						.getSigAlgName());
-				else
-					signer = builder.build(aaCredential.getKey());
+        if (properties.contains(ACGenerationProperties.FAKE_SIGNATURE_BITS))
+          signer = new RandomContentSigner(aaCredential.getCertificate()
+            .getSigAlgName());
+        else
+          signer = builder.build(aaCredential.getKey());
 
-			} catch (OperatorCreationException e) {
-				throw new VOMSError(e.getMessage(), e);
-			}
-		}
-		return signer;
-	}
+      } catch (OperatorCreationException e) {
+        throw new VOMSError(e.getMessage(), e);
+      }
+    }
+    return signer;
+  }
 
-	public VOMSACGenerator(X509Credential aaCredential) {
-		this.aaCredential = aaCredential;
-	}
+  public VOMSACGenerator(X509Credential aaCredential) {
 
-	private String buildVOURI(String voName, String host, int port) {
+    this.aaCredential = aaCredential;
+  }
 
-		return String.format("%s://%s:%d", voName, host, port);
-	}
+  private String buildVOURI(String voName, String host, int port) {
 
-	private ASN1Encodable buildACCertsExtensionContent(
-		EnumSet<ACGenerationProperties> properties) {
+    return String.format("%s://%s:%d", voName, host, port);
+  }
 
-		ASN1EncodableVector issuerCertsContainer = new ASN1EncodableVector();
+  private ASN1Encodable buildACCertsExtensionContent(
+    EnumSet<ACGenerationProperties> properties) {
 
-		if (properties.contains(ACGenerationProperties.INCLUDE_EMPTY_AC_CERTS_EXTENSION))
-			issuerCertsContainer.add(new DERSequence());
-		else
-			issuerCertsContainer.add(new DERSequence(
-				getCertAsDEREncodable(aaCredential.getCertificate())));
+    ASN1EncodableVector issuerCertsContainer = new ASN1EncodableVector();
 
-		return new DERSequence(issuerCertsContainer);
-	}
+    if (properties
+      .contains(ACGenerationProperties.INCLUDE_EMPTY_AC_CERTS_EXTENSION))
+      issuerCertsContainer.add(new DERSequence());
+    else
+      issuerCertsContainer.add(new DERSequence(
+        getCertAsDEREncodable(aaCredential.getCertificate())));
 
-	private AuthorityKeyIdentifier buildAuthorityKeyIdentifier() {
+    return new DERSequence(issuerCertsContainer);
+  }
 
-		byte[] authKeyId = aaCredential.getCertificate().getExtensionValue(
-			X509Extension.authorityKeyIdentifier.toString());
+  private AuthorityKeyIdentifier buildAuthorityKeyIdentifier() {
 
-		if (authKeyId != null) {
-			return new AuthorityKeyIdentifier(authKeyId);
-		}
+    byte[] authKeyId = aaCredential.getCertificate().getExtensionValue(
+      X509Extension.authorityKeyIdentifier.toString());
 
-		return null;
-	}
+    if (authKeyId != null) {
+      return new AuthorityKeyIdentifier(authKeyId);
+    }
 
-	private ASN1Encodable buildFQANsAttributeContent(List<String> fqans,
-		GeneralName policyAuthorityInfo) {
+    return null;
+  }
 
-		ASN1EncodableVector container = new ASN1EncodableVector();
-		ASN1EncodableVector encodedFQANs = new ASN1EncodableVector();
+  private ASN1Encodable buildFQANsAttributeContent(List<String> fqans,
+    GeneralName policyAuthorityInfo) {
 
-		// Policy authority info
-		DERTaggedObject pai = new DERTaggedObject(0, policyAuthorityInfo);
-		container.add(pai);
+    ASN1EncodableVector container = new ASN1EncodableVector();
+    ASN1EncodableVector encodedFQANs = new ASN1EncodableVector();
 
-		for (String s : fqans)
-			encodedFQANs.add(new DEROctetString(s.getBytes()));
+    // Policy authority info
+    DERTaggedObject pai = new DERTaggedObject(0, policyAuthorityInfo);
+    container.add(pai);
 
-		container.add(new DERSequence(encodedFQANs));
+    for (String s : fqans)
+      encodedFQANs.add(new DEROctetString(s.getBytes()));
 
-		return new DERSequence(container);
-	}
+    container.add(new DERSequence(encodedFQANs));
 
-	private ASN1Encodable buildGAExtensionContent(
-		EnumSet<ACGenerationProperties> properties, List<VOMSGenericAttribute> gas,
-		GeneralName policyAuthorityInfo) {
+    return new DERSequence(container);
+  }
 
-		ASN1EncodableVector tagContainer = new ASN1EncodableVector();
-		ASN1EncodableVector tagSequences = new ASN1EncodableVector();
+  private ASN1Encodable buildGAExtensionContent(
+    EnumSet<ACGenerationProperties> properties, List<VOMSGenericAttribute> gas,
+    GeneralName policyAuthorityInfo) {
 
-		for (VOMSGenericAttribute a : gas)
-			tagSequences.add(buildTagSequence(a));
+    ASN1EncodableVector tagContainer = new ASN1EncodableVector();
+    ASN1EncodableVector tagSequences = new ASN1EncodableVector();
 
-		tagContainer.add(new GeneralNames(policyAuthorityInfo));
-		tagContainer.add(new DERSequence(tagSequences));
+    for (VOMSGenericAttribute a : gas)
+      tagSequences.add(buildTagSequence(a));
 
-		DERSequence finalSequence;
+    tagContainer.add(new GeneralNames(policyAuthorityInfo));
+    tagContainer.add(new DERSequence(tagSequences));
 
-		// We wrap this three times as VOMS core does, even if I think this 
-		// is a bug 
-		finalSequence = new DERSequence(
-			new DERSequence(new DERSequence(tagContainer)));
+    DERSequence finalSequence;
 
-		return finalSequence;
-	}
+    // We wrap this three times as VOMS core does, even if I think this
+    // is a bug
+    finalSequence = new DERSequence(new DERSequence(new DERSequence(
+      tagContainer)));
 
-	private AttributeCertificateHolder buildHolder(X509Certificate holderCert)
-		throws CertificateEncodingException {
+    return finalSequence;
+  }
 
-		JcaX509CertificateHolder holderWrappedCert = new JcaX509CertificateHolder(
-			holderCert);
-		AttributeCertificateHolder acHolder = new AttributeCertificateHolder(
-			holderWrappedCert.getSubject(), holderCert.getSerialNumber());
+  private AttributeCertificateHolder buildHolder(X509Certificate holderCert)
+    throws CertificateEncodingException {
 
-		return acHolder;
-	}
+    JcaX509CertificateHolder holderWrappedCert = new JcaX509CertificateHolder(
+      holderCert);
+    AttributeCertificateHolder acHolder = new AttributeCertificateHolder(
+      holderWrappedCert.getSubject(), holderCert.getSerialNumber());
 
-	private AttributeCertificateIssuer buildIssuer()
-		throws CertificateEncodingException {
+    return acHolder;
+  }
 
-		JcaX509CertificateHolder issuer = new JcaX509CertificateHolder(
-			aaCredential.getCertificate());
-		return new AttributeCertificateIssuer(issuer.getSubject());
-	}
+  private AttributeCertificateIssuer buildIssuer()
+    throws CertificateEncodingException {
 
-	private GeneralName buildPolicyAuthorityInfo(String voName, String host,
-		int port) {
+    JcaX509CertificateHolder issuer = new JcaX509CertificateHolder(
+      aaCredential.getCertificate());
+    return new AttributeCertificateIssuer(issuer.getSubject());
+  }
 
-		return new GeneralName(GeneralName.uniformResourceIdentifier, buildVOURI(
-			voName, host, port));
-	}
+  private GeneralName buildPolicyAuthorityInfo(String voName, String host,
+    int port) {
 
-	private DERSequence buildTagSequence(VOMSGenericAttribute ga) {
+    return new GeneralName(GeneralName.uniformResourceIdentifier, buildVOURI(
+      voName, host, port));
+  }
 
-		ASN1EncodableVector tagSequence = new ASN1EncodableVector();
+  private DERSequence buildTagSequence(VOMSGenericAttribute ga) {
 
-		tagSequence.add(getDEROctetString(ga.getName()));
-		tagSequence.add(getDEROctetString(ga.getValue()));
-		tagSequence.add(getDEROctetString(ga.getContext()));
+    ASN1EncodableVector tagSequence = new ASN1EncodableVector();
 
-		return new DERSequence(tagSequence);
+    tagSequence.add(getDEROctetString(ga.getName()));
+    tagSequence.add(getDEROctetString(ga.getValue()));
+    tagSequence.add(getDEROctetString(ga.getContext()));
 
-	}
+    return new DERSequence(tagSequence);
 
-	private ASN1Encodable buildTargetsExtensionContent(
-		EnumSet<ACGenerationProperties> properties, List<String> targets) {
+  }
 
-		ASN1EncodableVector targetSeq = new ASN1EncodableVector();
+  private ASN1Encodable buildTargetsExtensionContent(
+    EnumSet<ACGenerationProperties> properties, List<String> targets) {
 
-		for (String s : targets) {
+    ASN1EncodableVector targetSeq = new ASN1EncodableVector();
 
-			DERTaggedObject encodedTarget = new DERTaggedObject(0, new GeneralName(
-				GeneralName.uniformResourceIdentifier, s));
+    for (String s : targets) {
 
-			// We wrap the target in another sequence as the old VOMS does	
-			targetSeq.add(new DERSequence(encodedTarget));
-		}
+      DERTaggedObject encodedTarget = new DERTaggedObject(0, new GeneralName(
+        GeneralName.uniformResourceIdentifier, s));
 
-		DERSequence targetExtensionContent = new DERSequence(new DERSequence(
-			targetSeq));
-		return targetExtensionContent;
-	}
+      // We wrap the target in another sequence as the old VOMS does
+      targetSeq.add(new DERSequence(encodedTarget));
+    }
 
+    DERSequence targetExtensionContent = new DERSequence(new DERSequence(
+      targetSeq));
+    return targetExtensionContent;
+  }
 
-	public X509AttributeCertificateHolder generateVOMSAttributeCertificate(
-		List<String> fqans,
-		List<VOMSGenericAttribute> gas, List<String> targets,
-		X509Certificate holderCert, BigInteger serialNumber, Date notBefore,
-		Date notAfter, String voName, String host, int port){
+  public X509AttributeCertificateHolder generateVOMSAttributeCertificate(
+    List<String> fqans, List<VOMSGenericAttribute> gas, List<String> targets,
+    X509Certificate holderCert, BigInteger serialNumber, Date notBefore,
+    Date notAfter, String voName, String host, int port) {
 
-		return generateVOMSAttributeCertificate(defaultGenerationProperties, 
-			fqans, 
-			gas, 
-			targets, 
-			holderCert, 
-			serialNumber, 
-			notBefore, 
-			notAfter, 
-			voName, 
-			host, 
-			port);
-	}
+    return generateVOMSAttributeCertificate(defaultGenerationProperties, fqans,
+      gas, targets, holderCert, serialNumber, notBefore, notAfter, voName,
+      host, port);
+  }
 
+  public X509AttributeCertificateHolder generateVOMSAttributeCertificate(
+    EnumSet<ACGenerationProperties> generationProperties, List<String> fqans,
+    List<VOMSGenericAttribute> gas, List<String> targets,
+    X509Certificate holderCert, BigInteger serialNumber, Date notBefore,
+    Date notAfter, String voName, String host, int port) {
 
-	public X509AttributeCertificateHolder generateVOMSAttributeCertificate(
-		EnumSet<ACGenerationProperties> generationProperties, List<String> fqans,
-		List<VOMSGenericAttribute> gas, List<String> targets,
-		X509Certificate holderCert, BigInteger serialNumber, Date notBefore,
-		Date notAfter, String voName, String host, int port) {
+    AttributeCertificateHolder holder = null;
+    AttributeCertificateIssuer issuer = null;
 
-		AttributeCertificateHolder holder = null;
-		AttributeCertificateIssuer issuer = null;
+    try {
 
-		try {
+      holder = buildHolder(holderCert);
+      issuer = buildIssuer();
 
-			holder = buildHolder(holderCert);
-			issuer = buildIssuer();
+    } catch (CertificateEncodingException e) {
+      throw new VOMSError(e.getMessage(), e);
+    }
 
-		} catch (CertificateEncodingException e) {
-			throw new VOMSError(e.getMessage(), e);
-		}
+    X509v2AttributeCertificateBuilder builder = new X509v2AttributeCertificateBuilder(
+      holder, issuer, serialNumber, notBefore, notAfter);
 
-		X509v2AttributeCertificateBuilder builder = new X509v2AttributeCertificateBuilder(
-			holder, issuer, serialNumber, notBefore, notAfter);
+    GeneralName policyAuthorityInfo = buildPolicyAuthorityInfo(voName, host,
+      port);
 
-		GeneralName policyAuthorityInfo = buildPolicyAuthorityInfo(voName, host,
-			port);
+    builder.addAttribute(VOMS_FQANS_OID,
+      buildFQANsAttributeContent(fqans, policyAuthorityInfo));
 
-		builder.addAttribute(VOMS_FQANS_OID,
-			buildFQANsAttributeContent(fqans, policyAuthorityInfo));
+    if (gas != null && !gas.isEmpty())
+      builder
+        .addExtension(
+          VOMS_GENERIC_ATTRS_OID,
+          false,
+          buildGAExtensionContent(generationProperties, gas,
+            policyAuthorityInfo));
 
-		if (gas != null && !gas.isEmpty())
-			builder
-			.addExtension(
-				VOMS_GENERIC_ATTRS_OID,
-				false,
-				buildGAExtensionContent(generationProperties, gas,
-					policyAuthorityInfo));
+    if (targets != null && !targets.isEmpty())
+      builder.addExtension(X509Extension.targetInformation, true,
+        buildTargetsExtensionContent(generationProperties, targets));
 
-		if (targets != null && !targets.isEmpty())
-			builder.addExtension(X509Extension.targetInformation, true,
-				buildTargetsExtensionContent(generationProperties, targets));
+    if (!generationProperties
+      .contains(ACGenerationProperties.SKIP_AC_CERTS_EXTENSION))
+      builder.addExtension(VOMS_CERTS_OID, false,
+        buildACCertsExtensionContent(generationProperties));
 
-		if (!generationProperties
-			.contains(ACGenerationProperties.SKIP_AC_CERTS_EXTENSION))
-			builder.addExtension(VOMS_CERTS_OID, false,
-				buildACCertsExtensionContent(generationProperties));
+    if (generationProperties
+      .contains(ACGenerationProperties.INCLUDE_FAKE_CRITICAL_EXTENSION))
+      builder.addExtension(FAKE_EXT_OID, true, new DERSequence());
 
-		if (generationProperties
-			.contains(ACGenerationProperties.INCLUDE_FAKE_CRITICAL_EXTENSION))
-			builder.addExtension(FAKE_EXT_OID, true, new DERSequence());
+    boolean noRevAvailIsCritical = false;
+    boolean akidIsCritical = false;
 
-		boolean noRevAvailIsCritical = false;
-		boolean akidIsCritical = false;
+    if (generationProperties
+      .contains(ACGenerationProperties.INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION))
+      noRevAvailIsCritical = true;
 
+    if (generationProperties
+      .contains(ACGenerationProperties.INCLUDE_CRITICAL_AKID_EXTENSION))
+      akidIsCritical = true;
 
-		if (generationProperties
-			.contains(ACGenerationProperties.INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION))
-			noRevAvailIsCritical = true;
+    builder.addExtension(X509Extension.noRevAvail, noRevAvailIsCritical,
+      new DERNull());
 
-		if (generationProperties
-			.contains(ACGenerationProperties.INCLUDE_CRITICAL_AKID_EXTENSION)) 
-			akidIsCritical = true;
+    AuthorityKeyIdentifier akid = buildAuthorityKeyIdentifier();
 
-		builder.addExtension(X509Extension.noRevAvail, 
-			noRevAvailIsCritical, 
-			new DERNull());
+    builder.addExtension(X509Extension.authorityKeyIdentifier, akidIsCritical,
+      akid != null ? akid : new DERNull());
 
-		AuthorityKeyIdentifier akid = buildAuthorityKeyIdentifier();
+    return builder.build(getSigner(generationProperties));
 
-		builder.addExtension(X509Extension.authorityKeyIdentifier, 
-			akidIsCritical,
-			akid != null ? akid : new DERNull());
+  }
 
-		return builder.build(getSigner(generationProperties));
+  public CertificateExtension generateVOMSExtension(
+    List<X509AttributeCertificateHolder> acs) {
 
-	}
+    ASN1EncodableVector vomsACs = new ASN1EncodableVector();
 
-	public CertificateExtension generateVOMSExtension(
-		List<X509AttributeCertificateHolder> acs) {
+    for (X509AttributeCertificateHolder ac : acs)
+      vomsACs.add(ac.toASN1Structure());
 
-		ASN1EncodableVector vomsACs = new ASN1EncodableVector();
+    DERSequence acSeq = new DERSequence(vomsACs);
 
-		for (X509AttributeCertificateHolder ac : acs)
-			vomsACs.add(ac.toASN1Structure());
+    CertificateExtension ext = new CertificateExtension(
+      VOMS_EXTENSION_OID.getId(), acSeq.toASN1Object(), false);
 
-		DERSequence acSeq = new DERSequence(vomsACs);
+    return ext;
+  }
 
-		CertificateExtension ext = new CertificateExtension(
-			VOMS_EXTENSION_OID.getId(), acSeq.toASN1Object(), false);
+  private DEREncodable getCertAsDEREncodable(X509Certificate cert) {
 
-		return ext;
-	}
+    try {
+      byte[] certBytes = cert.getEncoded();
 
-	private DEREncodable getCertAsDEREncodable(X509Certificate cert) {
+      ByteArrayInputStream bais = new ByteArrayInputStream(certBytes);
+      ASN1InputStream is = new ASN1InputStream(bais);
+      DERObject derCert = is.readObject();
+      is.close();
+      return derCert;
 
-		try {
-			byte[] certBytes = cert.getEncoded();
+    } catch (CertificateEncodingException e) {
+      throw new VOMSError("Error encoding X509 certificate: " + e.getMessage(),
+        e);
+    } catch (IOException e) {
+      throw new VOMSError("Error encoding X509 certificate: " + e.getMessage(),
+        e);
+    }
 
-			ByteArrayInputStream bais = new ByteArrayInputStream(certBytes);
-			ASN1InputStream is = new ASN1InputStream(bais);
-			DERObject derCert = is.readObject();
-			is.close();
-			return derCert;
+  }
 
-		} catch (CertificateEncodingException e) {
-			throw new VOMSError("Error encoding X509 certificate: " + e.getMessage(),
-				e);
-		} catch (IOException e) {
-			throw new VOMSError("Error encoding X509 certificate: " + e.getMessage(),
-				e);
-		}
+  private DEROctetString getDEROctetString(String s) {
 
-	}
-
-	private DEROctetString getDEROctetString(String s) {
-
-		return new DEROctetString(s.getBytes());
-	}
+    return new DEROctetString(s.getBytes());
+  }
 }

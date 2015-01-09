@@ -22,31 +22,25 @@ package org.italiangrid.voms.error;
  *
  */
 public enum VOMSValidationErrorCode {
-	
-	// Temporal validity
-	acNotValidAtCurrentTime,
-	
-	// LSC signature checks
-	lscFileNotFound,
-	emptyAcCertsExtension,
-	lscDescriptionDoesntMatchAcCert,
-	invalidAcCert,
-	acCertFailsSignatureVerification,
-	
-	// Local AA cert signature checks
-	aaCertNotFound,
-	invalidAaCert,
-	aaCertFailsSignatureVerification,
-	
-	// Holder checks
-	acHolderDoesntMatchCertChain,
-	
-	// Targets checks
-	localhostDoesntMatchAcTarget,
-	
-	// CAnL errors
-	canlError,
-	
-	// Other
-	other;
+
+  // Temporal validity
+  acNotValidAtCurrentTime,
+
+  // LSC signature checks
+  lscFileNotFound, emptyAcCertsExtension, lscDescriptionDoesntMatchAcCert, invalidAcCert, acCertFailsSignatureVerification,
+
+  // Local AA cert signature checks
+  aaCertNotFound, invalidAaCert, aaCertFailsSignatureVerification,
+
+  // Holder checks
+  acHolderDoesntMatchCertChain,
+
+  // Targets checks
+  localhostDoesntMatchAcTarget,
+
+  // CAnL errors
+  canlError,
+
+  // Other
+  other;
 }

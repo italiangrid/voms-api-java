@@ -32,22 +32,26 @@ import org.italiangrid.voms.util.NullListener;
  *
  */
 public class DefaultVOMSACParser implements VOMSACParser {
-	
-	private final VOMSACLookupStrategy acLookupStrategy;
-	private final VOMSAttributesNormalizationStrategy acNormalizationStrategy = new LeafVOMSExtensionNormalizationStrategy();
-	
-	public DefaultVOMSACParser() {
-		this(new LeafACLookupStrategy(NullListener.INSTANCE));
-	}
-	
-	public DefaultVOMSACParser(VOMSACLookupStrategy strategy){
-		this.acLookupStrategy = strategy;
-	}
-	
-	public List<VOMSAttribute> parse(X509Certificate[] validatedChain) {
-		if (validatedChain == null)
-			throw new NullPointerException("Cannot parse a null certchain!");
-		List<ACParsingContext> parsedACs = acLookupStrategy.lookupVOMSAttributeCertificates(validatedChain);
-		return acNormalizationStrategy.normalizeAttributes(parsedACs);
-	}
+
+  private final VOMSACLookupStrategy acLookupStrategy;
+  private final VOMSAttributesNormalizationStrategy acNormalizationStrategy = new LeafVOMSExtensionNormalizationStrategy();
+
+  public DefaultVOMSACParser() {
+
+    this(new LeafACLookupStrategy(NullListener.INSTANCE));
+  }
+
+  public DefaultVOMSACParser(VOMSACLookupStrategy strategy) {
+
+    this.acLookupStrategy = strategy;
+  }
+
+  public List<VOMSAttribute> parse(X509Certificate[] validatedChain) {
+
+    if (validatedChain == null)
+      throw new NullPointerException("Cannot parse a null certchain!");
+    List<ACParsingContext> parsedACs = acLookupStrategy
+      .lookupVOMSAttributeCertificates(validatedChain);
+    return acNormalizationStrategy.normalizeAttributes(parsedACs);
+  }
 }

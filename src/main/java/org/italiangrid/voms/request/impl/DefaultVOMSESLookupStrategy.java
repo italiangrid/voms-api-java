@@ -32,12 +32,11 @@ import java.util.Arrays;
  */
 public class DefaultVOMSESLookupStrategy extends BaseVOMSESLookupStrategy {
 
-	public static final String DEFAULT_VOMSES_DIR = "/etc/vomses";
-	
-	public DefaultVOMSESLookupStrategy() {
-		super(Arrays.asList(DEFAULT_VOMSES_DIR, 
-				System.getProperty("user.home") + "/.glite/vomses",
-				System.getProperty("user.home") + "/.voms/vomses"
-				));
-	}
+  public static final String DEFAULT_VOMSES_DIR = "/etc/vomses";
+
+  public DefaultVOMSESLookupStrategy() {
+
+    super(Arrays.asList(DEFAULT_VOMSES_DIR, System.getProperty("user.home")
+      + "/.glite/vomses", System.getProperty("user.home") + "/.voms/vomses"));
+  }
 }
