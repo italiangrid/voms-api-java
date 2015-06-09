@@ -69,7 +69,7 @@ public class SSLSocketFactoryProvider {
 
     try {
 
-      context = SSLContext.getInstance("TLSv1.2");
+      context = SSLContext.getInstance("TLS");
 
     } catch (NoSuchAlgorithmException e) {
 
