@@ -27,7 +27,8 @@ import eu.emi.security.authn.x509.X509Credential;
 
 public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 
-  public static final String[] VOMS_LEGACY_PROTOCOLS = { "SSLv3" };
+  public static final String[] VOMS_LEGACY_PROTOCOLS = { "TLSv1", 
+    "TLSv1.1", "TLSv1.2" };
 
   /**
    * The default value for the socket connection timeout
