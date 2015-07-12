@@ -35,7 +35,7 @@ public interface VOMSAttributesNormalizationStrategy {
    * Returns the normalized view of VOMS Authorization information starting from
    * a list of VOMS Attribute certificates.
    * 
-   * @param acs
+   * @param acs a list of VOMS Attribute certificates
    * @return a possibly empty list {@link VOMSAttribute} object
    */
   public List<VOMSAttribute> normalizeAttributes(List<ACParsingContext> acs);

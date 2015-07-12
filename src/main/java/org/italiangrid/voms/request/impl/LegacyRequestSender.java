@@ -97,6 +97,8 @@ public class LegacyRequestSender {
    * 
    * @param acRequest
    *          the AC request parameters. See {@link VOMSACRequest}.
+   * @param endpoint
+   *          VOMS server endpoint
    * @param stream
    *          an output stream.
    */

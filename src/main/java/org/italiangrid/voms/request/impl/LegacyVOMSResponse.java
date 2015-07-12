@@ -37,7 +37,7 @@ public class LegacyVOMSResponse implements VOMSResponse {
    * Builds a VOMSResponse starting from a DOM an XML document (see
    * {@link Document}).
    * 
-   * @param res
+   * @param res XML response
    */
   public LegacyVOMSResponse(Document res) {
 

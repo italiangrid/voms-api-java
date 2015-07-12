@@ -62,11 +62,11 @@ public class CredentialsUtils {
   /**
    * Serializes a private key to an output stream according to an encoding.
    * 
-   * @param os
-   * @param key
-   * @param encoding
-   * @throws IllegalArgumentException
-   * @throws IOException
+   * @param os output stream
+   * @param key private key
+   * @param encoding private key encoding
+   * @throws IllegalArgumentException illegal argument exception
+   * @throws IOException IO exception
    */
   public static void savePrivateKey(OutputStream os, PrivateKey key,
     PrivateKeyEncoding encoding) throws IllegalArgumentException, IOException {
@@ -90,10 +90,10 @@ public class CredentialsUtils {
    * This method just delegates to canl, but provides a much more understandable
    * signature.
    * 
-   * @param os
-   * @param key
-   * @throws IllegalArgumentException
-   * @throws IOException
+   * @param os output stream
+   * @param key private key
+   * @throws IllegalArgumentException illegal argument exception
+   * @throws IOException IO exception
    */
   private static void savePrivateKeyPKCS8(OutputStream os, PrivateKey key)
     throws IllegalArgumentException, IOException {
@@ -108,10 +108,10 @@ public class CredentialsUtils {
    * This method just delegates to canl, but provides a much more understandable
    * signature.
    * 
-   * @param os
-   * @param key
-   * @throws IllegalArgumentException
-   * @throws IOException
+   * @param os output stream
+   * @param key provate key
+   * @throws IllegalArgumentException illegal argument exception
+   * @throws IOException IO exception
    */
   private static void savePrivateKeyPKCS1(OutputStream os, PrivateKey key)
     throws IllegalArgumentException, IOException {
@@ -125,16 +125,16 @@ public class CredentialsUtils {
    * Saves user credentials as a plain text PEM data. <br>
    * Writes the user certificate chain first, then the user key.
    * 
-   * @param os
-   * @param uc
-   * @param encoding
-   * @throws UnrecoverableKeyException
-   * @throws KeyStoreException
-   * @throws IllegalArgumentException
-   * @throws NoSuchAlgorithmException
-   * @throws IOException
-   * @throws NoSuchProviderException
-   * @throws CertificateException
+   * @param os output stream
+   * @param uc user credential
+   * @param encoding private key encoding
+   * @throws UnrecoverableKeyException unrecoverable key exception
+   * @throws KeyStoreException key store exception
+   * @throws IllegalArgumentException illegal argument exception
+   * @throws NoSuchAlgorithmException no such algorithm exception
+   * @throws IOException IO exception
+   * @throws NoSuchProviderException no such provider exception
+   * @throws CertificateException certificate exception
    */
   public static void saveProxyCredentials(OutputStream os, X509Credential uc,
     PrivateKeyEncoding encoding) throws UnrecoverableKeyException,
@@ -174,15 +174,15 @@ public class CredentialsUtils {
    * Writes the user certificate chain first, then the user key, using the
    * default encoding specified in {@link #DEFAULT_ENCONDING}.
    *
-   * @param os
-   * @param uc
-   * @throws UnrecoverableKeyException
-   * @throws KeyStoreException
-   * @throws IllegalArgumentException
-   * @throws NoSuchAlgorithmException
-   * @throws IOException
-   * @throws NoSuchProviderException
-   * @throws CertificateException
+   * @param os output stream
+   * @param uc user credendial
+   * @throws UnrecoverableKeyException unrecoverable key exception
+   * @throws KeyStoreException key store exception
+   * @throws IllegalArgumentException illegal argument exception
+   * @throws NoSuchAlgorithmException no such algorithm exception
+   * @throws IOException IO exception
+   * @throws NoSuchProviderException no such provider exception
+   * @throws CertificateException certificate exception
    */
   public static void saveProxyCredentials(OutputStream os, X509Credential uc)
     throws UnrecoverableKeyException, KeyStoreException,
@@ -202,13 +202,13 @@ public class CredentialsUtils {
    *          the credential to be saved
    * @param encoding
    *          the private key encoding
-   * @throws IOException
-   * @throws UnrecoverableKeyException
-   * @throws KeyStoreException
-   * @throws IllegalArgumentException
-   * @throws NoSuchAlgorithmException
-   * @throws NoSuchProviderException
-   * @throws CertificateException
+   * @throws IOException IOException
+   * @throws UnrecoverableKeyException unrecoverable key exception
+   * @throws KeyStoreException key store exception
+   * @throws IllegalArgumentException illegal argument exception
+   * @throws NoSuchAlgorithmException no such algorithm exception
+   * @throws NoSuchProviderException no such provider exception
+   * @throws CertificateException certificate exception
    */
   public static void saveProxyCredentials(String proxyFileName,
     X509Credential uc, PrivateKeyEncoding encoding) throws IOException,
@@ -238,14 +238,16 @@ public class CredentialsUtils {
    * encoding specified in {@link #DEFAULT_ENCONDING}.
    * 
    * @param proxyFileName
+   *          the file where the proxy will be saved
    * @param uc
-   * @throws UnrecoverableKeyException
-   * @throws KeyStoreException
-   * @throws IllegalArgumentException
-   * @throws NoSuchAlgorithmException
-   * @throws NoSuchProviderException
-   * @throws CertificateException
-   * @throws IOException
+   *          the credential to be saved
+   * @throws UnrecoverableKeyException unrecoverable key exception
+   * @throws KeyStoreException key store exception
+   * @throws IllegalArgumentException illegal argument exception
+   * @throws NoSuchAlgorithmException no such algorithm exception
+   * @throws NoSuchProviderException no such provider exception
+   * @throws CertificateException certificate exception
+   * @throws IOException IOException
    */
   public static void saveProxyCredentials(String proxyFileName,
     X509Credential uc) throws UnrecoverableKeyException, KeyStoreException,

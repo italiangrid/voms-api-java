@@ -58,11 +58,11 @@ public class ValidationExample {
   }
 
   /**
-   * @param args
-   * @throws IOException
-   * @throws FileNotFoundException
-   * @throws CertificateException
-   * @throws KeyStoreException
+   * @param args arguments
+   * @throws KeyStoreException key store exception
+   * @throws CertificateException certificate exception
+   * @throws FileNotFoundException file not found exception
+   * @throws IOException IO exception
    */
   public static void main(String[] args) throws KeyStoreException,
     CertificateException, FileNotFoundException, IOException {

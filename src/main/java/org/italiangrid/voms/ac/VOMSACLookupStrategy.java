@@ -32,6 +32,7 @@ public interface VOMSACLookupStrategy {
    * This method defines how a set of VOMS Attribute Certificates is looked for
    * in a certificate chain.
    * 
+   * @param certChain certificate chain
    * @return a {@link List} of {@link ACParsingContext} that describes the
    *         lookup outcome
    */

@@ -63,7 +63,7 @@ public interface VOMSACValidator extends VOMSACParser {
    * about validation without relying on the registration of a
    * {@link ValidationResultListener}.
    * 
-   * @param validatedChain
+   * @param validatedChain validated chain
    * @return a possibly empty list of {@link VOMSValidationResult} object
    *         providing access to validation results and related attributes
    */

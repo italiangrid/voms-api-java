@@ -513,7 +513,7 @@ public class DefaultVOMSACService implements VOMSACService {
      * Sets the http protocol implementation
      * 
      * @param httpProtocol
-     *          the http protocol implementatino
+     *          the http protocol implementatioh
      * @return this {@link Builder} instance
      */
     public Builder httpProtocol(VOMSProtocol httpProtocol) {
@@ -524,6 +524,10 @@ public class DefaultVOMSACService implements VOMSACService {
 
     /**
      * Sets the legacy protocol implementation
+     * 
+     * @param legacyProtocol
+     *          the legacy protocol implementatioh
+     * @return this {@link Builder} instance
      */
     public Builder legacyProtocol(VOMSProtocol legacyProtocol) {
 

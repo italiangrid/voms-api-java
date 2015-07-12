@@ -164,7 +164,7 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
   /**
    * Sets whether this protocol will skip SSL hostname checks
    * 
-   * @param skipHostnameChecks 
+   * @param skipHostnameChecks skip hostname checks
    */
   public void setSkipHostnameChecks(boolean skipHostnameChecks) {
   

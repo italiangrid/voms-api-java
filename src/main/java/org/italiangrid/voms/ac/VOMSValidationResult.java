@@ -43,7 +43,7 @@ public class VOMSValidationResult {
    * Default constructor.
    * 
    * @param attributes
-   *          the attributes this validation result refer to
+   *          the attributes this validation result refers to
    * @param valid
    *          <code>true</code> in case of validation success,
    *          <code>false</code> otherwise
@@ -56,6 +56,8 @@ public class VOMSValidationResult {
   /**
    * This constructor is used to pass in a list of validation errors as well.
    * 
+   * @param attributes
+   *          the attributes this validation result refers to
    * @param valid
    *          <code>true</code> in case of validation success,
    *          <code>false</code> otherwise
