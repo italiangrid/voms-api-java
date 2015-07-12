@@ -32,6 +32,8 @@ public class VOMSThread extends Thread {
    *          the object whose <code>run</code> method is called.
    * @param name
    *          the name of the new thread.
+   * @param handler
+   *          uncaught exception handler
    */
   public VOMSThread(Runnable target, String name,
     UncaughtExceptionHandler handler) {

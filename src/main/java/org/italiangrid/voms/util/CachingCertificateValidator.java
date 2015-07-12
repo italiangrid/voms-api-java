@@ -132,7 +132,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
    * Validates a certificate chain using the wrapped validator, caching the
    * result for future validation calls.
    *
-   * @param certChain
+   * @param certChain certificate chain
    * @return a possibly cached {@link ValidationResult}
    * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.X509Certificate[])
    */
@@ -187,7 +187,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
   }
 
   /**
-   * @param certPath
+   * @param certPath certificate path
    * @return the {@link ValidationResult}
    * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.CertPath)
    */
@@ -215,7 +215,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
   }
 
   /**
-   * @param listener
+   * @param listener validation listener
    * @see eu.emi.security.authn.x509.X509CertChainValidator#addValidationListener(eu.emi.security.authn.x509.ValidationErrorListener)
    */
   public void addValidationListener(ValidationErrorListener listener) {
@@ -224,7 +224,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
   }
 
   /**
-   * @param listener
+   * @param listener validation listener
    * @see eu.emi.security.authn.x509.X509CertChainValidator#removeValidationListener(eu.emi.security.authn.x509.ValidationErrorListener)
    */
   public void removeValidationListener(ValidationErrorListener listener) {
@@ -233,7 +233,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
   }
 
   /**
-   * @param listener
+   * @param listener validation listener
    * @see eu.emi.security.authn.x509.X509CertChainValidator#addUpdateListener(eu.emi.security.authn.x509.StoreUpdateListener)
    */
   public void addUpdateListener(StoreUpdateListener listener) {
@@ -242,7 +242,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
   }
 
   /**
-   * @param listener
+   * @param listener validation listener
    * @see eu.emi.security.authn.x509.X509CertChainValidator#removeUpdateListener(eu.emi.security.authn.x509.StoreUpdateListener)
    */
   public void removeUpdateListener(StoreUpdateListener listener) {

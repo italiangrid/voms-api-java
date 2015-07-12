@@ -142,7 +142,7 @@ public class CertificateValidatorBuilder {
   /**
    * Sets whether the created validator will be lazy in loading anchors
    * 
-   * @param lazyness
+   * @param lazyness lazyness
    * @return the builder object
    */
   public CertificateValidatorBuilder lazyAnchorsLoading(boolean lazyness) {
@@ -227,6 +227,9 @@ public class CertificateValidatorBuilder {
    * @param validationErrorListener
    *          the listener that will receive notification about validation
    *          errors
+   * @param storeUpdateListener
+   *          the listener that will receive notification about trust
+   *          anchor store updates
    * @param updateInterval
    *          the trust anchor store update interval
    * @param namespaceChecks
@@ -259,6 +262,9 @@ public class CertificateValidatorBuilder {
    * @param validationErrorListener
    *          the listener that will receive notification about validation
    *          errors
+   * @param storeUpdateListener
+   *          the listener that will receive notification about trust
+   *          anchor store updates
    * @param updateInterval
    *          the trust anchor store update interval
    * @param namespaceChecks

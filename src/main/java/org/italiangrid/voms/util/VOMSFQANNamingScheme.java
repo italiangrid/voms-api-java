@@ -96,7 +96,7 @@ public class VOMSFQANNamingScheme {
    * syntax used by voms to identify roles.
    * 
    * 
-   * @param roleName
+   * @param roleName role name
    * @throws VOMSError
    *           If the string passed as argument doens not comply with the voms
    *           sytax.

@@ -117,7 +117,7 @@ public interface VOMSAttribute {
    * This method checks whether the attributes are valid in a given time passed
    * as argument. No validation is performed on the attributes.
    * 
-   * @param time
+   * @param time time
    * @return <code>true</code> if valid, <code>false</code> otherwise
    */
   public boolean validAt(Date time);
