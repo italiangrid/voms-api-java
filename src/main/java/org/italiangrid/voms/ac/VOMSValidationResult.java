@@ -56,6 +56,8 @@ public class VOMSValidationResult {
   /**
    * This constructor is used to pass in a list of validation errors as well.
    * 
+   * @param attributes 
+   *          the {@link VOMSAttribute} that will be validated
    * @param valid
    *          <code>true</code> in case of validation success,
    *          <code>false</code> otherwise

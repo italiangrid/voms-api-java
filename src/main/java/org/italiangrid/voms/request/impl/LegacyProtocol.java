@@ -64,7 +64,7 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements
 
       sslSocket = (SSLSocket) sslSocketFactory.createSocket();
       sslSocket.setSoTimeout(readTimeout);
-      sslSocket.setEnabledProtocols(VOMS_LEGACY_PROTOCOLS);
+      sslSocket.setEnabledProtocols(VOMS_LEGACY_ENABLED_PROTOCOLS);
 
       SocketAddress sa = new InetSocketAddress(endpoint.getURL().getHost(),
         endpoint.getURL().getPort());

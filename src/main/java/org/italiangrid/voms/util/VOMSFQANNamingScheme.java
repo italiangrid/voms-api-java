@@ -97,6 +97,7 @@ public class VOMSFQANNamingScheme {
    * 
    * 
    * @param roleName
+   *          the name of the role
    * @throws VOMSError
    *           If the string passed as argument doens not comply with the voms
    *           sytax.

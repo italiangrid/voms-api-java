@@ -57,18 +57,4 @@ public class ValidationExample {
 
   }
 
-  /**
-   * @param args
-   * @throws IOException
-   * @throws FileNotFoundException
-   * @throws CertificateException
-   * @throws KeyStoreException
-   */
-  public static void main(String[] args) throws KeyStoreException,
-    CertificateException, FileNotFoundException, IOException {
-
-    new ValidationExample();
-
-  }
-
 }

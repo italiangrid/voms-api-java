@@ -64,6 +64,7 @@ public interface VOMSACValidator extends VOMSACParser {
    * {@link ValidationResultListener}.
    * 
    * @param validatedChain
+   *          a chain of X.509 certificates   
    * @return a possibly empty list of {@link VOMSValidationResult} object
    *         providing access to validation results and related attributes
    */

@@ -83,9 +83,11 @@ public class VOMSACUtils implements VOMSConstants {
    * extension
    * 
    * @param vomsExtension
-   * @return the possybly empty {@link List} of {@link AttributeCertificate}
+   *          the VOMS extension
+   * @return the possibly empty {@link List} of {@link AttributeCertificate}
    *         extracted from a given extension
    * @throws IOException
+   *          in case of deserialization errors
    */
   public static List<AttributeCertificate> getACsFromVOMSExtension(
     byte[] vomsExtension) throws IOException {
@@ -142,6 +144,7 @@ public class VOMSACUtils implements VOMSConstants {
    * @return the possibly empty {@link List} of {@link AttributeCertificate}
    *         objects extracted from the VOMS extension
    * @throws IOException
+   *           in case of deserialization errors
    */
   public static List<AttributeCertificate> getACsFromCertificate(
     X509Certificate cert) throws IOException {
