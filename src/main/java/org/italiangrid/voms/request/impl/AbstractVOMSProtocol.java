@@ -25,9 +25,19 @@ import org.italiangrid.voms.util.NullListener;
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
 
+/**
+ * 
+ * Base implementation class for the VOMS client/server protocol  
+ *
+ */
 public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 
-  public static final String[] VOMS_LEGACY_PROTOCOLS = { "SSLv3" };
+  
+  /**
+   * Enabled TLS protocols for VOMS legacy connections.
+   */
+  public static final String[] VOMS_LEGACY_ENABLED_PROTOCOLS = { "TLSv1", 
+    "TLSv1.1", "TLSv1.2" };
 
   /**
    * The default value for the socket connection timeout
@@ -164,7 +174,9 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
   /**
    * Sets whether this protocol will skip SSL hostname checks
    * 
-   * @param skipHostnameChecks 
+   * @param skipHostnameChecks
+   *          flag that defines whether hostname checks should be 
+   *          skipped for this protocol 
    */
   public void setSkipHostnameChecks(boolean skipHostnameChecks) {
   

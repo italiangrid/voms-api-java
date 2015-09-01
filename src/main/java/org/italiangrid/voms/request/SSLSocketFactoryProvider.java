@@ -40,7 +40,7 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
  * 
  */
 public class SSLSocketFactoryProvider {
-
+  
   private X509Credential credential;
   private X509CertChainValidatorExt validator;
 
@@ -69,7 +69,7 @@ public class SSLSocketFactoryProvider {
 
     try {
 
-      context = SSLContext.getInstance("SSLv3");
+      context = SSLContext.getInstance("TLS");
 
     } catch (NoSuchAlgorithmException e) {
 

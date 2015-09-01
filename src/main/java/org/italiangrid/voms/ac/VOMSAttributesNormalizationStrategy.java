@@ -36,6 +36,8 @@ public interface VOMSAttributesNormalizationStrategy {
    * a list of VOMS Attribute certificates.
    * 
    * @param acs
+   *          a list of {@link ACParsingContext} objects
+   *          
    * @return a possibly empty list {@link VOMSAttribute} object
    */
   public List<VOMSAttribute> normalizeAttributes(List<ACParsingContext> acs);
