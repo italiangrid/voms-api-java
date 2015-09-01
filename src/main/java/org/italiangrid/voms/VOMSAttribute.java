@@ -41,8 +41,8 @@ public interface VOMSAttribute {
   public String getVO();
 
   /**
-   * This method returns the host where the VOMS Attribute Authority (AA) 
-   * that signed these attribute lives
+   * This method returns the host where the VOMS Attribute Authority (AA) that
+   * signed these attribute lives
    * 
    * @return The name of the host where the VOMS AA that signed these attributes
    *         lives
@@ -50,8 +50,8 @@ public interface VOMSAttribute {
   public String getHost();
 
   /**
-   * This method returns the port on which the VOMS Attribute Authority (AA) 
-   * that signed these attributes listens for requests. 
+   * This method returns the port on which the VOMS Attribute Authority (AA)
+   * that signed these attributes listens for requests.
    * 
    * @return The port on which the VOMS AA that signed these attributes listens
    *         for requests
@@ -59,7 +59,7 @@ public interface VOMSAttribute {
   public int getPort();
 
   /**
-   * This method returns the subject (as an {@link X500Principal}) of the holder 
+   * This method returns the subject (as an {@link X500Principal}) of the holder
    * of these VOMS attributes
    * 
    * @return The subject of the holder of these VOMS attributes
@@ -74,8 +74,8 @@ public interface VOMSAttribute {
   public BigInteger getHolderSerialNumber();
 
   /**
-   * This method returns the subject of the VOMS Attribute Authority that
-   * signed these attributes.
+   * This method returns the subject of the VOMS Attribute Authority that signed
+   * these attributes.
    * 
    * @return The subject of the VOMS AA that signed these attributes
    */
@@ -96,31 +96,31 @@ public interface VOMSAttribute {
   public Date getNotAfter();
 
   /**
-   * This method returns the list of signed 
-   * Fully Qualified Attribute Names (FQANs) in this {@link VOMSAttribute}.
+   * This method returns the list of signed Fully Qualified Attribute Names
+   * (FQANs) in this {@link VOMSAttribute}.
    * 
    * @return The {@link List} of VOMS fully qualified attribute names
    */
   public List<String> getFQANs();
 
   /**
-   * This method returns the primary FQAN (the first in the list 
-   * returned by {@link #getFQANs()}) in this {@link VOMSAttribute}.
+   * This method returns the primary FQAN (the first in the list returned by
+   * {@link #getFQANs()}) in this {@link VOMSAttribute}.
    * 
    * @return The primary VOMS fully qualified attribute name
    */
   public String getPrimaryFQAN();
 
   /**
-   * This method returns the signature on the VOMS attribute certificate as
-   * a byte array.
+   * This method returns the signature on the VOMS attribute certificate as a
+   * byte array.
    * 
    * @return The signature of this VOMS attributes
    */
   public byte[] getSignature();
 
   /**
-   * This method returns the list of VOMS Generic attributes in this 
+   * This method returns the list of VOMS Generic attributes in this
    * {@link VOMSAttribute}.
    * 
    * @return The VOMS generic attributes
@@ -128,7 +128,7 @@ public interface VOMSAttribute {
   public List<VOMSGenericAttribute> getGenericAttributes();
 
   /**
-   * This method returns the list of targets defined for this 
+   * This method returns the list of targets defined for this
    * {@link VOMSAttribute}.
    * 
    * @return The targets for this VOMS attributes
@@ -136,7 +136,7 @@ public interface VOMSAttribute {
   public List<String> getTargets();
 
   /**
-   * This method returns the certificate chain of the VOMS Attribute Authority 
+   * This method returns the certificate chain of the VOMS Attribute Authority
    * (AA) that signed this {@link VOMSAttribute}.
    * 
    * @return The VOMS AA certificate chain

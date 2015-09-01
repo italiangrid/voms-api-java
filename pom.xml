@@ -250,10 +250,10 @@
 
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcmail-jdk15on</artifactId>
+      <artifactId>bcpkix-jdk15on</artifactId>
       <version>${bc.version}</version>
     </dependency>
-
+    
     <dependency>
       <groupId>net.jcip</groupId>
       <artifactId>jcip-annotations</artifactId>

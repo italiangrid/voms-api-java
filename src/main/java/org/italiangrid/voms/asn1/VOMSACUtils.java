@@ -30,8 +30,8 @@ import java.util.List;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERIA5String;
@@ -57,362 +57,428 @@ import org.italiangrid.voms.ac.impl.VOMSGenericAttributeImpl;
 
 /**
  * A set of VOMS AC handling utilities.
- *
+ * 
  * @author Andrea Ceccanti
  *
  */
-public class VOMSACUtils implements VOMSConstants{
+public class VOMSACUtils implements VOMSConstants {
+
+  public static final String POLICY_AUTHORITY_SEP = "://";
+
+  /**
+   * Returns the VOMS extension, if present, in a given certificate
+   * 
+   * @param cert
+   *          the {@link X509Certificate} where the extension will be searched
+   * @return the DER-encoded octet string of the extension value or null if it
+   *         is not present.
+   */
+  public static byte[] getVOMSExtensionFromCertificate(X509Certificate cert) {
+
+    return cert.getExtensionValue(VOMSConstants.VOMS_EXTENSION_OID.getId());
+  }
+
+  /**
+   * Deserializes the VOMS Attribute certificates in a given certificate
+   * extension
+   * 
+   * @param vomsExtension
+   *          the VOMS extension
+   * @return the possibly empty {@link List} of {@link AttributeCertificate}
+   *         extracted from a given extension
+   * @throws IOException
+   *           in case of deserialization errors
+   */
+  public static List<AttributeCertificate> getACsFromVOMSExtension(
+    byte[] vomsExtension) throws IOException {
+
+    List<AttributeCertificate> acs = null;
 
-	public static final String POLICY_AUTHORITY_SEP ="://";
-	/**
-	 * Returns the VOMS extension, if present, in a given certificate
-	 * @param cert the {@link X509Certificate} where the extension will be searched
-	 * @return the DER-encoded octet string of the extension value or null if it is not present.
-	 */
-	public static byte[] getVOMSExtensionFromCertificate(X509Certificate cert){
+    if (vomsExtension == null)
+      return Collections.emptyList();
+
+    acs = new ArrayList<AttributeCertificate>();
+
+    // Convert extension to a DEROctetString
+    ASN1InputStream asn1Stream = new ASN1InputStream(new ByteArrayInputStream(
+      vomsExtension));
+    byte[] payload = ((DEROctetString) asn1Stream.readObject()).getOctets();
 
-		return cert.getExtensionValue(VOMSConstants.VOMS_EXTENSION_OID.getId());
-	}
+    asn1Stream.close();
 
-	/**
-	 * Deserializes the VOMS Attribute certificates in a given certificate extension
-	 *
-	 * @param vomsExtension
-	 * @return the possybly empty {@link List} of {@link AttributeCertificate} extracted from a given extension
-	 * @throws IOException
-	 */
-	public static List<AttributeCertificate> getACsFromVOMSExtension(byte[] vomsExtension) throws IOException{
+    asn1Stream = new ASN1InputStream(new ByteArrayInputStream(payload));
 
-		List<AttributeCertificate> acs = null;
+    // VOMS extension is SEQUENCE of SET of AttributeCertificate
+    // now, SET is an ordered sequence, and an AC is a sequence as
+    // well -- thus the three nested ASN.1 sequences below...
+    ASN1Sequence baseSequence = (ASN1Sequence) asn1Stream.readObject();
+    asn1Stream.close();
 
-		if (vomsExtension == null)
-			return Collections.emptyList();
+    @SuppressWarnings("unchecked")
+    Enumeration<ASN1Sequence> setSequence = baseSequence.getObjects();
 
-		acs = new ArrayList<AttributeCertificate>();
+    while (setSequence.hasMoreElements()) {
 
-		// Convert extension to a DEROctetString
-		ASN1InputStream asn1Stream = new ASN1InputStream(new ByteArrayInputStream(vomsExtension));
-		byte[] payload = ((DEROctetString) asn1Stream.readObject()).getOctets();
+      ASN1Sequence acSequence = setSequence.nextElement();
 
-		asn1Stream.close();
+      @SuppressWarnings("unchecked")
+      Enumeration<ASN1Sequence> theACs = acSequence.getObjects();
 
-		asn1Stream = new ASN1InputStream(new ByteArrayInputStream(payload));
+      while (theACs.hasMoreElements()) {
 
-        // VOMS extension is SEQUENCE of SET of AttributeCertificate
-        // now, SET is an ordered sequence, and an AC is a sequence as
-        // well -- thus the three nested ASN.1 sequences below...
-        ASN1Sequence baseSequence = (ASN1Sequence) asn1Stream.readObject();
-        asn1Stream.close();
+        AttributeCertificate parsedAC = new AttributeCertificate(
+          theACs.nextElement());
+        acs.add(parsedAC);
+      }
+    }
 
-        @SuppressWarnings("unchecked")
-		Enumeration<ASN1Sequence> setSequence = baseSequence.getObjects();
+    return acs;
+  }
 
-        while(setSequence.hasMoreElements()){
+  /**
+   * Deserializes the VOMS Attribute certificates, if present, in a given
+   * certificate passed as argument
+   * 
+   * @param cert
+   *          the {@link X509Certificate} where the ACs will be searched
+   * @return the possibly empty {@link List} of {@link AttributeCertificate}
+   *         objects extracted from the VOMS extension
+   * @throws IOException
+   *           in case of deserialization errors
+   */
+  public static List<AttributeCertificate> getACsFromCertificate(
+    X509Certificate cert) throws IOException {
 
-        	ASN1Sequence acSequence = setSequence.nextElement();
+    return getACsFromVOMSExtension(getVOMSExtensionFromCertificate(cert));
+  }
+
+  /**
+   * Deserializes the FQANs contained in a {@link IetfAttrSyntax} object
+   * 
+   * @param attr
+   *          the {@link IetfAttrSyntax} attribute syntax object containing the
+   *          VOMS extension
+   * @return a {@link List} of FQANs
+   */
+  private static List<String> deserializeFQANs(IetfAttrSyntax attr) {
 
-        	@SuppressWarnings("unchecked")
-        	Enumeration<ASN1Sequence> theACs = acSequence.getObjects();
+    if (attr.getValueType() != IetfAttrSyntax.VALUE_OCTETS)
+      raiseACNonConformantError("unsupported attribute values encoding.");
 
-        	while (theACs.hasMoreElements()){
+    List<String> fqans = new ArrayList<String>();
 
-        		AttributeCertificate parsedAC =
-        		  AttributeCertificate.getInstance(theACs.nextElement());
-        		acs.add(parsedAC);
-        	}
-        }
+    ASN1OctetString[] values = (ASN1OctetString[]) attr.getValues();
 
-        return acs;
-	}
+    for (ASN1OctetString s : values)
+      fqans.add(new String(s.getOctets()));
 
-	/**
-	 * Deserializes the VOMS Attribute certificates, if present, in a given certificate passed as argument
-	 *
-	 * @param cert the {@link X509Certificate} where the ACs will be searched
-	 * @return the possibly empty {@link List} of {@link AttributeCertificate} objects extracted from the VOMS extension
-	 * @throws IOException
-	 */
-	public static List<AttributeCertificate> getACsFromCertificate(X509Certificate cert) throws IOException{
-		return getACsFromVOMSExtension(getVOMSExtensionFromCertificate(cert));
-	}
+    return fqans;
+  }
 
-	/**
-	 * Deserializes the FQANs contained in a {@link IetfAttrSyntax} object
-	 *
-	 * @param attr the {@link IetfAttrSyntax} attribute syntax object containing the VOMS extension
-	 * @return a {@link List} of FQANs
-	 */
-	private static List<String> deserializeFQANs(IetfAttrSyntax attr){
+  @SuppressWarnings("rawtypes")
+  private static List<String> deserializeACTargets(
+    X509AttributeCertificateHolder ac) {
 
-		if (attr.getValueType() != IetfAttrSyntax.VALUE_OCTETS)
-			raiseACNonConformantError("unsupported attribute values encoding.");
+    List<String> targets = new ArrayList<String>();
 
-		List<String> fqans = new ArrayList<String>();
+    Extension targetExtension = ac.getExtension(Extension.targetInformation);
 
-		ASN1OctetString[] values = (ASN1OctetString[])attr.getValues();
+    if (targetExtension == null)
+      return targets;
 
-		for (ASN1OctetString s: values)
-			fqans.add(new String(s.getOctets()));
+    TargetInformation ti = TargetInformation
+      .getInstance((ASN1Sequence) targetExtension.getParsedValue());
 
-		return fqans;
-	}
+    // Only one Targets according to RFC 3281
+    Targets asn1TargetContainer = ti.getTargetsObjects()[0];
 
-	@SuppressWarnings("rawtypes")
-  private static List<String> deserializeACTargets(X509AttributeCertificateHolder ac){
-		List<String> targets = new ArrayList<String>();
+    // The deserialization has to be done by hand since it seems VOMS
+    // does not correctly encode the ACTargets extension...
+    ASN1Sequence targetSequence = (ASN1Sequence) asn1TargetContainer
+      .toASN1Primitive();
 
-		Extension targetExtension = ac.getExtension(Extension.targetInformation);
+    Target[] asn1Targets = new Target[targetSequence.size()];
 
-		if (targetExtension == null)
-			return targets;
+    int count = 0;
 
-		TargetInformation ti = TargetInformation.getInstance((ASN1Sequence)targetExtension.getParsedValue());
+    for (Enumeration e = targetSequence.getObjects(); e.hasMoreElements();) {
 
-		// Only one Targets according to RFC 3281
-		Targets asn1TargetContainer = ti.getTargetsObjects()[0];
+      // There's one sequence more than expected here that makes
+      // the bc constructor fail...
+      ASN1Sequence seq = (ASN1Sequence) e.nextElement();
+      ASN1TaggedObject val = (ASN1TaggedObject) seq.getObjectAt(0);
+      asn1Targets[count++] = Target.getInstance(val);
+    }
 
-		// The deserialization has to be done by hand since it seems VOMS
-		// does not correctly encode the ACTargets extension...
-		ASN1Sequence targetSequence = (ASN1Sequence) asn1TargetContainer.toASN1Primitive();
-		Target[] asn1Targets = new Target[targetSequence.size()];
+    // Extract the actual string
+    for (Target t : asn1Targets) {
 
-		int count = 0;
+      GeneralName targetURI = t.getTargetName();
 
-		for (Enumeration e = targetSequence.getObjects(); e.hasMoreElements();){
+      if (targetURI.getTagNo() != GeneralName.uniformResourceIdentifier)
+        raiseACNonConformantError("wrong AC target extension encoding. Only URI targets are supported.");
 
-        	// There's one sequence more than expected here that makes
-        	// the bc constructor fail...
-        	ASN1Sequence seq = (ASN1Sequence) e.nextElement();
-            ASN1TaggedObject val = (ASN1TaggedObject) seq.getObjectAt(0);
-        	asn1Targets[count++] = Target.getInstance(val);
-        }
+      String targetString = ((DERIA5String) targetURI.getName()).getString();
+      targets.add(targetString);
+    }
+    return targets;
+  }
 
-        // Extract the actual string
-        for (Target t: asn1Targets){
+  private static void raiseACNonConformantError(String errorString) {
 
-			GeneralName targetURI = t.getTargetName();
+    throw new VOMSError("Non conformant VOMS Attribute certificate: "
+      + errorString);
+  }
 
-			if (targetURI.getTagNo() != GeneralName.uniformResourceIdentifier)
-				raiseACNonConformantError("wrong AC target extension encoding. Only URI targets are supported.");
+  /**
+   * Peforms some sanity checks on the format of the policy authority field
+   * found in a VOMS extension. The enforced format is: vo://host:port
+   * 
+   * @param attr
+   *          the {@link IetfAttrSyntax} attribute syntax object containing the
+   *          VOMS extension
+   * @return the validated policy authority as a {@link String}
+   */
+  private static String policyAuthoritySanityChecks(IetfAttrSyntax attr) {
 
-			String targetString = ((DERIA5String)targetURI.getName()).getString();
-			targets.add(targetString);
-		}
-		return targets;
-	}
+    // The policy authority value is encoded as a DERIA5String
+    String policyAuthority = ((DERIA5String) attr.getPolicyAuthority()
+      .getNames()[0].getName()).getString();
 
-	private static void raiseACNonConformantError(String errorString){
-		throw new VOMSError("Non conformant VOMS Attribute certificate: "+errorString);
-	}
+    // PolicyAuthority scheme: <vo name>://<hostname>:<port>
+    int index = policyAuthority.indexOf(POLICY_AUTHORITY_SEP);
 
-	/**
-	 * Peforms some sanity checks on the format of the policy authority field found in a VOMS extension.
-	 * The enforced format is: vo://host:port
-	 *
-	 * @param attr the {@link IetfAttrSyntax} attribute syntax object containing the VOMS extension
-	 * @return the validated policy authority as a {@link String}
-	 */
-	private static String policyAuthoritySanityChecks(IetfAttrSyntax attr){
+    if ((index < 0) || (index == policyAuthority.length() - 1))
+      raiseACNonConformantError("unsupported policy authority encoding '"
+        + policyAuthority + "'");
 
-		// The policy authority value is encoded as a DERIA5String
-		String policyAuthority = ((DERIA5String) attr.getPolicyAuthority().getNames()[0].getName()).getString();
+    return policyAuthority;
 
-		// PolicyAuthority scheme: <vo name>://<hostname>:<port>
-		int index = policyAuthority.indexOf(POLICY_AUTHORITY_SEP);
+  }
 
-		if ((index < 0) || (index == policyAuthority.length()-1))
-			raiseACNonConformantError("unsupported policy authority encoding '"+policyAuthority+"'");
+  /**
+   * Deserializes the information in a list of VOMS attribute certificates.
+   * 
+   * @param acs
+   *          a {@link List} of VOMS acs
+   * @return a possibly empty list of {@link VOMSAttribute}
+   */
+  public static List<VOMSAttribute> deserializeVOMSAttributes(
+    List<AttributeCertificate> acs) {
 
-		return policyAuthority;
+    if (acs == null || acs.size() == 0)
+      return Collections.emptyList();
 
-	}
+    List<VOMSAttribute> attributes = new ArrayList<VOMSAttribute>();
+    for (AttributeCertificate a : acs) {
+      attributes.add(deserializeVOMSAttributes(a));
+    }
 
-	/**
-	 * Deserializes the information in a list of VOMS attribute certificates.
-	 * @param acs a {@link List} of VOMS acs
-	 * @return a possibly empty list of {@link VOMSAttribute}
-	 */
-	public static List<VOMSAttribute> deserializeVOMSAttributes(List<AttributeCertificate> acs){
+    return attributes;
+  }
 
-		if (acs == null || acs.size() == 0)
-			return Collections.emptyList();
+  /**
+   * Deserializes the information in a VOMS attribute certificate.
+   * 
+   * @param ac
+   *          a VOMS {@link AttributeCertificate}
+   * @return a {@link VOMSAttribute} object which provides more convenient
+   *         access to the VOMS authorization information
+   */
+  public static VOMSAttribute deserializeVOMSAttributes(AttributeCertificate ac) {
 
-		List<VOMSAttribute> attributes = new ArrayList<VOMSAttribute>();
-		for (AttributeCertificate a : acs){
-			attributes.add(deserializeVOMSAttributes(a));
-		}
+    VOMSAttributesImpl attrs = new VOMSAttributesImpl();
 
-		return attributes;
-	}
+    X509AttributeCertificateHolder acHolder = new X509AttributeCertificateHolder(
+      ac);
+    Attribute[] asn1Attrs = acHolder.getAttributes(VOMS_FQANS_OID);
 
-	/**
-	 * Deserializes the information in a VOMS attribute certificate.
-	 * @param ac a VOMS {@link AttributeCertificate}
-	 * @return a {@link VOMSAttribute} object which provides more convenient access to the VOMS authorization information
-	 */
-	public static VOMSAttribute deserializeVOMSAttributes(AttributeCertificate ac) {
+    for (Attribute a : asn1Attrs) {
+      ASN1Primitive theVOMSDerObject = a.getAttributeValues()[0]
+        .toASN1Primitive();
 
-		VOMSAttributesImpl attrs = new VOMSAttributesImpl();
+      IetfAttrSyntax attrSyntax = IetfAttrSyntax.getInstance(ASN1Sequence
+        .getInstance(theVOMSDerObject));
 
-		X509AttributeCertificateHolder acHolder = new X509AttributeCertificateHolder(ac);
-		Attribute[] asn1Attrs = acHolder.getAttributes(VOMS_FQANS_OID);
+      String policyAuthority = policyAuthoritySanityChecks(attrSyntax);
 
-		for (Attribute a: asn1Attrs){
-                        ASN1Object theVOMSDerObject = a.getAttributeValues()[0].toASN1Primitive();
-			IetfAttrSyntax attrSyntax = IetfAttrSyntax.getInstance(ASN1Sequence.getInstance(theVOMSDerObject));
+      // The policy authority string has the following format:
+      // <vo name>://<hostname>:<port>
 
+      attrs.setVO(policyAuthority.substring(0,
+        policyAuthority.indexOf(POLICY_AUTHORITY_SEP)));
+      attrs.setHost(policyAuthority.substring(
+        policyAuthority.indexOf(POLICY_AUTHORITY_SEP) + 3,
+        policyAuthority.lastIndexOf(":")));
+      attrs.setPort(Integer.parseInt(policyAuthority.substring(policyAuthority
+        .lastIndexOf(":") + 1)));
 
-			String policyAuthority = policyAuthoritySanityChecks(attrSyntax);
+      attrs.setFQANs(deserializeFQANs(attrSyntax));
 
+      attrs.setNotBefore(acHolder.getNotBefore());
+      attrs.setNotAfter(acHolder.getNotAfter());
+      attrs.setSignature(acHolder.getSignature());
+      attrs.setGenericAttributes(deserializeGAs(acHolder));
+      attrs.setAACertificates(deserializeACCerts(acHolder));
+      attrs.setTargets(deserializeACTargets(acHolder));
 
-			// The policy authority string has the following format:
-			// <vo name>://<hostname>:<port>
+      attrs.setVOMSAC(acHolder);
 
-			attrs.setVO(policyAuthority.substring(0, policyAuthority.indexOf(POLICY_AUTHORITY_SEP)));
-			attrs.setHost(policyAuthority.substring(policyAuthority.indexOf(POLICY_AUTHORITY_SEP)+3,
-					policyAuthority.lastIndexOf(":")));
-			attrs.setPort(Integer.parseInt(policyAuthority.substring(policyAuthority.lastIndexOf(":")+1)));
+      try {
 
+        attrs.setIssuer(new X500Principal(acHolder.getIssuer().getNames()[0]
+          .getEncoded()));
+        attrs.setHolder(new X500Principal(acHolder.getHolder().getIssuer()[0]
+          .getEncoded()));
+        attrs.setHolderSerialNumber(acHolder.getHolder().getSerialNumber());
 
-			attrs.setFQANs(deserializeFQANs(attrSyntax));
+      } catch (IOException e) {
+        throw new VOMSError(
+          "Error parsing attribute certificate issuer  or holder name: "
+            + e.getMessage(), e);
+      }
+    }
 
-			attrs.setNotBefore(acHolder.getNotBefore());
-			attrs.setNotAfter(acHolder.getNotAfter());
-			attrs.setSignature(acHolder.getSignature());
-			attrs.setGenericAttributes(deserializeGAs(acHolder));
-			attrs.setAACertificates(deserializeACCerts(acHolder));
-			attrs.setTargets(deserializeACTargets(acHolder));
+    return attrs;
+  }
 
-			attrs.setVOMSAC(acHolder);
+  /**
+   * Deserializes the VOMS generic attributes
+   * 
+   * @param ac
+   *          the VOMS {@link X509AttributeCertificateHolder}
+   * @return the {@link List} of {@link VOMSGenericAttribute} contained in the
+   *         ac
+   */
+  private static List<VOMSGenericAttribute> deserializeGAs(
+    X509AttributeCertificateHolder ac) {
 
-			try{
+    List<VOMSGenericAttribute> gas = new ArrayList<VOMSGenericAttribute>();
 
-				attrs.setIssuer(new X500Principal(acHolder.getIssuer().getNames()[0].getEncoded()));
-				attrs.setHolder(new X500Principal(acHolder.getHolder().getIssuer()[0].getEncoded()));
-				attrs.setHolderSerialNumber(acHolder.getHolder().getSerialNumber());
+    Extension gasExtension = ac.getExtension(VOMS_GENERIC_ATTRS_OID);
 
-			}catch (IOException e){
-				throw new VOMSError("Error parsing attribute certificate issuer  or holder name: "+e.getMessage(),e);
-			}
-		}
+    if (gasExtension == null)
+      return gas;
 
-		return attrs;
-	}
+    // SEQUENCE of TagList - contains just one taglist element
+    ASN1Sequence tagContainerSeq = (ASN1Sequence) gasExtension.getParsedValue();
+    if (tagContainerSeq.size() != 1)
+      raiseACNonConformantError("unsupported generic attributes container format.");
 
-	/**
-	 * Deserializes the VOMS generic attributes
-	 * @param ac the VOMS {@link X509AttributeCertificateHolder}
-	 * @return the {@link List} of {@link VOMSGenericAttribute} contained in the ac
-	 */
-	private static List<VOMSGenericAttribute> deserializeGAs(X509AttributeCertificateHolder ac){
+    // TagList - this also should be a sigle element sequence
+    ASN1Sequence tagListSeq = (ASN1Sequence) tagContainerSeq.getObjectAt(0);
+    if (tagListSeq.size() > 1)
+      raiseACNonConformantError("unsupported taglist format.");
 
-		List<VOMSGenericAttribute> gas = new ArrayList<VOMSGenericAttribute>();
+    // This TagList sequence is empty, gLite 3.2 VOMS versions had a bug
+    // that added the extension even there were no attributes encoded...
+    if (tagListSeq.size() == 0)
+      return gas;
 
-		Extension gasExtension = ac.getExtension(VOMS_GENERIC_ATTRS_OID);
+    // Down one level
+    tagListSeq = (ASN1Sequence) tagListSeq.getObjectAt(0);
 
-		if (gasExtension == null)
-			return gas;
+    // TODO: check policyAuthority!!
+    // GeneralNames policyAuthority =
+    // GeneralNames.getInstance(tagListSeq.getObjectAt(0));
 
-		// SEQUENCE of TagList - contains just one taglist element
-		ASN1Sequence tagContainerSeq = (ASN1Sequence) gasExtension.getParsedValue();
-		if (tagContainerSeq.size() != 1)
-			raiseACNonConformantError("unsupported generic attributes container format.");
+    // tags SEQUENCE OF Tag
+    ASN1Sequence tags = (ASN1Sequence) tagListSeq.getObjectAt(1);
 
-		// TagList -  this also should be a sigle element sequence
-		ASN1Sequence tagListSeq = (ASN1Sequence) tagContainerSeq.getObjectAt(0);
-		if (tagListSeq.size() > 1)
-			raiseACNonConformantError("unsupported taglist format.");
+    @SuppressWarnings("unchecked")
+    Enumeration<ASN1Sequence> e = tags.getObjects();
+    while (e.hasMoreElements()) {
 
-		// This TagList sequence is empty, gLite 3.2 VOMS versions had a bug
-		// that added the extension even there were no attributes encoded...
-		if (tagListSeq.size() == 0)
-			return gas;
+      ASN1Sequence theActualTag = e.nextElement();
 
-		// Down one level
-		tagListSeq = (ASN1Sequence) tagListSeq.getObjectAt(0);
+      if (theActualTag.size() != 3)
+        raiseACNonConformantError("unsupported tag format.");
 
-		// TODO: check policyAuthority!!
-		// GeneralNames policyAuthority = GeneralNames.getInstance(tagListSeq.getObjectAt(0));
+      VOMSGenericAttributeImpl attribute = new VOMSGenericAttributeImpl();
 
-		// tags SEQUENCE OF Tag
-		ASN1Sequence tags = (ASN1Sequence) tagListSeq.getObjectAt(1);
+      attribute.setName(new String(DEROctetString.getInstance(
+        theActualTag.getObjectAt(0)).getOctets()));
+      attribute.setValue(new String(DEROctetString.getInstance(
+        theActualTag.getObjectAt(1)).getOctets()));
+      attribute.setContext(new String(DEROctetString.getInstance(
+        theActualTag.getObjectAt(2)).getOctets()));
 
-		@SuppressWarnings("unchecked")
-		Enumeration<ASN1Sequence> e = tags.getObjects();
-		while(e.hasMoreElements()){
+      gas.add(attribute);
+    }
 
-			ASN1Sequence theActualTag = e.nextElement();
+    return gas;
+  }
 
-			if (theActualTag.size() != 3)
-				raiseACNonConformantError("unsupported tag format.");
+  /**
+   * Deserializes the VOMS ACCerts extension
+   * 
+   * @param ac
+   *          the VOMS {@link X509AttributeCertificateHolder}
+   * @return the parsed array of {@link X509Certificate}
+   */
+  private static X509Certificate[] deserializeACCerts(
+    X509AttributeCertificateHolder ac) {
 
-			VOMSGenericAttributeImpl attribute = new VOMSGenericAttributeImpl();
+    List<X509Certificate> certs = new ArrayList<X509Certificate>();
 
-			attribute.setName(new String(DEROctetString.getInstance(theActualTag.getObjectAt(0)).getOctets()));
-			attribute.setValue(new String(DEROctetString.getInstance(theActualTag.getObjectAt(1)).getOctets()));
-			attribute.setContext(new String(DEROctetString.getInstance(theActualTag.getObjectAt(2)).getOctets()));
+    Extension e = ac.getExtension(VOMS_CERTS_OID);
 
-			gas.add(attribute);
-		}
+    if (e == null)
+      return null;
 
-		return gas;
-	}
+    ASN1Sequence certSeq = (ASN1Sequence) e.getParsedValue();
+    if (certSeq.size() != 1)
+      raiseACNonConformantError("unsupported accerts format.");
 
-	/**
-	 * Deserializes the VOMS ACCerts extension
-	 * @param ac the VOMS {@link X509AttributeCertificateHolder}
-	 * @return the parsed array of {@link X509Certificate}
-	 */
-	private static X509Certificate[] deserializeACCerts(X509AttributeCertificateHolder ac){
-		List<X509Certificate> certs = new ArrayList<X509Certificate>();
+    // Down one level
+    certSeq = (ASN1Sequence) certSeq.getObjectAt(0);
 
-		Extension e = ac.getExtension(VOMS_CERTS_OID);
+    @SuppressWarnings("unchecked")
+    Enumeration<DLSequence> encodedCerts = certSeq.getObjects();
 
-		if (e == null)
-			return null;
+    CertificateFactory cf = null;
 
-		ASN1Sequence certSeq = (ASN1Sequence)e.getParsedValue();
-		if (certSeq.size() != 1)
-			raiseACNonConformantError("unsupported accerts format.");
+    try {
+      cf = CertificateFactory.getInstance("X.509",
+        BouncyCastleProvider.PROVIDER_NAME);
+    } catch (Exception ex) {
+      throw new VOMSError("Certificate factory creation error: "
+        + ex.getMessage(), ex);
+    }
 
-		// Down one level
-		certSeq = (ASN1Sequence)certSeq.getObjectAt(0);
+    while (encodedCerts.hasMoreElements()) {
 
-		@SuppressWarnings("unchecked")
-		Enumeration<DLSequence> encodedCerts = certSeq.getObjects();
+      DLSequence s = encodedCerts.nextElement();
+      X509CertificateObject certObj = null;
+      byte[] certData = null;
+      X509Certificate theCert = null;
 
-		CertificateFactory cf = null;
+      try {
 
-		try {
-			cf = CertificateFactory.getInstance("X.509", BouncyCastleProvider.PROVIDER_NAME);
-		} catch (Exception ex) {
-			throw new VOMSError("Certificate factory creation error: "+ex.getMessage(),ex);
-		}
+        certObj = new X509CertificateObject(
+          Certificate.getInstance(ASN1Sequence.getInstance(s)));
 
-		while (encodedCerts.hasMoreElements()){
+        certData = certObj.getEncoded();
+        theCert = (X509Certificate) cf
+          .generateCertificate(new ByteArrayInputStream(certData));
 
-                        DLSequence s  = encodedCerts.nextElement();
-			X509CertificateObject certObj = null;
-			byte[] certData = null;
-			X509Certificate theCert = null;
+      } catch (CertificateParsingException ex) {
+        throw new VOMSError("Certificate parsing error: " + ex.getMessage(), ex);
+      } catch (CertificateEncodingException ex) {
+        throw new VOMSError("Certificate encoding error: " + ex.getMessage(),
+          ex);
+      } catch (CertificateException ex) {
+        throw new VOMSError("Error generating certificate from parsed data: "
+          + ex.getMessage(), ex);
+      }
 
-			try {
+      certs.add(theCert);
+    }
 
-				certObj = new X509CertificateObject(Certificate.getInstance(ASN1Sequence.getInstance(s)));
-				certData = certObj.getEncoded();
-				theCert = (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(certData));
+    return certs.toArray(new X509Certificate[certs.size()]);
+  }
 
-			} catch (CertificateParsingException ex) {
-				throw new VOMSError("Certificate parsing error: "+ex.getMessage(), ex);
-			} catch (CertificateEncodingException ex) {
-				throw new VOMSError("Certificate encoding error: "+ex.getMessage(), ex);
-			} catch (CertificateException ex) {
-				throw new VOMSError("Error generating certificate from parsed data: "+ex.getMessage(), ex);
-			}
+  private VOMSACUtils() {
 
-			certs.add(theCert);
-		}
-
-		return certs.toArray(new X509Certificate[certs.size()]);
-	}
+  }
 }
