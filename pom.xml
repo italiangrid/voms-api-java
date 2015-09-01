@@ -4,7 +4,7 @@
 
   <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
-  <version>3.1.0.rc2</version>
+  <version>3.1.0.rc1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>voms-api-java</name>
@@ -253,7 +253,7 @@
       <artifactId>bcpkix-jdk15on</artifactId>
       <version>${bc.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>net.jcip</groupId>
       <artifactId>jcip-annotations</artifactId>
