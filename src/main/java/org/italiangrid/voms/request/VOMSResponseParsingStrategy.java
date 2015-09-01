@@ -26,11 +26,13 @@ import java.io.InputStream;
 public interface VOMSResponseParsingStrategy {
 
   /**
-   * Parse the response coming from a VOMS service and build a {@link VOMSResponse} object.
+   * Parse the response coming from a VOMS service and build a
+   * {@link VOMSResponse} object.
    * 
-   * @param inputStream the response from the VOMS service.
+   * @param inputStream
+   *          the response from the VOMS service.
    * @return the response object representing the response from the service.
    */
   public VOMSResponse parse(InputStream inputStream);
-  
+
 }

@@ -39,9 +39,9 @@ import eu.emi.security.authn.x509.proxy.ProxyType;
 import java.io.IOException;
 
 public class TestNoExtensionValidation implements Fixture{
-	
+
 	PEMCredential cred;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
@@ -58,15 +58,14 @@ public class TestNoExtensionValidation implements Fixture{
 
                 ProxyCertificateOptions options = new ProxyCertificateOptions(cred.getCertificateChain());
 		options.setType(ProxyType.LEGACY);
-		
+
 		ProxyCertificate proxy = ProxyGenerator.generate(options, cred.getKey());
-		
+
 		VOMSACValidator validator = Utils.getVOMSValidator();
 		List<VOMSAttribute> attrs = validator.validate(proxy.getCertificateChain());
-		
+
 		Assert.assertNotNull(attrs);
 		Assert.assertTrue(attrs.isEmpty());
-		
-	}
 
+	}
 }

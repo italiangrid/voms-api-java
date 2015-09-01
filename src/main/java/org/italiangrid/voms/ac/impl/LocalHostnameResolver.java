@@ -22,12 +22,14 @@ import java.net.UnknownHostException;
  *
  */
 public interface LocalHostnameResolver {
-	
-	/**
-	 * Resolves the hostname for localhost
-	 * @return a String containing the localhost hostname
-	 * @throws UnknownHostException when there is an error resolving the hostname
-	 */
-	public String resolveLocalHostname() throws UnknownHostException;
+
+  /**
+   * Resolves the hostname for localhost
+   * 
+   * @return a String containing the localhost hostname
+   * @throws UnknownHostException
+   *           when there is an error resolving the hostname
+   */
+  public String resolveLocalHostname() throws UnknownHostException;
 
 }

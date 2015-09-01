@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.SSLException;
@@ -71,17 +70,15 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements
         endpoint.getURL().getPort());
 
       sslSocket.connect(sa, connectTimeout);
-      SocketFactoryCreator.connectWithHostnameChecking(sslSocket, this);
+      if (!isSkipHostnameChecks()) {
+        SocketFactoryCreator.connectWithHostnameChecking(sslSocket, this);
+      }
 
-    } catch (UnknownHostException e) {
+    } catch (Throwable t) {
 
-      throw new VOMSProtocolError(e.getMessage(), endpoint, request,
-        credential, e);
+      throw new VOMSProtocolError(t.getMessage(), endpoint, request,
+        credential, t);
 
-    } catch (IOException e) {
-
-      throw new VOMSProtocolError(e.getMessage(), endpoint, request,
-        credential, e);
     }
 
     LegacyRequestSender protocol = LegacyRequestSender.instance(listener);
@@ -115,9 +112,10 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements
       FormatMode.MEDIUM_ONE_LINE);
     String message = String
       .format(
-        "Hostname does not match cerificate failed for host: %s. Peer certificate : %s",
+        "No subject alternative DNS name matching %s found. Peer certificate : %s",
         hostName, peerCertString);
     throw new SSLException(message);
+
   }
 
 }

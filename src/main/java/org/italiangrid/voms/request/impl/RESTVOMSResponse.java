@@ -25,146 +25,163 @@ import org.w3c.dom.NodeList;
 
 /**
  * 
- * This class is used to parse and represent VOMS server responses 
- * coming from a RESTful VOMS service.
+ * This class is used to parse and represent VOMS server responses coming from a
+ * RESTful VOMS service.
  * 
  * @author Andrea Ceccanti
  * @author Vincenzo Ciaschini
  * @author Valerio Venturi
  * 
  */
-public class RESTVOMSResponse implements org.italiangrid.voms.request.VOMSResponse {
+public class RESTVOMSResponse implements
+  org.italiangrid.voms.request.VOMSResponse {
 
-	private static int ERROR_OFFSET = 1000;
-	
-	protected Document xmlResponse;
+  private static int ERROR_OFFSET = 1000;
 
-	public RESTVOMSResponse(Document res) {
-	  xmlResponse = res;
+  protected Document xmlResponse;
+
+  public RESTVOMSResponse(Document res) {
+
+    xmlResponse = res;
   }
-	
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.glite.voms.contact.VOMSResponseIF#getVersion()
    */
   public int getVersion() {
-    
-    Element versionElement = (Element) xmlResponse.getElementsByTagName("version").item(0);
-    
+
+    Element versionElement = (Element) xmlResponse.getElementsByTagName(
+      "version").item(0);
+
     if (versionElement == null) {
-      
+
       return 0;
     }
-    
+
     return Integer.parseInt(versionElement.getFirstChild().getNodeValue());
   }
-	
-	/* (non-Javadoc)
-	 * @see org.glite.voms.contact.VOMSResponseIF#hasErrors()
-	 */
-	public boolean hasErrors() {
-		
-		return (xmlResponse.getElementsByTagName("error").getLength() != 0);
-	}
 
-	/* (non-Javadoc)
-	 * @see org.glite.voms.contact.VOMSResponseIF#hasWarnings()
-	 */
-	public boolean hasWarnings() {
-		
-		return (xmlResponse.getElementsByTagName("warning").getLength() != 0);
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.glite.voms.contact.VOMSResponseIF#hasErrors()
+   */
+  public boolean hasErrors() {
 
-	/* (non-Javadoc)
-	 * @see org.glite.voms.contact.VOMSResponseIF#getAC()
-	 */
-	public byte[] getAC() {
+    return (xmlResponse.getElementsByTagName("error").getLength() != 0);
+  }
 
-		Element acElement = (Element) xmlResponse.getElementsByTagName("ac").item(0);
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.glite.voms.contact.VOMSResponseIF#hasWarnings()
+   */
+  public boolean hasWarnings() {
 
-		if (acElement == null || !acElement.hasChildNodes())
-			return null;
-		
-		String acString = acElement.getFirstChild().getNodeValue();
-		
-		ACDecodingStrategy acDecodingStrategy = new GoodACDecodingStrategy();
-		
-		byte[] decodedAc = acDecodingStrategy.decode(acString);
-		
-		return decodedAc;
-	}
+    return (xmlResponse.getElementsByTagName("warning").getLength() != 0);
+  }
 
-	public VOMSErrorMessage[] errorMessages() {
-		
-	  NodeList nodes = xmlResponse.getElementsByTagName("error");
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.glite.voms.contact.VOMSResponseIF#getAC()
+   */
+  public byte[] getAC() {
 
-		if (nodes.getLength() == 0)
-			return null;
+    Element acElement = (Element) xmlResponse.getElementsByTagName("ac")
+      .item(0);
 
-		VOMSErrorMessage[] result = new VOMSErrorMessage[nodes.getLength()];
+    if (acElement == null || !acElement.hasChildNodes())
+      return null;
 
-		for (int i = 0; i < nodes.getLength(); i++) {
-			
-		  Element itemElement = (Element) nodes.item(i);
-		  Element codeElement = (Element) itemElement.getElementsByTagName("code").item(0);
-			Element messageElement = (Element) itemElement.getElementsByTagName("message").item(0);
-			String strcode = codeElement.getFirstChild().getNodeValue();
-			
-			int code;
+    String acString = acElement.getFirstChild().getNodeValue();
 
-			if (strcode.equals("NoSuchUser"))
-				code = 1001;
-			else if (strcode.equals("BadRequest"))
-				code = 1005;
-			else if (strcode.equals("SuspendedUser"))
-				code = 1004;
-			else
-				// InternalError
-				code = 1006;
+    ACDecodingStrategy acDecodingStrategy = new GoodACDecodingStrategy();
 
-			result[i] = new VOMSErrorMessage(code, messageElement.getFirstChild().getNodeValue());
-		}
-		
-		return result;
-	}
+    byte[] decodedAc = acDecodingStrategy.decode(acString);
 
-	public VOMSWarningMessage[] warningMessages() {
-		
-	  NodeList nodes = xmlResponse.getElementsByTagName("warning");
+    return decodedAc;
+  }
 
-		if (nodes.getLength() == 0)
-			return null;
+  public VOMSErrorMessage[] errorMessages() {
 
-		VOMSWarningMessage[] result = new VOMSWarningMessage[nodes.getLength()];
+    NodeList nodes = xmlResponse.getElementsByTagName("error");
 
-		for (int i = 0; i < nodes.getLength(); i++) {
+    if (nodes.getLength() == 0)
+      return null;
 
-			Element itemElement = (Element) nodes.item(i);
+    VOMSErrorMessage[] result = new VOMSErrorMessage[nodes.getLength()];
 
-			// Element messageElement = (Element) itemElement.getElementsByTagName("message").item(0);
+    for (int i = 0; i < nodes.getLength(); i++) {
 
-			String message = itemElement.getFirstChild().getNodeValue();
-			
-			int number;
+      Element itemElement = (Element) nodes.item(i);
+      Element codeElement = (Element) itemElement.getElementsByTagName("code")
+        .item(0);
+      Element messageElement = (Element) itemElement.getElementsByTagName(
+        "message").item(0);
+      String strcode = codeElement.getFirstChild().getNodeValue();
 
-			if (message.contains("validity"))
-				number = 2;
-			else if (message.contains("selected"))
-				number = 1;
-			else if (message.contains("contains attributes"))
-				number = 3;
-			else
-				number = 4;
-			
-			if (number < ERROR_OFFSET) {
-				result[i] = new VOMSWarningMessage(number, message);
-			}
-		}
+      int code;
 
-		return result;
-	}
+      if (strcode.equals("NoSuchUser"))
+        code = 1001;
+      else if (strcode.equals("BadRequest"))
+        code = 1005;
+      else if (strcode.equals("SuspendedUser"))
+        code = 1004;
+      else
+        // InternalError
+        code = 1006;
 
-	public String getXMLAsString() {
-		return XMLUtils.documentAsString(xmlResponse);
-	}
+      result[i] = new VOMSErrorMessage(code, messageElement.getFirstChild()
+        .getNodeValue());
+    }
+
+    return result;
+  }
+
+  public VOMSWarningMessage[] warningMessages() {
+
+    NodeList nodes = xmlResponse.getElementsByTagName("warning");
+
+    if (nodes.getLength() == 0)
+      return null;
+
+    VOMSWarningMessage[] result = new VOMSWarningMessage[nodes.getLength()];
+
+    for (int i = 0; i < nodes.getLength(); i++) {
+
+      Element itemElement = (Element) nodes.item(i);
+
+      // Element messageElement = (Element)
+      // itemElement.getElementsByTagName("message").item(0);
+
+      String message = itemElement.getFirstChild().getNodeValue();
+
+      int number;
+
+      if (message.contains("validity"))
+        number = 2;
+      else if (message.contains("selected"))
+        number = 1;
+      else if (message.contains("contains attributes"))
+        number = 3;
+      else
+        number = 4;
+
+      if (number < ERROR_OFFSET) {
+        result[i] = new VOMSWarningMessage(number, message);
+      }
+    }
+
+    return result;
+  }
+
+  public String getXMLAsString() {
+
+    return XMLUtils.documentAsString(xmlResponse);
+  }
 
 }

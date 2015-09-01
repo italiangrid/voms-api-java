@@ -40,157 +40,151 @@ import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 
 public class VOMSAA {
 
-	X509Credential credential;
-	String voName;
-	String host;
-	int port;
+  X509Credential credential;
+  String voName;
+  String host;
+  int port;
 
-	Date acNotBefore;
-	Date acNotAfter;
+  Date acNotBefore;
+  Date acNotAfter;
 
-	EnumSet<ACGenerationProperties> generationProperties = VOMSACGenerator.defaultGenerationProperties;
+  EnumSet<ACGenerationProperties> generationProperties = VOMSACGenerator.defaultGenerationProperties;
 
-	private volatile long serial = 0L;
+  private volatile long serial = 0L;
 
-	public VOMSAA(X509Credential cred, String vo, String host, int port) {
+  public VOMSAA(X509Credential cred, String vo, String host, int port) {
 
-		credential = cred;
-		voName = vo;
-		this.host = host;
-		this.port = port;
+    credential = cred;
+    voName = vo;
+    this.host = host;
+    this.port = port;
 
-	}
+  }
 
-	private synchronized BigInteger getAndIncrementSerial() {
+  private synchronized BigInteger getAndIncrementSerial() {
 
-		return BigInteger.valueOf(serial++);
-	}
+    return BigInteger.valueOf(serial++);
+  }
 
-	public ProxyCertificate createVOMSProxy(PEMCredential holder,
-		List<String> fqans, List<VOMSGenericAttribute> gas, List<String> targets)
-		throws InvalidKeyException, CertificateParsingException,
-		SignatureException, NoSuchAlgorithmException, IOException {
+  public ProxyCertificate createVOMSProxy(PEMCredential holder,
+    List<String> fqans, List<VOMSGenericAttribute> gas, List<String> targets)
+    throws InvalidKeyException, CertificateParsingException,
+    SignatureException, NoSuchAlgorithmException, IOException {
 
-		return createVOMSProxy(holder, holder, fqans, gas, targets);
-	}
+    return createVOMSProxy(holder, holder, fqans, gas, targets);
+  }
 
-	public ProxyCertificate createVOMSProxy(PEMCredential holder,
-		List<String> fqans) throws InvalidKeyException,
-		CertificateParsingException, SignatureException, NoSuchAlgorithmException,
-		IOException {
+  public ProxyCertificate createVOMSProxy(PEMCredential holder,
+    List<String> fqans) throws InvalidKeyException,
+    CertificateParsingException, SignatureException, NoSuchAlgorithmException,
+    IOException {
 
-		return createVOMSProxy(holder, holder, fqans, null, null);
-	}
+    return createVOMSProxy(holder, holder, fqans, null, null);
+  }
 
-	public AttributeCertificate getAC(X509Credential holder, List<String> fqans,
-		List<VOMSGenericAttribute> attrs, List<String> targets, Date notBefore,
-		Date notAfter) {
+  public AttributeCertificate getAC(X509Credential holder, List<String> fqans,
+    List<VOMSGenericAttribute> attrs, List<String> targets, Date notBefore,
+    Date notAfter) {
 
-		return getAC(credential, holder, voName, host, port, fqans, attrs, targets,
-			notBefore, notAfter);
-	}
+    return getAC(credential, holder, voName, host, port, fqans, attrs, targets,
+      notBefore, notAfter);
+  }
 
-	public AttributeCertificate getAC(X509Credential aaCredential,
-		X509Credential holder, String voName, String host, int port,
-		List<String> fqans, List<VOMSGenericAttribute> attrs, List<String> targets,
-		Date notBefore, Date notAfter) {
+  public AttributeCertificate getAC(X509Credential aaCredential,
+    X509Credential holder, String voName, String host, int port,
+    List<String> fqans, List<VOMSGenericAttribute> attrs, List<String> targets,
+    Date notBefore, Date notAfter) {
 
-		VOMSACGenerator generator = new VOMSACGenerator(aaCredential);
+    VOMSACGenerator generator = new VOMSACGenerator(aaCredential);
 
-		X509AttributeCertificateHolder acHolder = generator
-			.generateVOMSAttributeCertificate(
-				generationProperties,
-				fqans, attrs, targets,
-				holder.getCertificate(), 
-				getAndIncrementSerial(), 
-				notBefore, 
-				notAfter,
-				voName,
-				host,
-				port);
+    X509AttributeCertificateHolder acHolder = generator
+      .generateVOMSAttributeCertificate(generationProperties, fqans, attrs,
+        targets, holder.getCertificate(), getAndIncrementSerial(), notBefore,
+        notAfter, voName, host, port);
 
-		return acHolder.toASN1Structure();
+    return acHolder.toASN1Structure();
 
-	}
+  }
 
-	public ProxyCertificate createVOMSProxy(PEMCredential holder,
-		PEMCredential proxyHolder, List<String> fqans,
-		List<VOMSGenericAttribute> attrs, List<String> targets)
-		throws InvalidKeyException, CertificateParsingException,
-		SignatureException, NoSuchAlgorithmException, IOException {
+  public ProxyCertificate createVOMSProxy(PEMCredential holder,
+    PEMCredential proxyHolder, List<String> fqans,
+    List<VOMSGenericAttribute> attrs, List<String> targets)
+    throws InvalidKeyException, CertificateParsingException,
+    SignatureException, NoSuchAlgorithmException, IOException {
 
-		Calendar cal = Calendar.getInstance();
+    Calendar cal = Calendar.getInstance();
 
-		Date startDate = acNotBefore;
-		Date endDate = acNotAfter;
+    Date startDate = acNotBefore;
+    Date endDate = acNotAfter;
 
-		if (startDate == null)
-			startDate = cal.getTime();
+    if (startDate == null)
+      startDate = cal.getTime();
 
-		if (endDate == null) {
-			cal.add(Calendar.HOUR, 12);
-			endDate = cal.getTime();
-		}
+    if (endDate == null) {
+      cal.add(Calendar.HOUR, 12);
+      endDate = cal.getTime();
+    }
 
-		AttributeCertificate ac = getAC(credential, holder, voName, host, port,
-			fqans, attrs, targets, startDate, endDate);
+    AttributeCertificate ac = getAC(credential, holder, voName, host, port,
+      fqans, attrs, targets, startDate, endDate);
 
-		return createVOMSProxy(proxyHolder, new AttributeCertificate[] { ac });
-	}
+    return createVOMSProxy(proxyHolder, new AttributeCertificate[] { ac });
+  }
 
-	public ProxyCertificate createVOMSProxy(PEMCredential holder,
-		AttributeCertificate[] acs) throws InvalidKeyException,
-		CertificateParsingException, SignatureException, NoSuchAlgorithmException,
-		IOException {
+  public ProxyCertificate createVOMSProxy(PEMCredential holder,
+    AttributeCertificate[] acs) throws InvalidKeyException,
+    CertificateParsingException, SignatureException, NoSuchAlgorithmException,
+    IOException {
 
-		ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(
-			holder.getCertificateChain());
+    ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(
+      holder.getCertificateChain());
 
-		proxyOptions.setAttributeCertificates(acs);
-		ProxyCertificate proxy = ProxyGenerator.generate(proxyOptions,
-			holder.getKey());
+    proxyOptions.setAttributeCertificates(acs);
+    ProxyCertificate proxy = ProxyGenerator.generate(proxyOptions,
+      holder.getKey());
 
-		return proxy;
-	}
+    return proxy;
+  }
 
-	public VOMSAA setCredential(PEMCredential credential) {
+  public VOMSAA setCredential(PEMCredential credential) {
 
-		this.credential = credential;
-		return this;
-	}
+    this.credential = credential;
+    return this;
+  }
 
-	public VOMSAA setVoName(String voName) {
+  public VOMSAA setVoName(String voName) {
 
-		this.voName = voName;
-		return this;
-	}
+    this.voName = voName;
+    return this;
+  }
 
-	public VOMSAA setHost(String host) {
+  public VOMSAA setHost(String host) {
 
-		this.host = host;
-		return this;
-	}
+    this.host = host;
+    return this;
+  }
 
-	public VOMSAA setPort(int port) {
+  public VOMSAA setPort(int port) {
 
-		this.port = port;
-		return this;
-	}
+    this.port = port;
+    return this;
+  }
 
-	public VOMSAA setAcNotBefore(Date acNotBefore) {
+  public VOMSAA setAcNotBefore(Date acNotBefore) {
 
-		this.acNotBefore = acNotBefore;
-		return this;
-	}
+    this.acNotBefore = acNotBefore;
+    return this;
+  }
 
-	public VOMSAA setAcNotAfter(Date acNotAfter) {
+  public VOMSAA setAcNotAfter(Date acNotAfter) {
 
-		this.acNotAfter = acNotAfter;
-		return this;
-	}
+    this.acNotAfter = acNotAfter;
+    return this;
+  }
 
-	public VOMSAA setGenerationProperties(EnumSet<ACGenerationProperties> props) {
-		this.generationProperties = props;
-		return this;
-	}
+  public VOMSAA setGenerationProperties(EnumSet<ACGenerationProperties> props) {
+
+    this.generationProperties = props;
+    return this;
+  }
 }

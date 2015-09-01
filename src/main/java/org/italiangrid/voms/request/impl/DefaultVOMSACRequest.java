@@ -29,79 +29,84 @@ import org.italiangrid.voms.request.VOMSACRequest;
  */
 public class DefaultVOMSACRequest implements VOMSACRequest {
 
-	public static final int DEFAULT_LIFETIME = (int) TimeUnit.HOURS.toSeconds(12);
-	
-	private int lifetime;
+  public static final int DEFAULT_LIFETIME = (int) TimeUnit.HOURS.toSeconds(12);
 
-	private List<String> requestedFQANs;
+  private int lifetime;
 
-	private List<String> targets;
+  private List<String> requestedFQANs;
 
-	private String voName;
+  private List<String> targets;
 
-	public int getLifetime() {
+  private String voName;
 
-		return lifetime;
-	}
+  public int getLifetime() {
 
+    return lifetime;
+  }
 
-	public List<String> getRequestedFQANs() {
-		
-		return requestedFQANs;
-	}
+  public List<String> getRequestedFQANs() {
 
-	
-	public List<String> getTargets() {
+    return requestedFQANs;
+  }
 
-		return targets;
-	}
+  public List<String> getTargets() {
 
-	public String getVoName() {
+    return targets;
+  }
 
-		return voName;
-	}
-	
-	private DefaultVOMSACRequest(Builder b) {
-		this.lifetime = b.lifetime;
-		this.voName = b.voName;
-		this.targets = b.targets;
-		this.requestedFQANs = b.requestedFQANs;
-	}
+  public String getVoName() {
 
-	public static class Builder {
-		private int lifetime = DEFAULT_LIFETIME;
+    return voName;
+  }
 
-		private List<String> requestedFQANs = Collections.emptyList();
+  private DefaultVOMSACRequest(Builder b) {
 
-		private List<String> targets = Collections.emptyList();
+    this.lifetime = b.lifetime;
+    this.voName = b.voName;
+    this.targets = b.targets;
+    this.requestedFQANs = b.requestedFQANs;
+  }
 
-		private String voName;
+  public static class Builder {
 
-		public Builder(String voName) {
-			this.voName = voName;
-		}
+    private int lifetime = DEFAULT_LIFETIME;
 
-		public Builder lifetime(int l) {
-			this.lifetime = l;
-			return this;
-		}
+    private List<String> requestedFQANs = Collections.emptyList();
 
-		public Builder fqans(List<String> fqans) {
-			if (fqans != null)
-				this.requestedFQANs = fqans;
-			return this;
-		}
+    private List<String> targets = Collections.emptyList();
 
-		public Builder targets(List<String> targets) {
-			if (targets != null)
-				this.targets = targets;
-			return this;
-		}
+    private String voName;
 
-		public DefaultVOMSACRequest build() {
-			return new DefaultVOMSACRequest(this);
+    public Builder(String voName) {
 
-		}
-	}
+      this.voName = voName;
+    }
+
+    public Builder lifetime(int l) {
+
+      this.lifetime = l;
+      return this;
+    }
+
+    public Builder fqans(List<String> fqans) {
+
+      if (fqans != null)
+        this.requestedFQANs = fqans;
+      return this;
+    }
+
+    public Builder targets(List<String> targets) {
+
+      if (targets != null)
+        this.targets = targets;
+      return this;
+    }
+
+    public DefaultVOMSACRequest build() {
+
+      return new DefaultVOMSACRequest(this);
+
+    }
+  }
 
 }

@@ -26,143 +26,166 @@ import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
 import org.italiangrid.voms.util.NullListener;
 
 /**
- * A VOMS trust store that periodically updates itself. The update frequency is set
- * once at VOMS trust store creation time.
+ * A VOMS trust store that periodically updates itself. The update frequency is
+ * set once at VOMS trust store creation time.
  * 
  * 
  * @author Andrea Ceccanti
  *
  */
-public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore implements
-		UpdatingVOMSTrustStore {
-	
-	/**
-	 * Default trust store update frequency (10 minutes). 
-	 */
-	public static final long DEFAULT_UPDATE_FREQUENCY = TimeUnit
-	  .MINUTES.toMillis(10);
-	
-	/**
-	 * This trust store update frequency in milliseconds.
-	 */
-	private long updateFrequency;
-	
-	/**
-	 * The scheduler used to schedule the update tasks.
-	 */
-	private final ScheduledExecutorService scheduler = 
-	  Executors.newSingleThreadScheduledExecutor(new VOMSNamedThreadFactory());
-	
-	/**
-	 * Builds a trust store configured as defined in the parameters.
-	 * 
-	 * @param localTrustDirs where VOMS trust information will be looked for
-	 * @param updateFrequency the update frequency in milliseconds
-	 * @param listener a listener that is notified of interesting events related to this store
-	 */
-	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency, VOMSTrustStoreStatusListener listener) {
-		super(localTrustDirs, listener);
-		updateFrequencySanityChecks(updateFrequency);
-		this.updateFrequency = updateFrequency;
-		scheduleUpdate();
-	}
-	
-	/**
-	 * Builds a trust store configured as defined in the parameters.
-	 * @param updateFrequency the update frequency in milliseconds
-	 * 
-	 */
-	public DefaultUpdatingVOMSTrustStore(long updateFrequency) {
-		this(buildDefaultTrustedDirs(), updateFrequency, NullListener.INSTANCE);
-	}
-	
-	/**
-	 * Builds a trust store configured as defined in the parameters.
-	 * 
-	 * @param localTrustDirs where VOMS trust information will be looked for
-	 * @param updateFrequency the update frequency in milliseconds
-	 * 
-	 */
-	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs, long updateFrequency) {
-		this(localTrustDirs, updateFrequency, NullListener.INSTANCE);
-	}
+public class DefaultUpdatingVOMSTrustStore extends DefaultVOMSTrustStore
+  implements UpdatingVOMSTrustStore {
 
-	/**
-	 * Builds a trust store configured as defined in the parameters.
-	 * 
-	 * @param localTrustDirs where VOMS trust information will be looked for
-	 */
-	public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs){
-		this(localTrustDirs, DEFAULT_UPDATE_FREQUENCY, NullListener.INSTANCE);
-	}
-	
-	/**
-	 * Builds a trust store. VOMS information will be searched in 
-	 * the default VOMS dir location ({@link DefaultVOMSTrustStore#DEFAULT_VOMS_DIR}).
-	 * 
-	 * This store will be refreshed according to the value of 
-	 * {@link #DEFAULT_UPDATE_FREQUENCY}.
-	 */
-	public DefaultUpdatingVOMSTrustStore(){
-		this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY, NullListener.INSTANCE);
-	}
-	
-	
-	protected void updateFrequencySanityChecks(long updateFrequency){
-		if (updateFrequency <= 0)
-			throw new VOMSError("Please provide a positive value for this store update frequency!");
-	}
-	
-	protected void scheduleUpdate(){
-		
-		write.lock();
-		try{
+  /**
+   * Default trust store update frequency (10 minutes).
+   */
+  public static final long DEFAULT_UPDATE_FREQUENCY = TimeUnit.MINUTES
+    .toMillis(10);
 
-			long frequency = getUpdateFrequency();
+  /**
+   * This trust store update frequency in milliseconds.
+   */
+  private long updateFrequency;
 
-			scheduler.scheduleWithFixedDelay(new Runnable() {
-				// Just run update on the VOMS trust store and log any error
-				public void run() {
-					update();
-				}
-			}, 
-			frequency, // First execution delay 
-			frequency, // Next iterations delay 
-			TimeUnit.MILLISECONDS);
+  /**
+   * The scheduler used to schedule the update tasks.
+   */
+  private final ScheduledExecutorService scheduler = Executors
+    .newSingleThreadScheduledExecutor(new VOMSNamedThreadFactory());
 
-		}finally{
-			write.unlock();
-		}
-	}
-	
-	/**
-	 * Returns the update frequency, in milliseconds, for this store.
-	 */
-	public long getUpdateFrequency() {
-		read.lock();
-		try{
-			return updateFrequency;
-		}finally{
-			read.unlock();
-		}
-	}
-	/**
-	 * Updates the information in this store
-	 */
-	public void update() {
-		loadTrustInformation();
-	}
+  /**
+   * Builds a trust store configured as defined in the parameters.
+   * 
+   * @param localTrustDirs
+   *          where VOMS trust information will be looked for
+   * @param updateFrequency
+   *          the update frequency in milliseconds
+   * @param listener
+   *          a listener that is notified of interesting events related to this
+   *          store
+   */
+  public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs,
+    long updateFrequency, VOMSTrustStoreStatusListener listener) {
 
-	/**
-	 * Cancel the background tasks which updates this store.
-	 */
-	public void cancel() {
-		write.lock();
-		try{
-			scheduler.shutdownNow();
-		}finally{
-			write.unlock();
-		}
-	}
+    super(localTrustDirs, listener);
+    updateFrequencySanityChecks(updateFrequency);
+    this.updateFrequency = updateFrequency;
+    scheduleUpdate();
+  }
+
+  /**
+   * Builds a trust store configured as defined in the parameters.
+   * 
+   * @param updateFrequency
+   *          the update frequency in milliseconds
+   * 
+   */
+  public DefaultUpdatingVOMSTrustStore(long updateFrequency) {
+
+    this(buildDefaultTrustedDirs(), updateFrequency, NullListener.INSTANCE);
+  }
+
+  /**
+   * Builds a trust store configured as defined in the parameters.
+   * 
+   * @param localTrustDirs
+   *          where VOMS trust information will be looked for
+   * @param updateFrequency
+   *          the update frequency in milliseconds
+   * 
+   */
+  public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs,
+    long updateFrequency) {
+
+    this(localTrustDirs, updateFrequency, NullListener.INSTANCE);
+  }
+
+  /**
+   * Builds a trust store configured as defined in the parameters.
+   * 
+   * @param localTrustDirs
+   *          where VOMS trust information will be looked for
+   */
+  public DefaultUpdatingVOMSTrustStore(List<String> localTrustDirs) {
+
+    this(localTrustDirs, DEFAULT_UPDATE_FREQUENCY, NullListener.INSTANCE);
+  }
+
+  /**
+   * Builds a trust store. VOMS information will be searched in the default VOMS
+   * dir location ({@link DefaultVOMSTrustStore#DEFAULT_VOMS_DIR}).
+   * 
+   * This store will be refreshed according to the value of
+   * {@link #DEFAULT_UPDATE_FREQUENCY}.
+   */
+  public DefaultUpdatingVOMSTrustStore() {
+
+    this(buildDefaultTrustedDirs(), DEFAULT_UPDATE_FREQUENCY,
+      NullListener.INSTANCE);
+  }
+
+  protected void updateFrequencySanityChecks(long updateFrequency) {
+
+    if (updateFrequency <= 0)
+      throw new VOMSError(
+        "Please provide a positive value for this store update frequency!");
+  }
+
+  protected void scheduleUpdate() {
+
+    write.lock();
+    try {
+
+      long frequency = getUpdateFrequency();
+
+      scheduler.scheduleWithFixedDelay(new Runnable() {
+
+        // Just run update on the VOMS trust store and log any error
+        public void run() {
+
+          update();
+        }
+      }, frequency, // First execution delay
+        frequency, // Next iterations delay
+        TimeUnit.MILLISECONDS);
+
+    } finally {
+      write.unlock();
+    }
+  }
+
+  /**
+   * Returns the update frequency, in milliseconds, for this store.
+   */
+  public long getUpdateFrequency() {
+
+    read.lock();
+    try {
+      return updateFrequency;
+    } finally {
+      read.unlock();
+    }
+  }
+
+  /**
+   * Updates the information in this store
+   */
+  public void update() {
+
+    loadTrustInformation();
+  }
+
+  /**
+   * Cancel the background tasks which updates this store.
+   */
+  public void cancel() {
+
+    write.lock();
+    try {
+      scheduler.shutdownNow();
+    } finally {
+      write.unlock();
+    }
+  }
 
 }

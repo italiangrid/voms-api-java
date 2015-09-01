@@ -41,64 +41,67 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
  */
 public class SSLSocketFactoryProvider {
 
-	private X509Credential credential;
-	private X509CertChainValidatorExt validator;
+  private X509Credential credential;
+  private X509CertChainValidatorExt validator;
 
-	public SSLSocketFactoryProvider(X509Credential credential, X509CertChainValidatorExt validator) {
-		this.credential = credential;
-		this.validator = validator;
+  public SSLSocketFactoryProvider(X509Credential credential,
+    X509CertChainValidatorExt validator) {
 
-	}
+    this.credential = credential;
+    this.validator = validator;
 
-	public SSLSocketFactoryProvider(X509Credential credential) {
-		this(credential, 
-		  new CertificateValidatorBuilder()
-		  .trustAnchorsUpdateInterval(60000L)
-		  .build());
-	}
+  }
 
-	/**
-	 * Get the SSL socket factory.
-	 * 
-	 * @return the {@link SSLSocketFactory} object
-	 */
-	public SSLSocketFactory getSSLSockectFactory() {
+  public SSLSocketFactoryProvider(X509Credential credential) {
 
-		SSLContext context = null;
+    this(credential, new CertificateValidatorBuilder()
+      .trustAnchorsUpdateInterval(60000L).build());
+  }
 
-		try {
+  /**
+   * Get the SSL socket factory.
+   * 
+   * @return the {@link SSLSocketFactory} object
+   */
+  public SSLSocketFactory getSSLSockectFactory() {
 
-			context = SSLContext.getInstance("SSLv3");
+    SSLContext context = null;
 
-		} catch (NoSuchAlgorithmException e) {
+    try {
 
-			throw new VOMSError(e.getMessage(), e);
-		}
+      context = SSLContext.getInstance("SSLv3");
 
-		KeyManager[] keyManagers = new KeyManager[] { credential.getKeyManager() };
+    } catch (NoSuchAlgorithmException e) {
 
-		X509TrustManager trustManager = SocketFactoryCreator.getSSLTrustManager(validator);
+      throw new VOMSError(e.getMessage(), e);
+    }
 
-		TrustManager[] trustManagers = new TrustManager[] { trustManager };
+    KeyManager[] keyManagers = new KeyManager[] { credential.getKeyManager() };
 
-		SecureRandom secureRandom = null;
+    X509TrustManager trustManager = SocketFactoryCreator
+      .getSSLTrustManager(validator);
 
-		/* http://bugs.sun.com/view_bug.do?bug_id=6202721 */
-		/* Use new SecureRandom instead of SecureRandom.getInstance("SHA1PRNG") to avoid
-		 * unnecessary blocking
-		 */
-		secureRandom = new SecureRandom();
+    TrustManager[] trustManagers = new TrustManager[] { trustManager };
 
-		try {
+    SecureRandom secureRandom = null;
 
-			context.init(keyManagers, trustManagers, secureRandom);
+    /* http://bugs.sun.com/view_bug.do?bug_id=6202721 */
+    /*
+     * Use new SecureRandom instead of SecureRandom.getInstance("SHA1PRNG") to
+     * avoid unnecessary blocking
+     */
+    secureRandom = new SecureRandom();
 
-		} catch (KeyManagementException e) {
+    try {
 
-			throw new VOMSError(e.getMessage(), e);
-		}
+      context.init(keyManagers, trustManagers, secureRandom);
 
-		return context.getSocketFactory();
-	}
+    } catch (KeyManagementException e) {
+
+      throw new VOMSError(e.getMessage(), e);
+    }
+
+    return context.getSocketFactory();
+  }
 
 }

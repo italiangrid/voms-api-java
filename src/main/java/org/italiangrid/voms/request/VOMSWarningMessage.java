@@ -15,7 +15,6 @@
  */
 package org.italiangrid.voms.request;
 
-
 /**
  * 
  * This class is used to decode VOMS error messages contained in a VOMS
@@ -26,13 +25,14 @@ package org.italiangrid.voms.request;
  */
 public class VOMSWarningMessage extends VOMSMessage {
 
-	public VOMSWarningMessage(int code, String message) {
-		super(code, message);
-	}
+  public VOMSWarningMessage(int code, String message) {
 
-	public String toString() {
+    super(code, message);
+  }
 
-		return "voms warning " + code + ": " + message;
+  public String toString() {
 
-	}
+    return "voms warning " + code + ": " + message;
+
+  }
 }

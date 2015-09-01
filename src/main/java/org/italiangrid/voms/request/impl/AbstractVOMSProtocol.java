@@ -27,115 +27,149 @@ import eu.emi.security.authn.x509.X509Credential;
 
 public abstract class AbstractVOMSProtocol implements VOMSProtocol {
 
-	public static final String[] VOMS_LEGACY_PROTOCOLS = {"SSLv3"};
-	
-	/** 
-	 * The default value for the socket connection timeout
-	 */
-	public static final int DEFAULT_CONNECT_TIMEOUT = 2000;
-	
-	/** 
-	 * The default value for the socket read timeout
-	 */
-	public static final int DEFAULT_READ_TIMEOUT = 5000;
-	
-	
-	protected VOMSProtocolListener listener = NullListener.INSTANCE;
+  public static final String[] VOMS_LEGACY_PROTOCOLS = { "SSLv3" };
 
-	/**
-	 * The CAnL validator used to manage SSL authentication.
-	 */
-	protected X509CertChainValidatorExt validator;
-	
-	/**
-	 * The tcp connection timeout (in milliseconds)
-	 */
-	protected int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
-	
-	/**
-	 * The socket read timeout (in milliseconds)
-	 */
-	protected int readTimeout = DEFAULT_READ_TIMEOUT;
-	
+  /**
+   * The default value for the socket connection timeout
+   */
+  public static final int DEFAULT_CONNECT_TIMEOUT = 2000;
 
-	/**
-	 * Ctor.
-	 * 
-	 * @param validator
-	 *            the validator used to manage the SSL authentication
-	 */
-	public AbstractVOMSProtocol(X509CertChainValidatorExt validator) {
-		
-		this.validator = validator;
-	}
-	
-	/**
-	 * Ctor.
-	 * 
-	 * @param validator
-	 *            the validator used to manage the SSL authentication
-	 * @param listener 
-	 *            the listener informed of low-level protocol details
-	 * @param connectTimeout
-	 * 			  sets the socket connection timeout
-	 * @param readTimeout
-	 * 			  sets the socket read timeout	
-	 */
-	public AbstractVOMSProtocol(X509CertChainValidatorExt validator,
-			VOMSProtocolListener listener,
-			int connectTimeout, 
-			int readTimeout)
-			{
-		
-		this.validator = validator;
-		this.connectTimeout = connectTimeout;
-		this.readTimeout = readTimeout;
-		this.listener = listener;
-	}
-	
-	/**
-	 * Builds an SSL socket factory based on the credential passed as argument and the validator
-	 * configured for this {@link AbstractVOMSProtocol}
-	 * @param credential the client credential used for the socket factory being created
-	 * @return an {@link SSLSocketFactory} 
-	 */
-	protected SSLSocketFactory getSSLSocketFactory(X509Credential credential){
-		SSLSocketFactoryProvider sslSocketFactoryProvider = new SSLSocketFactoryProvider(credential, validator);
-	    return sslSocketFactoryProvider.getSSLSockectFactory();
-	}
+  /**
+   * The default value for the socket read timeout
+   */
+  public static final int DEFAULT_READ_TIMEOUT = 5000;
+  
+  /**
+   * The default hostname checking policy.
+   */
+  public static final boolean DEFAULT_SKIP_HOSTNAME_CHECKS = false;
 
-	/**
-	 * @return The connect timeout value (in milliseconds)
-	 */
-	public int getConnectTimeout() {
-		return connectTimeout;
-	}
+  protected VOMSProtocolListener listener = NullListener.INSTANCE;
 
-	/**
-	 * Sets the connection timeout value for the underlying socket of this {@link AbstractVOMSProtocol}
-	 * 
-	 * @param connectTimeout the connection timeout in milliseconds
-	 */
-	public void setConnectTimeout(int connectTimeout) {
-		this.connectTimeout = connectTimeout;
-	}
+  /**
+   * The CAnL validator used to manage SSL authentication.
+   */
+  protected X509CertChainValidatorExt validator;
 
-	/**
-	 * @return the read timeout value (in milliseconds)
-	 */
-	public int getReadTimeout() {
-		return readTimeout;
-	}
+  /**
+   * The tcp connection timeout (in milliseconds)
+   */
+  protected int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
 
-	/**
-	 * Sets the read timeout value for the underlying socket 
-	 * 
-	 * @param readTimeout the read timeout in milliseconds
-	 */
-	public void setReadTimeout(int readTimeout) {
-		this.readTimeout = readTimeout;
-	}
-	
-	
+  /**
+   * The socket read timeout (in milliseconds)
+   */
+  protected int readTimeout = DEFAULT_READ_TIMEOUT;
+  
+  /**
+   * Whether to skip hostname checks
+   */
+  protected boolean skipHostnameChecks = DEFAULT_SKIP_HOSTNAME_CHECKS;
 
+  /**
+   * Ctor.
+   * 
+   * @param validator
+   *          the validator used to manage the SSL authentication
+   */
+  public AbstractVOMSProtocol(X509CertChainValidatorExt validator) {
+
+    this.validator = validator;
+  }
+
+  /**
+   * Ctor.
+   * 
+   * @param validator
+   *          the validator used to manage the SSL authentication
+   * @param listener
+   *          the listener informed of low-level protocol details
+   * @param connectTimeout
+   *          sets the socket connection timeout
+   * @param readTimeout
+   *          sets the socket read timeout
+   */
+  public AbstractVOMSProtocol(X509CertChainValidatorExt validator,
+    VOMSProtocolListener listener, int connectTimeout, int readTimeout) {
+
+    this.validator = validator;
+    this.connectTimeout = connectTimeout;
+    this.readTimeout = readTimeout;
+    this.listener = listener;
+  }
+
+  /**
+   * Builds an SSL socket factory based on the credential passed as argument and
+   * the validator configured for this {@link AbstractVOMSProtocol}
+   * 
+   * @param credential
+   *          the client credential used for the socket factory being created
+   * @return an {@link SSLSocketFactory}
+   */
+  protected SSLSocketFactory getSSLSocketFactory(X509Credential credential) {
+
+    SSLSocketFactoryProvider sslSocketFactoryProvider = new SSLSocketFactoryProvider(
+      credential, validator);
+    return sslSocketFactoryProvider.getSSLSockectFactory();
+  }
+
+  /**
+   * @return The connect timeout value (in milliseconds)
+   */
+  public int getConnectTimeout() {
+
+    return connectTimeout;
+  }
+
+  /**
+   * Sets the connection timeout value for the underlying socket of this
+   * {@link AbstractVOMSProtocol}
+   * 
+   * @param connectTimeout
+   *          the connection timeout in milliseconds
+   */
+  public void setConnectTimeout(int connectTimeout) {
+
+    this.connectTimeout = connectTimeout;
+  }
+
+  /**
+   * @return the read timeout value (in milliseconds)
+   */
+  public int getReadTimeout() {
+
+    return readTimeout;
+  }
+
+  /**
+   * Sets the read timeout value for the underlying socket
+   * 
+   * @param readTimeout
+   *          the read timeout in milliseconds
+   */
+  public void setReadTimeout(int readTimeout) {
+
+    this.readTimeout = readTimeout;
+  }
+
+  
+  /**
+   * @return whether this protocol will skip hostname checks
+   */
+  public boolean isSkipHostnameChecks() {
+  
+    return skipHostnameChecks;
+  }
+
+  /**
+   * Sets whether this protocol will skip SSL hostname checks
+   * 
+   * @param skipHostnameChecks 
+   */
+  public void setSkipHostnameChecks(boolean skipHostnameChecks) {
+  
+    this.skipHostnameChecks = skipHostnameChecks;
+  }
+
+  
 }

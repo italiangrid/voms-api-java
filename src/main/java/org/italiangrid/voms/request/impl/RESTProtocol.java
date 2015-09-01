@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocol;
@@ -57,6 +59,14 @@ public class RESTProtocol extends AbstractVOMSProtocol implements VOMSProtocol {
     try {
 
       connection = (HttpsURLConnection) serviceUrl.openConnection();
+      
+      if (isSkipHostnameChecks()){
+        connection.setHostnameVerifier(new HostnameVerifier() {
+          public boolean verify(String arg0, SSLSession arg1) {
+            return true;
+          }
+        });
+      }
 
       connection.setConnectTimeout(connectTimeout);
       connection.setReadTimeout(readTimeout);

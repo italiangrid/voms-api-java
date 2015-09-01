@@ -19,23 +19,23 @@ import java.io.File;
 import java.util.List;
 
 /**
- * An strategy for building a list of {@link File} objects which will provide access
- * to the local trusted VOMS server contact information.
+ * An strategy for building a list of {@link File} objects which will provide
+ * access to the local trusted VOMS server contact information.
  * 
  * @author Andrea Ceccanti
  *
  */
 public interface VOMSESLookupStrategy {
 
-	/**
-	 * @return a {@link List} of {@link File} objects that can be 
-	 * used to parse VOMSES information.
-	 */
-	public List<File> lookupVomsesInfo();
-	
-	/**
-	 * @return a {@link List} of the paths that have been looked up to find
-	 * {@link File} objects that can be used to parse VOMSES information.
-	 */
-	public List<String> searchedPaths();
+  /**
+   * @return a {@link List} of {@link File} objects that can be used to parse
+   *         VOMSES information.
+   */
+  public List<File> lookupVomsesInfo();
+
+  /**
+   * @return a {@link List} of the paths that have been looked up to find
+   *         {@link File} objects that can be used to parse VOMSES information.
+   */
+  public List<String> searchedPaths();
 }
