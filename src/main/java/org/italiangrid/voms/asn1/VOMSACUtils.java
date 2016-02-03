@@ -126,8 +126,8 @@ public class VOMSACUtils implements VOMSConstants {
 
       while (theACs.hasMoreElements()) {
 
-        AttributeCertificate parsedAC = new AttributeCertificate(
-          theACs.nextElement());
+        AttributeCertificate parsedAC = 
+          AttributeCertificate.getInstance(theACs.nextElement());
         acs.add(parsedAC);
       }
     }
