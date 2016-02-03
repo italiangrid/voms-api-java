@@ -108,11 +108,18 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
           certChainValidator);
       }
 
-      if (validationResultListener == null)
+      if (validationResultListener == null) {
+
         validationResultListener = NullListener.INSTANCE;
 
-      if (acLookupStrategy == null)
+      }
+
+      if (acLookupStrategy == null){
+        
         acLookupStrategy = new LeafACLookupStrategy();
+      
+      }
+        
     }
 
     public DefaultVOMSValidator build() {
@@ -162,17 +169,22 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
   public List<VOMSAttribute> validate(X509Certificate[] validatedChain) {
 
     List<VOMSAttribute> validAttributes = new ArrayList<VOMSAttribute>();
+
     for (VOMSValidationResult result : internalValidate(validatedChain)) {
-      if (result.isValid())
+
+      if (result.isValid()) {
         validAttributes.add(result.getAttributes());
+      }
     }
+
     return validAttributes;
   }
 
   public void shutdown() {
 
-    if (trustStore instanceof UpdatingVOMSTrustStore)
+    if (trustStore instanceof UpdatingVOMSTrustStore) {
       ((UpdatingVOMSTrustStore) trustStore).cancel();
+    }
   }
 
   public List<AttributeCertificate> validateACs(List<AttributeCertificate> acs) {
@@ -189,8 +201,9 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
         validationResultListener.notifyValidationResult(result);
       }
 
-      if (result.isValid())
+      if (result.isValid()) {
         validatedAcs.add(ac);
+      }
     }
 
     return validatedAcs;
@@ -199,8 +212,9 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
   public void setValidationResultListener(ValidationResultListener listener) {
 
     synchronized (listenerLock) {
-      if (listener != null)
+      if (listener != null) {
         this.validationResultListener = listener;
+      }
     }
   }
 }
