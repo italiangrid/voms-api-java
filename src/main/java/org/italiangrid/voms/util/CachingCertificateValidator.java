@@ -18,6 +18,7 @@ package org.italiangrid.voms.util;
 import java.security.cert.CertPath;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.italiangrid.voms.VOMSError;
 
@@ -44,7 +45,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
   /**
    * Simple concurrent cache for validation results
    */
-  protected final ConcurrentHashMap<String, CachedValidationResult> validationResultsCache;
+  protected final ConcurrentMap<String, CachedValidationResult> validationResultsCache;
 
   /**
    * The wrapped CANL certificate validator
