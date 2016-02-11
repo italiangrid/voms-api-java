@@ -4,7 +4,7 @@
 
   <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
-  <version>3.2.0.rc0</version>
+  <version>3.2.0</version>
   <packaging>jar</packaging>
 
   <name>voms-api-java</name>
