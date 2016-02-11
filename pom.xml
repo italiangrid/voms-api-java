@@ -42,8 +42,7 @@
 
     <junit.version>4.11</junit.version>
     <hamcrest.version>1.3</hamcrest.version>
-    <canl.version>2.2.0</canl.version>
-    <bc.version>1.50</bc.version>
+    <canl.version>2.1.2</canl.version>
     <mockito.version>1.9.5</mockito.version>
     <jcip.version>1.0</jcip.version>
 
@@ -246,12 +245,6 @@
       <groupId>eu.eu-emi.security</groupId>
       <artifactId>canl</artifactId>
       <version>${canl.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
-      <version>${bc.version}</version>
     </dependency>
 
     <dependency>
