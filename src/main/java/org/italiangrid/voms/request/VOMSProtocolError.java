@@ -36,17 +36,17 @@ public class VOMSProtocolError extends VOMSError {
   /**
    * The request that is related with this error
    */
-  private VOMSACRequest request;
+  private final VOMSACRequest request;
 
   /**
    * The credential related with this error
    */
-  private X509Credential credential;
+  private final X509Credential credential;
 
   /**
    * The VOMS server endpoint information related with this error
    */
-  private VOMSServerInfo serverInfo;
+  private final VOMSServerInfo serverInfo;
 
   public VOMSProtocolError(String message, VOMSServerInfo serv,
     VOMSACRequest req, X509Credential cred, Throwable c) {
