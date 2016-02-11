@@ -6,7 +6,6 @@ jdk:
 - oraclejdk8
 os:
 - linux
-- osx
 
 notifications:
   slack:
