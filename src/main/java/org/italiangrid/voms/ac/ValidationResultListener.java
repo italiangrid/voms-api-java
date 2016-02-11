@@ -15,6 +15,8 @@
  */
 package org.italiangrid.voms.ac;
 
+import org.italiangrid.voms.VOMSAttribute;
+
 /**
  * This interface is used to notify interested listeners of VOMS attribute
  * certificate validation outcome.
