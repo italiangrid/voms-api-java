@@ -106,5 +106,4 @@ public class VOMSBase64Decoder {
     return out;
 
   }
-
 }

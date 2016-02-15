@@ -106,6 +106,9 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
   /**
    * Builds a list of trusted directories containing only
    * {@link #DEFAULT_VOMS_DIR}.
+   * 
+   * @return a list of default trusted directory containing the
+   *         {@link #DEFAULT_VOMS_DIR}
    **/
   protected static List<String> buildDefaultTrustedDirs() {
 
@@ -118,8 +121,12 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
    * 
    * @param localTrustDirs
    *          a non-null list of local trust directories
+   * @param listener
+   *          the {@link VOMSTrustStoreStatusListener} to use for this trust
+   *          store
    * @throws IllegalArgumentException
    *           when the list passed as argument is null
+   * 
    */
   public DefaultVOMSTrustStore(List<String> localTrustDirs,
     VOMSTrustStoreStatusListener listener) {

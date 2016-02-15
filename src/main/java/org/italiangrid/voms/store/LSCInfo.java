@@ -61,7 +61,7 @@ public interface LSCInfo {
    * 
    * The certificate chain description is a list of X.500 distinguished names
    * encoded as strings according to the OpenSSL slash-separated format, as in:
-   * <verbatim> /C=IT/O=INFN/CN=INFN CA </verbatim>
+   * <code>/C=IT/O=INFN/CN=INFN CA</code>
    * 
    * The first element in the description is the leaf certificate, while the
    * last is the CA certificate.
@@ -76,6 +76,7 @@ public interface LSCInfo {
    * information matches the certificate chain passed as argument.
    * 
    * @param certChain
+   *          the certificate chain to be checked
    * @return <code>true</code> if the description matches, <code>false</code>
    *         otherwise
    */

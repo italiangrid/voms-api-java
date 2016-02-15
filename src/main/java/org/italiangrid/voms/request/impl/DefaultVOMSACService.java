@@ -524,6 +524,12 @@ public class DefaultVOMSACService implements VOMSACService {
 
     /**
      * Sets the legacy protocol implementation
+     * 
+     * @param legacyProtocol
+     *          the legacy protocol implementation
+     *          
+     *  @return 
+     *        the {@link Builder}
      */
     public Builder legacyProtocol(VOMSProtocol legacyProtocol) {
 

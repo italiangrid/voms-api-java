@@ -133,6 +133,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
    * result for future validation calls.
    *
    * @param certChain
+   *          the certificate chain that will be validated
    * @return a possibly cached {@link ValidationResult}
    * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.X509Certificate[])
    */
@@ -188,6 +189,7 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 
   /**
    * @param certPath
+   *          the certificate path that will be validated
    * @return the {@link ValidationResult}
    * @see eu.emi.security.authn.x509.X509CertChainValidator#validate(java.security.cert.CertPath)
    */
@@ -216,6 +218,8 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 
   /**
    * @param listener
+   *          the {@link ValidationErrorListener} to be added to this validator
+   *          
    * @see eu.emi.security.authn.x509.X509CertChainValidator#addValidationListener(eu.emi.security.authn.x509.ValidationErrorListener)
    */
   public void addValidationListener(ValidationErrorListener listener) {
@@ -225,6 +229,8 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 
   /**
    * @param listener
+   *        the {@link ValidationErrorListener} that must be removed from 
+   *        this validator
    * @see eu.emi.security.authn.x509.X509CertChainValidator#removeValidationListener(eu.emi.security.authn.x509.ValidationErrorListener)
    */
   public void removeValidationListener(ValidationErrorListener listener) {
@@ -234,6 +240,9 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 
   /**
    * @param listener
+   *          the {@link StoreUpdateListener} that must be added to this 
+   *          validator
+   *        
    * @see eu.emi.security.authn.x509.X509CertChainValidator#addUpdateListener(eu.emi.security.authn.x509.StoreUpdateListener)
    */
   public void addUpdateListener(StoreUpdateListener listener) {
@@ -243,6 +252,9 @@ public class CachingCertificateValidator implements X509CertChainValidatorExt {
 
   /**
    * @param listener
+   *          the {@link StoreUpdateListener} that must be removed from this 
+   *          validator
+   *          
    * @see eu.emi.security.authn.x509.X509CertChainValidator#removeUpdateListener(eu.emi.security.authn.x509.StoreUpdateListener)
    */
   public void removeUpdateListener(StoreUpdateListener listener) {
@@ -320,6 +332,7 @@ class CachedValidationResult {
    * Sets this entry creation timestamp (in milliseconds since the epoch).
    *
    * @param timestamp
+   *          the timestamp
    */
   public void setTimestamp(long timestamp) {
 
@@ -351,6 +364,7 @@ class CachedValidationResult {
    * {@link FingerprintHelper#getFingerprint(X509Certificate)} method.
    *
    * @param certFingerprint
+   *          a certificate fingerprint describing a certificate
    */
   public void setCertFingerprint(String certFingerprint) {
 

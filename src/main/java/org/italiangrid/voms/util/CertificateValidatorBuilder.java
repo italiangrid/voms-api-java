@@ -42,6 +42,22 @@ import eu.emi.security.authn.x509.impl.ValidatorParamsExt;
 public class CertificateValidatorBuilder {
 
   /**
+   * This enum determine which hash function is configured for the canl
+   * {@link OpensslCertChainValidator} to resolve CRLs and other trust anchors
+   * files.
+   */
+  public static enum OpensslHashFunction {
+    MD5,
+    SHA1
+  };
+
+  /**
+   * The default Openssl hash function value. MD5 is chosen to ensure
+   * compatibility with Openssl pre 1.0 deployments.
+   */
+  public static final OpensslHashFunction DEFAULT_OPENSSL_HASH_FUNCTION = OpensslHashFunction.MD5;
+
+  /**
    * The default CRL checking policy.
    */
   public static final CrlCheckingMode DEFAULT_CRL_CHECKS = CrlCheckingMode.IF_VALID;
@@ -81,9 +97,25 @@ public class CertificateValidatorBuilder {
   private NamespaceCheckingMode namespaceChecks = DEFAULT_NS_CHECKS;
   private CrlCheckingMode crlChecks = DEFAULT_CRL_CHECKS;
   private OCSPCheckingMode ocspChecks = DEFAULT_OCSP_CHECKS;
+  private OpensslHashFunction opensslHashFunction = DEFAULT_OPENSSL_HASH_FUNCTION;
 
   public CertificateValidatorBuilder() {
 
+  }
+
+  /**
+   * Sets the openssl hash function for this builder
+   * 
+   * @param f
+   *          the {@link OpensslHashFunction}
+   * 
+   * @return the builder object
+   */
+  public CertificateValidatorBuilder opensslHashFunction(
+    OpensslHashFunction f) {
+
+    opensslHashFunction = f;
+    return this;
   }
 
   /**
@@ -93,7 +125,8 @@ public class CertificateValidatorBuilder {
    *          the {@link StoreUpdateListener}
    * @return the builder object
    */
-  public CertificateValidatorBuilder storeUpdateListener(StoreUpdateListener l) {
+  public CertificateValidatorBuilder storeUpdateListener(
+    StoreUpdateListener l) {
 
     storeUpdateListener = l;
     return this;
@@ -143,6 +176,9 @@ public class CertificateValidatorBuilder {
    * Sets whether the created validator will be lazy in loading anchors
    * 
    * @param lazyness
+   *          the boolean flag that determines if the validator will be lazy in
+   *          loading trust anchors
+   * 
    * @return the builder object
    */
   public CertificateValidatorBuilder lazyAnchorsLoading(boolean lazyness) {
@@ -205,16 +241,24 @@ public class CertificateValidatorBuilder {
     ValidatorParamsExt validationParams = new ValidatorParamsExt(
       revocationParameters, ProxySupport.ALLOW);
 
-    if (storeUpdateListener != null)
+    if (storeUpdateListener != null){
       validationParams.setInitialListeners(Arrays.asList(storeUpdateListener));
-
+    }
+    
+    boolean openssl1xMode = false;
+    
+    if (opensslHashFunction == OpensslHashFunction.SHA1){
+      openssl1xMode = true;
+    }
+    
     OpensslCertChainValidator validator = new OpensslCertChainValidator(
-      trustAnchorsDir, false, namespaceChecks, trustAnchorsUpdateInterval,
+      trustAnchorsDir, openssl1xMode, namespaceChecks, trustAnchorsUpdateInterval,
       validationParams, lazyAnchorsLoading);
 
-    if (validationErrorListener != null)
+    if (validationErrorListener != null){
       validator.addValidationListener(validationErrorListener);
-
+    }
+    
     return validator;
   }
 
@@ -227,6 +271,9 @@ public class CertificateValidatorBuilder {
    * @param validationErrorListener
    *          the listener that will receive notification about validation
    *          errors
+   * @param storeUpdateListener
+   *          the listener that will receive notifications about trust store
+   *          update events
    * @param updateInterval
    *          the trust anchor store update interval
    * @param namespaceChecks
@@ -259,6 +306,9 @@ public class CertificateValidatorBuilder {
    * @param validationErrorListener
    *          the listener that will receive notification about validation
    *          errors
+   * @param storeUpdateListener
+   *          the listener that will receive notifications about trust store
+   *          update events
    * @param updateInterval
    *          the trust anchor store update interval
    * @param namespaceChecks

@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 /**
- * 
- * This package provides main VOMS Java APIs class and interfaces.
- * For an introductory guide to the use of the API, check the API user manual
- *  <a href="http://italiangrid.github.com/voms-api-java">here</a>.
- * 
- * @author Andrea Ceccanti
- *
+ * This package (and inner packages) provides unit tests for the VOMS
+ * Java API.
  */
-package org.italiangrid.voms;
+package org.italiangrid.voms.test;

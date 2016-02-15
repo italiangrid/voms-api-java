@@ -29,6 +29,8 @@ public interface LoadCredentialsEventListener {
    * argument.
    * 
    * @param locations
+   *          the locations (as strings) where the credentials 
+   *          are being searched
    */
   public void notifyCredentialLookup(String... locations);
 
@@ -37,6 +39,8 @@ public interface LoadCredentialsEventListener {
    * passed as argument.
    * 
    * @param locations
+   *          the locations (as strings) where the credentials 
+   *          are being searched
    */
   public void notifyLoadCredentialSuccess(String... locations);
 

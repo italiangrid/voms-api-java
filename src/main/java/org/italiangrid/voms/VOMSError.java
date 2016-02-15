@@ -16,7 +16,7 @@
 package org.italiangrid.voms;
 
 /**
- * The VOMS error class.
+ * The base VOMS exception class.
  * 
  * @author Andrea Ceccanti
  *
