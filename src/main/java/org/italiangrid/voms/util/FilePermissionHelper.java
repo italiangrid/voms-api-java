@@ -33,6 +33,7 @@ import org.italiangrid.voms.credential.FilePermissionError;
  */
 public class FilePermissionHelper {
 
+  private static final boolean s_isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
   public static enum PosixFilePermission {
 
     USER_RO("400", "-r--------"), USER_RW("600", "-rw-------"), USER_ALL("700",
@@ -165,6 +166,9 @@ public class FilePermissionHelper {
 
     filenameSanityChecks(filename);
 
+    if (s_isWindows)
+      return;
+    
     if (p == null)
       throw new NullPointerException("null permission passed as argument");
 
@@ -247,6 +251,9 @@ public class FilePermissionHelper {
   public static void setFilePermissions(String filename,
     PosixFilePermission perm) {
 
+    if (s_isWindows)
+      return;
+    
     String cmd = String.format(CHMOD_CMD_TEMPLATE, perm.chmodForm(), filename);
 
     ProcessBuilder pb = new ProcessBuilder(cmd.split(" "));
