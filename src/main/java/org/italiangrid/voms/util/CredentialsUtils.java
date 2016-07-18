@@ -208,6 +208,7 @@ public class CredentialsUtils {
       throws IOException {
 
     File f = new File(proxyFileName);
+    f.createNewFile(); // Ensure file exists
     RandomAccessFile raf = new RandomAccessFile(f, "rws");
     FileChannel channel = raf.getChannel();
     FilePermissionHelper.setProxyPermissions(proxyFileName);
