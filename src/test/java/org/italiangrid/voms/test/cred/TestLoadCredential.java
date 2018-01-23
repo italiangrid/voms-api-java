@@ -15,7 +15,7 @@
  */
 package org.italiangrid.voms.test.cred;
 
-import org.bouncycastle.openssl.PasswordFinder;
+import eu.emi.security.authn.x509.helpers.PasswordSupplier;
 import org.italiangrid.voms.credential.impl.AbstractLoadCredentialsStrategy;
 import org.italiangrid.voms.credential.impl.DefaultLoadCredentialsStrategy;
 import org.italiangrid.voms.util.FilePermissionHelper;
@@ -51,7 +51,7 @@ public class TestLoadCredential {
       + "/.globus/usercred.p12");
   }
 
-  static class TestPasswordFinder implements PasswordFinder {
+  static class TestPasswordFinder implements PasswordSupplier {
 
     public char[] getPassword() {
 
@@ -59,7 +59,7 @@ public class TestLoadCredential {
     }
   }
 
-  static class NullPasswordFinder implements PasswordFinder {
+  static class NullPasswordSupplier implements PasswordSupplier {
 
     public char[] getPassword() {
 
@@ -72,7 +72,7 @@ public class TestLoadCredential {
 
     AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(
       emptyHome);
-    X509Credential cred = strategy.loadCredentials(new NullPasswordFinder());
+    X509Credential cred = strategy.loadCredentials(new NullPasswordSupplier());
     Assert.assertNull(cred);
   }
 
@@ -81,7 +81,7 @@ public class TestLoadCredential {
 
     AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(
       emptyGlobusHome);
-    X509Credential cred = strategy.loadCredentials(new NullPasswordFinder());
+    X509Credential cred = strategy.loadCredentials(new NullPasswordSupplier());
     Assert.assertNull(cred);
   }
 

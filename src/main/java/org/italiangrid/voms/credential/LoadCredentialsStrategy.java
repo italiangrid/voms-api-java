@@ -15,7 +15,7 @@
  */
 package org.italiangrid.voms.credential;
 
-import org.bouncycastle.openssl.PasswordFinder;
+import eu.emi.security.authn.x509.helpers.PasswordSupplier;
 
 import eu.emi.security.authn.x509.X509Credential;
 
@@ -37,5 +37,5 @@ public interface LoadCredentialsStrategy {
    * @return an {@link X509Credential}, or <code>null</code> if no credential
    *         was found
    */
-  public X509Credential loadCredentials(PasswordFinder passwordFinder);
+  public X509Credential loadCredentials(PasswordSupplier passwordFinder);
 }
