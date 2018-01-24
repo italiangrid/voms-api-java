@@ -15,7 +15,7 @@
  */
 package org.italiangrid.voms.credential.impl;
 
-import org.bouncycastle.openssl.PasswordFinder;
+import eu.emi.security.authn.x509.helpers.PasswordSupplier;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
 import org.italiangrid.voms.credential.ProxyNamingPolicy;
@@ -115,7 +115,7 @@ public class DefaultLoadCredentialsStrategy extends
     return val;
   }
 
-  public X509Credential loadCredentials(PasswordFinder pf) {
+  public X509Credential loadCredentials(PasswordSupplier pf) {
 
     if (pf == null)
       throw new IllegalArgumentException(
@@ -163,7 +163,7 @@ public class DefaultLoadCredentialsStrategy extends
     return null;
   }
 
-  protected X509Credential loadPEMCredentialFromEnv(PasswordFinder pf) {
+  protected X509Credential loadPEMCredentialFromEnv(PasswordSupplier pf) {
 
     String certPath = getFromEnvOrSystemProperty(X509_USER_CERT);
     String keyPath = getFromEnvOrSystemProperty(X509_USER_KEY);
@@ -175,7 +175,7 @@ public class DefaultLoadCredentialsStrategy extends
     return null;
   }
 
-  protected X509Credential loadPKCS12CredentialFromEnv(PasswordFinder pf) {
+  protected X509Credential loadPKCS12CredentialFromEnv(PasswordSupplier pf) {
 
     String pkcs12Path = getFromEnvOrSystemProperty(PKCS12_USER_CERT);
 
@@ -185,7 +185,7 @@ public class DefaultLoadCredentialsStrategy extends
     return null;
   }
 
-  protected X509Credential loadPKCS12CredentialsFromGlobusDir(PasswordFinder pf) {
+  protected X509Credential loadPKCS12CredentialsFromGlobusDir(PasswordSupplier pf) {
 
     String credPath = String.format("%s/%s", home,
       GLOBUS_PKCS12_CRED_PATH_SUFFIX);
@@ -193,7 +193,7 @@ public class DefaultLoadCredentialsStrategy extends
 
   }
 
-  protected X509Credential loadPEMCredentialsFromGlobusDir(PasswordFinder pf) {
+  protected X509Credential loadPEMCredentialsFromGlobusDir(PasswordSupplier pf) {
 
     String certPath = String.format("%s/%s", home, GLOBUS_PEM_CERT_PATH_SUFFIX);
     String keyPath = String.format("%s/%s", home, GLOBUS_PEM_KEY_PATH_SUFFIX);
