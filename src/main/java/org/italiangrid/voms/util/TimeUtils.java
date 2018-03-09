@@ -82,10 +82,10 @@ public class TimeUtils {
   /**
    * Parses a date from string
    * 
-   * @param date, the date string representation
+   * @param date the date string representation;
    * @return the parsed date
-   * @throws NullPointerException, if date is null; DateTimeParseException if the date is in the
-   *         wrong format
+   * @throws NullPointerException if date is null
+   * @throws java.time.format.DateTimeParseException if the date is in the wrong format
    */
   public static Date parseDate(String date) {
     if (isNull(date)) {
