@@ -22,6 +22,7 @@ public enum FakeVOMSACServiceProperties {
   AA_KEY("voms.fake.aaKey", "/etc/grid-security/hostkey.pem"),
   VO("voms.fake.vo", "test"),
   FQANS("voms.fake.fqans", "/test"),
+  GAS("voms.fake.gas"),
   HOST("voms.fake.host", "voms.example"),
   PORT("voms.fake.port", "15000"),
   NOT_BEFORE("voms.fake.notBefore"),

@@ -1,27 +1,31 @@
 /**
  * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.italiangrid.voms.request.impl;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
+import static java.util.Objects.isNull;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.FQANS;
+import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.GAS;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.HOST;
+import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_AFTER;
+import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_BEFORE;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.PORT;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.SERIAL;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.VO;
+import static org.italiangrid.voms.util.GaParser.parseGaString;
+import static org.italiangrid.voms.util.TimeUtils.parseDate;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -92,7 +96,7 @@ public class ACGenerationParams {
   public BigInteger getSerialNo() {
     return serialNo;
   }
-  
+
   public static class Builder {
     String vo = "test";
     List<String> fqans;
@@ -159,18 +163,17 @@ public class ACGenerationParams {
       return new ACGenerationParams(this);
     }
   }
-  
+
   public static Builder builder() {
     return new Builder();
   }
-  
+
   public static ACGenerationParams fromSystemProperties() {
     ACGenerationParams.Builder builder = ACGenerationParams.builder();
     builder.vo(VO.getSystemPropertyValue());
-    String fqansString = FQANS.getSystemPropertyValue(); 
-    
-    
-    for (String f: fqansString.split(",")) {
+    String fqansString = FQANS.getSystemPropertyValue();
+
+    for (String f : fqansString.split(",")) {
       String trimmedFqan = f.trim();
       if (!trimmedFqan.isEmpty()) {
         builder.fqan(trimmedFqan);
@@ -179,7 +182,23 @@ public class ACGenerationParams {
     builder.host(HOST.getSystemPropertyValue());
     builder.port(parseInt(PORT.getSystemPropertyValue()));
     builder.serialNo(parseLong(SERIAL.getSystemPropertyValue()));
-    
+
+    String notBefore = NOT_BEFORE.getSystemPropertyValue();
+    if (!isNull(notBefore)) {
+      builder.notBefore(parseDate(notBefore));
+    }
+
+    String notAfter = NOT_AFTER.getSystemPropertyValue();
+    if (!isNull(notAfter)) {
+      builder.notAfter(parseDate(notAfter));
+    }
+
+    String gaString = GAS.getSystemPropertyValue();
+
+    if (!isNull(gaString)) {
+      parseGaString(gaString).forEach(a -> builder.ga(a.getName(), a.getValue(), builder.vo));
+    }
+
     return builder.build();
   }
 }

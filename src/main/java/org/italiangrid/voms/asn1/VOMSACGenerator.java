@@ -213,9 +213,10 @@ public class VOMSACGenerator implements VOMSConstants {
     ASN1EncodableVector tagContainer = new ASN1EncodableVector();
     ASN1EncodableVector tagSequences = new ASN1EncodableVector();
 
-    for (VOMSGenericAttribute a : gas)
+    for (VOMSGenericAttribute a : gas) {
       tagSequences.add(buildTagSequence(a));
-
+    }
+    
     tagContainer.add(new GeneralNames(policyAuthorityInfo));
     tagContainer.add(new DERSequence(tagSequences));
 
@@ -234,10 +235,9 @@ public class VOMSACGenerator implements VOMSConstants {
 
     JcaX509CertificateHolder holderWrappedCert = new JcaX509CertificateHolder(
       holderCert);
-    AttributeCertificateHolder acHolder = new AttributeCertificateHolder(
+    
+    return new AttributeCertificateHolder(
       holderWrappedCert.getSubject(), holderCert.getSerialNumber());
-
-    return acHolder;
   }
 
   private AttributeCertificateIssuer buildIssuer()
