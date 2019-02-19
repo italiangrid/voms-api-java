@@ -138,6 +138,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>${plugin.javadoc.version}</version>
         <configuration>
+          <source>1.8</source>
           <outputDirectory>${project.build.directory}/javadoc</outputDirectory>
           <reportOutputDirectory>${project.reporting.outputDirectory}/javadoc</reportOutputDirectory>
         </configuration>
