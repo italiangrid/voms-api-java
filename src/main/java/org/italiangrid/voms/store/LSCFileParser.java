@@ -18,7 +18,6 @@ package org.italiangrid.voms.store;
 import java.io.File;
 import java.io.InputStream;
 
-import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.LSCFile;
 
 /**

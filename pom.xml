@@ -173,6 +173,7 @@
         <configuration>
           <header>src/license/license.txt</header>
           <excludes>
+            <exclude>Jenkinsfile</exclude>
             <exclude>.travis.yml</exclude>
             <exclude>*.md</exclude>
             <exclude>Makefile</exclude>
