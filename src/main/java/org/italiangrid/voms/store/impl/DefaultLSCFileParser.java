@@ -105,7 +105,7 @@ public class DefaultLSCFileParser implements LSCFileParser {
         if (line.startsWith("/"))
           certificateChainDescription.add(line);
 
-      } while (line != null);
+      } while (true);
 
       lscReader.close();
 
