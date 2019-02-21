@@ -311,7 +311,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
     return new VOMSValidationResult(attributes, valid, validationErrors);
   }
 
-  public synchronized VOMSValidationResult validateAC(VOMSAttribute attributes,
+  public VOMSValidationResult validateAC(VOMSAttribute attributes,
     X509Certificate[] chain) {
 
     boolean valid = true;
