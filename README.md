@@ -131,7 +131,7 @@ the
 ```java
 UserCredentials.loadCredentials(char[] keyPassword);
 ```
-method. This methods looks for PEM or PKCS12 credentials in standard localtions 
+method. This methods looks for PEM or PKCS12 credentials in standard locations 
 and returns a CANL X509Credential.
 
 ```java
