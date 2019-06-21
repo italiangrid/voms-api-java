@@ -2,7 +2,14 @@
 
 pipeline {
 
-  agent { label 'maven' }
+  agent {
+      kubernetes {
+          label "voms-api-java-${env.JOB_BASE_NAME}-${env.BUILD_NUMBER}"
+          cloud 'Kube mwdevel'
+          defaultContainer 'jnlp'
+          inheritFrom 'ci-template'
+      }
+  }
 
   options {
     timeout(time: 1, unit: 'HOURS')
@@ -15,7 +22,7 @@ pipeline {
 
     stage('license-check') {
       steps {
-        container('maven-runner') {
+        container('runner') {
           sh 'mvn -B license:check'
         }
       }
@@ -23,7 +30,7 @@ pipeline {
 
     stage('build') {
       steps {
-        container('maven-runner') {
+        container('runner') {
           sh 'mvn -B clean compile'
         }
       }
@@ -31,14 +38,14 @@ pipeline {
 
     stage('test') {
       steps {
-        container('maven-runner') {
+        container('runner') {
           sh 'mvn -B clean test'
         }
       }
 
       post {
         always {
-          container('maven-runner') {
+          container('runner') {
             junit '**/target/surefire-reports/TEST-*.xml'
           }
         }
@@ -47,7 +54,7 @@ pipeline {
 
     stage('deploy') {
       steps {
-        container('maven-runner') {
+        container('runner') {
           sh 'mvn -B deploy' 
         }
       }
