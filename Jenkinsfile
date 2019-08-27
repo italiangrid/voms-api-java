@@ -1,19 +1,23 @@
 #!/usr/bin/env groovy
+@Library('sd')_
+def kubeLabel = getKubeLabel()
 
 pipeline {
 
   agent {
       kubernetes {
-          label "voms-api-java-${env.JOB_BASE_NAME}-${env.BUILD_NUMBER}"
+          label "${kubeLabel}"
           cloud 'Kube mwdevel'
-          defaultContainer 'jnlp'
+          defaultContainer 'runner'
           inheritFrom 'ci-template'
       }
   }
 
   options {
-    timeout(time: 1, unit: 'HOURS')
+    ansiColor('xterm')
     buildDiscarder(logRotator(numToKeepStr: '5'))
+    timeout(time: 1, unit: 'HOURS')
+    timestamps()
   }
 
   triggers { cron('@daily') }
@@ -22,25 +26,19 @@ pipeline {
 
     stage('license-check') {
       steps {
-        container('runner') {
-          sh 'mvn -B license:check'
-        }
+        sh 'mvn -B license:check'
       }
     }
 
     stage('build') {
       steps {
-        container('runner') {
-          sh 'mvn -B clean compile'
-        }
+        sh 'mvn -B clean compile'
       }
     }
 
     stage('test') {
       steps {
-        container('runner') {
-          sh 'mvn -B clean test'
-        }
+        sh 'mvn -B clean test'
       }
 
       post {
@@ -54,9 +52,7 @@ pipeline {
 
     stage('deploy') {
       steps {
-        container('runner') {
-          sh 'mvn -B deploy' 
-        }
+        sh 'mvn -B deploy' 
       }
     }
 
