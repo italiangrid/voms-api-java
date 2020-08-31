@@ -42,7 +42,7 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
   /**
    * The default value for the socket connection timeout
    */
-  public static final int DEFAULT_CONNECT_TIMEOUT = 2000;
+  public static final int DEFAULT_CONNECT_TIMEOUT = 5000;
 
   /**
    * The default value for the socket read timeout
