@@ -45,7 +45,7 @@
     <canl.version>2.6.0</canl.version>
     <mockito.version>1.9.5</mockito.version>
     <jcip.version>1.0</jcip.version>
-    <bc.version>1.61</bc.version>
+    <bc.version>1.58</bc.version>
 
     <!-- properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
