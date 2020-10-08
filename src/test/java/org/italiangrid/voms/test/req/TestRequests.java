@@ -44,15 +44,13 @@ public class TestRequests implements Fixture {
   @Test
   public void testEchoRequest() throws Exception {
 
-    VOMSACService acService = Utils.buildACService(new EchoVOMSProtocol(Utils
-      .getAACredential()));
+    VOMSACService acService = Utils.buildACService(new EchoVOMSProtocol(Utils.getAACredential()));
 
     VOMSACRequest req = new DefaultVOMSACRequest.Builder("test.vo").build();
 
     PEMCredential holder = Utils.getTestUserCredential();
 
-    AttributeCertificate ac = acService
-      .getVOMSAttributeCertificate(holder, req);
+    AttributeCertificate ac = acService.getVOMSAttributeCertificate(holder, req);
 
     VOMSACValidator validator = Utils.getVOMSValidator();
     List<AttributeCertificate> acs = validator.validateACs(Arrays.asList(ac));
@@ -64,11 +62,9 @@ public class TestRequests implements Fixture {
   @Test
   public void testFailureIfVOIsNotKnown() throws Exception {
 
-    VOMSACService acService = Utils.buildACService(new EchoVOMSProtocol(Utils
-      .getAACredential()));
+    VOMSACService acService = Utils.buildACService(new EchoVOMSProtocol(Utils.getAACredential()));
 
-    VOMSACRequest req = new DefaultVOMSACRequest.Builder("test.unknown.vo")
-      .build();
+    VOMSACRequest req = new DefaultVOMSACRequest.Builder("test.unknown.vo").build();
 
     PEMCredential holder = Utils.getTestUserCredential();
 
@@ -77,8 +73,7 @@ public class TestRequests implements Fixture {
       acService.getVOMSAttributeCertificate(holder, req);
 
     } catch (VOMSError e) {
-      Assert
-        .assertEquals(
+      Assert.assertEquals(
           "VOMS server for VO test.unknown.vo is not known! Check your vomses configuration.",
           e.getMessage());
       return;
@@ -92,8 +87,8 @@ public class TestRequests implements Fixture {
 
     VOMSProtocol nullBytesProtocol = new VOMSProtocol() {
 
-      public VOMSResponse doRequest(VOMSServerInfo endpoint,
-        X509Credential credential, VOMSACRequest request) {
+      public VOMSResponse doRequest(VOMSServerInfo endpoint, X509Credential credential,
+          VOMSACRequest request) {
 
         VOMSResponse r = Mockito.mock(VOMSResponse.class);
 
@@ -105,8 +100,8 @@ public class TestRequests implements Fixture {
 
     VOMSACRequest req = new DefaultVOMSACRequest.Builder("test.vo").build();
 
-    AttributeCertificate ac = acService.getVOMSAttributeCertificate(
-      Utils.getTestUserCredential(), req);
+    AttributeCertificate ac =
+        acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
     Assert.assertNull(ac);
   }
@@ -116,8 +111,8 @@ public class TestRequests implements Fixture {
 
     VOMSProtocol nullBytesProtocol = new VOMSProtocol() {
 
-      public VOMSResponse doRequest(VOMSServerInfo endpoint,
-        X509Credential credential, VOMSACRequest request) {
+      public VOMSResponse doRequest(VOMSServerInfo endpoint, X509Credential credential,
+          VOMSACRequest request) {
 
         Random r = new Random();
         byte[] acBytes = new byte[2048];
@@ -135,8 +130,8 @@ public class TestRequests implements Fixture {
 
     VOMSACRequest req = new DefaultVOMSACRequest.Builder("test.vo").build();
 
-    AttributeCertificate ac = acService.getVOMSAttributeCertificate(
-      Utils.getTestUserCredential(), req);
+    AttributeCertificate ac =
+        acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
     Assert.assertNull(ac);
   }
@@ -146,23 +141,45 @@ public class TestRequests implements Fixture {
 
     VOMSProtocol exceptionProtocol = Mockito.mock(VOMSProtocol.class);
 
-    Mockito.when(
-      exceptionProtocol.doRequest(Mockito.any(VOMSServerInfo.class),
-        Mockito.any(X509Credential.class), Mockito.any(VOMSACRequest.class)))
+    Mockito
+      .when(exceptionProtocol.doRequest(Mockito.any(VOMSServerInfo.class),
+          Mockito.any(X509Credential.class), Mockito.any(VOMSACRequest.class)))
       .thenReturn(null);
 
     VOMSProtocol fallBackProtocol = Mockito.mock(VOMSProtocol.class);
 
-    VOMSACService acService = Utils.buildACService(exceptionProtocol,
-      fallBackProtocol);
+    VOMSACService acService = Utils.buildACService(exceptionProtocol, fallBackProtocol);
     VOMSACRequest req = new DefaultVOMSACRequest.Builder("test.vo").build();
 
-    AttributeCertificate ac = acService.getVOMSAttributeCertificate(
-      Utils.getTestUserCredential(), req);
+    AttributeCertificate ac =
+        acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
-    Mockito.verify(fallBackProtocol, Mockito.atLeastOnce()).doRequest(
-      Mockito.any(VOMSServerInfo.class), Mockito.any(X509Credential.class),
-      Mockito.any(VOMSACRequest.class));
+    Mockito.verify(fallBackProtocol, Mockito.atLeastOnce())
+      .doRequest(Mockito.any(VOMSServerInfo.class), Mockito.any(X509Credential.class),
+          Mockito.any(VOMSACRequest.class));
+
+    Assert.assertNull(ac);
+  }
+
+  @Test
+  public void testProtocolFallbackDisabled() throws Exception {
+
+    VOMSProtocol exceptionProtocol = Mockito.mock(VOMSProtocol.class);
+
+    Mockito
+      .when(exceptionProtocol.doRequest(Mockito.any(VOMSServerInfo.class),
+          Mockito.any(X509Credential.class), Mockito.any(VOMSACRequest.class)))
+      .thenReturn(null);
+
+    VOMSProtocol fallBackProtocol = Mockito.mock(VOMSProtocol.class);
+
+    VOMSACService acService = Utils.buildACService(exceptionProtocol, fallBackProtocol, false);
+    VOMSACRequest req = new DefaultVOMSACRequest.Builder("test.vo").build();
+
+    AttributeCertificate ac =
+        acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
+
+    Mockito.verifyZeroInteractions(fallBackProtocol);
 
     Assert.assertNull(ac);
   }
@@ -172,24 +189,22 @@ public class TestRequests implements Fixture {
 
     VOMSProtocol exceptionProtocol = Mockito.mock(VOMSProtocol.class);
 
-    Mockito.when(
-      exceptionProtocol.doRequest(Mockito.any(VOMSServerInfo.class),
-        Mockito.any(X509Credential.class), Mockito.any(VOMSACRequest.class)))
-      .thenThrow(
-        new VOMSProtocolError("protocol error", null, null, null, null));
+    Mockito
+      .when(exceptionProtocol.doRequest(Mockito.any(VOMSServerInfo.class),
+          Mockito.any(X509Credential.class), Mockito.any(VOMSACRequest.class)))
+      .thenThrow(new VOMSProtocolError("protocol error", null, null, null, null));
 
     VOMSProtocol fallBackProtocol = Mockito.mock(VOMSProtocol.class);
 
-    VOMSACService acService = Utils.buildACService(exceptionProtocol,
-      fallBackProtocol);
+    VOMSACService acService = Utils.buildACService(exceptionProtocol, fallBackProtocol);
     VOMSACRequest req = new DefaultVOMSACRequest.Builder("test.vo").build();
 
-    AttributeCertificate ac = acService.getVOMSAttributeCertificate(
-      Utils.getTestUserCredential(), req);
+    AttributeCertificate ac =
+        acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
-    Mockito.verify(fallBackProtocol, Mockito.atLeastOnce()).doRequest(
-      Mockito.any(VOMSServerInfo.class), Mockito.any(X509Credential.class),
-      Mockito.any(VOMSACRequest.class));
+    Mockito.verify(fallBackProtocol, Mockito.atLeastOnce())
+      .doRequest(Mockito.any(VOMSServerInfo.class), Mockito.any(X509Credential.class),
+          Mockito.any(VOMSACRequest.class));
 
     Assert.assertNull(ac);
   }
