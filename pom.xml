@@ -4,7 +4,7 @@
 
   <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
-  <version>3.3.2</version>
+  <version>3.4.0</version>
   <packaging>jar</packaging>
 
   <name>voms-api-java</name>
@@ -28,7 +28,7 @@
 
   <properties>
     <!-- versions -->
-    <plugin.compiler.version>3.1</plugin.compiler.version>
+    <plugin.compiler.version>3.11.0</plugin.compiler.version>
     <plugin.license.version>1.9.0</plugin.license.version>
     <plugin.release.version>2.2.2</plugin.release.version>
     <plugin.source.version>2.2.1</plugin.source.version>
@@ -45,11 +45,13 @@
     <canl.version>2.6.0</canl.version>
     <mockito.version>1.9.5</mockito.version>
     <jcip.version>1.0</jcip.version>
-    <bc.version>1.58</bc.version>
+    <bc.version>1.76</bc.version>
 
     <!-- properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <java.version>17</java.version>
 
     <assembly.java.dir>/usr/share/java</assembly.java.dir>
     <assembly.doc.dir>/usr/share/doc/${project.name}</assembly.doc.dir>
@@ -95,8 +97,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${plugin.compiler.version}</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <release>17</release>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
         </configuration>
@@ -251,15 +252,15 @@
     </dependency>
     
     <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-jdk15on</artifactId>
-        <version>${bc.version}</version>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk18on</artifactId>
+      <version>${bc.version}</version>
     </dependency>
     
-        <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>${bc.version}</version>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
+      <version>${bc.version}</version>
     </dependency>
 
     <dependency>
