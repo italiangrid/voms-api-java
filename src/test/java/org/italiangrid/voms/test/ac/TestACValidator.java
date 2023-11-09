@@ -201,7 +201,7 @@ public class TestACValidator implements Fixture {
     aa.setGenerationProperties(EnumSet.of(ACGenerationProperties.SKIP_AC_CERTS_EXTENSION));
 
     aa.setVoName("test.vo.2");
-    aa.setHost("wilco.cnaf.infn.it");
+    aa.setHost("wilco.test.example");
     aa.setCredential(Utils.getAACredential2());
 
     VOMSACValidator validator = Utils.getVOMSValidator();
@@ -231,7 +231,7 @@ public class TestACValidator implements Fixture {
 
     VOMSAA aa = Utils.getVOMSAA();
     aa.setVoName("test.vo.2");
-    aa.setHost("wilco.cnaf.infn.it");
+    aa.setHost("wilco.test.example");
     aa.setCredential(Utils.getAACredential2());
     aa.setGenerationProperties(EnumSet.of(ACGenerationProperties.FAKE_SIGNATURE_BITS));
 

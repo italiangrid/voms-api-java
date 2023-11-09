@@ -56,6 +56,7 @@ import org.italiangrid.voms.asn1.VOMSACUtils;
 import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -86,7 +87,7 @@ public class TestACGeneration {
   static final String holderKey = "src/test/resources/certs/test0.key.pem";
 
   static final String defaultVO = "test.vo";
-  static final String defaultHost = "test-host.cnaf.infn.it";
+  static final String defaultHost = "test-host.test.example";
   static final int port = 15000;
 
   static final String vomsdir = "src/test/resources/vomsdir";
@@ -152,8 +153,8 @@ public class TestACGeneration {
     defaultGenerator = new VOMSACGenerator(aaCredential);
   }
 
-  @AfterClass
-  static public void classTestShutdown() {
+  @After
+  public void classTestShutdown() {
 
     certValidator.dispose();
   }
@@ -245,7 +246,7 @@ public class TestACGeneration {
 
     VOMSACValidator validator = VOMSValidators.newValidator(trustStore, certValidator, c);
     AttributeCertificate ac = createAC(aaCredential2, Arrays.asList("/test.vo.1"), defaultGAs,
-        "test.vo.1", "wilco.cnaf.infn.it");
+        "test.vo.1", "wilco.test.example");
     List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays.asList(ac));
     assertEquals(validatedAttrs.size(), 0);
   }

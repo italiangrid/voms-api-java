@@ -47,7 +47,7 @@ public interface Fixture {
   static final String trustAnchorsDir = "src/test/resources/trust-anchors";
 
   static final String defaultVO = "test.vo";
-  static final String defaultVOHost = "test-host.cnaf.infn.it";
+  static final String defaultVOHost = "test-host.test.example";
   static final int defaultVOPort = 15000;
 
   static final List<String> defaultVOFqans = Arrays.asList("/test.vo");

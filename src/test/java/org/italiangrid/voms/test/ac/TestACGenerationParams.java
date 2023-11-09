@@ -31,7 +31,7 @@ import java.util.Date;
 import org.italiangrid.voms.request.impl.ACGenerationParams;
 import org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties;
 import org.italiangrid.voms.util.TimeUtils;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Test;
 
 public class TestACGenerationParams {
@@ -47,7 +47,7 @@ public class TestACGenerationParams {
       Date.from(LocalDateTime.parse(JAN_FIRST_2020_00_00_10_S, TimeUtils.DATE_FORMATTER)
         .toInstant(ZoneOffset.UTC));
 
-  @AfterClass
+  @After
   public void after() {
     // Cleanup system properties
     for (FakeVOMSACServiceProperties p : FakeVOMSACServiceProperties.values()) {

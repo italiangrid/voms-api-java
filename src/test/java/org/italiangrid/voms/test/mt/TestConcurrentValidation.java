@@ -114,8 +114,8 @@ public class TestConcurrentValidation {
     PEMCredential aaCred2 = new PEMCredential(new FileInputStream(aaKey2),
       new FileInputStream(aaCert2), (char[]) null);
 
-    testVO_1 = new VOMSAA(aaCred1, "test.vo", "test-host.cnaf.infn.it", 15000);
-    testVO_2 = new VOMSAA(aaCred2, "test.vo.2", "wilco.cnaf.infn.it", 15001);
+    testVO_1 = new VOMSAA(aaCred1, "test.vo", "test-host.test.example", 15000);
+    testVO_2 = new VOMSAA(aaCred2, "test.vo.2", "wilco.test.example", 15001);
 
   }
 

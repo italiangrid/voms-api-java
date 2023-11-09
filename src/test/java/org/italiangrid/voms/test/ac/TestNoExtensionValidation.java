@@ -41,15 +41,15 @@ import eu.emi.security.authn.x509.proxy.ProxyType;
 
 public class TestNoExtensionValidation implements Fixture {
 
-  PEMCredential cred;
+  static PEMCredential cred;
 
   @BeforeClass
-  public void setUp() throws Exception {
+  public static void setUp() throws Exception {
     cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
   }
 
   @AfterClass
-  public void tearDown() throws Exception {
+  public static void tearDown() throws Exception {
     cred = null;
   }
 

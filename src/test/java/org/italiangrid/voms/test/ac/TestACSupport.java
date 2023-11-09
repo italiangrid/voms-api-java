@@ -43,7 +43,7 @@ public class TestACSupport {
   static final String holderKey = "src/test/resources/certs/test0.key.pem";
 
   static final String defaultVO = "test.vo";
-  static final String defaultHost = "test-host.cnaf.infn.it";
+  static final String defaultHost = "test-host.test.example";
   static final int port = 15000;
 
   static final String vomsdir = "src/test/resources/vomsdir";
