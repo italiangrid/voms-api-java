@@ -15,7 +15,7 @@
  */
 package org.italiangrid.voms.test.mt;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,9 +43,9 @@ import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultUpdatingVOMSTrustStore;
 import org.italiangrid.voms.test.utils.VOMSAA;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import eu.emi.security.authn.x509.NamespaceCheckingMode;
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
@@ -143,7 +143,7 @@ public class TestConcurrentValidation {
     return testProxies.get(randomIndex).getCertificateChain();
   }
 
-  @BeforeAll
+  @BeforeClass
   public static void setup() throws KeyStoreException, CertificateException,
     FileNotFoundException, IOException, InvalidKeyException,
     SignatureException, NoSuchAlgorithmException {
@@ -162,7 +162,7 @@ public class TestConcurrentValidation {
     System.out.println("Setup done.");
   }
 
-  @AfterAll
+  @AfterClass
   public static void tearDown() {
 
   }

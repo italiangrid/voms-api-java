@@ -15,15 +15,15 @@
  */
 package org.italiangrid.voms.test.cred;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.italiangrid.voms.credential.impl.AbstractLoadCredentialsStrategy;
 import org.italiangrid.voms.credential.impl.DefaultLoadCredentialsStrategy;
 import org.italiangrid.voms.util.FilePermissionHelper;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.PasswordSupplier;
@@ -45,7 +45,7 @@ public class TestLoadCredential {
   public static final String pemCredsHome = "src/test/resources/homes/pem-creds";
   public static final String pkcs12CredsHome = "src/test/resources/homes/pkcs12-creds";
 
-  @BeforeAll
+  @BeforeClass
   public static void setupFilePermissions() {
 
     FilePermissionHelper.setPrivateKeyPermissions(pemCredsHome + "/.globus/userkey.pem");

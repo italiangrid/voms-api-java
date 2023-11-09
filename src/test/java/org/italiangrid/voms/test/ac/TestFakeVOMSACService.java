@@ -15,7 +15,7 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,8 +35,8 @@ import org.italiangrid.voms.request.impl.ACGenerationParams;
 import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
 import org.italiangrid.voms.request.impl.FakeVOMSACService;
 import org.italiangrid.voms.util.NullListener;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 
 public class TestFakeVOMSACService extends TestACSupport {
@@ -48,7 +48,7 @@ public class TestFakeVOMSACService extends TestACSupport {
   public static final Date JAN_TEN_2010 = Date
     .from(LocalDate.parse("2010-01-10", DATE_FORMATTER).atStartOfDay().toInstant(ZoneOffset.UTC));
 
-  @BeforeAll
+  @BeforeClass
   public static void suiteInit()
       throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
     initializeCredentials();

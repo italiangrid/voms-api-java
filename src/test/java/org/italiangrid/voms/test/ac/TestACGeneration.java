@@ -20,8 +20,8 @@ import static org.italiangrid.voms.error.VOMSValidationErrorCode.canlError;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.invalidAcCert;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.lscDescriptionDoesntMatchAcCert;
 import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -56,9 +56,9 @@ import org.italiangrid.voms.asn1.VOMSACUtils;
 import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -112,7 +112,7 @@ public class TestACGeneration {
 
   static VOMSACGenerator defaultGenerator;
 
-  @BeforeAll
+  @BeforeClass
   static public void classTestSetup()
       throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
 
@@ -152,7 +152,7 @@ public class TestACGeneration {
     defaultGenerator = new VOMSACGenerator(aaCredential);
   }
 
-  @AfterAll
+  @AfterClass
   static public void classTestShutdown() {
 
     certValidator.dispose();
@@ -335,11 +335,11 @@ class ValidationResultChecker implements ValidationResultListener {
 
   public void notifyValidationResult(VOMSValidationResult result) {
 
-    assertEquals(expectedValidationResult, result.isValid(),
-        errorMessage("ValidationResult validity check failed.", result));
+    assertEquals(errorMessage("ValidationResult validity check failed.", result),
+        expectedValidationResult, result.isValid());
 
-    assertEquals(expectedErrorMessages.size(), result.getValidationErrors().size(),
-        errorMessage("ValidationResult error message size check failed.", result));
+    assertEquals(errorMessage("ValidationResult error message size check failed.", result),
+        expectedErrorMessages.size(), result.getValidationErrors().size());
 
     List<VOMSValidationErrorMessage> errorMessages =
         new ArrayList<VOMSValidationErrorMessage>(result.getValidationErrors());
@@ -350,14 +350,16 @@ class ValidationResultChecker implements ValidationResultListener {
           errorMessage(String.format("<%s> was not found in error messages. Error messages: <%s>",
               expectedMessage, result.getValidationErrors()), result);
 
-      assertTrue(result.getValidationErrors().contains(expectedMessage), failureMessage);
+      assertTrue(failureMessage, result.getValidationErrors().contains(expectedMessage));
     }
 
     if (errorMessages.size() > 0) {
       errorMessages.removeAll(expectedErrorMessages);
 
-      assertTrue(errorMessages.isEmpty(), errorMessage(
-          "ValidationResult check failed. Got more error messages than expected.", result));
+      assertTrue(
+          errorMessage("ValidationResult check failed. Got more error messages than expected.",
+              result),
+          errorMessages.isEmpty());
     }
 
   }

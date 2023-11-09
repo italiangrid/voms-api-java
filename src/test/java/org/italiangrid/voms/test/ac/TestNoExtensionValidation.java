@@ -15,8 +15,8 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -29,9 +29,9 @@ import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
@@ -43,12 +43,12 @@ public class TestNoExtensionValidation implements Fixture {
 
   PEMCredential cred;
 
-  @BeforeEach
+  @BeforeClass
   public void setUp() throws Exception {
     cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
   }
 
-  @AfterEach
+  @AfterClass
   public void tearDown() throws Exception {
     cred = null;
   }

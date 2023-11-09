@@ -15,8 +15,8 @@
  */
 package org.italiangrid.voms.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.StringReader;
@@ -28,7 +28,7 @@ import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSESParserFactory;
 import org.italiangrid.voms.request.VOMSServerInfo;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class TestVOMSESParser {
 

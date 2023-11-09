@@ -15,15 +15,15 @@
  */
 package org.italiangrid.voms.test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
 
 import org.italiangrid.voms.credential.FilePermissionError;
 import org.italiangrid.voms.util.FilePermissionHelper;
 import org.italiangrid.voms.util.FilePermissionHelper.PosixFilePermission;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class TestFilePermissionHelper {
 
@@ -35,7 +35,7 @@ public class TestFilePermissionHelper {
 
   public static final String keyWith600Perms = "src/test/resources/perm-test/test2.key.pem";
 
-  @BeforeAll
+  @BeforeClass
   public static void setupPermissions() {
 
     FilePermissionHelper.setPrivateKeyPermissions(keyWithRightPerms);

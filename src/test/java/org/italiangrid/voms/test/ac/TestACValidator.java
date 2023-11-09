@@ -15,9 +15,9 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -41,8 +41,8 @@ import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
 import org.italiangrid.voms.test.utils.VOMSAA;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -53,7 +53,7 @@ public class TestACValidator implements Fixture {
   static PEMCredential holder, holder2;
   static VOMSACValidator validator;
 
-  @BeforeAll
+  @BeforeClass
   public static void setup() throws KeyStoreException, CertificateException, IOException {
 
     holder = Utils.getTestUserCredential();
@@ -106,7 +106,7 @@ public class TestACValidator implements Fixture {
 
     VOMSValidationResult result = results.get(0);
     assertFalse(result.isValid());
-    assertTrue(result.getValidationErrors().size() == 1);
+    assertEquals(1, result.getValidationErrors().size());
     VOMSValidationErrorMessage m = result.getValidationErrors().get(0);
     assertEquals(VOMSValidationErrorCode.acHolderDoesntMatchCertChain, m.getErrorCode());
   }

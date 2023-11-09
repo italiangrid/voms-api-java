@@ -15,19 +15,18 @@
  */
 package org.italiangrid.voms.test;
 
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.net.URISyntaxException;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.impl.VOMSESLineParser;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class TestVOMSESLineParser {
 

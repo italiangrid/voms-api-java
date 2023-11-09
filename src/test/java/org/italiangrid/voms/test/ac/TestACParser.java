@@ -15,10 +15,10 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.security.KeyStoreException;
@@ -32,8 +32,8 @@ import org.italiangrid.voms.ac.impl.DefaultVOMSACParser;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
 import org.italiangrid.voms.test.utils.VOMSAA;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
@@ -43,7 +43,7 @@ public class TestACParser implements Fixture {
   static VOMSAA aa;
   static PEMCredential holder;
 
-  @BeforeAll
+  @BeforeClass
   public static void setup() throws KeyStoreException, CertificateException, IOException {
 
     aa = Utils.getVOMSAA();

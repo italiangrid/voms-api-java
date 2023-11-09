@@ -15,9 +15,10 @@
  */
 package org.italiangrid.voms.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.security.KeyStoreException;
@@ -25,8 +26,8 @@ import java.security.cert.CertificateException;
 
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.CertificateValidatorBuilder.OpensslHashFunction;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import eu.emi.security.authn.x509.ValidationResult;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -43,7 +44,7 @@ public class TestOpensslHashFunction {
 
   static PEMCredential cred;
 
-  @BeforeAll
+  @BeforeClass
   public static void init() throws KeyStoreException, CertificateException, IOException {
 
     cred = new PEMCredential(userKey, userCert, keyPassword.toCharArray());

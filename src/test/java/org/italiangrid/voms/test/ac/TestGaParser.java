@@ -16,15 +16,15 @@
 package org.italiangrid.voms.test.ac;
 
 import static org.italiangrid.voms.util.GaParser.parseGaString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.italiangrid.voms.VOMSGenericAttribute;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class TestGaParser {
 
@@ -63,7 +63,7 @@ public class TestGaParser {
 
     gas = parseGaString("  c= p   , pippo =franco,a8_d2=789");
 
-    assertEquals(3, gas);
+    assertEquals(3, gas.size());
 
     assertEquals("c", gas.get(0).getName());
     assertEquals("p", gas.get(0).getValue());

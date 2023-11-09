@@ -20,8 +20,8 @@ import static org.hamcrest.Matchers.is;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.GAS;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_AFTER;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_BEFORE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -31,8 +31,8 @@ import java.util.Date;
 import org.italiangrid.voms.request.impl.ACGenerationParams;
 import org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties;
 import org.italiangrid.voms.util.TimeUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.AfterClass;
+import org.junit.Test;
 
 public class TestACGenerationParams {
 
@@ -47,7 +47,7 @@ public class TestACGenerationParams {
       Date.from(LocalDateTime.parse(JAN_FIRST_2020_00_00_10_S, TimeUtils.DATE_FORMATTER)
         .toInstant(ZoneOffset.UTC));
 
-  @AfterEach
+  @AfterClass
   public void after() {
     // Cleanup system properties
     for (FakeVOMSACServiceProperties p : FakeVOMSACServiceProperties.values()) {
