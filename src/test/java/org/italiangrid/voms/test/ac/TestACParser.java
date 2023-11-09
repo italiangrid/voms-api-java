@@ -15,13 +15,16 @@
  */
 package org.italiangrid.voms.test.ac;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.util.Collections;
 import java.util.List;
-
-import org.junit.Assert;
 
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSError;
@@ -29,8 +32,8 @@ import org.italiangrid.voms.ac.impl.DefaultVOMSACParser;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
 import org.italiangrid.voms.test.utils.VOMSAA;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
@@ -40,9 +43,8 @@ public class TestACParser implements Fixture {
   static VOMSAA aa;
   static PEMCredential holder;
 
-  @BeforeClass
-  public static void setup() throws KeyStoreException, CertificateException,
-    IOException {
+  @BeforeAll
+  public static void setup() throws KeyStoreException, CertificateException, IOException {
 
     aa = Utils.getVOMSAA();
 
@@ -56,16 +58,18 @@ public class TestACParser implements Fixture {
 
     DefaultVOMSACParser parser = new DefaultVOMSACParser();
     List<VOMSAttribute> attrs = parser.parse(proxy.getCertificateChain());
-    Assert.assertFalse(attrs.isEmpty());
-    Assert.assertEquals(1, attrs.size());
-    Assert.assertEquals(defaultVOFqans, attrs.get(0).getFQANs());
+    assertFalse(attrs.isEmpty());
+    assertEquals(1, attrs.size());
+    assertEquals(defaultVOFqans, attrs.get(0).getFQANs());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testParseNullChainFailure() {
 
     DefaultVOMSACParser parser = new DefaultVOMSACParser();
-    parser.parse(null);
+    assertThrows(NullPointerException.class, () -> {
+      parser.parse(null);
+    });
   }
 
   @Test
@@ -80,13 +84,12 @@ public class TestACParser implements Fixture {
     try {
       parser.parse(proxy.getCertificateChain());
     } catch (VOMSError e) {
-      Assert
-        .assertEquals(
+      assertEquals(
           "Non conformant VOMS Attribute certificate: unsupported attribute values encoding.",
           e.getMessage());
       return;
     }
 
-    Assert.fail("No exception raised when parsing invalid VOMS AC!");
+    fail("No exception raised when parsing invalid VOMS AC!");
   }
 }

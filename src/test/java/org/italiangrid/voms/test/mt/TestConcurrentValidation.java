@@ -15,6 +15,8 @@
  */
 package org.italiangrid.voms.test.mt;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,17 +37,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
-
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultUpdatingVOMSTrustStore;
 import org.italiangrid.voms.test.utils.VOMSAA;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import eu.emi.security.authn.x509.NamespaceCheckingMode;
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
@@ -143,7 +143,7 @@ public class TestConcurrentValidation {
     return testProxies.get(randomIndex).getCertificateChain();
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() throws KeyStoreException, CertificateException,
     FileNotFoundException, IOException, InvalidKeyException,
     SignatureException, NoSuchAlgorithmException {
@@ -162,7 +162,7 @@ public class TestConcurrentValidation {
     System.out.println("Setup done.");
   }
 
-  @AfterClass
+  @AfterAll
   public static void tearDown() {
 
   }
@@ -178,7 +178,6 @@ public class TestConcurrentValidation {
     for (int i = 0; i < NUM_WORKERS; i++)
       pool.execute(new ValidatorWorker());
 
-    barrier.await();
     barrier.await();
 
     pool.shutdown();
@@ -227,7 +226,7 @@ public class TestConcurrentValidation {
 
           X509Certificate[] chain = getRandomProxy();
           List<VOMSAttribute> attrs = validator.validate(chain);
-          Assert.assertEquals(1, attrs.size());
+          assertEquals(1, attrs.size());
 
         } catch (Exception e) {
           System.err.println(e.getMessage());

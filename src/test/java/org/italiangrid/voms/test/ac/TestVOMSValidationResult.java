@@ -15,10 +15,13 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.italiangrid.voms.ac.VOMSValidationResult;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestVOMSValidationResult {
 
@@ -31,9 +34,8 @@ public class TestVOMSValidationResult {
     assertNull(r.getAttributes());
     assertTrue(r.getValidationErrors().isEmpty());
 
-    assertEquals(
-      "VOMSValidationResult [valid=false, validationErrors=[], attributes=null]",
-      r.toString());
+    assertEquals("VOMSValidationResult [valid=false, validationErrors=[], attributes=null]",
+        r.toString());
 
   }
 

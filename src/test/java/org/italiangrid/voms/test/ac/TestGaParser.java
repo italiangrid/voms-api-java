@@ -15,64 +15,63 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.italiangrid.voms.util.GaParser.parseGaString;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
 import org.italiangrid.voms.VOMSGenericAttribute;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestGaParser {
 
-
-  
   @Test
   public void testEmptyString() {
-    
+
     List<VOMSGenericAttribute> result = parseGaString("");
-    assertThat(result, empty());
-    
+    assertTrue(result.isEmpty());
+
   }
-  
-  @Test(expected=NullPointerException.class)
+
+  @Test
   public void testNullString() {
-    
-    parseGaString(null);
+
+    assertThrows(NullPointerException.class, () -> {
+      parseGaString(null);
+    });
   }
-  
+
   @Test
   public void testInvalidStrings() {
-    
-    assertThat(parseGaString("dsa"), empty());
-    assertThat(parseGaString("=, a == d"), empty());
+
+    assertTrue(parseGaString("dsa").isEmpty());
+    assertTrue(parseGaString("=, a == d").isEmpty());
   }
-  
+
   @Test
   public void testValidStrings() {
     List<VOMSGenericAttribute> gas = parseGaString("ciccio = paglia");
-    
-    assertThat(gas, hasSize(1));
-    
-    assertThat(gas.get(0).getName(), is("ciccio"));
-    assertThat(gas.get(0).getValue(), is("paglia"));
-    assertThat(gas.get(0).getContext(), is(nullValue()));
-    
-    gas =parseGaString("  c= p   , pippo =franco,a8_d2=789");
-    
-    assertThat(gas, hasSize(3));
-    
-    assertThat(gas.get(0).getName(), is("c"));
-    assertThat(gas.get(0).getValue(), is("p"));
-    
-    assertThat(gas.get(1).getName(), is("pippo"));
-    assertThat(gas.get(1).getValue(), is("franco"));
-    
-    assertThat(gas.get(2).getName(), is("a8_d2"));
-    assertThat(gas.get(2).getValue(), is("789"));
+
+    assertEquals(1, gas.size());
+
+    assertEquals("ciccio", gas.get(0).getName());
+    assertEquals("paglia", gas.get(0).getValue());
+    assertNull(gas.get(0).getContext());
+
+    gas = parseGaString("  c= p   , pippo =franco,a8_d2=789");
+
+    assertEquals(3, gas);
+
+    assertEquals("c", gas.get(0).getName());
+    assertEquals("p", gas.get(0).getValue());
+
+    assertEquals("pippo", gas.get(1).getName());
+    assertEquals("franco", gas.get(1).getValue());
+
+    assertEquals("a8_d2", gas.get(2).getName());
+    assertEquals("789", gas.get(2).getValue());
   }
 }

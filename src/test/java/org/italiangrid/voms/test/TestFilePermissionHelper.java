@@ -15,13 +15,15 @@
  */
 package org.italiangrid.voms.test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 
 import org.italiangrid.voms.credential.FilePermissionError;
 import org.italiangrid.voms.util.FilePermissionHelper;
 import org.italiangrid.voms.util.FilePermissionHelper.PosixFilePermission;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFilePermissionHelper {
 
@@ -33,7 +35,7 @@ public class TestFilePermissionHelper {
 
   public static final String keyWith600Perms = "src/test/resources/perm-test/test2.key.pem";
 
-  @BeforeClass
+  @BeforeAll
   public static void setupPermissions() {
 
     FilePermissionHelper.setPrivateKeyPermissions(keyWithRightPerms);
@@ -58,16 +60,20 @@ public class TestFilePermissionHelper {
 
   }
 
-  @Test(expected = FilePermissionError.class)
+  @Test
   public void testFilePermissionsFailureKey() throws IOException {
 
-    FilePermissionHelper.checkPrivateKeyPermissions(keyWithWrongPerms);
+    assertThrows(FilePermissionError.class, () -> {
+      FilePermissionHelper.checkPrivateKeyPermissions(keyWithWrongPerms);
+    });
   }
 
-  @Test(expected = FilePermissionError.class)
+  @Test
   public void testFilePermissionsFailureP12() throws IOException {
 
-    FilePermissionHelper.checkPKCS12Permissions(p12WithWrongPerms);
+    assertThrows(FilePermissionError.class, () -> {
+      FilePermissionHelper.checkPKCS12Permissions(p12WithWrongPerms);
+    });
   }
 
 }

@@ -15,13 +15,13 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.GAS;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_AFTER;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_BEFORE;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -31,8 +31,8 @@ import java.util.Date;
 import org.italiangrid.voms.request.impl.ACGenerationParams;
 import org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties;
 import org.italiangrid.voms.util.TimeUtils;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class TestACGenerationParams {
 
@@ -47,7 +47,7 @@ public class TestACGenerationParams {
       Date.from(LocalDateTime.parse(JAN_FIRST_2020_00_00_10_S, TimeUtils.DATE_FORMATTER)
         .toInstant(ZoneOffset.UTC));
 
-  @After
+  @AfterEach
   public void after() {
     // Cleanup system properties
     for (FakeVOMSACServiceProperties p : FakeVOMSACServiceProperties.values()) {
@@ -63,32 +63,40 @@ public class TestACGenerationParams {
 
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testNotAfterNullDateRaisesNullPointerException() {
-    System.setProperty(NOT_AFTER.getPropertyName(), null);
-    ACGenerationParams.fromSystemProperties();
+    assertThrows(NullPointerException.class, () -> {
+      System.setProperty(NOT_AFTER.getPropertyName(), null);
+      ACGenerationParams.fromSystemProperties();
+    });
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testNotBeforeNullDateRaisesNullPointerException() {
-    System.setProperty(NOT_BEFORE.getPropertyName(), null);
-    ACGenerationParams.fromSystemProperties();
+    assertThrows(NullPointerException.class, () -> {
+      System.setProperty(NOT_BEFORE.getPropertyName(), null);
+      ACGenerationParams.fromSystemProperties();
+    });
   }
 
 
-  @Test(expected = DateTimeParseException.class)
+  @Test
   public void testNotAfterDateParsingError() {
 
-    System.setProperty(NOT_AFTER.getPropertyName(), "ciccio");
-    ACGenerationParams.fromSystemProperties();
+    assertThrows(DateTimeParseException.class, () -> {
+      System.setProperty(NOT_AFTER.getPropertyName(), "ciccio");
+      ACGenerationParams.fromSystemProperties();
+    });
 
   }
 
-  @Test(expected = DateTimeParseException.class)
+  @Test
   public void testNotBeforeDateParsingError() {
 
-    System.setProperty(NOT_BEFORE.getPropertyName(), "ciccio");
-    ACGenerationParams.fromSystemProperties();
+    assertThrows(DateTimeParseException.class, () -> {
+      System.setProperty(NOT_BEFORE.getPropertyName(), "ciccio");
+      ACGenerationParams.fromSystemProperties();
+    });
   }
 
 
@@ -97,26 +105,26 @@ public class TestACGenerationParams {
     System.setProperty(NOT_BEFORE.getPropertyName(), JAN_FIRST_2020_00_00_00_S);
     System.setProperty(NOT_AFTER.getPropertyName(), JAN_FIRST_2020_00_00_10_S);
     ACGenerationParams params = ACGenerationParams.fromSystemProperties();
-    assertThat(params.getNotBefore(), equalTo(JAN_FIRST_2020_00_00_00));
-    assertThat(params.getNotAfter(), equalTo(JAN_FIRST_2020_00_00_10));
+    assertEquals(JAN_FIRST_2020_00_00_00, params.getNotBefore());
+    assertEquals(JAN_FIRST_2020_00_00_10, params.getNotAfter());
   }
 
   @Test
   public void testGaParsing() {
     System.setProperty(GAS.getPropertyName(), "one = uno, two = due, three = tre");
     ACGenerationParams params = ACGenerationParams.fromSystemProperties();
-    assertThat(params.getGas(), hasSize(3));
-    assertThat(params.getGas().get(0).getName(), is("one"));
-    assertThat(params.getGas().get(0).getValue(), is("uno"));
-    assertThat(params.getGas().get(0).getContext(), is("test"));
+    assertEquals(params.getGas(), hasSize(3));
+    assertEquals(params.getGas().get(0).getName(), is("one"));
+    assertEquals(params.getGas().get(0).getValue(), is("uno"));
+    assertEquals(params.getGas().get(0).getContext(), is("test"));
     
-    assertThat(params.getGas().get(1).getName(), is("two"));
-    assertThat(params.getGas().get(1).getValue(), is("due"));
-    assertThat(params.getGas().get(1).getContext(), is("test"));
+    assertEquals(params.getGas().get(1).getName(), is("two"));
+    assertEquals(params.getGas().get(1).getValue(), is("due"));
+    assertEquals(params.getGas().get(1).getContext(), is("test"));
 
-    assertThat(params.getGas().get(2).getName(), is("three"));
-    assertThat(params.getGas().get(2).getValue(), is("tre"));
-    assertThat(params.getGas().get(2).getContext(), is("test"));
+    assertEquals(params.getGas().get(2).getName(), is("three"));
+    assertEquals(params.getGas().get(2).getValue(), is("tre"));
+    assertEquals(params.getGas().get(2).getContext(), is("test"));
   }
 
 

@@ -20,8 +20,8 @@ import static org.italiangrid.voms.error.VOMSValidationErrorCode.canlError;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.invalidAcCert;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.lscDescriptionDoesntMatchAcCert;
 import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -56,9 +56,9 @@ import org.italiangrid.voms.asn1.VOMSACUtils;
 import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -92,11 +92,10 @@ public class TestACGeneration {
   static final String vomsdir = "src/test/resources/vomsdir";
   static final String trustAnchorsDir = "src/test/resources/trust-anchors";
 
-  static final List<String> defaultFQANs = Arrays.asList("/test.vo",
-    "/test.vo/G1", "/test.vo/G2");
+  static final List<String> defaultFQANs = Arrays.asList("/test.vo", "/test.vo/G1", "/test.vo/G2");
 
-  final List<VOMSGenericAttribute> defaultGAs = Arrays.asList(
-    buildGA("test", "value", defaultVO), buildGA("test2", "value", defaultVO));
+  final List<VOMSGenericAttribute> defaultGAs =
+      Arrays.asList(buildGA("test", "value", defaultVO), buildGA("test2", "value", defaultVO));
 
   static PEMCredential aaCredential = null;
   static PEMCredential aaCredential2 = null;
@@ -113,57 +112,54 @@ public class TestACGeneration {
 
   static VOMSACGenerator defaultGenerator;
 
-  @BeforeClass
-  static public void classTestSetup() throws KeyStoreException,
-    CertificateException, FileNotFoundException, IOException {
+  @BeforeAll
+  static public void classTestSetup()
+      throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
 
-    aaCredential = new PEMCredential(new FileInputStream(aaKey),
-      new FileInputStream(aaCert), (char[]) null);
+    aaCredential =
+        new PEMCredential(new FileInputStream(aaKey), new FileInputStream(aaCert), (char[]) null);
 
-    aaCredential2 = new PEMCredential(new FileInputStream(aaKey2),
-      new FileInputStream(aaCert2), (char[]) null);
+    aaCredential2 =
+        new PEMCredential(new FileInputStream(aaKey2), new FileInputStream(aaCert2), (char[]) null);
 
     expiredCredential = new PEMCredential(new FileInputStream(expiredKey),
-      new FileInputStream(expiredCert), keyPassword.toCharArray());
+        new FileInputStream(expiredCert), keyPassword.toCharArray());
 
     revokedCredential = new PEMCredential(new FileInputStream(revokedKey),
-      new FileInputStream(revokedCert), keyPassword.toCharArray());
+        new FileInputStream(revokedCert), keyPassword.toCharArray());
 
     holderCredential = new PEMCredential(new FileInputStream(holderKey),
-      new FileInputStream(holderCert), keyPassword.toCharArray());
+        new FileInputStream(holderCert), keyPassword.toCharArray());
 
     trustStore = new DefaultVOMSTrustStore(Arrays.asList(vomsdir));
     certValidator = new OpensslCertChainValidator(trustAnchorsDir);
 
-    final String expirationMessage = String.format(
-      "Certificate has expired on: %s", expiredCredential.getCertificate()
-        .getNotAfter());
+    final String expirationMessage = String.format("Certificate has expired on: %s",
+        expiredCredential.getCertificate().getNotAfter());
 
     expiredCertErrorMessage = newErrorMessage(canlError, expirationMessage);
 
-    expiredCertCRLErrorMessage = newErrorMessage(
-      canlError,
-      "CRL for an expired certificate was not resolved Cause: No CRLs found for issuer \"cn=Test CA,o=IGI,c=IT\"");
+    expiredCertCRLErrorMessage = newErrorMessage(canlError,
+        "CRL for an expired certificate was not resolved Cause: No CRLs found for issuer \"cn=Test CA,o=IGI,c=IT\"");
 
     final Date revocationDate = new Date(1348673124000L);
 
     final String revocationMessage = String.format(
-      "Certificate was revoked at: "
-        + "%s, the reason reported is: unspecified", revocationDate);
+        "Certificate was revoked at: " + "%s, the reason reported is: unspecified", revocationDate);
 
     revokedCertErrorMessage = newErrorMessage(canlError, revocationMessage);
 
     defaultGenerator = new VOMSACGenerator(aaCredential);
   }
 
-  @AfterClass
+  @AfterAll
   static public void classTestShutdown() {
 
     certValidator.dispose();
   }
 
-  private AttributeCertificate createAC(PEMCredential aaCredential,
-    List<String> fqans, List<VOMSGenericAttribute> gas, String vo, String host) {
+  private AttributeCertificate createAC(PEMCredential aaCredential, List<String> fqans,
+      List<VOMSGenericAttribute> gas, String vo, String host) {
 
     VOMSACGenerator gen = new VOMSACGenerator(aaCredential);
 
@@ -173,9 +169,8 @@ public class TestACGeneration {
     cal.add(Calendar.HOUR, 12);
     Date expiration = cal.getTime();
 
-    X509AttributeCertificateHolder ac = gen.generateVOMSAttributeCertificate(
-      fqans, gas, null, holderCredential.getCertificate(), BigInteger.ONE, now,
-      expiration, vo, host, port);
+    X509AttributeCertificateHolder ac = gen.generateVOMSAttributeCertificate(fqans, gas, null,
+        holderCredential.getCertificate(), BigInteger.ONE, now, expiration, vo, host, port);
 
     return ac.toASN1Structure();
   }
@@ -192,25 +187,22 @@ public class TestACGeneration {
   }
 
   @Test
-  public void testGeneratedACParsing() throws KeyStoreException,
-    CertificateException, FileNotFoundException, IOException,
-    OperatorCreationException {
+  public void testGeneratedACParsing() throws KeyStoreException, CertificateException,
+      FileNotFoundException, IOException, OperatorCreationException {
 
-    AttributeCertificate ac = createAC(aaCredential, defaultFQANs, defaultGAs,
-      defaultVO, defaultHost);
+    AttributeCertificate ac =
+        createAC(aaCredential, defaultFQANs, defaultGAs, defaultVO, defaultHost);
     VOMSAttribute attrs = VOMSACUtils.deserializeVOMSAttributes(ac);
 
     // Check holder
-    assertEquals(holderCredential.getCertificate().getSubjectX500Principal(),
-      attrs.getHolder());
+    assertEquals(holderCredential.getCertificate().getSubjectX500Principal(), attrs.getHolder());
 
     // Check holder serial number
     assertEquals(holderCredential.getCertificate().getSerialNumber(),
-      attrs.getHolderSerialNumber());
+        attrs.getHolderSerialNumber());
 
     // Check issuer
-    assertEquals(aaCredential.getCertificate().getSubjectX500Principal(),
-      attrs.getIssuer());
+    assertEquals(aaCredential.getCertificate().getSubjectX500Principal(), attrs.getIssuer());
 
     // Check policyAuthority
     assertEquals(defaultVO, attrs.getVO());
@@ -235,13 +227,11 @@ public class TestACGeneration {
 
     ValidationResultChecker c = new ValidationResultChecker(true);
 
-    VOMSACValidator validator = VOMSValidators.newValidator(trustStore,
-      certValidator, c);
+    VOMSACValidator validator = VOMSValidators.newValidator(trustStore, certValidator, c);
 
-    AttributeCertificate ac = createAC(aaCredential, defaultFQANs, defaultGAs,
-      defaultVO, defaultHost);
-    List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays
-      .asList(ac));
+    AttributeCertificate ac =
+        createAC(aaCredential, defaultFQANs, defaultGAs, defaultVO, defaultHost);
+    List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays.asList(ac));
 
     assertEquals(validatedAttrs.size(), 1);
 
@@ -251,53 +241,41 @@ public class TestACGeneration {
   public void testLSCValidationFailure() {
 
     ValidationResultChecker c = new ValidationResultChecker(false,
-      newErrorMessage(lscDescriptionDoesntMatchAcCert),
-      newErrorMessage(aaCertNotFound));
+        newErrorMessage(lscDescriptionDoesntMatchAcCert), newErrorMessage(aaCertNotFound));
 
-    VOMSACValidator validator = VOMSValidators.newValidator(trustStore,
-      certValidator, c);
-    AttributeCertificate ac = createAC(aaCredential2,
-      Arrays.asList("/test.vo.1"), defaultGAs, "test.vo.1",
-      "wilco.cnaf.infn.it");
-    List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays
-      .asList(ac));
+    VOMSACValidator validator = VOMSValidators.newValidator(trustStore, certValidator, c);
+    AttributeCertificate ac = createAC(aaCredential2, Arrays.asList("/test.vo.1"), defaultGAs,
+        "test.vo.1", "wilco.cnaf.infn.it");
+    List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays.asList(ac));
     assertEquals(validatedAttrs.size(), 0);
   }
 
   @Test
-  public void testExpiredAACertValidationFailure()
-    throws OperatorCreationException {
+  public void testExpiredAACertValidationFailure() throws OperatorCreationException {
 
-    ValidationResultChecker c = new ValidationResultChecker(false,
-      expiredCertErrorMessage, expiredCertCRLErrorMessage,
-      newErrorMessage(invalidAcCert), newErrorMessage(aaCertNotFound));
+    ValidationResultChecker c =
+        new ValidationResultChecker(false, expiredCertErrorMessage, expiredCertCRLErrorMessage,
+            newErrorMessage(invalidAcCert), newErrorMessage(aaCertNotFound));
 
-    VOMSACValidator validator = VOMSValidators.newValidator(trustStore,
-      certValidator, c);
+    VOMSACValidator validator = VOMSValidators.newValidator(trustStore, certValidator, c);
 
-    AttributeCertificate ac = createAC(expiredCredential,
-      Arrays.asList("/test.vo.1"), defaultGAs, defaultVO,
-      "test-expired.cnaf.infn.it");
+    AttributeCertificate ac = createAC(expiredCredential, Arrays.asList("/test.vo.1"), defaultGAs,
+        defaultVO, "test-expired.cnaf.infn.it");
 
-    List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays
-      .asList(ac));
+    List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays.asList(ac));
     assertEquals(validatedAttrs.size(), 0);
   }
 
   @Test
   public void testRevokedAACertValidationFailure() {
 
-    ValidationResultChecker c = new ValidationResultChecker(false,
-      revokedCertErrorMessage, newErrorMessage(invalidAcCert),
-      newErrorMessage(aaCertNotFound));
+    ValidationResultChecker c = new ValidationResultChecker(false, revokedCertErrorMessage,
+        newErrorMessage(invalidAcCert), newErrorMessage(aaCertNotFound));
 
-    VOMSACValidator validator = VOMSValidators.newValidator(trustStore,
-      certValidator, c);
-    AttributeCertificate ac = createAC(revokedCredential,
-      Arrays.asList("/test.vo.1"), defaultGAs, defaultVO,
-      "test-revoked.cnaf.infn.it");
-    List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays
-      .asList(ac));
+    VOMSACValidator validator = VOMSValidators.newValidator(trustStore, certValidator, c);
+    AttributeCertificate ac = createAC(revokedCredential, Arrays.asList("/test.vo.1"), defaultGAs,
+        defaultVO, "test-revoked.cnaf.infn.it");
+    List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays.asList(ac));
     assertEquals(validatedAttrs.size(), 0);
   }
 
@@ -306,17 +284,15 @@ public class TestACGeneration {
 
     ValidationResultChecker c = new ValidationResultChecker(true);
 
-    VOMSACValidator validator = VOMSValidators.newValidator(trustStore,
-      certValidator, c);
+    VOMSACValidator validator = VOMSValidators.newValidator(trustStore, certValidator, c);
 
-    AttributeCertificate ac = createAC(aaCredential, defaultFQANs, defaultGAs,
-      defaultVO, defaultHost);
+    AttributeCertificate ac =
+        createAC(aaCredential, defaultFQANs, defaultGAs, defaultVO, defaultHost);
 
     X509Certificate[] chain;
 
     try {
-      chain = createVOMSProxy(holderCredential,
-        new AttributeCertificate[] { ac });
+      chain = createVOMSProxy(holderCredential, new AttributeCertificate[] {ac});
     } catch (Exception e) {
       throw new VOMSError("Error generating VOMS proxy:" + e.getMessage(), e);
     }
@@ -325,29 +301,27 @@ public class TestACGeneration {
     assertEquals(1, attrs.size());
   }
 
-  private X509Certificate[] createVOMSProxy(PEMCredential holder,
-    AttributeCertificate[] acs) throws InvalidKeyException,
-    CertificateParsingException, SignatureException, NoSuchAlgorithmException,
-    IOException {
+  private X509Certificate[] createVOMSProxy(PEMCredential holder, AttributeCertificate[] acs)
+      throws InvalidKeyException, CertificateParsingException, SignatureException,
+      NoSuchAlgorithmException, IOException {
 
-    ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(
-      holder.getCertificateChain());
+    ProxyCertificateOptions proxyOptions =
+        new ProxyCertificateOptions(holder.getCertificateChain());
 
     proxyOptions.setAttributeCertificates(acs);
-    ProxyCertificate proxy = ProxyGenerator.generate(proxyOptions,
-      holder.getKey());
+    ProxyCertificate proxy = ProxyGenerator.generate(proxyOptions, holder.getKey());
 
     return proxy.getCertificateChain();
   }
 }
+
 
 class ValidationResultChecker implements ValidationResultListener {
 
   final List<VOMSValidationErrorMessage> expectedErrorMessages;
   boolean expectedValidationResult;
 
-  public ValidationResultChecker(boolean valid,
-    VOMSValidationErrorMessage... expectedMessages) {
+  public ValidationResultChecker(boolean valid, VOMSValidationErrorMessage... expectedMessages) {
 
     expectedValidationResult = valid;
     expectedErrorMessages = Arrays.asList(expectedMessages);
@@ -361,33 +335,29 @@ class ValidationResultChecker implements ValidationResultListener {
 
   public void notifyValidationResult(VOMSValidationResult result) {
 
-    assertEquals(
-      errorMessage("ValidationResult validity check failed.", result),
-      expectedValidationResult, result.isValid());
+    assertEquals(expectedValidationResult, result.isValid(),
+        errorMessage("ValidationResult validity check failed.", result));
 
-    assertEquals(errorMessage("ValidationResult error message size check "
-      + "failed.", result), expectedErrorMessages.size(), result
-      .getValidationErrors().size());
+    assertEquals(expectedErrorMessages.size(), result.getValidationErrors().size(),
+        errorMessage("ValidationResult error message size check failed.", result));
 
-    List<VOMSValidationErrorMessage> errorMessages = new ArrayList<VOMSValidationErrorMessage>(
-      result.getValidationErrors());
+    List<VOMSValidationErrorMessage> errorMessages =
+        new ArrayList<VOMSValidationErrorMessage>(result.getValidationErrors());
 
     for (VOMSValidationErrorMessage expectedMessage : expectedErrorMessages) {
 
-      String failureMessage = errorMessage(String.format(
-        "<%s> was not found in error messages. Error messages: <%s>",
-        expectedMessage, result.getValidationErrors()), result);
+      String failureMessage =
+          errorMessage(String.format("<%s> was not found in error messages. Error messages: <%s>",
+              expectedMessage, result.getValidationErrors()), result);
 
-      assertTrue(failureMessage,
-        result.getValidationErrors().contains(expectedMessage));
+      assertTrue(result.getValidationErrors().contains(expectedMessage), failureMessage);
     }
 
     if (errorMessages.size() > 0) {
       errorMessages.removeAll(expectedErrorMessages);
 
-      assertTrue(errorMessage("ValidationResult check failed. "
-        + "Got more error messages than expected.", result),
-        errorMessages.isEmpty());
+      assertTrue(errorMessages.isEmpty(), errorMessage(
+          "ValidationResult check failed. Got more error messages than expected.", result));
     }
 
   }

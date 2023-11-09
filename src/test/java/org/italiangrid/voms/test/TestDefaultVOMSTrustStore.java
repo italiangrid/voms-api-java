@@ -18,8 +18,9 @@
  */
 package org.italiangrid.voms.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,7 +32,8 @@ import java.util.List;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
@@ -42,28 +44,31 @@ import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
  */
 public class TestDefaultVOMSTrustStore {
 
-  @Test(expected = VOMSError.class)
+  @Test
   public void testEmptyTrustDirsFailure() {
 
-    @SuppressWarnings({ "unused", "unchecked" })
-    DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(
-      Collections.EMPTY_LIST);
-
+    assertThrows(VOMSError.class, () -> {
+      @SuppressWarnings({"unused", "unchecked"})
+      DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(Collections.EMPTY_LIST);
+    });
   }
 
-  @Test(expected = VOMSError.class)
+  @Test
   public void testNonExistentTrustDirsFailure() {
 
-    List<String> trustDirs = Arrays.asList(new String[] { "/etc/do/not/exist",
-      "/etc/grid-security/vomsdir" });
+    List<String> trustDirs =
+        Arrays.asList(new String[] {"/etc/do/not/exist", "/etc/grid-security/vomsdir"});
 
-    @SuppressWarnings("unused")
-    DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
+    assertThrows(VOMSError.class, () -> {
+      @SuppressWarnings("unused")
+      DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
+    });
   }
 
   // FIXME: This test assumes /etc/grid-security/vomsdir exists in the machine
   // where the test run. Disabling it
   // for now.
+  @Disabled
   public void testDefaultTrustDir() {
 
     DefaultVOMSTrustStore store = new DefaultVOMSTrustStore();
@@ -86,22 +91,21 @@ public class TestDefaultVOMSTrustStore {
   }
 
   @Test
-  public void testCertificateParsing() throws FileNotFoundException,
-    IOException {
+  public void testCertificateParsing() throws FileNotFoundException, IOException {
 
     String vomsDir = "src/test/resources/vomsdir";
     String certFileName = "src/test/resources/vomsdir/test-host.cnaf.infn.it.pem";
-    X509Certificate cert = CertificateUtils.loadCertificate(
-      new FileInputStream(certFileName), Encoding.PEM);
+    X509Certificate cert =
+        CertificateUtils.loadCertificate(new FileInputStream(certFileName), Encoding.PEM);
 
-    List<String> trustDirs = Arrays.asList(new String[] { vomsDir });
+    List<String> trustDirs = Arrays.asList(new String[] {vomsDir});
 
     DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
 
     assertEquals(1, store.getLocalAACertificates().size());
 
-    assertTrue(cert.getSubjectX500Principal().equals(
-      store.getLocalAACertificates().get(0).getSubjectX500Principal()));
+    assertTrue(cert.getSubjectX500Principal()
+      .equals(store.getLocalAACertificates().get(0).getSubjectX500Principal()));
   }
 
   public void testUpdatingVOMSTrustStore() {

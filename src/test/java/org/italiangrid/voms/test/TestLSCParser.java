@@ -15,17 +15,18 @@
  */
 package org.italiangrid.voms.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultLSCFileParser;
 import org.italiangrid.voms.store.impl.LSCFile;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestLSCParser {
 

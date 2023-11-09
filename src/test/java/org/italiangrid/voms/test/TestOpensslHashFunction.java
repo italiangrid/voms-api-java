@@ -15,15 +15,18 @@
  */
 package org.italiangrid.voms.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.CertificateValidatorBuilder.OpensslHashFunction;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import eu.emi.security.authn.x509.ValidationResult;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -40,9 +43,8 @@ public class TestOpensslHashFunction {
 
   static PEMCredential cred;
 
-  @BeforeClass
-  public static void init()
-    throws KeyStoreException, CertificateException, IOException {
+  @BeforeAll
+  public static void init() throws KeyStoreException, CertificateException, IOException {
 
     cred = new PEMCredential(userKey, userCert, keyPassword.toCharArray());
   }
@@ -53,10 +55,9 @@ public class TestOpensslHashFunction {
     CertificateValidatorBuilder builder = new CertificateValidatorBuilder();
     builder.trustAnchorsDir(md5TrustAnchorsDir);
 
-    ValidationResult result = builder.build()
-      .validate(cred.getCertificateChain());
+    ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
-    Assert.assertTrue(result.isValid());
+    assertTrue(result.isValid());
 
   }
 
@@ -64,13 +65,11 @@ public class TestOpensslHashFunction {
   public void testSHA1Hash() {
 
     CertificateValidatorBuilder builder = new CertificateValidatorBuilder();
-    builder.trustAnchorsDir(sha1TrustAnchorsDir)
-      .opensslHashFunction(OpensslHashFunction.SHA1);
+    builder.trustAnchorsDir(sha1TrustAnchorsDir).opensslHashFunction(OpensslHashFunction.SHA1);
 
-    ValidationResult result = builder.build()
-      .validate(cred.getCertificateChain());
+    ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
-    Assert.assertTrue(result.isValid());
+    assertTrue(result.isValid());
   }
 
   @Test
@@ -79,21 +78,18 @@ public class TestOpensslHashFunction {
     CertificateValidatorBuilder builder = new CertificateValidatorBuilder();
     builder.trustAnchorsDir(sha1TrustAnchorsDir);
 
-    ValidationResult result = builder.build()
-      .validate(cred.getCertificateChain());
+    ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
-    Assert.assertFalse(result.isValid());
-    Assert.assertEquals(2, result.getErrors().size());
-    Assert.assertEquals(
-      "No trusted CA certificate was found for the certificate chain",
-      result.getErrors().get(0).getMessage());
+    assertFalse(result.isValid());
+    assertEquals(2, result.getErrors().size());
+    assertEquals("No trusted CA certificate was found for the certificate chain",
+        result.getErrors().get(0).getMessage());
 
-    Assert.assertEquals(
-      "Trusted issuer of this certificate was not established",
-      result.getErrors().get(1).getMessage());
+    assertEquals("Trusted issuer of this certificate was not established",
+        result.getErrors().get(1).getMessage());
 
-    Assert.assertEquals(cred.getCertificate().getSubjectX500Principal(),
-      result.getErrors().get(1).getChain()[0].getSubjectX500Principal());
+    assertEquals(cred.getCertificate().getSubjectX500Principal(),
+        result.getErrors().get(1).getChain()[0].getSubjectX500Principal());
 
   }
 
@@ -101,24 +97,20 @@ public class TestOpensslHashFunction {
   public void testSHA1FailsOnMD5Dir() {
 
     CertificateValidatorBuilder builder = new CertificateValidatorBuilder();
-    builder.trustAnchorsDir(md5TrustAnchorsDir)
-      .opensslHashFunction(OpensslHashFunction.SHA1);
+    builder.trustAnchorsDir(md5TrustAnchorsDir).opensslHashFunction(OpensslHashFunction.SHA1);
 
-    ValidationResult result = builder.build()
-      .validate(cred.getCertificateChain());
+    ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
-    Assert.assertFalse(result.isValid());
-    Assert.assertEquals(2, result.getErrors().size());
-    Assert.assertEquals(
-      "No trusted CA certificate was found for the certificate chain",
-      result.getErrors().get(0).getMessage());
+    assertFalse(result.isValid());
+    assertEquals(2, result.getErrors().size());
+    assertEquals("No trusted CA certificate was found for the certificate chain",
+        result.getErrors().get(0).getMessage());
 
-    Assert.assertEquals(
-      "Trusted issuer of this certificate was not established",
-      result.getErrors().get(1).getMessage());
+    assertEquals("Trusted issuer of this certificate was not established",
+        result.getErrors().get(1).getMessage());
 
-    Assert.assertEquals(cred.getCertificate().getSubjectX500Principal(),
-      result.getErrors().get(1).getChain()[0].getSubjectX500Principal());
+    assertEquals(cred.getCertificate().getSubjectX500Principal(),
+        result.getErrors().get(1).getChain()[0].getSubjectX500Principal());
 
   }
 

@@ -15,7 +15,9 @@
  */
 package org.italiangrid.voms.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -24,8 +26,7 @@ import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;
 import org.italiangrid.voms.request.impl.DefaultVOMSServerInfoStore;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestVOMSServerInfoStore {
 
@@ -40,7 +41,7 @@ public class TestVOMSServerInfoStore {
 
     assertEquals(3, store.getVOMSServerInfo("atlas").size());
     assertEquals(2, store.getVOMSServerInfo("eumed").size());
-    Assert.assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
+    assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
 
     assertEquals(5, store.getVOMSServerInfo().size());
   }
@@ -57,13 +58,13 @@ public class TestVOMSServerInfoStore {
     assertEquals(3, store.getVOMSServerInfo("atlas").size());
     assertEquals(2, store.getVOMSServerInfo("eumed").size());
 
-    Assert.assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
+    assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
 
     Set<VOMSServerInfo> infos = store.getVOMSServerInfo("my-atlas");
 
-    Assert.assertFalse(infos.isEmpty());
+    assertFalse(infos.isEmpty());
 
-    Assert.assertEquals(2, infos.size());
+    assertEquals(2, infos.size());
 
   }
 
@@ -78,13 +79,13 @@ public class TestVOMSServerInfoStore {
 
     assertEquals(1, store.getVOMSServerInfo("atlas").size());
 
-    Assert.assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
+    assertTrue(store.getVOMSServerInfo("non-existing-vo").isEmpty());
 
     Set<VOMSServerInfo> infos = store.getVOMSServerInfo("a");
 
-    Assert.assertFalse(infos.isEmpty());
+    assertFalse(infos.isEmpty());
 
-    Assert.assertEquals(1, infos.size());
+    assertEquals(1, infos.size());
 
   }
 }

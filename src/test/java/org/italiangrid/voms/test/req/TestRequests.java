@@ -15,6 +15,11 @@
  */
 package org.italiangrid.voms.test.req;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -32,8 +37,7 @@ import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
 import org.italiangrid.voms.test.utils.EchoVOMSProtocol;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import eu.emi.security.authn.x509.X509Credential;
@@ -55,7 +59,7 @@ public class TestRequests implements Fixture {
     VOMSACValidator validator = Utils.getVOMSValidator();
     List<AttributeCertificate> acs = validator.validateACs(Arrays.asList(ac));
 
-    Assert.assertFalse(acs.isEmpty());
+    assertFalse(acs.isEmpty());
 
   }
 
@@ -73,13 +77,13 @@ public class TestRequests implements Fixture {
       acService.getVOMSAttributeCertificate(holder, req);
 
     } catch (VOMSError e) {
-      Assert.assertEquals(
+      assertEquals(
           "VOMS server for VO test.unknown.vo is not known! Check your vomses configuration.",
           e.getMessage());
       return;
     }
 
-    Assert.fail("No exceptions raised for unknown VO");
+    fail("No exceptions raised for unknown VO");
   }
 
   @Test
@@ -103,7 +107,7 @@ public class TestRequests implements Fixture {
     AttributeCertificate ac =
         acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
-    Assert.assertNull(ac);
+    assertNull(ac);
   }
 
   @Test
@@ -133,7 +137,7 @@ public class TestRequests implements Fixture {
     AttributeCertificate ac =
         acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
-    Assert.assertNull(ac);
+    assertNull(ac);
   }
 
   @Test
@@ -158,7 +162,7 @@ public class TestRequests implements Fixture {
       .doRequest(Mockito.any(VOMSServerInfo.class), Mockito.any(X509Credential.class),
           Mockito.any(VOMSACRequest.class));
 
-    Assert.assertNull(ac);
+    assertNull(ac);
   }
 
   @Test
@@ -179,9 +183,9 @@ public class TestRequests implements Fixture {
     AttributeCertificate ac =
         acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
-    Mockito.verifyZeroInteractions(fallBackProtocol);
+    Mockito.verifyNoInteractions(fallBackProtocol);
 
-    Assert.assertNull(ac);
+    assertNull(ac);
   }
 
   @Test
@@ -206,7 +210,7 @@ public class TestRequests implements Fixture {
       .doRequest(Mockito.any(VOMSServerInfo.class), Mockito.any(X509Credential.class),
           Mockito.any(VOMSACRequest.class));
 
-    Assert.assertNull(ac);
+    assertNull(ac);
   }
 
 }

@@ -15,8 +15,7 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,8 +35,9 @@ import org.italiangrid.voms.request.impl.ACGenerationParams;
 import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
 import org.italiangrid.voms.request.impl.FakeVOMSACService;
 import org.italiangrid.voms.util.NullListener;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 
 public class TestFakeVOMSACService extends TestACSupport {
 
@@ -48,7 +48,7 @@ public class TestFakeVOMSACService extends TestACSupport {
   public static final Date JAN_TEN_2010 = Date
     .from(LocalDate.parse("2010-01-10", DATE_FORMATTER).atStartOfDay().toInstant(ZoneOffset.UTC));
 
-  @BeforeClass
+  @BeforeAll
   public static void suiteInit()
       throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
     initializeCredentials();
@@ -65,19 +65,19 @@ public class TestFakeVOMSACService extends TestACSupport {
       .serialNo(189)
       .build();
 
-    FakeVOMSACService acService = FakeVOMSACService.newInstance(aaCredential, params, 
-        NullListener.INSTANCE);
+    FakeVOMSACService acService =
+        FakeVOMSACService.newInstance(aaCredential, params, NullListener.INSTANCE);
 
     VOMSACRequest req = new DefaultVOMSACRequest.Builder("test").build();
     AttributeCertificate ac = acService.getVOMSAttributeCertificate(holderCredential, req);
 
     VOMSAttribute attrs = VOMSACUtils.deserializeVOMSAttributes(ac);
 
-    assertThat(attrs.getVO(), equalTo("test"));
-    assertThat(attrs.getNotBefore(), equalTo(JAN_FIRST_2010));
-    assertThat(attrs.getNotAfter(), equalTo(JAN_TEN_2010));
-    assertThat(attrs.getPrimaryFQAN(), equalTo("/fake"));
-    assertThat(attrs.getVOMSAC().getSerialNumber(), equalTo(BigInteger.valueOf(189)));
+    assertEquals("test", attrs.getVO());
+    assertEquals(JAN_FIRST_2010, attrs.getNotBefore());
+    assertEquals(JAN_TEN_2010, attrs.getNotAfter());
+    assertEquals("/fake", attrs.getPrimaryFQAN());
+    assertEquals(BigInteger.valueOf(189), attrs.getVOMSAC().getSerialNumber());
   }
 
 }
