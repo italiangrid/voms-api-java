@@ -32,9 +32,7 @@ pipeline {
 
       post {
         always {
-          container('runner') {
-            junit '**/target/surefire-reports/TEST-*.xml'
-          }
+          junit '**/target/surefire-reports/TEST-*.xml'
         }
       }
     }
@@ -45,19 +43,5 @@ pipeline {
       }
     }
 
-  }
-
-  post {
-    success {
-      slackSend channel: "#voms", color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Success (<${env.BUILD_URL}|Open>)" 
-    }
-
-    unstable {
-      slackSend channel: "#voms", color: 'danger', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Unstable (<${env.BUILD_URL}|Open>)" 
-    }
-
-    failure {
-      slackSend channel: "#voms", color: 'danger', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Failure (<${env.BUILD_URL}|Open>)" 
-    }
   }
 }
