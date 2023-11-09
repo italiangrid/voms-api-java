@@ -1,17 +1,6 @@
-#!/usr/bin/env groovy
-@Library('sd')_
-def kubeLabel = getKubeLabel()
-
 pipeline {
 
-  agent {
-      kubernetes {
-          label "${kubeLabel}"
-          cloud 'Kube mwdevel'
-          defaultContainer 'runner'
-          inheritFrom 'ci-template'
-      }
-  }
+  agent { label 'java17' }
 
   options {
     ansiColor('xterm')
@@ -52,7 +41,7 @@ pipeline {
 
     stage('deploy') {
       steps {
-        sh 'mvn -B deploy' 
+        sh 'mvn -B deploy'
       }
     }
 
