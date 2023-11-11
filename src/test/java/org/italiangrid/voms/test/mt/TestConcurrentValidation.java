@@ -179,7 +179,6 @@ public class TestConcurrentValidation {
       pool.execute(new ValidatorWorker());
 
     barrier.await();
-    barrier.await();
 
     pool.shutdown();
     sharedVOMSTrustStore.cancel();
