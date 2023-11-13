@@ -113,18 +113,18 @@ public class TestACGenerationParams {
   public void testGaParsing() {
     System.setProperty(GAS.getPropertyName(), "one = uno, two = due, three = tre");
     ACGenerationParams params = ACGenerationParams.fromSystemProperties();
-    assertEquals(params.getGas(), hasSize(3));
-    assertEquals(params.getGas().get(0).getName(), is("one"));
-    assertEquals(params.getGas().get(0).getValue(), is("uno"));
-    assertEquals(params.getGas().get(0).getContext(), is("test"));
+    assertEquals(3, params.getGas().size());
+    assertEquals("one", params.getGas().get(0).getName());
+    assertEquals("uno", params.getGas().get(0).getValue());
+    assertEquals("test", params.getGas().get(0).getContext());
     
-    assertEquals(params.getGas().get(1).getName(), is("two"));
-    assertEquals(params.getGas().get(1).getValue(), is("due"));
-    assertEquals(params.getGas().get(1).getContext(), is("test"));
+    assertEquals("two", params.getGas().get(1).getName());
+    assertEquals("due", params.getGas().get(1).getValue());
+    assertEquals("test", params.getGas().get(1).getContext());
 
-    assertEquals(params.getGas().get(2).getName(), is("three"));
-    assertEquals(params.getGas().get(2).getValue(), is("tre"));
-    assertEquals(params.getGas().get(2).getContext(), is("test"));
+    assertEquals("three", params.getGas().get(2).getName());
+    assertEquals("tre", params.getGas().get(2).getValue());
+    assertEquals("test", params.getGas().get(2).getContext());
   }
 
 
