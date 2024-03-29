@@ -16,15 +16,19 @@
 package org.italiangrid.voms.util;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Set;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.CertificateHelpers;
@@ -206,11 +210,13 @@ public class CredentialsUtils {
   public static void saveProxyCredentials(String proxyFileName,
     X509Credential uc, PrivateKeyEncoding encoding) 
       throws IOException {
+    
+    Set<java.nio.file.attribute.PosixFilePermission> ownerWritable = PosixFilePermissions.fromString("rw-------");
+    FileAttribute<?> permissions = PosixFilePermissions.asFileAttribute(ownerWritable);
+    Path p = Files.createFile(Path.of(proxyFileName), permissions);
 
-    File f = new File(proxyFileName);
-    RandomAccessFile raf = new RandomAccessFile(f, "rws");
+    RandomAccessFile raf = new RandomAccessFile(p.toFile(), "rws");
     FileChannel channel = raf.getChannel();
-    FilePermissionHelper.setProxyPermissions(proxyFileName);
     channel.truncate(0);
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
