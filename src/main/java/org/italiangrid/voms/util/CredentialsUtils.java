@@ -16,7 +16,7 @@
 package org.italiangrid.voms.util;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
-import static java.nio.file.StandardOpenOption.SYNC;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,6 +27,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.security.PrivateKey;
@@ -211,17 +212,18 @@ public class CredentialsUtils {
    * @throws IOException
    *          in case of errors writing to the proxy file
    */
-  public static void saveProxyCredentials(String proxyFileName,
-    X509Credential uc, PrivateKeyEncoding encoding) 
-      throws IOException {
+  public static void saveProxyCredentials(String proxyFileName, X509Credential uc,
+      PrivateKeyEncoding encoding) throws IOException {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     saveProxyCredentials(baos, uc, encoding);
     baos.close();
     ByteBuffer proxyBuffer = ByteBuffer.wrap(baos.toByteArray());
 
-    Set<java.nio.file.attribute.PosixFilePermission> ownerWritable = PosixFilePermissions.fromString("rw-------");
+    Set<java.nio.file.attribute.PosixFilePermission> ownerWritable =
+        PosixFilePermissions.fromString("rw-------");
     FileAttribute<?> permissions = PosixFilePermissions.asFileAttribute(ownerWritable);
+    Set<StandardOpenOption> options = Set.of(CREATE_NEW, WRITE);
     Path proxyFilePath = Path.of(proxyFileName);
 
     try {
@@ -229,7 +231,7 @@ public class CredentialsUtils {
     } catch (NoSuchFileException e) {
       // ignore
     }
-    try (FileChannel fc = FileChannel.open(proxyFilePath, Set.of(CREATE_NEW, SYNC), permissions)) {
+    try (FileChannel fc = FileChannel.open(proxyFilePath, options, permissions)) {
       fc.write(proxyBuffer);
     } catch (FileAlreadyExistsException e) {
       throw new IOException("Cannot create proxy file safely");
