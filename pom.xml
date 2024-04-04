@@ -46,6 +46,7 @@
     <mockito.version>1.9.5</mockito.version>
     <jcip.version>1.0</jcip.version>
     <bc.version>1.58</bc.version>
+    <guava.version>33.1.0-jre</guava.version>
 
     <!-- properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -249,17 +250,23 @@
       <artifactId>canl</artifactId>
       <version>${canl.version}</version>
     </dependency>
-    
+
     <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcpkix-jdk15on</artifactId>
         <version>${bc.version}</version>
     </dependency>
-    
-        <dependency>
+
+    <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk15on</artifactId>
         <version>${bc.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
 
     <dependency>

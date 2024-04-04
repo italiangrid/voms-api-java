@@ -27,13 +27,17 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.CertificateHelpers;
@@ -218,13 +222,12 @@ public class CredentialsUtils {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     saveProxyCredentials(baos, uc, encoding);
     baos.close();
-    ByteBuffer proxyBuffer = ByteBuffer.wrap(baos.toByteArray());
 
-    Set<java.nio.file.attribute.PosixFilePermission> ownerWritable =
-        PosixFilePermissions.fromString("rw-------");
-    FileAttribute<?> permissions = PosixFilePermissions.asFileAttribute(ownerWritable);
-    Set<StandardOpenOption> options = Set.of(CREATE_NEW, WRITE);
-    Path proxyFilePath = Path.of(proxyFileName);
+    final ByteBuffer proxyBuffer = ByteBuffer.wrap(baos.toByteArray());
+    final Path proxyFilePath = Paths.get(proxyFileName);
+    final FileAttribute<Set<PosixFilePermission>> permissions =
+        PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------"));
+    final Set<StandardOpenOption> options = Sets.newHashSet(CREATE_NEW, WRITE);
 
     try {
       Files.delete(proxyFilePath);
