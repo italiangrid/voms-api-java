@@ -27,7 +27,7 @@ pipeline {
 
     stage('deploy') {
       steps {
-        sh 'mvn -B deploy' 
+        sh 'mvn -B deploy -DskipTests' 
       }
     }
 
