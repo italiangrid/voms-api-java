@@ -1,17 +1,6 @@
-#!/usr/bin/env groovy
-@Library('sd')_
-def kubeLabel = getKubeLabel()
-
 pipeline {
 
-  agent {
-      kubernetes {
-          label "${kubeLabel}"
-          cloud 'Kube mwdevel'
-          defaultContainer 'runner'
-          inheritFrom 'ci-template'
-      }
-  }
+  agent { label 'java11' }
 
   options {
     ansiColor('xterm')
@@ -56,19 +45,5 @@ pipeline {
       }
     }
 
-  }
-
-  post {
-    success {
-      slackSend channel: "#voms", color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Success (<${env.BUILD_URL}|Open>)" 
-    }
-
-    unstable {
-      slackSend channel: "#voms", color: 'danger', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Unstable (<${env.BUILD_URL}|Open>)" 
-    }
-
-    failure {
-      slackSend channel: "#voms", color: 'danger', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Failure (<${env.BUILD_URL}|Open>)" 
-    }
   }
 }
