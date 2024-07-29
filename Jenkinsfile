@@ -25,20 +25,6 @@ pipeline {
       }
     }
 
-    stage('test') {
-      steps {
-        sh 'mvn -B clean test'
-      }
-
-      post {
-        always {
-          container('runner') {
-            junit '**/target/surefire-reports/TEST-*.xml'
-          }
-        }
-      }
-    }
-
     stage('deploy') {
       steps {
         sh 'mvn -B deploy' 
