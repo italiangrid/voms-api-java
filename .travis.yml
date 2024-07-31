@@ -9,6 +9,11 @@ jdk:
 os:
 - linux
 
+addons:
+  # Fix OpenJDK builds
+  # https://github.com/travis-ci/travis-ci/issues/5227
+  hostname: localhost
+
 cache:
   directories:
   - "$HOME/.m2/repository"
