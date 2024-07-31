@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -31,24 +30,22 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DLSequence;
 import org.bouncycastle.asn1.x509.Attribute;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.IetfAttrSyntax;
 import org.bouncycastle.asn1.x509.Target;
 import org.bouncycastle.asn1.x509.TargetInformation;
 import org.bouncycastle.asn1.x509.Targets;
-import org.bouncycastle.asn1.x509.X509CertificateStructure;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.provider.X509CertificateObject;
+import org.bouncycastle.jcajce.provider.asymmetric.x509.CertificateFactory;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSGenericAttribute;
@@ -87,7 +84,7 @@ public class VOMSACUtils implements VOMSConstants {
    * @return the possibly empty {@link List} of {@link AttributeCertificate}
    *         extracted from a given extension
    * @throws IOException
-   *          in case of deserialization errors
+   *           in case of deserialization errors
    */
   public static List<AttributeCertificate> getACsFromVOMSExtension(
     byte[] vomsExtension) throws IOException {
@@ -126,8 +123,8 @@ public class VOMSACUtils implements VOMSConstants {
 
       while (theACs.hasMoreElements()) {
 
-        AttributeCertificate parsedAC = new AttributeCertificate(
-          theACs.nextElement());
+        AttributeCertificate parsedAC = 
+          AttributeCertificate.getInstance(theACs.nextElement());
         acs.add(parsedAC);
       }
     }
@@ -181,8 +178,7 @@ public class VOMSACUtils implements VOMSConstants {
 
     List<String> targets = new ArrayList<String>();
 
-    X509Extension targetExtension = ac
-      .getExtension(X509Extension.targetInformation);
+    Extension targetExtension = ac.getExtension(Extension.targetInformation);
 
     if (targetExtension == null)
       return targets;
@@ -196,7 +192,8 @@ public class VOMSACUtils implements VOMSConstants {
     // The deserialization has to be done by hand since it seems VOMS
     // does not correctly encode the ACTargets extension...
     ASN1Sequence targetSequence = (ASN1Sequence) asn1TargetContainer
-      .getDERObject();
+      .toASN1Primitive();
+
     Target[] asn1Targets = new Target[targetSequence.size()];
 
     int count = 0;
@@ -294,9 +291,11 @@ public class VOMSACUtils implements VOMSConstants {
     Attribute[] asn1Attrs = acHolder.getAttributes(VOMS_FQANS_OID);
 
     for (Attribute a : asn1Attrs) {
-      DERObject theVOMSDerObject = a.getAttributeValues()[0].getDERObject();
-      IetfAttrSyntax attrSyntax = new IetfAttrSyntax(
-        ASN1Sequence.getInstance(theVOMSDerObject));
+      ASN1Primitive theVOMSDerObject = a.getAttributeValues()[0]
+        .toASN1Primitive();
+
+      IetfAttrSyntax attrSyntax = IetfAttrSyntax.getInstance(ASN1Sequence
+        .getInstance(theVOMSDerObject));
 
       String policyAuthority = policyAuthoritySanityChecks(attrSyntax);
 
@@ -353,7 +352,7 @@ public class VOMSACUtils implements VOMSConstants {
 
     List<VOMSGenericAttribute> gas = new ArrayList<VOMSGenericAttribute>();
 
-    X509Extension gasExtension = ac.getExtension(VOMS_GENERIC_ATTRS_OID);
+    Extension gasExtension = ac.getExtension(VOMS_GENERIC_ATTRS_OID);
 
     if (gasExtension == null)
       return gas;
@@ -418,46 +417,35 @@ public class VOMSACUtils implements VOMSConstants {
     X509AttributeCertificateHolder ac) {
 
     List<X509Certificate> certs = new ArrayList<X509Certificate>();
+    
+    Extension e = ac.getExtension(VOMS_CERTS_OID);
 
-    X509Extension e = ac.getExtension(VOMS_CERTS_OID);
-
-    if (e == null)
+    if (e == null) {
       return null;
-
+    }
+    
     ASN1Sequence certSeq = (ASN1Sequence) e.getParsedValue();
-    if (certSeq.size() != 1)
+    
+    if (certSeq.size() != 1) {
       raiseACNonConformantError("unsupported accerts format.");
-
+    }
     // Down one level
     certSeq = (ASN1Sequence) certSeq.getObjectAt(0);
 
     @SuppressWarnings("unchecked")
-    Enumeration<DERSequence> encodedCerts = certSeq.getObjects();
-
-    CertificateFactory cf = null;
-
-    try {
-      cf = CertificateFactory.getInstance("X.509",
-        BouncyCastleProvider.PROVIDER_NAME);
-    } catch (Exception ex) {
-      throw new VOMSError("Certificate factory creation error: "
-        + ex.getMessage(), ex);
-    }
+    Enumeration<DLSequence> encodedCerts = certSeq.getObjects();
+    
+    CertificateFactory cf = new CertificateFactory();
 
     while (encodedCerts.hasMoreElements()) {
 
-      DERSequence s = encodedCerts.nextElement();
-      X509CertificateObject certObj = null;
-      byte[] certData = null;
-      X509Certificate theCert = null;
-
+      DLSequence s = encodedCerts.nextElement();
+      
+      X509Certificate theCert;
+      
       try {
-
-        certObj = new X509CertificateObject(
-          X509CertificateStructure.getInstance(ASN1Sequence.getInstance(s)));
-        certData = certObj.getEncoded();
-        theCert = (X509Certificate) cf
-          .generateCertificate(new ByteArrayInputStream(certData));
+        ASN1InputStream stream = new ASN1InputStream(s.getEncoded());
+        theCert = (X509Certificate) cf.engineGenerateCertificate(stream);
 
       } catch (CertificateParsingException ex) {
         throw new VOMSError("Certificate parsing error: " + ex.getMessage(), ex);
@@ -467,6 +455,9 @@ public class VOMSACUtils implements VOMSConstants {
       } catch (CertificateException ex) {
         throw new VOMSError("Error generating certificate from parsed data: "
           + ex.getMessage(), ex);
+      } catch (IOException ex) {
+        throw new VOMSError("Certficate parsing error : "+ex.getMessage(), 
+            ex);
       }
 
       certs.add(theCert);

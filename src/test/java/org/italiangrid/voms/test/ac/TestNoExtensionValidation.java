@@ -36,39 +36,36 @@ import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 import eu.emi.security.authn.x509.proxy.ProxyCertificateOptions;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyType;
+import java.io.IOException;
 
-public class TestNoExtensionValidation implements Fixture {
+public class TestNoExtensionValidation implements Fixture{
 
-  PEMCredential cred;
+	PEMCredential cred;
 
-  @Before
-  public void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
+		cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
+	}
 
-    cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
-  }
+	@After
+	public void tearDown() throws Exception {
+		cred = null;
+	}
 
-  @After
-  public void tearDown() throws Exception {
+	@Test
+	public void testNoExtensionValidation() throws InvalidKeyException, CertificateParsingException,
+                SignatureException, NoSuchAlgorithmException, IOException {
 
-    cred = null;
-  }
+                ProxyCertificateOptions options = new ProxyCertificateOptions(cred.getCertificateChain());
+		options.setType(ProxyType.LEGACY);
 
-  @Test
-  public void testNoExtensionValidation() throws InvalidKeyException,
-    CertificateParsingException, SignatureException, NoSuchAlgorithmException {
+		ProxyCertificate proxy = ProxyGenerator.generate(options, cred.getKey());
 
-    ProxyCertificateOptions options = new ProxyCertificateOptions(
-      cred.getCertificateChain());
-    options.setType(ProxyType.LEGACY);
+		VOMSACValidator validator = Utils.getVOMSValidator();
+		List<VOMSAttribute> attrs = validator.validate(proxy.getCertificateChain());
 
-    ProxyCertificate proxy = ProxyGenerator.generate(options, cred.getKey());
+		Assert.assertNotNull(attrs);
+		Assert.assertTrue(attrs.isEmpty());
 
-    VOMSACValidator validator = Utils.getVOMSValidator();
-    List<VOMSAttribute> attrs = validator.validate(proxy.getCertificateChain());
-
-    Assert.assertNotNull(attrs);
-    Assert.assertTrue(attrs.isEmpty());
-
-  }
-
+	}
 }

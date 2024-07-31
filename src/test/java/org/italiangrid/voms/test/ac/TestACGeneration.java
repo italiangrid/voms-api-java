@@ -143,7 +143,7 @@ public class TestACGeneration {
 
     expiredCertCRLErrorMessage = newErrorMessage(
       canlError,
-      "CRL for an expired certificate was not resolved Cause: No CRLs found for issuer \"CN=Test CA, O=IGI, C=IT\"");
+      "CRL for an expired certificate was not resolved Cause: No CRLs found for issuer \"cn=Test CA,o=IGI,c=IT\"");
 
     final Date revocationDate = new Date(1348673124000L);
 

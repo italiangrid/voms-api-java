@@ -27,7 +27,7 @@ import org.italiangrid.voms.VOMSAttribute;
 public interface ValidationResultListener {
 
   /**
-   * Informs of the result of the validation of a set of {@link VOMSAttribute}.
+   * Informs of the result of the validation of a set of {@link VOMSAttribute}
    * 
    * @param result
    *          the validation result

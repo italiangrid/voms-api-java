@@ -15,7 +15,7 @@
  */
 package org.italiangrid.voms.credential;
 
-import org.bouncycastle.openssl.PasswordFinder;
+import eu.emi.security.authn.x509.helpers.PasswordSupplier;
 import org.italiangrid.voms.credential.impl.DefaultLoadCredentialsStrategy;
 
 import eu.emi.security.authn.x509.X509Credential;
@@ -43,7 +43,7 @@ public class UserCredentials {
 
   public static X509Credential loadCredentials(final char[] keyPassword) {
 
-    PasswordFinder pf = new PasswordFinder() {
+    PasswordSupplier pf = new PasswordSupplier() {
 
       public char[] getPassword() {
 
@@ -54,7 +54,7 @@ public class UserCredentials {
     return loadCredentialsStrategy.loadCredentials(pf);
   }
 
-  public static X509Credential loadCredentials(PasswordFinder passwordFinder) {
+  public static X509Credential loadCredentials(PasswordSupplier passwordFinder) {
 
     return loadCredentialsStrategy.loadCredentials(passwordFinder);
   }

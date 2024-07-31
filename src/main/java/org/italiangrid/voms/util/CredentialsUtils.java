@@ -15,16 +15,29 @@
  */
 package org.italiangrid.voms.util;
 
+import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import static java.nio.file.StandardOpenOption.WRITE;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.CertificateHelpers;
@@ -203,24 +216,29 @@ public class CredentialsUtils {
    * @throws IOException
    *          in case of errors writing to the proxy file
    */
-  public static void saveProxyCredentials(String proxyFileName,
-    X509Credential uc, PrivateKeyEncoding encoding) 
-      throws IOException {
-
-    File f = new File(proxyFileName);
-    RandomAccessFile raf = new RandomAccessFile(f, "rws");
-    FileChannel channel = raf.getChannel();
-    FilePermissionHelper.setProxyPermissions(proxyFileName);
-    channel.truncate(0);
+  public static void saveProxyCredentials(String proxyFileName, X509Credential uc,
+      PrivateKeyEncoding encoding) throws IOException {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     saveProxyCredentials(baos, uc, encoding);
-
     baos.close();
-    channel.write(ByteBuffer.wrap(baos.toByteArray()));
 
-    channel.close();
-    raf.close();
+    final ByteBuffer proxyBuffer = ByteBuffer.wrap(baos.toByteArray());
+    final Path proxyFilePath = Paths.get(proxyFileName);
+    final FileAttribute<Set<PosixFilePermission>> permissions =
+        PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------"));
+    final Set<StandardOpenOption> options = Sets.newHashSet(CREATE_NEW, WRITE);
+
+    try {
+      Files.delete(proxyFilePath);
+    } catch (NoSuchFileException e) {
+      // ignore
+    }
+    try (FileChannel fc = FileChannel.open(proxyFilePath, options, permissions)) {
+      fc.write(proxyBuffer);
+    } catch (FileAlreadyExistsException e) {
+      throw new IOException("Cannot create proxy file safely");
+    }
   }
 
   /**

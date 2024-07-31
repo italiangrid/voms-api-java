@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/italiangrid/voms-api-java.svg)](https://travis-ci.org/italiangrid/voms-api-java)
 
-Java binding for the Virtual Organization Membership Service (VOMS) API.
+Java client APIs for the Virtual Organization Membership Service (VOMS).
 
 The VOMS API can be used for 
 - validating attribute certifcates (ACs) inside a proxy and reading the attributes (VOSM FQANs or VOMS generic attributes)
@@ -248,7 +248,7 @@ validator.shutdown();
 
 More details on the new APIs can be found in the [Javadoc](http://italiangrid.github.com/voms-api-java/javadocs/3.x/index.html).
 
-## Licence
+## License
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this project except in compliance with the License. You may obtain a copy of

@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.Extension;
 
 /**
  * A set of useful constants for ASN.1 parsing of VOMS attributes.
@@ -56,7 +56,7 @@ public interface VOMSConstants {
 
   public final Set<ASN1ObjectIdentifier> VOMS_HANDLED_EXTENSIONS = new HashSet<ASN1ObjectIdentifier>(
     Arrays.asList(VOMS_FQANS_OID, VOMS_CERTS_OID, VOMS_GENERIC_ATTRS_OID,
-      X509Extension.targetInformation, X509Extension.noRevAvail,
-      X509Extension.authorityKeyIdentifier));
+      Extension.targetInformation, Extension.noRevAvail,
+      Extension.authorityKeyIdentifier));
 
 }

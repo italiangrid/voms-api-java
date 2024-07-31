@@ -15,6 +15,12 @@
  */
 package org.italiangrid.voms.util;
 
+import static java.util.Objects.isNull;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -26,35 +32,31 @@ import java.util.Date;
  */
 public class TimeUtils {
 
+  public static final DateTimeFormatter DATE_FORMATTER =
+      DateTimeFormatter.ISO_DATE_TIME.withResolverStyle(ResolverStyle.LENIENT);
+
   private TimeUtils() {
 
   }
 
   /**
-   * Checks that a date falls in the interval allowing for a certain clock skew
-   * expressed in minutes. The interval defined by (startDate, endDate) is
-   * modified to be (startDate - skewInMinutes, endDate + skewInMinutes).
+   * Checks that a date falls in the interval allowing for a certain clock skew expressed in
+   * minutes. The interval defined by (startDate, endDate) is modified to be (startDate -
+   * skewInMinutes, endDate + skewInMinutes).
    * 
-   * @param timeToCheck
-   *          the time to be checked
-   * @param startDate
-   *          the start date of the time range
-   * @param endDate
-   *          the end date of the time range
-   * @param skewInMinutes
-   *          the clock skew in minutes to take into account
+   * @param timeToCheck the time to be checked
+   * @param startDate the start date of the time range
+   * @param endDate the end date of the time range
+   * @param skewInMinutes the clock skew in minutes to take into account
    * 
-   * @throws IllegalArgumentException
-   *           if passed an illegal time range
-   * @return <code>true</code>, if the time is in the given range,
-   *         <code>false</code> otherwise
+   * @throws IllegalArgumentException if passed an illegal time range
+   * @return <code>true</code>, if the time is in the given range, <code>false</code> otherwise
    */
-  public static boolean checkTimeInRangeWithSkew(Date timeToCheck,
-    Date startDate, Date endDate, int skewInMinutes) {
+  public static boolean checkTimeInRangeWithSkew(Date timeToCheck, Date startDate, Date endDate,
+      int skewInMinutes) {
 
     if (startDate.after(endDate) || startDate.equals(endDate)) {
-      String msg = String
-        .format(
+      String msg = String.format(
           "Illegal time interval: start date must be before end date. [start date: %s, end date: %s]",
           startDate, endDate);
       throw new IllegalArgumentException(msg);
@@ -72,9 +74,26 @@ public class TimeUtils {
 
     Date skewedEndDate = cal.getTime();
 
-    return skewedEndDate.after(timeToCheck)
-      && skewedStartDate.before(timeToCheck);
+    return skewedEndDate.after(timeToCheck) && skewedStartDate.before(timeToCheck);
 
+  }
+
+
+  /**
+   * Parses a date from string
+   * 
+   * @param date the date string representation;
+   * @return the parsed date
+   * @throws NullPointerException if date is null
+   * @throws java.time.format.DateTimeParseException if the date is in the wrong format
+   */
+  public static Date parseDate(String date) {
+    if (isNull(date)) {
+      throw new NullPointerException("Cannot parse a null date");
+    }
+
+    LocalDateTime dateTime = LocalDateTime.parse(date, DATE_FORMATTER);
+    return Date.from(dateTime.atZone(ZoneOffset.UTC).toInstant());
   }
 
 }

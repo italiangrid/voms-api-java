@@ -51,8 +51,9 @@ public class Utils implements Fixture {
 
   }
 
+
   public static VOMSACService buildACService(VOMSProtocol main,
-    VOMSProtocol fallback) throws Exception {
+      VOMSProtocol fallback, boolean legacyProtocolEnabled) throws Exception {
 
     VOMSServerInfoStore store = Mockito.mock(VOMSServerInfoStore.class);
 
@@ -65,10 +66,17 @@ public class Utils implements Fixture {
     DefaultVOMSACService acService = new DefaultVOMSACService.Builder(
       getCertificateValidator()).serverInfoStore(store)
       .requestListener(LogListener.INSTANCE).httpProtocol(main)
-      .legacyProtocol(fallback).build();
+          .legacyProtocol(fallback)
+          .legacyProtocolEnabled(legacyProtocolEnabled)
+          .build();
 
     return acService;
 
+  }
+
+  public static VOMSACService buildACService(VOMSProtocol main, VOMSProtocol fallback)
+      throws Exception {
+    return buildACService(main, fallback, true);
   }
 
   public static VOMSACService buildACService(VOMSProtocol protocol)

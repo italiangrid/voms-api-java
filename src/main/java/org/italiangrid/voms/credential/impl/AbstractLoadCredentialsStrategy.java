@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import org.bouncycastle.openssl.PasswordFinder;
+import eu.emi.security.authn.x509.helpers.PasswordSupplier;
 import org.italiangrid.voms.credential.LoadCredentialsEventListener;
 import org.italiangrid.voms.credential.LoadCredentialsStrategy;
 import org.italiangrid.voms.credential.VOMSEnvironmentVariables;
@@ -83,13 +83,13 @@ public abstract class AbstractLoadCredentialsStrategy implements
    * @param certificatePath
    *          the path to the certificate
    * @param pf
-   *          a {@link PasswordFinder} used to resolve the private key password
+   *          a {@link PasswordSupplier} used to resolve the private key password
    *          when needed
    * @return the loaded {@link X509Credential}, or <code>null</code> if the
    *         credential couldn't be loaded
    */
   protected X509Credential loadPEMCredential(String privateKeyPath,
-    String certificatePath, PasswordFinder pf) {
+    String certificatePath, PasswordSupplier pf) {
 
     PEMCredential cred = null;
 
@@ -120,12 +120,12 @@ public abstract class AbstractLoadCredentialsStrategy implements
    * @param pkcs12FilePath
    *          the path to the pkcs12 credential
    * @param pf
-   *          a {@link PasswordFinder} used to resolve the private key password
+   *          a {@link PasswordSupplier} used to resolve the private key password
    * @return the loaded {@link X509Credential}, or <code>null</code> if the
    *         credential couldn't be loaded
    */
   protected X509Credential loadPKCS12Credential(String pkcs12FilePath,
-    PasswordFinder pf) {
+    PasswordSupplier pf) {
 
     KeystoreCredential cred = null;
 

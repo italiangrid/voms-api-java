@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.italiangrid.voms.VOMSError;
 
+
 /**
  * A VOMSES file parser.
  * 
