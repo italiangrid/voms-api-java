@@ -35,9 +35,9 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-
-import com.google.common.collect.Sets;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.CertificateHelpers;
@@ -227,7 +227,8 @@ public class CredentialsUtils {
     final Path proxyFilePath = Paths.get(proxyFileName);
     final FileAttribute<Set<PosixFilePermission>> permissions =
         PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------"));
-    final Set<StandardOpenOption> options = Sets.newHashSet(CREATE_NEW, WRITE);
+    final Set<StandardOpenOption> options = new HashSet<>();
+    Collections.addAll(options, CREATE_NEW, WRITE);
 
     try {
       Files.delete(proxyFilePath);
