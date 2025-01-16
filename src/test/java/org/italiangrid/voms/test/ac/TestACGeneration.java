@@ -276,7 +276,7 @@ public class TestACGeneration {
       certValidator, c);
 
     AttributeCertificate ac = createAC(expiredCredential,
-      Arrays.asList("/test.vo.1"), defaultGAs, defaultVO,
+      Arrays.asList("/test.vo"), defaultGAs, defaultVO,
       "test-expired.cnaf.infn.it");
 
     List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays
@@ -294,7 +294,7 @@ public class TestACGeneration {
     VOMSACValidator validator = VOMSValidators.newValidator(trustStore,
       certValidator, c);
     AttributeCertificate ac = createAC(revokedCredential,
-      Arrays.asList("/test.vo.1"), defaultGAs, defaultVO,
+      Arrays.asList("/test.vo"), defaultGAs, defaultVO,
       "test-revoked.cnaf.infn.it");
     List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays
       .asList(ac));
