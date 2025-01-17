@@ -178,10 +178,7 @@ public class TestACValidator implements Fixture {
     VOMSAA aa = Utils.getVOMSAA();
     aa.setGenerationProperties(EnumSet.of(ACGenerationProperties.INCLUDE_EMPTY_AC_CERTS_EXTENSION));
 
-    VOMSACValidator validator = Utils.getVOMSValidator();
-
-    ProxyCertificate proxy =
-        aa.createVOMSProxy(Utils.getTestUserCredential(), Arrays.asList("/test.vo"));
+    ProxyCertificate proxy = aa.createVOMSProxy(holder, defaultVOFqans);
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
 
