@@ -1,0 +1,49 @@
+name: Maven build
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 11
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: 11
+
+    - name: Install libfaketime on Ubuntu
+      run: |
+        sudo apt update
+        sudo apt install -y faketime
+
+    - name: Clone remote repository
+      run: |
+        git clone https://baltig.infn.it/mw-devel/helper-scripts.git $GITHUB_WORKSPACE/helper-scripts
+        echo "Repo cloned to $GITHUB_WORKSPACE/helper-scripts"
+    - name: Add to PATH
+      run: |
+        echo "$GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts" >> $GITHUB_PATH
+        echo "Updated PATH with $GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts"
+    - name: Verify PATH
+      run: |
+        echo "Current PATH: $PATH"
+        ls -la $GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts
+
+    - name: Create CA files
+      run: |
+        echo "Create CA files ..."
+        cd src/test/resources
+        ./setup.sh || { echo "setup.sh failed"; exit 1; }
+        cd ../../../
+
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Build with Maven
+      run: mvn -B clean package
