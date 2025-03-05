@@ -15,13 +15,11 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.GAS;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_AFTER;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_BEFORE;
-import static org.junit.Assert.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -105,18 +103,18 @@ public class TestACGenerationParams {
   public void testGaParsing() {
     System.setProperty(GAS.getPropertyName(), "one = uno, two = due, three = tre");
     ACGenerationParams params = ACGenerationParams.fromSystemProperties();
-    assertThat(params.getGas(), hasSize(3));
-    assertThat(params.getGas().get(0).getName(), is("one"));
-    assertThat(params.getGas().get(0).getValue(), is("uno"));
-    assertThat(params.getGas().get(0).getContext(), is("test"));
+    assertThat(params.getGas().size(), equalTo(3));
+    assertThat(params.getGas().get(0).getName(), equalTo("one"));
+    assertThat(params.getGas().get(0).getValue(), equalTo("uno"));
+    assertThat(params.getGas().get(0).getContext(), equalTo("test"));
     
-    assertThat(params.getGas().get(1).getName(), is("two"));
-    assertThat(params.getGas().get(1).getValue(), is("due"));
-    assertThat(params.getGas().get(1).getContext(), is("test"));
+    assertThat(params.getGas().get(1).getName(), equalTo("two"));
+    assertThat(params.getGas().get(1).getValue(), equalTo("due"));
+    assertThat(params.getGas().get(1).getContext(), equalTo("test"));
 
-    assertThat(params.getGas().get(2).getName(), is("three"));
-    assertThat(params.getGas().get(2).getValue(), is("tre"));
-    assertThat(params.getGas().get(2).getContext(), is("test"));
+    assertThat(params.getGas().get(2).getName(), equalTo("three"));
+    assertThat(params.getGas().get(2).getValue(), equalTo("tre"));
+    assertThat(params.getGas().get(2).getContext(), equalTo("test"));
   }
 
 

@@ -9,14 +9,12 @@
 
   <name>voms-api-java</name>
   <description>Java APIs to validate and request VOMS attribute certificates</description>
-
   <url>https://github.com/italiangrid/voms-api-java</url>
 
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
     </license>
   </licenses>
 
@@ -28,25 +26,28 @@
 
   <properties>
     <!-- versions -->
-    <plugin.compiler.version>3.1</plugin.compiler.version>
+    <plugin.enforcer.version>3.5.0</plugin.enforcer.version>
+    <plugin.versions.version>2.16.1</plugin.versions.version>
+    <plugin.compiler.version>3.13.0</plugin.compiler.version>
     <plugin.license.version>1.9.0</plugin.license.version>
-    <plugin.release.version>2.2.2</plugin.release.version>
+    <plugin.release.version>3.1.1</plugin.release.version>
     <plugin.source.version>2.2.1</plugin.source.version>
-    <plugin.assembly.version>2.4.1</plugin.assembly.version>
-    <plugin.deploy.version>2.8.2</plugin.deploy.version>
-    <plugin.jar.version>2.5</plugin.jar.version>
+    <plugin.assembly.version>3.7.1</plugin.assembly.version>
+    <plugin.jar.version>3.4.2</plugin.jar.version>
     <plugin.javadoc.version>2.9.1</plugin.javadoc.version>
-    <plugin.cobertura.version>2.5.2</plugin.cobertura.version>
-    <plugin.gpg.version>1.5</plugin.gpg.version>
-    <plugin.central-publishing.version>0.6.0</plugin.central-publishing.version>
+    <plugin.cobertura.version>2.7</plugin.cobertura.version>
+    <plugin.gpg.version>3.2.5</plugin.gpg.version>
+    <plugin.central-publishing.version>0.7.0</plugin.central-publishing.version>
     <plugin.maven-gpg.version>3.2.7</plugin.maven-gpg.version>
 
-    <junit.version>4.11</junit.version>
+    <junit.version>4.13.2</junit.version>
     <hamcrest.version>1.3</hamcrest.version>
-    <canl.version>2.6.0</canl.version>
-    <mockito.version>1.9.5</mockito.version>
+    <canl.version>2.7.0</canl.version>
+    <mockito.version>5.16.0</mockito.version>
     <jcip.version>1.0</jcip.version>
-    <bc.version>1.58</bc.version>
+    <bc.version>1.69</bc.version>
+
+    <maven.compiler.release>17</maven.compiler.release>
 
     <!-- properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,27 +61,27 @@
 
   <developers>
     <developer>
-      <id>andreac</id>
-      <name>Andrea Ceccanti</name>
-      <email>andrea.ceccanti@cnaf.infn.it</email>
+      <id>vianello</id>
+      <name>Enrico Vianello</name>
+      <email>enrico.vianello@cnaf.infn.it</email>
       <organization>INFN CNAF</organization>
       <roles>
         <role>Developer</role>
       </roles>
     </developer>
     <developer>
-      <id>vventuri</id>
-      <name>Valerio Venturi</name>
-      <email>valerio.venturi@cnaf.infn.it</email>
+      <id>giaco</id>
+      <name>Francesco Giacomini</name>
+      <email>francesco.giacomini@cnaf.infn.it</email>
       <organization>INFN CNAF</organization>
       <roles>
         <role>Developer</role>
       </roles>
     </developer>
     <developer>
-      <id>dandreotti</id>
-      <name>Daniele Andreotti</name>
-      <email>daniele.andreotti@cnaf.infn.it</email>
+      <id>szotti</id>
+      <name>Stefano Zotti</name>
+      <email>stefano.zotti@cnaf.infn.it</email>
       <organization>INFN CNAF</organization>
       <roles>
         <role>Developer</role>
@@ -89,15 +90,41 @@
   </developers>
 
   <build>
-
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${plugin.enforcer.version}</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.6.3</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>${plugin.versions.version}</version>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${plugin.compiler.version}</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <release>17</release>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
         </configuration>
@@ -135,39 +162,6 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${plugin.javadoc.version}</version>
-        <configuration>
-          <source>1.8</source>
-          <outputDirectory>${project.build.directory}/javadoc</outputDirectory>
-          <reportOutputDirectory>${project.reporting.outputDirectory}/javadoc</reportOutputDirectory>
-        </configuration>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>${plugin.source.version}</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>com.mycila.maven-license-plugin</groupId>
         <artifactId>maven-license-plugin</artifactId>
         <version>${plugin.license.version}</version>
@@ -177,6 +171,7 @@
             <exclude>Jenkinsfile</exclude>
             <exclude>.travis.yml</exclude>
             <exclude>*.md</exclude>
+            <exclude>.vscode/**</exclude>
             <exclude>Makefile</exclude>
             <exclude>AUTHORS</exclude>
             <exclude>LICENSE</exclude>
@@ -184,6 +179,7 @@
             <exclude>spec/**</exclude>
             <exclude>src/test/resources/**</exclude>
             <exclude>src/config/**</exclude>
+            <exclude>src/test/resources/home/**</exclude>
             <exclude>src/main/java/org/glite/voms/FQAN.java</exclude>
           </excludes>
           <useDefaultExcludes>true</useDefaultExcludes>
@@ -211,12 +207,6 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <version>${plugin.deploy.version}</version>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>${plugin.jar.version}</version>
         <configuration>
@@ -240,7 +230,7 @@
 
     <dependency>
       <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
+      <artifactId>hamcrest-core</artifactId>
       <version>${hamcrest.version}</version>
       <scope>test</scope>
     </dependency>
@@ -249,18 +239,28 @@
       <groupId>eu.eu-emi.security</groupId>
       <artifactId>canl</artifactId>
       <version>${canl.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcpkix-jdk15on</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-jdk15on</artifactId>
-        <version>${bc.version}</version>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <version>${bc.version}</version>
     </dependency>
 
     <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>${bc.version}</version>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>${bc.version}</version>
     </dependency>
 
     <dependency>
@@ -334,20 +334,6 @@
 
     <profile>
       <id>central-staging</id>
-      <distributionManagement>
-        <snapshotRepository>
-          <id>central</id>
-          <name>Maven central snapshots</name>
-          <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-
-        <repository>
-          <id>central</id>
-          <name>Maven central releases</name>
-          <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-      </distributionManagement>
-
       <build>
         <plugins>
           <plugin>
@@ -355,8 +341,8 @@
             <artifactId>central-publishing-maven-plugin</artifactId>
             <version>${plugin.central-publishing.version}</version>
             <extensions>true</extensions>
-	    <configuration>
-	      <publishingServerId>central</publishingServerId>
+	        <configuration>
+	          <publishingServerId>central</publishingServerId>
             </configuration>
           </plugin>
           <plugin>
@@ -370,6 +356,12 @@
                 <goals>
                   <goal>sign</goal>
                 </goals>
+                <configuration>
+                  <gpgArguments>
+                    <arg>--pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>
+                </configuration>
               </execution>
             </executions>
           </plugin>

@@ -15,8 +15,8 @@
  */
 package org.italiangrid.voms.test.ac;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -179,7 +179,7 @@ public class TestRequests implements Fixture {
     AttributeCertificate ac =
         acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
-    Mockito.verifyZeroInteractions(fallBackProtocol);
+    Mockito.verifyNoMoreInteractions(fallBackProtocol);
 
     Assert.assertNull(ac);
   }
