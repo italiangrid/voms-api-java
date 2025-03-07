@@ -30,7 +30,9 @@ import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
+import eu.emi.security.authn.x509.helpers.ssl.DisabledNameMismatchCallback;
+import eu.emi.security.authn.x509.helpers.ssl.EnforcingNameMismatchCallback;
+import eu.emi.security.authn.x509.impl.SocketFactoryCreator2;
 
 /**
  * Provider for a SSL socket factory configured using CAnL.
@@ -40,22 +42,26 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
  * 
  */
 public class SSLSocketFactoryProvider {
-  
+
   private X509Credential credential;
   private X509CertChainValidatorExt validator;
+  private boolean skipHostnameChecks;
 
-  public SSLSocketFactoryProvider(X509Credential credential,
-    X509CertChainValidatorExt validator) {
+  public SSLSocketFactoryProvider(X509Credential credential, X509CertChainValidatorExt validator, boolean skipHostnameChecks) {
 
     this.credential = credential;
     this.validator = validator;
+    this.skipHostnameChecks = skipHostnameChecks;
+  }
 
+  public SSLSocketFactoryProvider(X509Credential credential, X509CertChainValidatorExt validator) {
+
+    this(credential, validator, false);
   }
 
   public SSLSocketFactoryProvider(X509Credential credential) {
 
-    this(credential, new CertificateValidatorBuilder()
-      .trustAnchorsUpdateInterval(60000L).build());
+    this(credential, new CertificateValidatorBuilder().trustAnchorsUpdateInterval(60000L).build());
   }
 
   /**
@@ -76,21 +82,22 @@ public class SSLSocketFactoryProvider {
       throw new VOMSError(e.getMessage(), e);
     }
 
-    KeyManager[] keyManagers = new KeyManager[] { credential.getKeyManager() };
+    KeyManager[] keyManagers = new KeyManager[] {credential.getKeyManager()};
 
-    X509TrustManager trustManager = SocketFactoryCreator
-      .getSSLTrustManager(validator);
+    SocketFactoryCreator2 factory =
+        new SocketFactoryCreator2(credential, validator,
+            skipHostnameChecks ? new DisabledNameMismatchCallback()
+                : new EnforcingNameMismatchCallback());
+    X509TrustManager trustManager = factory.getSSLTrustManager();
 
-    TrustManager[] trustManagers = new TrustManager[] { trustManager };
-
-    SecureRandom secureRandom = null;
+    TrustManager[] trustManagers = new TrustManager[] {trustManager};
 
     /* http://bugs.sun.com/view_bug.do?bug_id=6202721 */
     /*
-     * Use new SecureRandom instead of SecureRandom.getInstance("SHA1PRNG") to
-     * avoid unnecessary blocking
+     * Use new SecureRandom instead of SecureRandom.getInstance("SHA1PRNG") to avoid unnecessary
+     * blocking
      */
-    secureRandom = new SecureRandom();
+    SecureRandom secureRandom = new SecureRandom();
 
     try {
 

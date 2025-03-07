@@ -119,7 +119,7 @@ public abstract class AbstractVOMSProtocol implements VOMSProtocol {
   protected SSLSocketFactory getSSLSocketFactory(X509Credential credential) {
 
     SSLSocketFactoryProvider sslSocketFactoryProvider = new SSLSocketFactoryProvider(
-      credential, validator);
+      credential, validator, skipHostnameChecks);
     return sslSocketFactoryProvider.getSSLSockectFactory();
   }
 

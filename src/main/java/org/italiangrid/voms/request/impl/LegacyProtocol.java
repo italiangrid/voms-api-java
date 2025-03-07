@@ -19,9 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -36,8 +36,7 @@ import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.FormatMode;
-import eu.emi.security.authn.x509.impl.HostnameMismatchCallback;
-import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
+import eu.emi.security.authn.x509.impl.HostnameMismatchCallback2;
 
 /**
  * Protocol implementing the legacy interface.
@@ -45,7 +44,7 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
  * 
  */
 public class LegacyProtocol extends AbstractVOMSProtocol implements
-  VOMSProtocol, HostnameMismatchCallback {
+  VOMSProtocol, HostnameMismatchCallback2 {
 
   public LegacyProtocol(X509CertChainValidatorExt validator,
     VOMSProtocolListener listener, int connectTimeout, int readTimeout) {
@@ -70,9 +69,6 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements
         endpoint.getURL().getPort());
 
       sslSocket.connect(sa, connectTimeout);
-      if (!isSkipHostnameChecks()) {
-        SocketFactoryCreator.connectWithHostnameChecking(sslSocket, this);
-      }
 
     } catch (Throwable t) {
 
@@ -105,17 +101,17 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements
     return response;
   }
 
-  public void nameMismatch(SSLSocket socket, X509Certificate peerCertificate,
-    String hostName) throws SSLException {
+  @Override
+  public void nameMismatch(X509Certificate peerCertificate, String hostName)
+      throws CertificateException {
 
     String peerCertString = CertificateUtils.format(peerCertificate,
-      FormatMode.MEDIUM_ONE_LINE);
-    String message = String
-      .format(
-        "No subject alternative DNS name matching %s found. Peer certificate : %s",
-        hostName, peerCertString);
-    throw new SSLException(message);
-
+        FormatMode.MEDIUM_ONE_LINE);
+      String message = String
+        .format(
+          "No subject alternative DNS name matching %s found. Peer certificate : %s",
+          hostName, peerCertString);
+      throw new CertificateException(message);
   }
 
 }

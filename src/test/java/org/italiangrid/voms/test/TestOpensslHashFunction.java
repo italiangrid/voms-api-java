@@ -92,8 +92,8 @@ public class TestOpensslHashFunction {
       "Trusted issuer of this certificate was not established",
       result.getErrors().get(1).getMessage());
 
-    Assert.assertEquals(cred.getCertificate().getSubjectDN(),
-      result.getErrors().get(1).getChain()[0].getSubjectDN());
+    Assert.assertEquals(cred.getCertificate().getSubjectX500Principal(),
+      result.getErrors().get(1).getChain()[0].getSubjectX500Principal());
 
   }
 
@@ -117,8 +117,8 @@ public class TestOpensslHashFunction {
       "Trusted issuer of this certificate was not established",
       result.getErrors().get(1).getMessage());
 
-    Assert.assertEquals(cred.getCertificate().getSubjectDN(),
-      result.getErrors().get(1).getChain()[0].getSubjectDN());
+    Assert.assertEquals(cred.getCertificate().getSubjectX500Principal(),
+      result.getErrors().get(1).getChain()[0].getSubjectX500Principal());
 
   }
 
