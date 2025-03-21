@@ -16,7 +16,10 @@
 package org.italiangrid.voms.store.impl;
 
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.security.auth.x500.X500Principal;
 
 import org.italiangrid.voms.store.LSCInfo;
 
@@ -51,7 +54,7 @@ public class LSCFile implements LSCInfo {
   String hostname;
 
   /** The certificate chain description contained in this LSC file **/
-  List<String> certChainDescription;
+  List<String> certChainDescription = new ArrayList<>();
 
   public String getVOName() {
 
@@ -95,7 +98,7 @@ public class LSCFile implements LSCInfo {
 
   public void setCertificateChainDescription(List<String> certChainDesc) {
 
-    this.certChainDescription = certChainDesc;
+    this.certChainDescription = new ArrayList<>(certChainDesc);
   }
 
   @Override
@@ -138,39 +141,33 @@ public class LSCFile implements LSCInfo {
       + hostname + ", certChainDescription=" + certChainDescription + "]";
   }
 
-  @SuppressWarnings("deprecation")
   public boolean matches(X509Certificate[] certChain) {
 
-    if (certChainDescription == null || certChainDescription.isEmpty())
-      return false;
-
-    if (certChain == null || certChain.length == 0)
-      return false;
-
-    if (certChainDescription.size() == certChain.length * 2) {
-
-      for (int i = 0; i < certChain.length; i++) {
-
-        String lscSubjectRFC2253 = OpensslNameUtils
-          .opensslToRfc2253(certChainDescription.get(i));
-        String lscIssuerRFC2253 = OpensslNameUtils
-          .opensslToRfc2253(certChainDescription.get(i + 1));
-
-        boolean subjectDoesMatch = X500NameUtils.equal(
-          certChain[i].getSubjectX500Principal(), lscSubjectRFC2253);
-        boolean issuerDoesMatch = X500NameUtils.equal(
-          certChain[i].getIssuerX500Principal(), lscIssuerRFC2253);
-
-        if (!subjectDoesMatch || !issuerDoesMatch)
-          return false;
-
-      }
-    } else {
-      // Cert chain description does not match certificate chain length
+    if (certChainDescription == null || certChainDescription.isEmpty()) {
       return false;
     }
 
+    if (certChain == null || certChain.length == 0) {
+      return false;
+    }
+
+    if (certChainDescription.size() != certChain.length * 2) {
+      return false;
+    }
+
+    for (int i = 0; i < certChain.length; i++) {
+      if (!matches(certChain[i].getSubjectX500Principal(), certChainDescription.get(2 * i))) {
+        return false;
+      }
+      if (!matches(certChain[i].getIssuerX500Principal(), certChainDescription.get(2 * i + 1))) {
+        return false;
+      }
+    }
     return true;
   }
 
+  @SuppressWarnings("deprecation")
+  private boolean matches(X500Principal certDn, String lscDn) {
+    return X500NameUtils.equal(certDn, OpensslNameUtils.opensslToRfc2253(lscDn));
+  }
 }
