@@ -1,6 +1,6 @@
 # VOMS Java API
 
-[![Build Status](https://travis-ci.org/italiangrid/voms-api-java.svg)](https://travis-ci.org/italiangrid/voms-api-java)
+![Build Status](https://github.com/italiangrid/voms-api-java/actions/workflows/maven.yaml/badge.svg)
 
 Java client APIs for the Virtual Organization Membership Service (VOMS).
 
