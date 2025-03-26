@@ -44,7 +44,7 @@ public class TestLSCParser {
 
     assertNull(f.getFilename());
 
-    assertEquals("vo", f.getVo());
+    assertEquals("vo", f.getVOName());
 
     assertEquals("host", f.getHostname());
 

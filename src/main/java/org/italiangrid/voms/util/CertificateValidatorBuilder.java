@@ -326,6 +326,7 @@ public class CertificateValidatorBuilder {
    * 
    * @deprecated Create a {@link CertificateValidatorBuilder} object instead.
    */
+  @Deprecated
   public static X509CertChainValidatorExt buildCertificateValidator(
     String trustAnchorsDir, ValidationErrorListener validationErrorListener,
     StoreUpdateListener storeUpdateListener, long updateInterval,
@@ -357,6 +358,7 @@ public class CertificateValidatorBuilder {
    * 
    * @deprecated Create a {@link CertificateValidatorBuilder} object instead.
    */
+  @Deprecated
   public static X509CertChainValidatorExt buildCertificateValidator(
     String trustAnchorsDir, ValidationErrorListener validationErrorListener) {
 
@@ -381,6 +383,7 @@ public class CertificateValidatorBuilder {
    * 
    * @deprecated Create a {@link CertificateValidatorBuilder} object instead.
    */
+  @Deprecated
   public static X509CertChainValidatorExt buildCertificateValidator(
     String trustAnchorsDir, ValidationErrorListener validationErrorListener,
     StoreUpdateListener storeListener) {
@@ -415,6 +418,7 @@ public class CertificateValidatorBuilder {
    * @deprecated Create a {@link CertificateValidatorBuilder} object instead.
    * 
    */
+  @Deprecated
   public static X509CertChainValidatorExt buildCertificateValidator(
     String trustAnchorsDir, ValidationErrorListener validationErrorListener,
     StoreUpdateListener storeListener, long updateInterval, boolean lazy) {
@@ -445,6 +449,7 @@ public class CertificateValidatorBuilder {
    * @deprecated Create a {@link CertificateValidatorBuilder} object instead.
    * 
    */
+  @Deprecated
   public static X509CertChainValidatorExt buildCertificateValidator(
     String trustAnchorsDir, ValidationErrorListener validationErrorListener,
     StoreUpdateListener storeListener, long updateInterval) {
@@ -475,6 +480,7 @@ public class CertificateValidatorBuilder {
    * @deprecated Create a {@link CertificateValidatorBuilder} object instead.
    * 
    */
+  @Deprecated
   public static X509CertChainValidatorExt buildCertificateValidator(
     String trustAnchorsDir, ValidationErrorListener validationErrorListener,
     long updateInterval, boolean lazy) {
@@ -502,6 +508,7 @@ public class CertificateValidatorBuilder {
    * @deprecated Create a {@link CertificateValidatorBuilder} object instead.
    * 
    */
+  @Deprecated
   public static X509CertChainValidatorExt buildCertificateValidator(
     String trustAnchorsDir, ValidationErrorListener validationErrorListener,
     long updateInterval) {
@@ -523,6 +530,7 @@ public class CertificateValidatorBuilder {
    * 
    * @deprecated Create a {@link CertificateValidatorBuilder} object instead.
    */
+  @Deprecated
   public static X509CertChainValidatorExt buildCertificateValidator(
     String trustAnchorsDir) {
 
@@ -538,6 +546,7 @@ public class CertificateValidatorBuilder {
    * 
    * @deprecated Create a {@link CertificateValidatorBuilder} object instead.
    */
+  @Deprecated
   public static X509CertChainValidatorExt buildCertificateValidator() {
 
     return buildCertificateValidator(

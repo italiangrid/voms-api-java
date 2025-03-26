@@ -27,80 +27,117 @@ import eu.emi.security.authn.x509.impl.OpensslNameUtils;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 /**
- * A VOMS LSC file.
+ * Represents a VOMS LSC (Legacy Secure Channel) file.
  * 
- * The LSC file describes the certificate chain that a VOMS attribute authority
- * uses to sign a VOMS attribute certificate. The LSC mechanism solves the
- * public key distribution problem for VOMS AA certificates and is used in the
- * VOMS validation process to validate the signature on the AC by extracting the
- * VOMS AA certificate included in the VOMS extension and checking that the
- * chain conforms to the description in the LSC file.
+ * <p>The LSC file describes the certificate chain that a VOMS attribute authority
+ * uses to sign a VOMS attribute certificate. The LSC mechanism helps in solving
+ * the public key distribution problem for VOMS AA certificates and is used in
+ * the VOMS validation process to validate the signature on the AC. It does this by
+ * extracting the VOMS AA certificate included in the VOMS extension and ensuring
+ * that the chain conforms to the description in the LSC file.</p>
  * 
- * Two {@link LSCFile} object are considered to be equal if their vo and
- * hostname fields match.
+ * <p>Two {@link LSCFile} objects are considered equal if their VO and hostname fields match.</p>
  * 
- * @author Andrea Ceccanti
- *
  */
 public class LSCFile implements LSCInfo {
 
-  /** The LSC filename **/
+  /** The LSC filename. */
   String filename;
 
-  /** The VO this LSC file is about **/
+  /** The VO (Virtual Organization) this LSC file is associated with. */
   String vo;
 
-  /** The hostname this LSC file is about **/
+  /** The hostname that this LSC file pertains to. */
   String hostname;
 
-  /** The certificate chain description contained in this LSC file **/
+  /** The certificate chain description contained in this LSC file. */
   List<String> certChainDescription = new ArrayList<>();
 
+  /**
+   * Returns the VO name.
+   *
+   * @return the VO name
+   */
   public String getVOName() {
 
     return vo;
   }
 
+  /**
+   * Returns the hostname.
+   *
+   * @return the hostname
+   */
   public String getHostname() {
 
     return hostname;
   }
 
+  /**
+   * Returns the certificate chain description.
+   *
+   * @return a list of certificate chain descriptions
+   */
   public List<String> getCertificateChainDescription() {
 
     return certChainDescription;
   }
 
+  /**
+   * Returns the filename of the LSC file.
+   *
+   * @return the LSC filename
+   */
   public String getFilename() {
 
     return filename;
   }
 
-  public String getVo() {
-
-    return vo;
-  }
-
+  /**
+   * Sets the filename for this LSC file.
+   *
+   * @param filename the filename to set
+   */
   public void setFilename(String filename) {
 
     this.filename = filename;
   }
 
+  /**
+   * Sets the VO name.
+   *
+   * @param vo the VO name to set
+   */
   public void setVo(String vo) {
 
     this.vo = vo;
   }
 
+  /**
+   * Sets the hostname.
+   *
+   * @param hostname the hostname to set
+   */
   public void setHostname(String hostname) {
 
     this.hostname = hostname;
   }
 
+  /**
+   * Sets the certificate chain description.
+   *
+   * @param certChainDesc the certificate chain description to set
+   */
   public void setCertificateChainDescription(List<String> certChainDesc) {
 
     this.certChainDescription = new ArrayList<>(certChainDesc);
   }
 
+  /**
+   * Computes the hash code for this LSC file.
+   *
+   * @return the hash code
+   */
   @Override
   public int hashCode() {
 
@@ -111,6 +148,12 @@ public class LSCFile implements LSCInfo {
     return result;
   }
 
+  /**
+   * Determines if two {@code LSCFile} objects are equal based on their VO and hostname.
+   *
+   * @param obj the object to compare with
+   * @return {@code true} if the objects are equal, otherwise {@code false}
+   */
   @Override
   public boolean equals(Object obj) {
 
@@ -134,6 +177,11 @@ public class LSCFile implements LSCInfo {
     return true;
   }
 
+  /**
+   * Returns a string representation of this LSC file.
+   *
+   * @return a string representation of this LSC file
+   */
   @Override
   public String toString() {
 
@@ -141,6 +189,12 @@ public class LSCFile implements LSCInfo {
       + hostname + ", certChainDescription=" + certChainDescription + "]";
   }
 
+  /**
+   * Checks if the given certificate chain matches the description in this LSC file.
+   *
+   * @param certChain the certificate chain to verify
+   * @return {@code true} if the certificate chain matches, otherwise {@code false}
+   */
   public boolean matches(X509Certificate[] certChain) {
 
     if (certChainDescription == null || certChainDescription.isEmpty()) {
@@ -166,6 +220,13 @@ public class LSCFile implements LSCInfo {
     return true;
   }
 
+  /**
+   * Checks if a certificate distinguished name (DN) matches the expected DN in the LSC file.
+   *
+   * @param certDn the certificate DN
+   * @param lscDn the expected DN in the LSC file
+   * @return {@code true} if the DNs match, otherwise {@code false}
+   */
   @SuppressWarnings("deprecation")
   private boolean matches(X500Principal certDn, String lscDn) {
     return X500NameUtils.equal(certDn, OpensslNameUtils.opensslToRfc2253(lscDn));

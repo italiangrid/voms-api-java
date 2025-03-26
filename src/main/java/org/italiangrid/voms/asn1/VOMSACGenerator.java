@@ -62,50 +62,130 @@ import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.proxy.CertificateExtension;
 
 /**
+ * A generator for VOMS Attribute Certificates (ACs).
+ * <p>
+ * This class provides methods for creating VOMS ACs with customizable properties, including
+ * optional extensions and fake signature bits for testing purposes.
+ * </p>
  * 
- * This AC generator provides the VOMS AC encoding starting from a set of attributes.
- * 
- * @author Andrea Ceccanti
+ * <p>
+ * It uses BouncyCastle for cryptographic operations and supports various extensions required for
+ * VOMS attribute certificates.
+ * </p>
  * 
  */
 public class VOMSACGenerator implements VOMSConstants {
 
+  /**
+   * Enumeration defining various properties that can influence the generation of VOMS Attribute
+   * Certificates.
+   */
   public enum ACGenerationProperties {
-    SKIP_AC_CERTS_EXTENSION, FAKE_SIGNATURE_BITS, INCLUDE_FAKE_CRITICAL_EXTENSION, INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION, INCLUDE_CRITICAL_AKID_EXTENSION, INCLUDE_EMPTY_AC_CERTS_EXTENSION
+
+    // @formatting off
+
+    /**
+     * Skips the inclusion of the AC Certs extension in the generated Attribute Certificate.
+     * <p>
+     * This extension normally contains the issuer's certificate chain, which may be omitted
+     * if the relying party already possesses it.
+     * </p>
+     */
+    SKIP_AC_CERTS_EXTENSION,
+
+    /**
+     * Generates fake signature bits instead of signing the certificate with a real key.
+     * <p>
+     * This is primarily used for testing purposes, as the resulting AC will not be verifiable.
+     * </p>
+     */
+    FAKE_SIGNATURE_BITS,
+
+    /**
+     * Includes a fake critical extension in the generated Attribute Certificate.
+     * <p>
+     * This extension is added for testing scenarios where certificate parsers need to handle
+     * unknown critical extensions.
+     * </p>
+     */
+    INCLUDE_FAKE_CRITICAL_EXTENSION,
+
+    /**
+     * Includes the "No Revocation Available" extension as a critical extension.
+     * <p>
+     * This extension indicates that no revocation information is available for the AC.
+     * </p>
+     */
+    INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION,
+
+    /**
+     * Includes the Authority Key Identifier (AKID) extension as a critical extension.
+     * <p>
+     * The AKID extension helps in linking the AC to its issuer, making it easier for
+     * verification systems to locate the issuing certificate.
+     * </p>
+     */
+    INCLUDE_CRITICAL_AKID_EXTENSION,
+
+    /**
+     * Includes an empty AC Certs extension in the generated Attribute Certificate.
+     * <p>
+     * This is useful for testing scenarios where the extension is expected but contains no
+     * actual certificate information.
+     * </p>
+     */
+    INCLUDE_EMPTY_AC_CERTS_EXTENSION;
+    // @formatting on
   }
 
+  /** Default generation properties (none enabled). */
   public static final EnumSet<ACGenerationProperties> defaultGenerationProperties =
       EnumSet.noneOf(ACGenerationProperties.class);
 
+  /**
+   * A ContentSigner implementation that generates random signature bits.
+   * <p>
+   * This is used for testing purposes to create attribute certificates with fake signatures.
+   * </p>
+   */
   static class RandomContentSigner implements ContentSigner {
 
+    /** The length of the randomly generated signature. */
     public static final int SIG_LENGHT = 1024;
 
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
     AlgorithmIdentifier sigAlgId;
 
+    /**
+     * Constructs a RandomContentSigner with the given signature algorithm name.
+     *
+     * @param sigAlgName the name of the signature algorithm
+     */
     public RandomContentSigner(String sigAlgName) {
 
       this.sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find(sigAlgName);
     }
 
+    @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {
 
       return sigAlgId;
     }
 
+    @Override
     public OutputStream getOutputStream() {
 
       return bos;
     }
 
+    @Override
     public byte[] getSignature() {
 
       try {
         bos.close();
       } catch (IOException e) {
-
+        // Ignore
       }
 
       Random r = new Random();
@@ -118,12 +198,20 @@ public class VOMSACGenerator implements VOMSConstants {
 
   }
 
+  /** Fake extension OID used in testing. */
   public static final ASN1ObjectIdentifier FAKE_EXT_OID =
       new ASN1ObjectIdentifier("1.3.6.1.4.1.8005.100.120.82");
 
   private X509Credential aaCredential;
   private ContentSigner signer;
 
+  /**
+   * Retrieves the appropriate ContentSigner based on the provided properties.
+   *
+   * @param properties the properties influencing AC generation
+   * @return a ContentSigner instance
+   * @throws VOMSError if an error occurs during signer creation
+   */
   private ContentSigner getSigner(EnumSet<ACGenerationProperties> properties) {
 
     if (signer == null) {
@@ -147,11 +235,24 @@ public class VOMSACGenerator implements VOMSConstants {
     return signer;
   }
 
+  /**
+   * Constructs a VOMSACGenerator with the given credential.
+   *
+   * @param aaCredential the attribute authority credential
+   */
   public VOMSACGenerator(X509Credential aaCredential) {
 
     this.aaCredential = aaCredential;
   }
 
+  /**
+   * Builds a VOMS URI.
+   *
+   * @param voName the VO name
+   * @param host the host name
+   * @param port the port number
+   * @return a formatted VOMS URI
+   */
   private String buildVOURI(String voName, String host, int port) {
 
     return String.format("%s://%s:%d", voName, host, port);
@@ -270,20 +371,53 @@ public class VOMSACGenerator implements VOMSConstants {
     return targetExtensionContent;
   }
 
+  /**
+   * Generates a VOMS attribute certificate with the given properties.
+   *
+   * @param fqans the list of Fully Qualified Attribute Names (FQANs)
+   * @param gas the list of generic attributes
+   * @param targets the list of target restrictions
+   * @param holderCert the X.509 certificate of the holder
+   * @param serialNumber the serial number of the AC
+   * @param notBefore the start of the AC validity period
+   * @param notAfter the end of the AC validity period
+   * @param voName the VO name
+   * @param host the VOMS server hostname
+   * @param port the VOMS server port
+   * @return the generated X.509 attribute certificate
+   * @throws VOMSError if certificate generation fails
+   */
   public X509AttributeCertificateHolder generateVOMSAttributeCertificate(List<String> fqans,
       List<VOMSGenericAttribute> gas, List<String> targets, X509Certificate holderCert,
       BigInteger serialNumber, Date notBefore, Date notAfter, String voName, String host,
-      int port) {
+      int port) throws VOMSError {
 
     return generateVOMSAttributeCertificate(defaultGenerationProperties, fqans, gas, targets,
         holderCert, serialNumber, notBefore, notAfter, voName, host, port);
   }
 
+  /**
+   * Generates a VOMS attribute certificate with the specified properties.
+   *
+   * @param generationProperties the properties influencing AC generation
+   * @param fqans the list of Fully Qualified Attribute Names (FQANs)
+   * @param gas the list of generic attributes
+   * @param targets the list of target restrictions
+   * @param holderCert the X.509 certificate of the holder
+   * @param serialNumber the serial number of the AC
+   * @param notBefore the start of the AC validity period
+   * @param notAfter the end of the AC validity period
+   * @param voName the VO name
+   * @param host the VOMS server hostname
+   * @param port the VOMS server port
+   * @return the generated X.509 attribute certificate
+   * @throws VOMSError if certificate generation fails
+   */
   public X509AttributeCertificateHolder generateVOMSAttributeCertificate(
       EnumSet<ACGenerationProperties> generationProperties, List<String> fqans,
       List<VOMSGenericAttribute> gas, List<String> targets, X509Certificate holderCert,
       BigInteger serialNumber, Date notBefore, Date notAfter, String voName, String host,
-      int port) {
+      int port) throws VOMSError {
 
     AttributeCertificateHolder holder = null;
     AttributeCertificateIssuer issuer = null;
@@ -345,6 +479,12 @@ public class VOMSACGenerator implements VOMSConstants {
 
   }
 
+  /**
+   * Generates a VOMS certificate extension.
+   *
+   * @param acs the list of X.509 attribute certificates
+   * @return the generated certificate extension
+   */
   public CertificateExtension generateVOMSExtension(List<X509AttributeCertificateHolder> acs) {
 
     ASN1EncodableVector vomsACs = new ASN1EncodableVector();
