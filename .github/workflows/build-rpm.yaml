@@ -16,7 +16,7 @@ jobs:
         version: [8, 9]
     outputs:
       repo: ${{ steps.info.outputs.repo }}
-      version: ${{ steps.info.outputs.version_pom }}
+      version_pom: ${{ steps.info.outputs.version_pom }}
     runs-on: ubuntu-latest
     container: '${{ matrix.os }}:${{ matrix.version }}'
     steps:
