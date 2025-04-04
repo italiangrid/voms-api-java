@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # VOMS Java API
 
 ![Build Status](https://github.com/italiangrid/voms-api-java/actions/workflows/maven.yaml/badge.svg)

@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -30,7 +36,6 @@
     <plugin.enforcer.version>3.5.0</plugin.enforcer.version>
     <plugin.versions.version>2.16.1</plugin.versions.version>
     <plugin.compiler.version>3.13.0</plugin.compiler.version>
-    <plugin.license.version>1.9.0</plugin.license.version>
     <plugin.release.version>3.1.1</plugin.release.version>
     <plugin.source.version>2.2.1</plugin.source.version>
     <plugin.assembly.version>3.7.1</plugin.assembly.version>
@@ -161,41 +166,6 @@
             <descriptor>${basedir}/src/main/assembly/voms-api-java.xml</descriptor>
           </descriptors>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-        <version>${plugin.license.version}</version>
-        <configuration>
-          <header>src/license/license.txt</header>
-          <excludes>
-            <exclude>Jenkinsfile</exclude>
-            <exclude>.travis.yml</exclude>
-            <exclude>*.md</exclude>
-            <exclude>.vscode/**</exclude>
-            <exclude>Makefile</exclude>
-            <exclude>AUTHORS</exclude>
-            <exclude>LICENSE</exclude>
-            <exclude>.gitignore</exclude>
-            <exclude>spec/**</exclude>
-            <exclude>src/test/resources/**</exclude>
-            <exclude>src/config/**</exclude>
-            <exclude>src/test/resources/home/**</exclude>
-            <exclude>src/main/java/org/glite/voms/FQAN.java</exclude>
-          </excludes>
-          <useDefaultExcludes>true</useDefaultExcludes>
-          <strictCheck>true</strictCheck>
-        </configuration>
-        <executions>
-          <execution>
-            <id>check-headers</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
 
       <plugin>
