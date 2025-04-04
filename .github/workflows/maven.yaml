@@ -6,6 +6,8 @@ name: Maven build
 
 on:
   push:
+env:
+  SNAPSHOT_BRANCH: develop
 
 jobs:
   build:
@@ -17,6 +19,11 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: 17
+        server-id: central
+        server-username: MAVEN_CENTRAL_USERNAME
+        server-password: MAVEN_CENTRAL_PASSWORD
+        gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
     - name: Install libfaketime on Ubuntu
       run: |
@@ -51,3 +58,29 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
       run: mvn -B clean package
+    - name: Deploy to Maven Central
+      env:
+        MAVEN_CENTRAL_USERNAME: ${{ vars.MAVEN_CENTRAL_USERNAME }}
+        MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      run: |
+        VERSION_POM=$(mvn org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=project.version -q -DforceStdout)
+        if [[ ${{ github.ref_type }} = 'tag' ]]; then
+          # In case is a tag, get the tag value
+          GITHUB_REF=${{ github.ref }}
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          # Check if the tag matches v<x>.<y>.<z>
+          if [[ ${TAG_NAME} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            if [[ ${VERSION} != ${VERSION_POM} ]]; then
+              echo "Version mismatch between tag (${VERSION}) and POM file (${VERSION_POM})"
+              exit 1
+            fi
+            mvn deploy -P central-staging
+          fi
+        elif [[ ${GITHUB_REF} = "refs/heads/${SNAPSHOT_BRANCH}" ]]; then
+          # Check if the version in POM file matches <x>.<y>.<z>-SNAPSHOT
+          if [[ ${VERSION_POM} =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+            mvn deploy -P central-staging
+          fi
+        fi
