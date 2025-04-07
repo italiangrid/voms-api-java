@@ -73,7 +73,7 @@ rm -rf %{buildroot}
 %doc %{_javadocdir}/%{name}-%{version_pom}
 
 %changelog
-* Tue Mar 25 2025 Enrico Vianello <enrico.vianello at cnaf.infn.it> - 3.3.4-0
+* Tue Mar 25 2025 Enrico Vianello <enrico.vianello at cnaf.infn.it> - 3.3.4-1
 - Bumped packaging for 3.3.4 version
 
 * Fri Jun 21 2024 Enrico Vianello <enrico.vianello at cnaf.infn.it> - 3.3.3-1
