@@ -6,6 +6,12 @@ SPDX-License-Identifier: Apache-2.0
 
 # Changelog
 
+## 3.3.5 (2025-04-10)
+
+### Changed
+
+* Bump to CANL 2.8.3 and BC 1.80
+
 ## 3.3.4 (2025-04-04)
 
 ### Changed

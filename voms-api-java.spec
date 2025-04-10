@@ -73,34 +73,3 @@ rm -rf %{buildroot}
 %doc %{_javadocdir}/%{name}-%{version_pom}
 
 %changelog
-* Tue Mar 25 2025 Enrico Vianello <enrico.vianello at cnaf.infn.it> - 3.3.4-1
-- Bumped packaging for 3.3.4 version
-
-* Fri Jun 21 2024 Enrico Vianello <enrico.vianello at cnaf.infn.it> - 3.3.3-1
-- Bumped packaging for 3.3.3 version
-
-* Thu Jan 25 2018 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 3.3.2-0
-- Bumped packaging for 3.3.2 version
-
-* Tue Jun 9 2015 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 3.0.6-0
-- Bumped packaging for 3.0.6 version
-
-* Wed Dec 10 2014 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 3.0.5-1
-- Bumped packaging for 3.0.5 version
-
-* Thu Dec 19 2013 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 3.0.4-1
-- Fix for https://issues.infn.it/browse/VOMS-455
-- Caching certificate validator
-- Refactored certificate validator builder
-- Less stringent mutual exclusion on default AC parser and validator
-
-* Thu Sep 26 2013 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 3.0.2-1
-- Fix for https://issues.infn.it/browse/VOMS-424
-- Adoption of CANL 1.3.0
-- Refactored internal AC generator
-
-* Tue Aug 6 2013 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 3.0.1-1
-- Fix for https://issues.infn.it/jira/browse/VOMS-364
-
-* Wed Oct 24 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 3.0.0-1
-- New version of VOMS Java APIs based on CAnL
