@@ -4,8 +4,7 @@
 
 name: Build RPM
 on: push
-env:
-  NIGHTLY_BRANCH: develop
+
 jobs:
   build-rpm:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -23,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           dnf upgrade -y
-          [[ "${{ matrix.version }}" = 8 ]] && dnf module enable -y maven:3.8/common
+          dnf module enable -y maven:3.8
           dnf install -y git rpmdevtools rpmlint maven-openjdk17
       - name: Setup build tree
         run: |
@@ -41,11 +40,8 @@ jobs:
           # Maven uses -SNAPSHOT for pre-releases, change the - to ~ in the RPM
           VERSION_RPM=$(echo ${VERSION_POM} | sed 's/-/~/')
           if [[ ${{ github.ref_type }} = 'tag' ]]; then
-            # In case is a tag, get the tag value
-            GITHUB_REF=${{ github.ref }}
-            TAG_NAME=${GITHUB_REF#refs/tags/}
-            # Check if the tag matches v<x>.<y>.<z>
-            if [[ ${TAG_NAME} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            # In case is a tag, check if the tag matches v<x>.<y>.<z>
+            if [[ ${GITHUB_REF_NAME} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
               REPO='stable'
               VERSION="${BASH_REMATCH[1]}"
               if [[ ${VERSION} != ${VERSION_POM} ]]; then
@@ -53,7 +49,7 @@ jobs:
                 exit 1
               fi
             fi
-          elif [[ ${GITHUB_REF} = "refs/heads/${NIGHTLY_BRANCH}" ]]; then
+          elif [[ ${GITHUB_REF_NAME} = ${{ github.event.repository.default_branch }} ]]; then
             # Check if the version in POM file matches <x>.<y>.<z>-SNAPSHOT
             if [[ ${VERSION_POM} =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
               REPO='nightly'
