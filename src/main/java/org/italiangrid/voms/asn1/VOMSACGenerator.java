@@ -273,14 +273,16 @@ public class VOMSACGenerator implements VOMSConstants {
   private ASN1Encodable buildFQANsAttributeContent(List<String> fqans,
       GeneralName policyAuthorityInfo) {
 
-    ASN1EncodableVector container = new ASN1EncodableVector();
+    ASN1EncodableVector generalNames = new ASN1EncodableVector();
+    generalNames.add(policyAuthorityInfo);
+
     ASN1EncodableVector encodedFQANs = new ASN1EncodableVector();
-
-    container.add(new GeneralNames(policyAuthorityInfo));
-
-    for (String s : fqans)
+    for (String s : fqans) {
       encodedFQANs.add(new DEROctetString(s.getBytes()));
+    }
 
+    ASN1EncodableVector container = new ASN1EncodableVector();
+    container.add(new DERTaggedObject(false, 0, new DERSequence(generalNames)));
     container.add(new DERSequence(encodedFQANs));
 
     return new DERSequence(container);
