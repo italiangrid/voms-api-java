@@ -20,7 +20,7 @@ BuildRequires:  maven-openjdk17
 
 Provides:       voms-api-java3 = %{version}
 Requires:       canl-java >= 2.7
-Requires:       java-17-openjdk-headless
+Requires:       java-headless >= 1.8
 
 %description
 The Virtual Organization Membership Service (VOMS) is an attribute authority
