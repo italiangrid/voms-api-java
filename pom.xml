@@ -54,7 +54,8 @@ SPDX-License-Identifier: Apache-2.0
     <jcip.version>1.0</jcip.version>
     <bc.version>1.80</bc.version>
 
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
 
     <!-- properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -131,7 +132,7 @@ SPDX-License-Identifier: Apache-2.0
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${plugin.compiler.version}</version>
         <configuration>
-          <release>17</release>
+          <release>8</release>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
         </configuration>

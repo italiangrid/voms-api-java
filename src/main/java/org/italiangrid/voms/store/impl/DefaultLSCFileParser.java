@@ -49,7 +49,7 @@ public class DefaultLSCFileParser implements LSCFileParser {
       List<String> certificateChainDescription = new ArrayList<String>();
       String line;
       while ((line = reader.readLine()) != null) {
-        if (line.trim().startsWith("#") || line.isBlank()) {
+        if (line.trim().startsWith("#") || line.trim().isEmpty()) {
           continue;
         }
         if (line.equalsIgnoreCase(NEXT_CHAIN)) {
