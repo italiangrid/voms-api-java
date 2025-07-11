@@ -6,6 +6,13 @@ SPDX-License-Identifier: Apache-2.0
 
 # Changelog
 
+## 3.3.6 (2025-07-31)
+
+### Changed
+
+* Bump to BC 1.81
+* Fix ASN.1 encoding of policy authority info
+
 ## 3.3.5 (2025-04-10)
 
 ### Changed
