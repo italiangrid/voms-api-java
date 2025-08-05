@@ -1,18 +1,7 @@
-/**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.italiangrid.voms.util;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
@@ -35,9 +24,9 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-
-import com.google.common.collect.Sets;
 
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.CertificateHelpers;
@@ -227,7 +216,8 @@ public class CredentialsUtils {
     final Path proxyFilePath = Paths.get(proxyFileName);
     final FileAttribute<Set<PosixFilePermission>> permissions =
         PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------"));
-    final Set<StandardOpenOption> options = Sets.newHashSet(CREATE_NEW, WRITE);
+    final Set<StandardOpenOption> options = new HashSet<>();
+    Collections.addAll(options, CREATE_NEW, WRITE);
 
     try {
       Files.delete(proxyFilePath);

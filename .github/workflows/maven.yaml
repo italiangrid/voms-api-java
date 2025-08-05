@@ -1,0 +1,81 @@
+# SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: Maven build
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: 17
+        server-id: central
+        server-username: MAVEN_CENTRAL_USERNAME
+        server-password: MAVEN_CENTRAL_PASSWORD
+        gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+    - name: Install libfaketime on Ubuntu
+      run: |
+        sudo apt update
+        sudo apt install -y faketime
+
+    - name: Clone remote repository
+      run: |
+        git clone https://baltig.infn.it/mw-devel/helper-scripts.git $GITHUB_WORKSPACE/helper-scripts
+        echo "Repo cloned to $GITHUB_WORKSPACE/helper-scripts"
+    - name: Add to PATH
+      run: |
+        echo "$GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts" >> $GITHUB_PATH
+        echo "Updated PATH with $GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts"
+    - name: Verify PATH
+      run: |
+        echo "Current PATH: $PATH"
+        ls -la $GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts
+
+    - name: Create CA files
+      run: |
+        echo "Create CA files ..."
+        cd src/test/resources
+        ./setup.sh || { echo "setup.sh failed"; exit 1; }
+        cd ../../../
+
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Build with Maven
+      run: mvn -B clean package
+    - name: Deploy to Maven Central
+      env:
+        MAVEN_CENTRAL_USERNAME: ${{ vars.MAVEN_CENTRAL_USERNAME }}
+        MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      run: |
+        VERSION_POM=$(mvn org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=project.version -q -DforceStdout)
+        if [[ ${{ github.ref_type }} = 'tag' ]]; then
+          # In case is a tag, check if the tag matches v<x>.<y>.<z>
+          if [[ ${GITHUB_REF_NAME} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            if [[ ${VERSION} != ${VERSION_POM} ]]; then
+              echo "Version mismatch between tag (${VERSION}) and POM file (${VERSION_POM})"
+              exit 1
+            fi
+            mvn deploy -P central-staging
+          fi
+        elif [[ ${GITHUB_REF_NAME} = ${{ github.event.repository.default_branch }} ]]; then
+          # Check if the version in POM file matches <x>.<y>.<z>-SNAPSHOT
+          if [[ ${VERSION_POM} =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+            mvn deploy -P central-staging
+          fi
+        fi

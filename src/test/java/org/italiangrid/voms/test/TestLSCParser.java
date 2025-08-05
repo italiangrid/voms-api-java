@@ -1,18 +1,7 @@
-/**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.italiangrid.voms.test;
 
 import static org.junit.Assert.assertEquals;
@@ -21,6 +10,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultLSCFileParser;
@@ -43,7 +33,7 @@ public class TestLSCParser {
 
     assertNull(f.getFilename());
 
-    assertEquals("vo", f.getVo());
+    assertEquals("vo", f.getVOName());
 
     assertEquals("host", f.getHostname());
 
@@ -51,8 +41,7 @@ public class TestLSCParser {
 
     assertEquals(2, f.getCertificateChainDescription().size());
 
-    assertEquals("/C=it/O=org/CN=commonName", f
-      .getCertificateChainDescription().get(0));
+    assertEquals("/C=it/O=org/CN=commonName", f.getCertificateChainDescription().get(0));
     assertEquals("/C=it/O=org/CN=CA", f.getCertificateChainDescription().get(1));
 
   }
@@ -112,6 +101,43 @@ public class TestLSCParser {
   }
 
   @Test
+  public void testSlashInsideCommonNameIsIgnored() {
+
+    DefaultLSCFileParser parser = new DefaultLSCFileParser();
+
+    String malformedLSCContent = "/C=it/O=org/CN=commonName\n" + "/C=it/O=org/CN=common/Name";
+
+    LSCFile f =
+        parser.parse("vo", "host", new ByteArrayInputStream(malformedLSCContent.getBytes()));
+
+    assertEquals(2, f.getCertificateChainDescription().size());
+  }
+
+  @Test
+  public void testUnsupportedMultichainLSCFileParseSuccess() {
+
+    DefaultLSCFileParser parser = new DefaultLSCFileParser();
+
+    String multichainLSCContent = "/C=IT/O=IGI/CN=test-host.cnaf.infn.it\n"
+        + "/C=IT/O=IGI/CN=Test CA\n" + "------NEXT CHAIN------\n"
+        + "/C=IT/O=IGI/CN=test-host2.cnaf.infn.it\n" + "/C=IT/O=IGI/CN=Test CA";
+
+    try {
+
+      LSCFile f =
+          parser.parse("vo", "host", new ByteArrayInputStream(multichainLSCContent.getBytes()));
+      assertEquals(2, f.getCertificateChainDescription().size());
+      assertEquals("/C=IT/O=IGI/CN=test-host.cnaf.infn.it", f.getCertificateChainDescription().get(0));
+      assertEquals("/C=IT/O=IGI/CN=Test CA", f.getCertificateChainDescription().get(1));
+
+    } catch (VOMSError e) {
+      fail("No error expected for malformed, empty LSC file parsing.");
+      return;
+    }
+  }
+
+
+  @Test
   public void testNonExistingFileParse() {
 
     DefaultLSCFileParser parser = new DefaultLSCFileParser();
@@ -121,7 +147,7 @@ public class TestLSCParser {
     try {
 
       @SuppressWarnings("unused")
-      LSCFile f = parser.parse("vo", "host", nonExistentFile);
+      LSCFile f = parser.parse("vo", "host", new File(nonExistentFile));
 
     } catch (VOMSError e) {
 

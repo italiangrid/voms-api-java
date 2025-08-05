@@ -1,18 +1,7 @@
-/**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.italiangrid.voms.test.ac;
 
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.aaCertNotFound;
@@ -31,14 +20,20 @@ import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
+import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
+import java.security.cert.X509CRL;
+import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
@@ -92,6 +87,8 @@ public class TestACGeneration {
   static final String vomsdir = "src/test/resources/vomsdir";
   static final String trustAnchorsDir = "src/test/resources/trust-anchors";
 
+  static final String testCaCrl = "src/test/resources/trust-anchors/igi_test_ca.crl";
+
   static final List<String> defaultFQANs = Arrays.asList("/test.vo",
     "/test.vo/G1", "/test.vo/G2");
 
@@ -115,7 +112,7 @@ public class TestACGeneration {
 
   @BeforeClass
   static public void classTestSetup() throws KeyStoreException,
-    CertificateException, FileNotFoundException, IOException {
+    CertificateException, FileNotFoundException, IOException, CRLException {
 
     aaCredential = new PEMCredential(new FileInputStream(aaKey),
       new FileInputStream(aaCert), (char[]) null);
@@ -145,7 +142,17 @@ public class TestACGeneration {
       canlError,
       "CRL for an expired certificate was not resolved Cause: No CRLs found for issuer \"cn=Test CA,o=IGI,c=IT\"");
 
-    final Date revocationDate = new Date(1348673124000L);
+    final Date revocationDate = ((Supplier<Date>) () -> {
+      try (FileInputStream fis = new FileInputStream(testCaCrl)) {
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        X509CRL crl = (X509CRL) cf.generateCRL(fis);
+        Set<? extends X509CRLEntry> revokedCertificates = crl.getRevokedCertificates();
+        X509CRLEntry entry = revokedCertificates.iterator().next();
+        return entry.getRevocationDate();
+      } catch (CertificateException | CRLException | IOException e) {
+        throw new RuntimeException(e.getMessage());
+      }
+    }).get();
 
     final String revocationMessage = String.format(
       "Certificate was revoked at: "
@@ -276,7 +283,7 @@ public class TestACGeneration {
       certValidator, c);
 
     AttributeCertificate ac = createAC(expiredCredential,
-      Arrays.asList("/test.vo.1"), defaultGAs, defaultVO,
+      Arrays.asList("/test.vo"), defaultGAs, defaultVO,
       "test-expired.cnaf.infn.it");
 
     List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays
@@ -294,7 +301,7 @@ public class TestACGeneration {
     VOMSACValidator validator = VOMSValidators.newValidator(trustStore,
       certValidator, c);
     AttributeCertificate ac = createAC(revokedCredential,
-      Arrays.asList("/test.vo.1"), defaultGAs, defaultVO,
+      Arrays.asList("/test.vo"), defaultGAs, defaultVO,
       "test-revoked.cnaf.infn.it");
     List<AttributeCertificate> validatedAttrs = validator.validateACs(Arrays
       .asList(ac));

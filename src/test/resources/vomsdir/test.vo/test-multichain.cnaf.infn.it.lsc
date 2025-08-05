@@ -1,0 +1,5 @@
+/C=IT/O=IGI/CN=test-host.cnaf.infn.it
+/C=IT/O=IGI/CN=Test CA
+------NEXT CHAIN------
+/C=IT/O=IGI/CN=test-host2.cnaf.infn.it
+/C=IT/O=IGI/CN=Test CA

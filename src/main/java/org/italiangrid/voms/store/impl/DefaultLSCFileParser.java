@@ -1,18 +1,7 @@
-/**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.italiangrid.voms.store.impl;
 
 import java.io.BufferedReader;
@@ -35,102 +24,67 @@ import org.italiangrid.voms.store.LSCFileParser;
  */
 public class DefaultLSCFileParser implements LSCFileParser {
 
-  public static final String EMPTY_LINE_REGEX = "(?m)^\\s*?$";
   public static final String MALFORMED_LSC_FILE_ERROR_TEMPLATE = "LSC file parsing error: Malformed LSC file (vo=%s, host=%s): %s";
 
   private void checkFileExistanceAndReadabilty(File f) {
 
-    if (!f.exists())
+    if (!f.exists()) {
       throw new VOMSError("LSC file does not exist: " + f.getAbsolutePath());
-
-    if (!f.canRead())
-      throw new VOMSError("LSC file is not readable: " + f.getAbsolutePath());
-
-  }
-
-  public LSCFile parse(String vo, String hostname, String filename) {
-
-    LSCFile lsc = null;
-
-    try {
-
-      File f = new File(filename);
-
-      checkFileExistanceAndReadabilty(f);
-
-      lsc = parse(vo, hostname, new FileInputStream(f));
-
-      lsc.setFilename(filename);
-
-    } catch (IOException e) {
-      throw new VOMSError("LSC file parsing error: " + e.getMessage(), e);
     }
-
-    return lsc;
+    if (!f.canRead()) {
+      throw new VOMSError("LSC file is not readable: " + f.getAbsolutePath());
+    }
   }
 
   public synchronized LSCFile parse(String vo, String hostname, InputStream is) {
+
+    final String NEXT_CHAIN = "------NEXT CHAIN------";
 
     LSCFile lsc = new LSCFile();
 
     lsc.setHostname(hostname);
     lsc.setVo(vo);
 
-    try {
-
-      BufferedReader lscReader = new BufferedReader(new InputStreamReader(is));
-
-      String line = null;
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
       List<String> certificateChainDescription = new ArrayList<String>();
-
-      do {
-        line = lscReader.readLine();
-
-        // This is EOF
-        if (line == null)
+      String line;
+      while ((line = reader.readLine()) != null) {
+        if (line.trim().startsWith("#") || line.trim().isEmpty()) {
+          continue;
+        }
+        if (line.equalsIgnoreCase(NEXT_CHAIN)) {
+          /* This parser doesn't support multi-chain LSC files */
           break;
-
-        // Ignore comments
-        if (line.startsWith("#"))
-          continue;
-
-        // Ignore ---NEXT CHAIN---
-        if (line.startsWith("-"))
-          continue;
-
-        // Ignore empty lines
-        if (line.matches(EMPTY_LINE_REGEX))
-          continue;
-
-        if (line.startsWith("/"))
+        }
+        if (line.startsWith("/")) {
           certificateChainDescription.add(line);
-
-      } while (true);
-
-      lscReader.close();
-
-      if (certificateChainDescription.size() % 2 != 0) {
-        String errorMessage = String.format(MALFORMED_LSC_FILE_ERROR_TEMPLATE,
-          vo, hostname, "Odd number of distinguished name entries.");
-
-        throw new VOMSError(errorMessage);
-
+        }
       }
-
-      if (certificateChainDescription.size() == 0) {
-        String errorMessage = String.format(MALFORMED_LSC_FILE_ERROR_TEMPLATE,
-          vo, hostname, "No distinguished name entries found.");
-
-        throw new VOMSError(errorMessage);
-      }
-
+      validateChain(certificateChainDescription, vo, hostname);
       lsc.setCertificateChainDescription(certificateChainDescription);
-
     } catch (IOException e) {
       throw new VOMSError("LSC file parsing error: " + e.getMessage(), e);
     }
-
+    if (lsc.getCertificateChainDescription().isEmpty()) {
+      String errorMessage =
+          String.format(MALFORMED_LSC_FILE_ERROR_TEMPLATE, vo, hostname, "No chains found.");
+      throw new VOMSError(errorMessage);
+    }
     return lsc;
+  }
+
+  private void validateChain(List<String> certificateChainDescription, String vo, String hostname) {
+    if (certificateChainDescription.size() % 2 != 0) {
+      String errorMessage = String.format(MALFORMED_LSC_FILE_ERROR_TEMPLATE, vo, hostname,
+          "Odd number of distinguished name entries.");
+      throw new VOMSError(errorMessage);
+    }
+    if (certificateChainDescription.size() == 0) {
+      String errorMessage = String.format(MALFORMED_LSC_FILE_ERROR_TEMPLATE, vo, hostname,
+          "No distinguished name entries found.");
+
+      throw new VOMSError(errorMessage);
+    }
   }
 
   public LSCFile parse(String vo, String hostname, File file) {
@@ -150,7 +104,5 @@ public class DefaultLSCFileParser implements LSCFileParser {
     }
 
     return lsc;
-
   }
-
 }

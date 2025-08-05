@@ -1,0 +1,100 @@
+# SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build RPM
+on: push
+
+jobs:
+  build-rpm:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [almalinux]
+        version: [8, 9]
+    outputs:
+      repo: ${{ steps.info.outputs.repo }}
+      version_pom: ${{ steps.info.outputs.version_pom }}
+    runs-on: ubuntu-latest
+    container: '${{ matrix.os }}:${{ matrix.version }}'
+    steps:
+      - name: Install dependencies
+        run: |
+          dnf upgrade -y
+          dnf module enable -y maven:3.8
+          dnf install -y git rpmdevtools rpmlint maven-openjdk17
+      - name: Setup build tree
+        run: |
+          echo "%_topdir $(pwd)/rpmbuild" >> ~/.rpmmacros
+          rpmdev-setuptree
+      - uses: actions/checkout@v4
+        with:
+          path: 'rpmbuild/BUILD'
+          fetch-depth: 0
+      - name: Calculate version and repo
+        id: info
+        run: |
+          cd rpmbuild/BUILD
+          VERSION_POM=$(mvn org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=project.version -q -DforceStdout)
+          # Maven uses -SNAPSHOT for pre-releases, change the - to ~ in the RPM
+          VERSION_RPM=$(echo ${VERSION_POM} | sed 's/-/~/')
+          if [[ ${{ github.ref_type }} = 'tag' ]]; then
+            # In case is a tag, check if the tag matches v<x>.<y>.<z>
+            if [[ ${GITHUB_REF_NAME} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+              REPO='stable'
+              VERSION="${BASH_REMATCH[1]}"
+              if [[ ${VERSION} != ${VERSION_POM} ]]; then
+                echo "Version mismatch between tag (${VERSION}) and POM file (${VERSION_POM})"
+                exit 1
+              fi
+            fi
+          elif [[ ${GITHUB_REF_NAME} = ${{ github.event.repository.default_branch }} ]]; then
+            # Check if the version in POM file matches <x>.<y>.<z>-SNAPSHOT
+            if [[ ${VERSION_POM} =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+              REPO='nightly'
+            fi
+          fi
+          echo "REPO=${REPO}" >> "${GITHUB_ENV}"
+          echo "repo=${REPO}" >> "${GITHUB_OUTPUT}"
+          echo "VERSION_POM=${VERSION_POM}" >> "${GITHUB_ENV}"
+          echo "version_pom=${VERSION_POM}" >> "${GITHUB_OUTPUT}"
+          echo "VERSION_RPM=${VERSION_RPM}" >> "${GITHUB_ENV}"
+          echo "Version POM: ${VERSION_POM}"
+          echo "Version RPM: ${VERSION_RPM}"
+          echo "Repo: ${REPO:-none}"
+      - name: Build RPM
+        run: |
+          cp rpmbuild/BUILD/voms-api-java.spec rpmbuild/SPECS/voms-api-java.spec
+          rpmlint rpmbuild/SPECS/voms-api-java.spec
+          rpmbuild --define "base_version ${VERSION_RPM}" --define "version_pom ${VERSION_POM}" -ba rpmbuild/SPECS/voms-api-java.spec
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-rpm-${{ matrix.os }}-${{ matrix.version }}
+          path: |
+            rpmbuild/RPMS/noarch/*.rpm
+      - name: Upload release to repo
+        if: env.REPO != ''
+        run: |
+          for file in rpmbuild/RPMS/noarch/*.rpm; do
+            curl --fail --user "${{ vars.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }}" --upload-file "${file}" https://repo.cloud.cnaf.infn.it/repository/voms-rpm-${REPO}/redhat${{ matrix.version }}/
+          done
+  create-release:
+    needs: build-rpm
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION_POM: ${{ needs.build-rpm.outputs.version_pom }}
+    if: needs.build-rpm.outputs.repo == 'stable'
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+      - name: Create release
+        run: |
+          # Get from the changelog file only the part related to the tagged release, in particular:
+          # - Delete lines up to the one beginning with "## <x>.<y>.<z>" (inclusive)
+          # - Delete lines from the next one beginning with "## " until the end of the file
+          # - Change all the "### " to "## " to use heading level 2 instead of level 3
+          sed -e "1,/^## ${VERSION_POM}/d;/^## /,\$d;s/^### /## /g" CHANGELOG.md > RELEASE-CHANGELOG.md
+          gh release create v${VERSION_POM} --title "VOMS API Java ${VERSION_POM}" --notes-file RELEASE-CHANGELOG.md build-*/*

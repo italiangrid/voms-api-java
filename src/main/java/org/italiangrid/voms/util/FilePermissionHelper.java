@@ -1,18 +1,7 @@
-/**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.italiangrid.voms.util;
 
 import java.io.BufferedReader;
@@ -25,33 +14,68 @@ import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.credential.FilePermissionError;
 
 /**
- * An helper class that does simple unix file permissions checks (until we get
- * proper support for this stuff in Java 7)
- * 
- * @author Andrea Ceccanti
- * 
+ * A helper class for performing basic Unix file permission checks.
+ *
+ * <p>
+ * This class is intended to provide simple permission validation and modification for specific
+ * files, such as private keys and proxy certificates. It relies on executing system commands to
+ * fetch and update file permissions.
+ * </p>
+ *
+ * <p>
+ * Note: This implementation is a workaround until proper support for POSIX file permissions is
+ * available in Java.
+ * </p>
+ *
  */
 public class FilePermissionHelper {
 
+  /**
+   * Enumeration representing POSIX file permissions.
+   */
   public static enum PosixFilePermission {
 
-    USER_RO("400", "-r--------"), USER_RW("600", "-rw-------"), USER_ALL("700",
-      "-rwx------"), ALL_PERMS("777", "-rwxrwxrwx");
+    // @formatter:off
+    /** Read-only permission for the user (chmod 400, stat -r--------). */
+    USER_RO   ("400", "-r--------"),
+    /** Read and write permission for the user (chmod 600, stat -rw-------). */
+    USER_RW   ("600", "-rw-------"),
+    /** Full permissions for the user (chmod 700, stat -rwx------). */
+    USER_ALL  ("700", "-rwx------"),
+    /** Full permissions for all users (chmod 777, stat -rwxrwxrwx). */
+    ALL_PERMS ("777", "-rwxrwxrwx");
+    // @formatter:off
 
+    private String chmodForm;
+    private String statForm;
+
+    /**
+     * Constructor for PosixFilePermission enum.
+     *
+     * @param chmodForm the chmod-style representation of the permission
+     * @param statForm the stat-style representation of the permission
+     */
     private PosixFilePermission(String chmodForm, String statForm) {
 
       this.chmodForm = chmodForm;
       this.statForm = statForm;
     }
 
-    private String statForm;
-    private String chmodForm;
-
+    /**
+     * Gets the stat-style (symbolic) representation of the permission.
+     *
+     * @return the stat-formatted permission string (e.g., "-rw-------").
+     */
     public String statForm() {
 
       return statForm;
     }
 
+    /**
+     * Gets the chmod-style (numeric) representation of the permission.
+     *
+     * @return the chmod-formatted permission string (e.g., "600").
+     */
     public String chmodForm() {
 
       return chmodForm;
@@ -61,14 +85,14 @@ public class FilePermissionHelper {
   /**
    * Required file permissions for the private key file
    */
-  public static final EnumSet<PosixFilePermission> PRIVATE_KEY_PERMS = EnumSet
-    .of(PosixFilePermission.USER_RO, PosixFilePermission.USER_RW);
+  public static final EnumSet<PosixFilePermission> PRIVATE_KEY_PERMS =
+      EnumSet.of(PosixFilePermission.USER_RO, PosixFilePermission.USER_RW);
 
   /**
    * String representation of private key required permissions.
    */
-  public static final String PRIVATE_KEY_PERMS_STR = PosixFilePermission.USER_RO
-    .chmodForm() + ", " + PosixFilePermission.USER_RW.chmodForm();
+  public static final String PRIVATE_KEY_PERMS_STR =
+      PosixFilePermission.USER_RO.chmodForm() + ", " + PosixFilePermission.USER_RW.chmodForm();
 
   /**
    * The command used to retrieve file permissions for a given file
@@ -82,14 +106,11 @@ public class FilePermissionHelper {
 
   /**
    * Checks whether a proxy file has the right permissions
-   * 
-   * @param proxyFile
-   *          the file to be checked
-   * 
-   * @throws IOException
-   *           if an error occurs checking file attributes
-   * @throws FilePermissionError
-   *           if permissions are not as expected
+   *
+   * @param proxyFile the file to be checked
+   *
+   * @throws IOException if an error occurs checking file attributes
+   * @throws FilePermissionError if permissions are not as expected
    */
   public static void checkProxyPermissions(String proxyFile) throws IOException {
 
@@ -98,16 +119,12 @@ public class FilePermissionHelper {
 
   /**
    * Checks whether a private key file has the 'right' permissions
-   * 
-   * @param privateKeyFile
-   *          the file to be checked
-   * @throws IOException
-   *           if an error occurs checking file attributes
-   * @throws FilePermissionError
-   *           if the permissions are not correct
+   *
+   * @param privateKeyFile the file to be checked
+   * @throws IOException if an error occurs checking file attributes
+   * @throws FilePermissionError if the permissions are not correct
    */
-  public static void checkPrivateKeyPermissions(String privateKeyFile)
-    throws IOException {
+  public static void checkPrivateKeyPermissions(String privateKeyFile) throws IOException {
 
     for (PosixFilePermission p : PRIVATE_KEY_PERMS) {
       try {
@@ -117,152 +134,150 @@ public class FilePermissionHelper {
       }
     }
 
-    final String errorMessage = String.format(
-      "Wrong file permissions on file %s. Required permissions are: %s ",
-      privateKeyFile, PRIVATE_KEY_PERMS_STR);
+    final String errorMessage =
+        String.format("Wrong file permissions on file %s. Required permissions are: %s ",
+            privateKeyFile, PRIVATE_KEY_PERMS_STR);
 
     throw new FilePermissionError(errorMessage);
   }
 
   /**
-   * Chekcs whether a pkcs12 file has the 'right' permissions
-   * 
-   * @param pkcs12File
-   *          the file to be checked
-   * @throws IOException
-   *           if an error occurs checking file attributes
-   * @throws FilePermissionError
-   *           if the permissions are not correct
+   * Checks whether a pkcs12 file has the 'right' permissions
+   *
+   * @param pkcs12File the file to be checked
+   * @throws IOException if an error occurs checking file attributes
+   * @throws FilePermissionError if the permissions are not correct
    */
-  public static void checkPKCS12Permissions(String pkcs12File)
-    throws IOException {
+  public static void checkPKCS12Permissions(String pkcs12File) throws IOException {
 
     matchesFilePermissions(pkcs12File, PosixFilePermission.USER_RW);
   }
 
   /**
-   * Checks that a given file has the appropriate unix permissions. This naive
-   * implementation just fetches the output of ls -al on a given file and
-   * matches the resulting string with the permissionString passed as argument.
-   * 
+   * Checks that a given file has the appropriate unix permissions. This naive implementation just
+   * fetches the output of ls -al on a given file and matches the resulting string with the
+   * permissionString passed as argument.
+   *
    * So the permissionString must be something like:
-   * 
+   *
    * <pre>
    * -rw-------
    * </pre>
-   * 
-   * @param filename
-   *          the filename to be checked
-   * @param p
-   *          the permission string that must be matched
-   * @throws IOException
-   *           if an error occurs checking file attributes
-   * @throws FilePermissionError
-   *           if file permissions are not as requested
+   *
+   * @param filename the filename to be checked
+   * @param expectedPerm the permission string that must be matched
+   * @throws IOException if an error occurs checking file attributes
+   * @throws FilePermissionError if file permissions are not as requested
    */
-  public static void matchesFilePermissions(String filename,
-    PosixFilePermission p) throws IOException {
+  public static void matchesFilePermissions(String filename, PosixFilePermission expectedPerm)
+      throws IOException {
 
     filenameSanityChecks(filename);
 
-    if (p == null)
-      throw new NullPointerException("null permission passed as argument");
+    if (expectedPerm == null) {
+      throw new NullPointerException("Expected permission cannot be null.");
+    }
 
-    File f = new File(filename);
+    String filePerms = getFilePermissions(new File(filename).getCanonicalPath());
 
-    // Don't get fooled by symlinks...
-    String canonicalPath = f.getCanonicalPath();
-
-    String filePerms = getFilePermissions(canonicalPath);
-
-    if (!filePerms.startsWith(p.statForm))
-      throw new FilePermissionError("Wrong file permissions on file "
-        + filename + ". Required permissions are: " + p.chmodForm());
-
+    if (!filePerms.startsWith(expectedPerm.statForm())) {
+      throw new FilePermissionError(
+          String.format("Wrong file permissions on file %s. Expected: %s",
+              filename, expectedPerm.chmodForm()));
+    }
   }
 
   private static void filenameSanityChecks(String filename) {
 
-    if (filename == null)
-      throw new NullPointerException("null filename passed as argument");
+    if (filename == null) {
+      throw new NullPointerException("Filename cannot be null.");
+    }
 
-    File f = new File(filename);
-    if (!f.exists())
+    File file = new File(filename);
+    if (!file.exists()) {
       throw new VOMSError("File not found: " + filename);
+    }
   }
 
   private static String getFilePermissions(String filename) {
 
     String cmd = String.format(LS_CMD_TEMPLATE, filename);
-
-    String permString;
-
     ProcessBuilder pb = new ProcessBuilder(cmd.split(" "));
 
     try {
       Process p = pb.start();
       int exitStatus = p.waitFor();
 
-      if (exitStatus != 0)
-        throw new VOMSError("Cannot list properties for file '" + filename
-          + "': error invoking the '" + cmd + "' os command!");
+      if (exitStatus != 0) {
+        throw new VOMSError("Failed to retrieve file properties: " + filename);
+      }
 
-      BufferedReader r = new BufferedReader(new InputStreamReader(
-        p.getInputStream()));
-
-      permString = r.readLine();
-      if (permString == null)
-        throw new VOMSError("Cannot list properties for file '" + filename
-          + "': the output of '" + cmd + "' is empty!");
-
-      return permString;
-
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+        String permString = reader.readLine();
+        if (permString == null) {
+          throw new VOMSError("No output received from command: " + cmd);
+        }
+        return permString;
+      }
     } catch (IOException e) {
-      throw new VOMSError("Cannot list properties for file '" + filename
-        + "': " + e.getMessage(), e);
-
+      throw new VOMSError("Error retrieving file permissions for " + filename, e);
     } catch (InterruptedException e) {
       return null;
     }
   }
 
+  /**
+   * Sets the default POSIX permissions on a proxy identified by filename.
+   *
+   * @param filename the file to modify
+   */
   public static void setProxyPermissions(String filename) {
 
-    filenameSanityChecks(filename);
     setFilePermissions(filename, PosixFilePermission.USER_RW);
   }
 
+  /**
+   * Sets the default POSIX permissions on a p12 identified by filename.
+   *
+   * @param filename the file to modify
+   */
   public static void setPKCS12Permissions(String filename) {
 
-    filenameSanityChecks(filename);
     setFilePermissions(filename, PosixFilePermission.USER_RW);
   }
 
+  /**
+   * Sets the default POSIX permissions on a private key identified by filename.
+   *
+   * @param filename the file to modify
+   */
   public static void setPrivateKeyPermissions(String filename) {
 
-    filenameSanityChecks(filename);
     setFilePermissions(filename, PosixFilePermission.USER_RO);
   }
 
-  public static void setFilePermissions(String filename,
-    PosixFilePermission perm) {
+  /**
+   * Sets the specified POSIX permissions on a file.
+   *
+   * @param filename the file to modify
+   * @param perm the permissions to apply
+   */
+  public static void setFilePermissions(String filename, PosixFilePermission perm) {
+
+    filenameSanityChecks(filename);
 
     String cmd = String.format(CHMOD_CMD_TEMPLATE, perm.chmodForm(), filename);
-
     ProcessBuilder pb = new ProcessBuilder(cmd.split(" "));
+
     try {
-      Process p = pb.start();
-      int exitStatus = p.waitFor();
+      Process process = pb.start();
+      int exitStatus = process.waitFor();
 
-      if (exitStatus != 0)
-        throw new VOMSError("Cannot change permissions on file '" + filename
-          + "': error invoking the '" + cmd + "' os command!");
-    } catch (IOException e) {
-      throw new VOMSError("Cannot list properties for file '" + filename
-        + "': " + e.getMessage(), e);
-
-    } catch (InterruptedException e) {
-      throw new VOMSError("Interrupted while running os command!", e);
+      if (exitStatus != 0) {
+        throw new VOMSError("Failed to change file permissions: " + filename);
+      }
+    } catch (IOException | InterruptedException e) {
+      throw new VOMSError("Error setting file permissions for " + filename, e);
     }
   }
 

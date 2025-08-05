@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+#
+# SPDX-License-Identifier: Apache-2.0
+
 /.settings
 /bin
 /dist
@@ -10,3 +14,14 @@
 /RPMS
 /tgz
 /target
+/src/test/resources/certs
+/src/test/resources/homes
+/src/test/resources/vomsdir-expired-aa-cert
+/src/test/resources/vomsdir-fake-aa-cert
+/src/test/resources/vomsdir/test.vo.2/test-host.cnaf.infn.it.pem
+/src/test/resources/vomsdir/test-host.cnaf.infn.it.pem
+/src/test/resources/trust-anchors
+/src/test/resources/md5-trust-anchors
+/src/test/resources/perm-test
+/src/test/resources/sha1-trust-anchors
+/src/test/resources/igi_test_ca

@@ -1,5 +1,0 @@
-TO Issuer "/C=IT/O=IGI/CN=Test CA" \
-    PERMIT Subject "/C=it/O=IGI/.*"
-
-TO Issuer "/C=IT/O=IGI/CN=Test CA" \
-    PERMIT Subject "/C=IT/O=IGI/.*"

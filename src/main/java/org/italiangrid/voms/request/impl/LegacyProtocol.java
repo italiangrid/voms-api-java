@@ -1,27 +1,16 @@
-/**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.italiangrid.voms.request.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -36,8 +25,7 @@ import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.FormatMode;
-import eu.emi.security.authn.x509.impl.HostnameMismatchCallback;
-import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
+import eu.emi.security.authn.x509.impl.HostnameMismatchCallback2;
 
 /**
  * Protocol implementing the legacy interface.
@@ -45,7 +33,7 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
  * 
  */
 public class LegacyProtocol extends AbstractVOMSProtocol implements
-  VOMSProtocol, HostnameMismatchCallback {
+  VOMSProtocol, HostnameMismatchCallback2 {
 
   public LegacyProtocol(X509CertChainValidatorExt validator,
     VOMSProtocolListener listener, int connectTimeout, int readTimeout) {
@@ -70,9 +58,6 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements
         endpoint.getURL().getPort());
 
       sslSocket.connect(sa, connectTimeout);
-      if (!isSkipHostnameChecks()) {
-        SocketFactoryCreator.connectWithHostnameChecking(sslSocket, this);
-      }
 
     } catch (Throwable t) {
 
@@ -105,17 +90,17 @@ public class LegacyProtocol extends AbstractVOMSProtocol implements
     return response;
   }
 
-  public void nameMismatch(SSLSocket socket, X509Certificate peerCertificate,
-    String hostName) throws SSLException {
+  @Override
+  public void nameMismatch(X509Certificate peerCertificate, String hostName)
+      throws CertificateException {
 
     String peerCertString = CertificateUtils.format(peerCertificate,
-      FormatMode.MEDIUM_ONE_LINE);
-    String message = String
-      .format(
-        "No subject alternative DNS name matching %s found. Peer certificate : %s",
-        hostName, peerCertString);
-    throw new SSLException(message);
-
+        FormatMode.MEDIUM_ONE_LINE);
+      String message = String
+        .format(
+          "No subject alternative DNS name matching %s found. Peer certificate : %s",
+          hostName, peerCertString);
+      throw new CertificateException(message);
   }
 
 }

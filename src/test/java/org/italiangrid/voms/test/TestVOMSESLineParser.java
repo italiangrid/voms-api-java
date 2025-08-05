@@ -1,29 +1,17 @@
-/**
- * Copyright (c) Istituto Nazionale di Fisica Nucleare, 2006-2014.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// SPDX-FileCopyrightText: 2006 Istituto Nazionale di Fisica Nucleare
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.italiangrid.voms.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URISyntaxException;
 
-import org.hamcrest.CoreMatchers;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.impl.VOMSESLineParser;
@@ -68,9 +56,7 @@ public class TestVOMSESLineParser {
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
-      assertThat(e.getMessage(),
-        CoreMatchers
-          .containsString("Invalid VOMSES line: empty 'vo alias' field."));
+      assertTrue(e.getMessage().contains("Invalid VOMSES line: empty 'vo alias' field."));
     }
   }
 
@@ -84,9 +70,7 @@ public class TestVOMSESLineParser {
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
-      assertThat(e.getMessage(),
-        CoreMatchers
-          .containsString("Invalid VOMSES line: incomplete 'vo alias' field."));
+      assertTrue(e.getMessage().contains("Invalid VOMSES line: incomplete 'vo alias' field."));
     }
   }
 
@@ -100,9 +84,7 @@ public class TestVOMSESLineParser {
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
-      assertThat(e.getMessage(),
-        CoreMatchers
-          .containsString("Invalid VOMSES line: incomplete 'voms host' field."));
+      assertTrue(e.getMessage().contains("Invalid VOMSES line: incomplete 'voms host' field."));
     }
   }
 
@@ -116,9 +98,7 @@ public class TestVOMSESLineParser {
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
-      assertThat(e.getMessage(),
-        CoreMatchers
-          .containsString("Invalid VOMSES line: incomplete information"));
+      assertTrue(e.getMessage().contains("Invalid VOMSES line: incomplete information"));
     }
   }
 
@@ -134,9 +114,7 @@ public class TestVOMSESLineParser {
     } catch (VOMSError e) {
 
       assertNotNull("Got a null error message", e.getMessage());
-      assertThat(e.getMessage(),
-        CoreMatchers
-          .containsString("Invalid VOMSES line: incomplete information"));
+      assertTrue(e.getMessage().contains("Invalid VOMSES line: incomplete information"));
     }
   }
 
@@ -148,14 +126,10 @@ public class TestVOMSESLineParser {
     VOMSESLineParser p = new VOMSESLineParser();
     VOMSServerInfo i = p.parse(line);
 
-    assertThat(i.getAlias(), CoreMatchers.equalTo("a"));
-
-    assertThat(i.getURL().toString(),
-      CoreMatchers.equalTo("voms://voms.cern.ch:15000"));
-
-    assertThat(i.getVoName(), CoreMatchers.equalTo("alice"));
-
-    assertThat(i.getVOMSServerDN(), CoreMatchers.equalTo("DN=Illo"));
+    assertEquals("a", i.getAlias());
+    assertEquals("voms://voms.cern.ch:15000", i.getURL().toString());
+    assertEquals("alice", i.getVoName());
+    assertEquals("DN=Illo", i.getVOMSServerDN());
   }
 
   @Test
@@ -166,14 +140,10 @@ public class TestVOMSESLineParser {
     VOMSESLineParser p = new VOMSESLineParser();
     VOMSServerInfo i = p.parse(line);
 
-    assertThat(i.getAlias(), CoreMatchers.equalTo("a"));
-
-    assertThat(i.getURL().toString(),
-      CoreMatchers.equalTo("voms://voms.cern.ch:15000"));
-
-    assertThat(i.getVoName(), CoreMatchers.equalTo("alice"));
-
-    assertThat(i.getVOMSServerDN(), CoreMatchers.equalTo("DN=Illo"));
+    assertEquals("a", i.getAlias());
+    assertEquals("voms://voms.cern.ch:15000", i.getURL().toString());
+    assertEquals("alice", i.getVoName());
+    assertEquals("DN=Illo", i.getVOMSServerDN());
   }
 
   @Test
@@ -187,8 +157,7 @@ public class TestVOMSESLineParser {
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
-      assertThat(e.getMessage(),
-        CoreMatchers.containsString("Invalid VOMSES line: too many fields!"));
+      assertTrue(e.getMessage().contains("Invalid VOMSES line: too many fields!"));
     }
 
   }
@@ -204,9 +173,7 @@ public class TestVOMSESLineParser {
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
-      assertThat(e.getMessage(),
-        CoreMatchers
-          .containsString("Invalid VOMSES line: invalid port number."));
+      assertTrue(e.getMessage().contains("Invalid VOMSES line: invalid port number."));
     }
 
   }
@@ -222,9 +189,7 @@ public class TestVOMSESLineParser {
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
-      assertThat(e.getMessage(),
-        CoreMatchers
-          .containsString("Invalid VOMSES line: invalid port number: -1"));
+      assertTrue(e.getMessage().contains("Invalid VOMSES line: invalid port number: -1"));
     }
   }
 
@@ -239,9 +204,7 @@ public class TestVOMSESLineParser {
       fail("No error raised.");
     } catch (VOMSError e) {
       assertNotNull("Got a null error message", e.getMessage());
-      assertThat(e.getMessage(),
-        CoreMatchers
-          .containsString("Invalid VOMSES line: invalid port number: 65536"));
+      assertTrue(e.getMessage().contains("Invalid VOMSES line: invalid port number: 65536"));
     }
   }
 
@@ -255,14 +218,12 @@ public class TestVOMSESLineParser {
     VOMSServerInfo i0 = p.parse(line0);
     VOMSServerInfo i1 = p.parse(line1);
 
-    assertThat(i0.getAlias(), CoreMatchers.equalTo("a"));
-    assertThat(i0.getURL().toString(),
-      CoreMatchers.equalTo("voms://voms.cern.ch:15000"));
-    assertThat(i0.getVoName(), CoreMatchers.equalTo("alice"));
+    assertEquals("a", i0.getAlias());
+    assertEquals("voms://voms.cern.ch:15000", i0.getURL().toString());
+    assertEquals("alice", i0.getVoName());
 
-    assertThat(i1.getAlias(), CoreMatchers.equalTo("b"));
-    assertThat(i1.getURL().toString(),
-      CoreMatchers.equalTo("voms://voms.cern.ch:15001"));
-    assertThat(i1.getVoName(), CoreMatchers.equalTo("bolice"));
+    assertEquals("b", i1.getAlias());
+    assertEquals("voms://voms.cern.ch:15001", i1.getURL().toString());
+    assertEquals("bolice", i1.getVoName());
   }
 }
