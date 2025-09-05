@@ -66,19 +66,19 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
    * The list of local trusted directories that is searched for trust
    * information (certs or LSC files)
    **/
-  private final List<String> localTrustedDirs;
+  protected final List<String> localTrustedDirs;
 
   /** Map of local parsed AA certificates keyed by certificate subject hash **/
-  private Map<String, X509Certificate> localAACertificatesByHash = new HashMap<String, X509Certificate>();
+  protected Map<String, X509Certificate> localAACertificatesByHash = new HashMap<String, X509Certificate>();
 
   /** The set of local parsed LSC information keyed by VO **/
-  private Map<String, Set<LSCInfo>> localLSCInfo = new HashMap<String, Set<LSCInfo>>();
+  protected Map<String, Set<LSCInfo>> localLSCInfo = new HashMap<String, Set<LSCInfo>>();
 
   /**
    * The trust store status listener that will be notified of changes in this
    * trust store
    **/
-  private VOMSTrustStoreStatusListener listener;
+  protected VOMSTrustStoreStatusListener listener;
 
   /** The read/write lock that implements thread safety for this store **/
   protected final ReadWriteLock rwLock = new ReentrantReadWriteLock();
@@ -99,7 +99,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
    * @return a list of default trusted directory containing the
    *         {@link #DEFAULT_VOMS_DIR}
    **/
-  protected static List<String> buildDefaultTrustedDirs() {
+  public static List<String> buildDefaultTrustedDirs() {
 
     List<String> tDirs = new ArrayList<String>();
     tDirs.add(DEFAULT_VOMS_DIR);
@@ -266,7 +266,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
    * 
    * @param directory
    */
-  private void loadLSCFromDirectory(File directory) {
+  protected void loadLSCFromDirectory(File directory) {
 
     directorySanityChecks(directory);
 
@@ -345,7 +345,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
    * 
    * @param directory
    */
-  private void directorySanityChecks(File directory) {
+  protected void directorySanityChecks(File directory) {
 
     if (!directory.exists())
       throw new VOMSError("Local trust directory does not exists:"
