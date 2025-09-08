@@ -7,9 +7,9 @@
  */
 package org.italiangrid.voms.test;
 
-import static java.util.Objects.isNull;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.FileInputStream;
@@ -101,9 +101,9 @@ public class TestDefaultVOMSTrustStore {
 
     DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs, NullListener.INSTANCE);
 
-    assertFalse(isNull(store.getLSC("test.vo", "test-host.cnaf.infn.it")));
-    assertFalse(isNull(store.getLSC("test.vo", "test-multichain.cnaf.infn.it")));
-    assertFalse(isNull(store.getLSC("test.vo.1", "wilco.cnaf.infn.it")));
+    assertNotNull(store.getLSC("test.vo", "test-host.cnaf.infn.it"));
+    assertNotNull(store.getLSC("test.vo", "test-multichain.cnaf.infn.it"));
+    assertNotNull(store.getLSC("test.vo.1", "wilco.cnaf.infn.it"));
 
   }
 
@@ -115,9 +115,9 @@ public class TestDefaultVOMSTrustStore {
     DefaultVOMSTrustStore store =
         new DefaultVOMSTrustStore(trustDirs, Arrays.asList("test.vo"), NullListener.INSTANCE);
 
-    assertFalse(isNull(store.getLSC("test.vo", "test-host.cnaf.infn.it")));
-    assertFalse(isNull(store.getLSC("test.vo", "test-multichain.cnaf.infn.it")));
-    assertTrue(isNull(store.getLSC("test.vo.1", "wilco.cnaf.infn.it")));
+    assertNotNull(store.getLSC("test.vo", "test-host.cnaf.infn.it"));
+    assertNotNull(store.getLSC("test.vo", "test-multichain.cnaf.infn.it"));
+    assertNull(store.getLSC("test.vo.1", "wilco.cnaf.infn.it"));
 
   }
 
