@@ -7,7 +7,9 @@
  */
 package org.italiangrid.voms.test;
 
+import static java.util.Objects.isNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.FileInputStream;
@@ -20,6 +22,7 @@ import java.util.List;
 
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
+import org.italiangrid.voms.util.NullListener;
 import org.junit.Test;
 
 import eu.emi.security.authn.x509.impl.CertificateUtils;
@@ -34,17 +37,16 @@ public class TestDefaultVOMSTrustStore {
   @Test(expected = VOMSError.class)
   public void testEmptyTrustDirsFailure() {
 
-    @SuppressWarnings({ "unused", "unchecked" })
-    DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(
-      Collections.EMPTY_LIST);
+    @SuppressWarnings({"unused", "unchecked"})
+    DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(Collections.EMPTY_LIST);
 
   }
 
   @Test(expected = VOMSError.class)
   public void testNonExistentTrustDirsFailure() {
 
-    List<String> trustDirs = Arrays.asList(new String[] { "/etc/do/not/exist",
-      "/etc/grid-security/vomsdir" });
+    List<String> trustDirs =
+        Arrays.asList(new String[] {"/etc/do/not/exist", "/etc/grid-security/vomsdir"});
 
     @SuppressWarnings("unused")
     DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
@@ -75,22 +77,48 @@ public class TestDefaultVOMSTrustStore {
   }
 
   @Test
-  public void testCertificateParsing() throws FileNotFoundException,
-    IOException {
+  public void testCertificateParsing() throws FileNotFoundException, IOException {
 
     String vomsDir = "src/test/resources/vomsdir";
     String certFileName = "src/test/resources/vomsdir/test-host.cnaf.infn.it.pem";
-    X509Certificate cert = CertificateUtils.loadCertificate(
-      new FileInputStream(certFileName), Encoding.PEM);
+    X509Certificate cert =
+        CertificateUtils.loadCertificate(new FileInputStream(certFileName), Encoding.PEM);
 
-    List<String> trustDirs = Arrays.asList(new String[] { vomsDir });
+    List<String> trustDirs = Arrays.asList(new String[] {vomsDir});
 
     DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
 
     assertEquals(1, store.getLocalAACertificates().size());
 
-    assertTrue(cert.getSubjectX500Principal().equals(
-      store.getLocalAACertificates().get(0).getSubjectX500Principal()));
+    assertTrue(cert.getSubjectX500Principal()
+      .equals(store.getLocalAACertificates().get(0).getSubjectX500Principal()));
+  }
+
+  @Test
+  public void testAllLSCInStore() {
+
+    List<String> trustDirs = Arrays.asList("src/test/resources/vomsdir");
+
+    DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs, NullListener.INSTANCE);
+
+    assertFalse(isNull(store.getLSC("test.vo", "test-host.cnaf.infn.it")));
+    assertFalse(isNull(store.getLSC("test.vo", "test-multichain.cnaf.infn.it")));
+    assertFalse(isNull(store.getLSC("test.vo.1", "wilco.cnaf.infn.it")));
+
+  }
+
+  @Test
+  public void testLSCForVoInStore() {
+
+    List<String> trustDirs = Arrays.asList("src/test/resources/vomsdir");
+
+    DefaultVOMSTrustStore store =
+        new DefaultVOMSTrustStore(trustDirs, "test.vo", NullListener.INSTANCE);
+
+    assertFalse(isNull(store.getLSC("test.vo", "test-host.cnaf.infn.it")));
+    assertFalse(isNull(store.getLSC("test.vo", "test-multichain.cnaf.infn.it")));
+    assertTrue(isNull(store.getLSC("test.vo.1", "wilco.cnaf.infn.it")));
+
   }
 
   public void testUpdatingVOMSTrustStore() {
