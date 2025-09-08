@@ -113,7 +113,7 @@ public class TestDefaultVOMSTrustStore {
     List<String> trustDirs = Arrays.asList("src/test/resources/vomsdir");
 
     DefaultVOMSTrustStore store =
-        new DefaultVOMSTrustStore(trustDirs, "test.vo", NullListener.INSTANCE);
+        new DefaultVOMSTrustStore(trustDirs, Arrays.asList("test.vo"), NullListener.INSTANCE);
 
     assertFalse(isNull(store.getLSC("test.vo", "test-host.cnaf.infn.it")));
     assertFalse(isNull(store.getLSC("test.vo", "test-multichain.cnaf.infn.it")));

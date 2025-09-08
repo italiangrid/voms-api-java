@@ -89,7 +89,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
   /** A lock to guard the setting of the status listener **/
   protected final Object listenerLock = new Object();
 
-  protected final String voName;
+  protected final List<String> voName;
 
   /**
    * Builds a list of trusted directories containing only {@link #DEFAULT_VOMS_DIR}.
@@ -115,7 +115,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
     this(localTrustDirs, null, listener);
   }
 
-  public DefaultVOMSTrustStore(List<String> localTrustDirs, String voName,
+  public DefaultVOMSTrustStore(List<String> localTrustDirs, List<String> voName,
       VOMSTrustStoreStatusListener listener) {
 
     if (localTrustDirs == null)
@@ -398,7 +398,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
         for (File voDir : voDirs) {
 
-          if (voName != null && !voDir.getName().equals(voName))
+          if (voName != null && !voName.contains(voDir.getName()))
             continue;
 
           loadLSCFromDirectory(voDir);
