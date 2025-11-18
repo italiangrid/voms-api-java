@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [almalinux]
-        version: [8, 9]
+        version: [8, 9, 10]
     outputs:
       repo: ${{ steps.info.outputs.repo }}
       version_pom: ${{ steps.info.outputs.version_pom }}
@@ -22,8 +22,9 @@ jobs:
       - name: Install dependencies
         run: |
           dnf upgrade -y
-          dnf module enable -y maven:3.8
-          dnf install -y git rpmdevtools rpmlint maven-openjdk17
+          [[ "${{ matrix.version }}" -lt 10 ]] && dnf module enable -y maven:3.8
+          [[ "${{ matrix.version }}" = 10 ]] && dnf install -y almalinux-release-devel
+          dnf install -y git maven-openjdk21 rpmdevtools rpmlint
       - name: Setup build tree
         run: |
           echo "%_topdir $(pwd)/rpmbuild" >> ~/.rpmmacros

@@ -16,11 +16,11 @@ URL: https://github.com/italiangrid/voms-api-java
 
 BuildArch: noarch
 
-BuildRequires:  maven-openjdk17
+BuildRequires:  maven-openjdk21
 
 Provides:       voms-api-java3 = %{version}
 Requires:       canl-java >= 2.7
-Requires:       java-headless >= 1.8
+Requires:       java-headless >= 1:1.8.0
 
 %description
 The Virtual Organization Membership Service (VOMS) is an attribute authority
@@ -55,9 +55,6 @@ install -m 644 target/%{name}-%{version_pom}.jar -t %{buildroot}%{_javadir}
 ln -s %{name}-%{version_pom}.jar %{buildroot}%{_javadir}/%{name}.jar
 cp -r target/javadoc/* %{buildroot}%{_javadocdir}/%{name}-%{version_pom}
 ln -s %{name}-%{version_pom} %{buildroot}%{_javadocdir}/%{name}
-
-%clean
-rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
