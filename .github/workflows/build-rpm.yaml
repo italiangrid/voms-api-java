@@ -24,7 +24,7 @@ jobs:
           dnf upgrade -y
           [[ "${{ matrix.version }}" -lt 10 ]] && dnf module enable -y maven:3.8
           [[ "${{ matrix.version }}" = 10 ]] && dnf install -y almalinux-release-devel
-          dnf install -y git maven-openjdk21 rpmdevtools rpmlint
+          dnf install -y git maven-openjdk21 rpmdevtools rpmlint rpm-sign
       - name: Setup build tree
         run: |
           echo "%_topdir $(pwd)/rpmbuild" >> ~/.rpmmacros
@@ -64,11 +64,29 @@ jobs:
           echo "Version POM: ${VERSION_POM}"
           echo "Version RPM: ${VERSION_RPM}"
           echo "Repo: ${REPO:-none}"
+      - name: Import GPG key
+        if: ${{ matrix.version != 8 }}
+        env:
+          MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_KEY }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: |
+          echo "${MAVEN_GPG_KEY}" > private-key.asc
+          gpg --batch --import-options import-show --import private-key.asc
+          rm private-key.asc
+          gpg --export -a CNAFSD > RPM-GPG-KEY-pmanager
+          rpm --import RPM-GPG-KEY-pmanager
+          echo "%_gpg_name CNAFSD" >> ~/.rpmmacros
+          echo "%_gpg_sign_cmd_extra_args --pinentry-mode loopback --passphrase ${MAVEN_GPG_PASSPHRASE}" >> ~/.rpmmacros
       - name: Build RPM
         run: |
           cp rpmbuild/BUILD/voms-api-java.spec rpmbuild/SPECS/voms-api-java.spec
           rpmlint rpmbuild/SPECS/voms-api-java.spec
           rpmbuild --define "base_version ${VERSION_RPM}" --define "version_pom ${VERSION_POM}" -ba rpmbuild/SPECS/voms-api-java.spec
+          if [[ "${{ matrix.version }}" = 8 ]]; then
+            echo "Skip signing on AlmaLinux 8 to avoid error: RPM-GPG-KEY-pmanager: key 1 import failed"
+            exit 0
+          fi
+          GPG_TTY="" rpm --addsign rpmbuild/RPMS/noarch/*.rpm
       - uses: actions/upload-artifact@v4
         with:
           name: build-rpm-${{ matrix.os }}-${{ matrix.version }}
