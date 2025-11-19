@@ -94,9 +94,11 @@ jobs:
             rpmbuild/RPMS/noarch/*.rpm
       - name: Upload release to repo
         if: env.REPO != ''
+        env:
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         run: |
           for file in rpmbuild/RPMS/noarch/*.rpm; do
-            curl --fail --user "${{ vars.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }}" --upload-file "${file}" https://repo.cloud.cnaf.infn.it/repository/voms-rpm-${REPO}/redhat${{ matrix.version }}/
+            curl --fail --user "${{ vars.NEXUS_USERNAME }}:${NEXUS_PASSWORD}" --upload-file "${file}" https://repo.cloud.cnaf.infn.it/repository/voms-rpm-${REPO}/redhat${{ matrix.version }}/
           done
   create-release:
     needs: build-rpm
