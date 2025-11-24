@@ -63,19 +63,19 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
    * The list of local trusted directories that is searched for trust information (certs or LSC
    * files)
    **/
-  protected final List<String> localTrustedDirs;
+  private final List<String> localTrustedDirs;
 
   /** Map of local parsed AA certificates keyed by certificate subject hash **/
-  protected Map<String, X509Certificate> localAACertificatesByHash =
+  private Map<String, X509Certificate> localAACertificatesByHash =
       new HashMap<String, X509Certificate>();
 
   /** The set of local parsed LSC information keyed by VO **/
-  protected Map<String, Set<LSCInfo>> localLSCInfo = new HashMap<String, Set<LSCInfo>>();
+  private Map<String, Set<LSCInfo>> localLSCInfo = new HashMap<String, Set<LSCInfo>>();
 
   /**
    * The trust store status listener that will be notified of changes in this trust store
    **/
-  protected VOMSTrustStoreStatusListener listener;
+  private VOMSTrustStoreStatusListener listener;
 
   /** The read/write lock that implements thread safety for this store **/
   protected final ReadWriteLock rwLock = new ReentrantReadWriteLock();
@@ -89,14 +89,14 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
   /** A lock to guard the setting of the status listener **/
   protected final Object listenerLock = new Object();
 
-  protected final List<String> voName;
+  private final List<String> voNames;
 
   /**
    * Builds a list of trusted directories containing only {@link #DEFAULT_VOMS_DIR}.
    * 
    * @return a list of default trusted directory containing the {@link #DEFAULT_VOMS_DIR}
    **/
-  public static List<String> buildDefaultTrustedDirs() {
+  protected static List<String> buildDefaultTrustedDirs() {
 
     List<String> tDirs = new ArrayList<String>();
     tDirs.add(DEFAULT_VOMS_DIR);
@@ -115,16 +115,17 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
     this(localTrustDirs, null, listener);
   }
 
-  public DefaultVOMSTrustStore(List<String> localTrustDirs, List<String> voName,
+  public DefaultVOMSTrustStore(List<String> localTrustDirs, List<String> voNames,
       VOMSTrustStoreStatusListener listener) {
 
-    if (localTrustDirs == null)
+    if (localTrustDirs == null) {
       throw new IllegalArgumentException(
           "Please provide a non-null list of local trust directories!");
+    }
 
     this.localTrustedDirs = localTrustDirs;
     this.listener = listener;
-    this.voName = voName;
+    this.voNames = voNames;
     loadTrustInformation();
   }
 
@@ -263,7 +264,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
    * 
    * @param directory
    */
-  protected void loadLSCFromDirectory(File directory) {
+  private void loadLSCFromDirectory(File directory) {
 
     directorySanityChecks(directory);
 
@@ -340,7 +341,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
    * 
    * @param directory
    */
-  protected void directorySanityChecks(File directory) {
+  private void directorySanityChecks(File directory) {
 
     if (!directory.exists())
       throw new VOMSError("Local trust directory does not exists:" + directory.getAbsolutePath());
@@ -398,11 +399,10 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
         for (File voDir : voDirs) {
 
-          if (voName != null && !voName.contains(voDir.getName()))
-            continue;
-
-          loadLSCFromDirectory(voDir);
-          loadCertificatesFromDirectory(voDir);
+          if (voNames == null || voNames.contains(voDir.getName())) {
+            loadLSCFromDirectory(voDir);
+            loadCertificatesFromDirectory(voDir);
+          }
         }
       }
 
