@@ -10,7 +10,7 @@ SPDX-License-Identifier: Apache-2.0
 
   <groupId>org.italiangrid</groupId>
   <artifactId>voms-api-java</artifactId>
-  <version>3.3.7-SNAPSHOT</version>
+  <version>3.3.7</version>
   <packaging>jar</packaging>
 
   <name>voms-api-java</name>
@@ -90,6 +90,15 @@ SPDX-License-Identifier: Apache-2.0
       <id>szotti</id>
       <name>Stefano Zotti</name>
       <email>stefano.zotti@cnaf.infn.it</email>
+      <organization>INFN CNAF</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>fagostin</id>
+      <name>Federica Agostini</name>
+      <email>federica.agostini@cnaf.infn.it</email>
       <organization>INFN CNAF</organization>
       <roles>
         <role>Developer</role>
