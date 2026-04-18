@@ -6,6 +6,12 @@ SPDX-License-Identifier: Apache-2.0
 
 # Changelog
 
+## 3.3.8 (2026-04-21)
+
+### Changed
+
+* Bump to BC 1.84
+
 ## 3.3.7 (2025-12-18)
 
 ### Changed
