@@ -52,7 +52,7 @@ SPDX-License-Identifier: Apache-2.0
     <canl.version>2.8.3</canl.version>
     <mockito.version>5.16.0</mockito.version>
     <jcip.version>1.0</jcip.version>
-    <bc.version>1.81</bc.version>
+    <bc.version>1.84</bc.version>
 
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
