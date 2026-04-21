@@ -6,113 +6,62 @@ name: Dependency Updates
 
 on:
   push:
-    paths:
-      - "pom.xml"
   pull_request:
-    paths:
-      - "pom.xml"
   workflow_dispatch:
-    schedule:
-      - cron: "0 6 * * 1" # weekly fallback (Monday)
+  schedule:
+    - cron: "0 6 * * 1"
 
 jobs:
   check-dependencies:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Set up Java
-        uses: actions/setup-java@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Check if pom.xml changed
-        id: changes
-        uses: dorny/paths-filter@v4
-        with:
-          filters: |
-            pom:
-              - 'pom.xml'
-
-      - name: Run Maven (minor updates only)
-        if: steps.changes.outputs.pom == 'true'
+      - name: Run dependency check and publish table
         run: |
           mvn versions:display-dependency-updates \
             -DallowMajorUpdates=false \
             -DprocessDependencyManagement=true \
-            | tee minor-updates.txt
+            | tee minor.txt
 
-      - name: Run Maven (all updates)
-        if: steps.changes.outputs.pom == 'true'
-        run: |
           mvn versions:display-dependency-updates \
             -DallowMajorUpdates=true \
             -DprocessDependencyManagement=true \
-            | tee all-updates.txt
+            | tee all.txt
 
-      - name: Generate HTML report
-        if: steps.changes.outputs.pom == 'true'
-        run: |
-          echo "<html><head><style>
-            body { font-family: Arial, sans-serif; }
-            table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid #ddd; padding: 8px; }
-            th { background-color: #f2f2f2; text-align: left; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
-          </style></head><body>" > report.html
-
-          echo "<h1>Dependency Updates</h1>" >> report.html
-
-          # Also prepare summary (GitHub UI)
           echo "# Dependency Updates" >> $GITHUB_STEP_SUMMARY
 
           parse_file () {
             FILE=$1
             TITLE=$2
 
-            # HTML
-            echo "<h2>$TITLE</h2>" >> report.html
-            echo "<table>" >> report.html
-            echo "<tr><th>GroupId</th><th>ArtifactId</th><th>Current</th><th>Latest</th></tr>" >> report.html
-
-            # Summary (Markdown)
             echo "## $TITLE" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "| GroupId | ArtifactId | Current | Latest |" >> $GITHUB_STEP_SUMMARY
             echo "|---------|------------|---------|--------|" >> $GITHUB_STEP_SUMMARY
 
-            grep -- "->" "$FILE" | sed 's/^\[INFO\]\s*//' | while read -r line; do
-              # Extract groupId:artifactId
-              GA=$(echo "$line" | sed -E 's/^([a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+).*/\1/')
+            grep -- "->" "$FILE" \
+              | sed 's/^\[INFO\]\s*//' \
+              | while read -r line; do
 
-              GROUP=$(echo "$GA" | cut -d: -f1)
-              ARTIFACT=$(echo "$GA" | cut -d: -f2)
+                GA=$(echo "$line" | sed -E 's/^([a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+).*/\1/')
+                GROUP=$(echo "$GA" | cut -d: -f1)
+                ARTIFACT=$(echo "$GA" | cut -d: -f2)
 
-              # Extract versions (last "X -> Y" in line)
-              CURRENT=$(echo "$line" | sed -E 's/.* ([0-9A-Za-z.\-]+) -> .*/\1/')
-              LATEST=$(echo "$line" | sed -E 's/.* -> ([0-9A-Za-z.\-]+).*/\1/')
+                CURRENT=$(echo "$line" | sed -E 's/.* ([0-9A-Za-z.\-]+) -> .*/\1/')
+                LATEST=$(echo "$line" | sed -E 's/.* -> ([0-9A-Za-z.\-]+).*/\1/')
 
-              echo "<tr><td>$GROUP</td><td>$ARTIFACT</td><td>$CURRENT</td><td>$LATEST</td></tr>" >> report.html
-              echo "| $GROUP | $ARTIFACT | $CURRENT | $LATEST |" >> $GITHUB_STEP_SUMMARY
-            done
-
-            echo "</table>" >> report.html
-            echo "" >> report.html
+                echo "| $GROUP | $ARTIFACT | $CURRENT | $LATEST |" >> $GITHUB_STEP_SUMMARY
+              done
 
             echo "" >> $GITHUB_STEP_SUMMARY
           }
 
-          parse_file minor-updates.txt "Minor / Patch Updates Only"
-          parse_file all-updates.txt "All Updates (Including Major)"
-
-          echo "</body></html>" >> report.html
-
-      - name: Upload report
-        if: steps.changes.outputs.pom == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          name: dependency-update-report
-          path: report.html
+          parse_file minor.txt "Minor / Patch Updates Only"
+          parse_file all.txt "All Updates (Including Major)"
