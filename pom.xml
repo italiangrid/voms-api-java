@@ -50,7 +50,7 @@ SPDX-License-Identifier: Apache-2.0
     <junit.version>4.13.2</junit.version>
     <hamcrest.version>1.3</hamcrest.version>
     <canl.version>2.8.3</canl.version>
-    <mockito.version>5.16.0</mockito.version>
+    <mockito.version>5.23.0</mockito.version>
     <jcip.version>1.0</jcip.version>
     <bc.version>1.84</bc.version>
 
