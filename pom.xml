@@ -33,7 +33,7 @@ SPDX-License-Identifier: Apache-2.0
   <properties>
 
     <!-- versions -->
-    <plugin.enforcer.version>3.5.0</plugin.enforcer.version>
+    <plugin.enforcer.version>3.6.2</plugin.enforcer.version>
     <plugin.versions.version>2.16.1</plugin.versions.version>
     <plugin.compiler.version>3.13.0</plugin.compiler.version>
     <plugin.release.version>3.1.1</plugin.release.version>
