@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 # VOMS Java API
 
 ![Build Status](https://github.com/italiangrid/voms-api-java/actions/workflows/maven.yaml/badge.svg)
+[![MvnRepository](https://badges.mvnrepository.com/badge/org.italiangrid/voms-api-java/badge.svg?label=MvnRepository)](https://mvnrepository.com/artifact/org.italiangrid/voms-api-java)
 
 Java client APIs for the Virtual Organization Membership Service (VOMS).
 
