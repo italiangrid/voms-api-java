@@ -14,3 +14,11 @@ updates:
         - "org.apache.maven.plugins:*"
         - "org.codehaus.mojo:*"
         - "org.sonatype.central:*"
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "weekly"
+  groups:
+    github-actions:
+      patterns:
+        - "*"
