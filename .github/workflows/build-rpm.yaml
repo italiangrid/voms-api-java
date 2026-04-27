@@ -29,7 +29,7 @@ jobs:
         run: |
           echo "%_topdir $(pwd)/rpmbuild" >> ~/.rpmmacros
           rpmdev-setuptree
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           path: 'rpmbuild/BUILD'
           fetch-depth: 0
@@ -95,7 +95,7 @@ jobs:
             exit 0
           fi
           GPG_TTY="" rpm --addsign rpmbuild/RPMS/noarch/*.rpm
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: build-rpm-${{ matrix.os }}-${{ matrix.version }}
           path: |
@@ -117,8 +117,8 @@ jobs:
     if: needs.build-rpm.outputs.repo == 'stable'
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+        uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
       - name: Create release
         run: |
           # Get from the changelog file only the part related to the tagged release, in particular:
