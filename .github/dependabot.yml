@@ -13,4 +13,4 @@ updates:
       patterns:
         - "org.apache.maven.plugins:*"
         - "org.codehaus.mojo:*"
-        - "org.sonatype:*"
+        - "org.sonatype.central:*"
