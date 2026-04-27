@@ -70,6 +70,10 @@ jobs:
           MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         run: |
+          if [ -z "${MAVEN_GPG_KEY}" ]; then
+            echo "Skip signing because key is missing"
+            exit 0
+          fi
           echo "${MAVEN_GPG_KEY}" > private-key.asc
           gpg --batch --import-options import-show --import private-key.asc
           rm private-key.asc
@@ -84,6 +88,10 @@ jobs:
           rpmbuild --define "base_version ${VERSION_RPM}" --define "version_pom ${VERSION_POM}" -ba rpmbuild/SPECS/voms-api-java.spec
           if [[ "${{ matrix.version }}" = 8 ]]; then
             echo "Skip signing on AlmaLinux 8 to avoid error: RPM-GPG-KEY-pmanager: key 1 import failed"
+            exit 0
+          fi
+          if [ ! -f RPM-GPG-KEY-pmanager ]; then
+            echo "Skip signing because key is missing"
             exit 0
           fi
           GPG_TTY="" rpm --addsign rpmbuild/RPMS/noarch/*.rpm
