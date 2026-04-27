@@ -34,18 +34,18 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- versions -->
     <plugin.enforcer.version>3.6.2</plugin.enforcer.version>
-    <plugin.versions.version>2.16.1</plugin.versions.version>
-    <plugin.compiler.version>3.13.0</plugin.compiler.version>
+    <plugin.versions.version>2.21.0</plugin.versions.version>
+    <plugin.compiler.version>3.15.0</plugin.compiler.version>
     <plugin.release.version>3.3.1</plugin.release.version>
-    <plugin.source.version>2.2.1</plugin.source.version>
-    <plugin.assembly.version>3.7.1</plugin.assembly.version>
+    <plugin.source.version>3.4.0</plugin.source.version>
+    <plugin.assembly.version>3.8.0</plugin.assembly.version>
     <plugin.jar.version>3.5.0</plugin.jar.version>
     <plugin.javadoc.version>2.9.1</plugin.javadoc.version>
     <plugin.cobertura.version>2.7</plugin.cobertura.version>
-    <plugin.gpg.version>3.2.5</plugin.gpg.version>
-    <plugin.central-publishing.version>0.7.0</plugin.central-publishing.version>
-    <plugin.maven-gpg.version>3.2.7</plugin.maven-gpg.version>
-    <plugin.javadoc.version>3.11.2</plugin.javadoc.version>
+    <plugin.gpg.version>3.2.8</plugin.gpg.version>
+    <plugin.central-publishing.version>0.10.0</plugin.central-publishing.version>
+    <plugin.maven-gpg.version>3.2.8</plugin.maven-gpg.version>
+    <plugin.javadoc.version>3.12.0</plugin.javadoc.version>
 
     <junit.version>4.13.2</junit.version>
     <hamcrest.version>3.0</hamcrest.version>
