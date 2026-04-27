@@ -43,7 +43,7 @@ SPDX-License-Identifier: Apache-2.0
     <plugin.javadoc.version>2.9.1</plugin.javadoc.version>
     <plugin.cobertura.version>2.7</plugin.cobertura.version>
     <plugin.gpg.version>3.2.5</plugin.gpg.version>
-    <plugin.central-publishing.version>0.7.0</plugin.central-publishing.version>
+    <plugin.central-publishing.version>0.10.0</plugin.central-publishing.version>
     <plugin.maven-gpg.version>3.2.7</plugin.maven-gpg.version>
     <plugin.javadoc.version>3.11.2</plugin.javadoc.version>
 
