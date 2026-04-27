@@ -8,3 +8,9 @@ updates:
   directory: "/"
   schedule:
     interval: "weekly"
+  groups:
+    maven-plugins:
+      patterns:
+        - "org.apache.maven.plugins:*"
+        - "org.codehaus.mojo:*"
+        - "org.sonatype:*"
