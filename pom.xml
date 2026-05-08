@@ -46,6 +46,7 @@ SPDX-License-Identifier: Apache-2.0
     <plugin.central-publishing.version>0.10.0</plugin.central-publishing.version>
     <plugin.maven-gpg.version>3.2.8</plugin.maven-gpg.version>
     <plugin.javadoc.version>3.12.0</plugin.javadoc.version>
+    <plugin.spotless.version>3.4.0</plugin.spotless.version>
 
     <junit.version>4.13.2</junit.version>
     <hamcrest.version>3.0</hamcrest.version>
@@ -230,6 +231,17 @@ SPDX-License-Identifier: Apache-2.0
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${plugin.spotless.version}</version>
+        <configuration>
+          <java>
+            <googleJavaFormat />
+          </java>
+        </configuration>
       </plugin>
     </plugins>
   </build>
