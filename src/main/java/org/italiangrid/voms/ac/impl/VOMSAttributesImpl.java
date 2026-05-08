@@ -4,25 +4,21 @@
 
 package org.italiangrid.voms.ac.impl;
 
+import eu.emi.security.authn.x509.impl.X500NameUtils;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSGenericAttribute;
 import org.italiangrid.voms.util.TimeUtils;
 
-import eu.emi.security.authn.x509.impl.X500NameUtils;
-
 /**
  * The default implementation for voms attributes
- * 
- * @author andreaceccanti
  *
+ * @author andreaceccanti
  */
 public class VOMSAttributesImpl implements VOMSAttribute {
 
@@ -43,9 +39,7 @@ public class VOMSAttributesImpl implements VOMSAttribute {
   private X509Certificate[] aaCerts;
   private X509AttributeCertificateHolder VOMSAC;
 
-  public VOMSAttributesImpl() {
-
-  }
+  public VOMSAttributesImpl() {}
 
   public X500Principal getIssuer() {
 
@@ -145,11 +139,27 @@ public class VOMSAttributesImpl implements VOMSAttribute {
   @Override
   public String toString() {
 
-    return "VOMSAttributesImpl [VO=" + VO + ", host=" + host + ", port=" + port
-      + ", FQANs=" + FQANs + ", gas=" + genericAttributes + ", issuer='"
-      + X500NameUtils.getReadableForm(issuer) + "', holder='"
-      + X500NameUtils.getReadableForm(holder) + "', notAfter=" + notAfter
-      + ", notBefore=" + notBefore + ", targets=" + acTargets + " ]";
+    return "VOMSAttributesImpl [VO="
+        + VO
+        + ", host="
+        + host
+        + ", port="
+        + port
+        + ", FQANs="
+        + FQANs
+        + ", gas="
+        + genericAttributes
+        + ", issuer='"
+        + X500NameUtils.getReadableForm(issuer)
+        + "', holder='"
+        + X500NameUtils.getReadableForm(holder)
+        + "', notAfter="
+        + notAfter
+        + ", notBefore="
+        + notBefore
+        + ", targets="
+        + acTargets
+        + " ]";
   }
 
   public List<VOMSGenericAttribute> getGenericAttributes() {
@@ -189,8 +199,8 @@ public class VOMSAttributesImpl implements VOMSAttribute {
 
   public boolean validAt(Date date) {
 
-    return TimeUtils.checkTimeInRangeWithSkew(date, getNotBefore(),
-      getNotAfter(), DEFAULT_CLOCK_SKEW_IN_MINUTES);
+    return TimeUtils.checkTimeInRangeWithSkew(
+        date, getNotBefore(), getNotAfter(), DEFAULT_CLOCK_SKEW_IN_MINUTES);
   }
 
   public X509AttributeCertificateHolder getVOMSAC() {

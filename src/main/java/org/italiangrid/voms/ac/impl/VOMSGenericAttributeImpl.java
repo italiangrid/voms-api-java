@@ -8,9 +8,8 @@ import org.italiangrid.voms.VOMSGenericAttribute;
 
 /**
  * The default implementation for VOMS Generic Attributes.
- * 
- * @author Andrea Ceccanti
  *
+ * @author Andrea Ceccanti
  */
 public class VOMSGenericAttributeImpl implements VOMSGenericAttribute {
 
@@ -18,9 +17,7 @@ public class VOMSGenericAttributeImpl implements VOMSGenericAttribute {
   private String value;
   private String context;
 
-  public VOMSGenericAttributeImpl() {
-
-  }
+  public VOMSGenericAttributeImpl() {}
 
   public String getName() {
 
@@ -55,8 +52,7 @@ public class VOMSGenericAttributeImpl implements VOMSGenericAttribute {
   @Override
   public String toString() {
 
-    return "VOMSGenericAttribute [name=" + name + ", value=" + value
-      + ", context=" + context + "]";
+    return "VOMSGenericAttribute [name=" + name + ", value=" + value + ", context=" + context + "]";
   }
 
   @Override
@@ -73,28 +69,19 @@ public class VOMSGenericAttributeImpl implements VOMSGenericAttribute {
   @Override
   public boolean equals(Object obj) {
 
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     VOMSGenericAttributeImpl other = (VOMSGenericAttributeImpl) obj;
     if (context == null) {
-      if (other.context != null)
-        return false;
-    } else if (!context.equals(other.context))
-      return false;
+      if (other.context != null) return false;
+    } else if (!context.equals(other.context)) return false;
     if (name == null) {
-      if (other.name != null)
-        return false;
-    } else if (!name.equals(other.name))
-      return false;
+      if (other.name != null) return false;
+    } else if (!name.equals(other.name)) return false;
     if (value == null) {
-      if (other.value != null)
-        return false;
-    } else if (!value.equals(other.value))
-      return false;
+      if (other.value != null) return false;
+    } else if (!value.equals(other.value)) return false;
     return true;
   }
 }

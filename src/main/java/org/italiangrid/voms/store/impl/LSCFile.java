@@ -4,29 +4,24 @@
 
 package org.italiangrid.voms.store.impl;
 
+import eu.emi.security.authn.x509.impl.OpensslNameUtils;
+import eu.emi.security.authn.x509.impl.X500NameUtils;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.italiangrid.voms.store.LSCInfo;
-
-import eu.emi.security.authn.x509.impl.OpensslNameUtils;
-import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 /**
  * Represents a VOMS LSC (Legacy Secure Channel) file.
- * 
- * <p>The LSC file describes the certificate chain that a VOMS attribute authority
- * uses to sign a VOMS attribute certificate. The LSC mechanism helps in solving
- * the public key distribution problem for VOMS AA certificates and is used in
- * the VOMS validation process to validate the signature on the AC. It does this by
- * extracting the VOMS AA certificate included in the VOMS extension and ensuring
- * that the chain conforms to the description in the LSC file.</p>
- * 
- * <p>Two {@link LSCFile} objects are considered equal if their VO and hostname fields match.</p>
- * 
+ *
+ * <p>The LSC file describes the certificate chain that a VOMS attribute authority uses to sign a
+ * VOMS attribute certificate. The LSC mechanism helps in solving the public key distribution
+ * problem for VOMS AA certificates and is used in the VOMS validation process to validate the
+ * signature on the AC. It does this by extracting the VOMS AA certificate included in the VOMS
+ * extension and ensuring that the chain conforms to the description in the LSC file.
+ *
+ * <p>Two {@link LSCFile} objects are considered equal if their VO and hostname fields match.
  */
 public class LSCFile implements LSCInfo {
 
@@ -146,23 +141,16 @@ public class LSCFile implements LSCInfo {
   @Override
   public boolean equals(Object obj) {
 
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     LSCFile other = (LSCFile) obj;
     if (hostname == null) {
-      if (other.hostname != null)
-        return false;
-    } else if (!hostname.equals(other.hostname))
-      return false;
+      if (other.hostname != null) return false;
+    } else if (!hostname.equals(other.hostname)) return false;
     if (vo == null) {
-      if (other.vo != null)
-        return false;
-    } else if (!vo.equals(other.vo))
-      return false;
+      if (other.vo != null) return false;
+    } else if (!vo.equals(other.vo)) return false;
     return true;
   }
 
@@ -174,8 +162,15 @@ public class LSCFile implements LSCInfo {
   @Override
   public String toString() {
 
-    return "LSCFile [filename=" + filename + ", vo=" + vo + ", hostname="
-      + hostname + ", certChainDescription=" + certChainDescription + "]";
+    return "LSCFile [filename="
+        + filename
+        + ", vo="
+        + vo
+        + ", hostname="
+        + hostname
+        + ", certChainDescription="
+        + certChainDescription
+        + "]";
   }
 
   /**
@@ -218,6 +213,7 @@ public class LSCFile implements LSCInfo {
    */
   @SuppressWarnings("deprecation")
   private boolean matches(X500Principal certDn, String lscDn) {
+
     return X500NameUtils.equal(certDn, OpensslNameUtils.opensslToRfc2253(lscDn));
   }
 }

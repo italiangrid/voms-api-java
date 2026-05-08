@@ -21,9 +21,6 @@ public class TestVOMSValidationResult {
     assertTrue(r.getValidationErrors().isEmpty());
 
     assertEquals(
-      "VOMSValidationResult [valid=false, validationErrors=[], attributes=null]",
-      r.toString());
-
+        "VOMSValidationResult [valid=false, validationErrors=[], attributes=null]", r.toString());
   }
-
 }

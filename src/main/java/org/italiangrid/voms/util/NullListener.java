@@ -8,7 +8,6 @@ import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.security.cert.X509Certificate;
 import java.util.List;
-
 import org.italiangrid.voms.ac.ACLookupListener;
 import org.italiangrid.voms.ac.VOMSValidationResult;
 import org.italiangrid.voms.ac.ValidationResultListener;
@@ -26,114 +25,63 @@ import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
 
 /**
- * 
  * A Singleton Listener which swallows notification.
- * 
- * @author andreaceccanti
  *
+ * @author andreaceccanti
  */
-public enum NullListener implements ACLookupListener, ValidationResultListener,
-  VOMSServerInfoStoreListener, LoadCredentialsEventListener,
-  VOMSTrustStoreStatusListener, UncaughtExceptionHandler, VOMSRequestListener,
-  VOMSProtocolListener {
-
+public enum NullListener
+    implements
+        ACLookupListener, ValidationResultListener, VOMSServerInfoStoreListener,
+        LoadCredentialsEventListener, VOMSTrustStoreStatusListener, UncaughtExceptionHandler,
+        VOMSRequestListener, VOMSProtocolListener {
   INSTANCE;
 
-  public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
+  public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {}
 
-  }
+  public void notifyVOMSRequestSuccess(VOMSACRequest request, VOMSServerInfo endpoint) {}
 
-  public void notifyVOMSRequestSuccess(VOMSACRequest request,
-    VOMSServerInfo endpoint) {
+  public void notifyVOMSRequestFailure(
+      VOMSACRequest request, VOMSServerInfo endpoint, Throwable error) {}
 
-  }
+  public void notifyErrorsInVOMSReponse(
+      VOMSACRequest request, VOMSServerInfo si, VOMSErrorMessage[] errors) {}
 
-  public void notifyVOMSRequestFailure(VOMSACRequest request,
-    VOMSServerInfo endpoint, Throwable error) {
+  public void notifyWarningsInVOMSResponse(
+      VOMSACRequest request, VOMSServerInfo si, VOMSWarningMessage[] warnings) {}
 
-  }
+  public void uncaughtException(Thread t, Throwable e) {}
 
-  public void notifyErrorsInVOMSReponse(VOMSACRequest request,
-    VOMSServerInfo si, VOMSErrorMessage[] errors) {
+  public void notifyTrustStoreUpdate(VOMSTrustStore store) {}
 
-  }
+  public void notifyCertficateLookupEvent(String dir) {}
 
-  public void notifyWarningsInVOMSResponse(VOMSACRequest request,
-    VOMSServerInfo si, VOMSWarningMessage[] warnings) {
+  public void notifyLSCLookupEvent(String dir) {}
 
-  }
+  public void notifyCertificateLoadEvent(X509Certificate cert, File f) {}
 
-  public void uncaughtException(Thread t, Throwable e) {
+  public void notifyLSCLoadEvent(LSCInfo lsc, File f) {}
 
-  }
+  public void notifyCredentialLookup(String... locations) {}
 
-  public void notifyTrustStoreUpdate(VOMSTrustStore store) {
+  public void notifyLoadCredentialSuccess(String... locations) {}
 
-  }
+  public void notifyLoadCredentialFailure(Throwable error, String... locations) {}
 
-  public void notifyCertficateLookupEvent(String dir) {
+  public void notifyNoValidVOMSESError(List<String> searchedPaths) {}
 
-  }
+  public void notifyVOMSESlookup(String vomsesPath) {}
 
-  public void notifyLSCLookupEvent(String dir) {
+  public void notifyVOMSESInformationLoaded(String vomsesPath, VOMSServerInfo info) {}
 
-  }
+  public void notifyValidationResult(VOMSValidationResult result) {}
 
-  public void notifyCertificateLoadEvent(X509Certificate cert, File f) {
+  public void notifyACLookupEvent(X509Certificate[] chain, int chainLevel) {}
 
-  }
+  public void notifyACParseEvent(X509Certificate[] chain, int chainLevel) {}
 
-  public void notifyLSCLoadEvent(LSCInfo lsc, File f) {
+  public void notifyHTTPRequest(String url) {}
 
-  }
+  public void notifyLegacyRequest(String xmlLegacyRequest) {}
 
-  public void notifyCredentialLookup(String... locations) {
-
-  }
-
-  public void notifyLoadCredentialSuccess(String... locations) {
-
-  }
-
-  public void notifyLoadCredentialFailure(Throwable error, String... locations) {
-
-  }
-
-  public void notifyNoValidVOMSESError(List<String> searchedPaths) {
-
-  }
-
-  public void notifyVOMSESlookup(String vomsesPath) {
-
-  }
-
-  public void notifyVOMSESInformationLoaded(String vomsesPath,
-    VOMSServerInfo info) {
-
-  }
-
-  public void notifyValidationResult(VOMSValidationResult result) {
-
-  }
-
-  public void notifyACLookupEvent(X509Certificate[] chain, int chainLevel) {
-
-  }
-
-  public void notifyACParseEvent(X509Certificate[] chain, int chainLevel) {
-
-  }
-
-  public void notifyHTTPRequest(String url) {
-
-  }
-
-  public void notifyLegacyRequest(String xmlLegacyRequest) {
-
-  }
-
-  public void notifyReceivedResponse(VOMSResponse r) {
-
-  }
-
+  public void notifyReceivedResponse(VOMSResponse r) {}
 }

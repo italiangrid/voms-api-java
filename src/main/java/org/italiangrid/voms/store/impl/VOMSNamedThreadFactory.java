@@ -10,9 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A simple thread factory to create named VOMS background threads.
- * 
- * @author Andrea Ceccanti
  *
+ * @author Andrea Ceccanti
  */
 public class VOMSNamedThreadFactory implements ThreadFactory {
 
@@ -26,13 +25,10 @@ public class VOMSNamedThreadFactory implements ThreadFactory {
     this.handler = h;
   }
 
-  public VOMSNamedThreadFactory() {
-
-  }
+  public VOMSNamedThreadFactory() {}
 
   public Thread newThread(Runnable r) {
 
-    return new VOMSThread(r, poolBaseName + "-" + created.incrementAndGet(),
-      handler);
+    return new VOMSThread(r, poolBaseName + "-" + created.incrementAndGet(), handler);
   }
 }

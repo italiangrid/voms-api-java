@@ -6,15 +6,12 @@ package org.italiangrid.voms;
 
 /**
  * The base VOMS exception class.
- * 
- * @author Andrea Ceccanti
  *
+ * @author Andrea Ceccanti
  */
 public class VOMSError extends RuntimeException {
 
-  /**
-	 * 
-	 */
+  /** */
   private static final long serialVersionUID = 1L;
 
   public VOMSError(String message) {

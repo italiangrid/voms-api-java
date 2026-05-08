@@ -6,14 +6,12 @@ package org.italiangrid.voms.request.impl;
 
 import java.io.OutputStream;
 import java.io.StringWriter;
-
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSProtocolListener;
@@ -21,11 +19,9 @@ import org.italiangrid.voms.request.VOMSServerInfo;
 import org.w3c.dom.Document;
 
 /**
- * This class manages the client-side communication protocol with the VOMS
- * server.
- * 
+ * This class manages the client-side communication protocol with the VOMS server.
+ *
  * @author Andrea Ceccanti
- * 
  */
 public class LegacyRequestSender {
 
@@ -56,7 +52,6 @@ public class LegacyRequestSender {
     } catch (TransformerConfigurationException e) {
 
       throw new VOMSError(e.getMessage(), e);
-
     }
 
     StringWriter writer = new StringWriter();
@@ -72,7 +67,6 @@ public class LegacyRequestSender {
     } catch (TransformerException e) {
 
       throw new VOMSError(e.getMessage(), e);
-
     }
 
     writer.flush();
@@ -81,20 +75,13 @@ public class LegacyRequestSender {
   }
 
   /**
-   * 
    * This method is used to send a request to a VOMS server.
-   * 
-   * 
-   * @param acRequest
-   *          the AC request parameters. See {@link VOMSACRequest}.
-   * @param endpoint
-   *          the {@link VOMSServerInfo} endpoint to use for this 
-   *          request
-   * @param stream
-   *          an output stream.
+   *
+   * @param acRequest the AC request parameters. See {@link VOMSACRequest}.
+   * @param endpoint the {@link VOMSServerInfo} endpoint to use for this request
+   * @param stream an output stream.
    */
-  public void sendRequest(VOMSACRequest acRequest, VOMSServerInfo endpoint,
-    OutputStream stream) {
+  public void sendRequest(VOMSACRequest acRequest, VOMSServerInfo endpoint, OutputStream stream) {
 
     Document request = requestFactory.buildRequest(acRequest, endpoint);
 
@@ -123,7 +110,6 @@ public class LegacyRequestSender {
     } catch (Exception e) {
 
       throw new VOMSError(e.getMessage(), e);
-
     }
   }
 }

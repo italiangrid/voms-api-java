@@ -7,9 +7,8 @@ package org.italiangrid.voms.credential;
 import org.italiangrid.voms.VOMSError;
 
 /**
- * This error is raised when there is an attempt to load a credential which has
- * the wrong file permissions
- * 
+ * This error is raised when there is an attempt to load a credential which has the wrong file
+ * permissions
  */
 public class FilePermissionError extends VOMSError {
 
@@ -23,9 +22,6 @@ public class FilePermissionError extends VOMSError {
     super(message, cause);
   }
 
-  /**
-	 * 
-	 */
+  /** */
   private static final long serialVersionUID = 1L;
-
 }

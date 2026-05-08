@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URISyntaxException;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.impl.VOMSESLineParser;
@@ -43,7 +42,6 @@ public class TestVOMSESLineParser {
     VOMSESLineParser p = new VOMSESLineParser();
     VOMSServerInfo i = p.parse(line);
     assertNull(i);
-
   }
 
   @Test
@@ -149,7 +147,8 @@ public class TestVOMSESLineParser {
   @Test
   public void tooManyFields() {
 
-    String line = "\t\"a\"  \"voms.cern.ch\" \t \"15000\" \"DN=Illo\" \"alice\" \"24\" \"Too much\"";
+    String line =
+        "\t\"a\"  \"voms.cern.ch\" \t \"15000\" \"DN=Illo\" \"alice\" \"24\" \"Too much\"";
 
     try {
       VOMSESLineParser p = new VOMSESLineParser();
@@ -159,7 +158,6 @@ public class TestVOMSESLineParser {
       assertNotNull("Got a null error message", e.getMessage());
       assertTrue(e.getMessage().contains("Invalid VOMSES line: too many fields!"));
     }
-
   }
 
   @Test
@@ -175,7 +173,6 @@ public class TestVOMSESLineParser {
       assertNotNull("Got a null error message", e.getMessage());
       assertTrue(e.getMessage().contains("Invalid VOMSES line: invalid port number."));
     }
-
   }
 
   @Test

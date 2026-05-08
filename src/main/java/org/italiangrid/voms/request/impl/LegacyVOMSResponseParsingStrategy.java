@@ -5,11 +5,9 @@
 package org.italiangrid.voms.request.impl;
 
 import java.io.InputStream;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSResponseParsingStrategy;
@@ -17,12 +15,10 @@ import org.w3c.dom.Document;
 
 /**
  * Parsing strategy for legacy VOMS responses.
- * 
- * @author valerioventuri
  *
+ * @author valerioventuri
  */
-public class LegacyVOMSResponseParsingStrategy implements
-  VOMSResponseParsingStrategy {
+public class LegacyVOMSResponseParsingStrategy implements VOMSResponseParsingStrategy {
 
   protected DocumentBuilder documentBuilder;
 
@@ -54,8 +50,6 @@ public class LegacyVOMSResponseParsingStrategy implements
     } catch (Exception e) {
 
       throw new VOMSError(e.getMessage());
-
     }
-
   }
 }

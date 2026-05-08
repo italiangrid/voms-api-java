@@ -7,14 +7,12 @@ package org.italiangrid.voms.request.impl;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import org.italiangrid.voms.request.VOMSACRequest;
 
 /**
  * The default implementation for a {@link VOMSACRequest}.
- * 
+ *
  * @author Valerio Venturi
- * 
  */
 public class DefaultVOMSACRequest implements VOMSACRequest {
 
@@ -79,23 +77,19 @@ public class DefaultVOMSACRequest implements VOMSACRequest {
 
     public Builder fqans(List<String> fqans) {
 
-      if (fqans != null)
-        this.requestedFQANs = fqans;
+      if (fqans != null) this.requestedFQANs = fqans;
       return this;
     }
 
     public Builder targets(List<String> targets) {
 
-      if (targets != null)
-        this.targets = targets;
+      if (targets != null) this.targets = targets;
       return this;
     }
 
     public DefaultVOMSACRequest build() {
 
       return new DefaultVOMSACRequest(this);
-
     }
   }
-
 }

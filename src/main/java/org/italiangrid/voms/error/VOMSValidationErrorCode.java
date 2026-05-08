@@ -6,9 +6,8 @@ package org.italiangrid.voms.error;
 
 /**
  * VOMS validation error codes.
- * 
- * @author Andrea Ceccanti
  *
+ * @author Andrea Ceccanti
  */
 public enum VOMSValidationErrorCode {
 
@@ -16,10 +15,16 @@ public enum VOMSValidationErrorCode {
   acNotValidAtCurrentTime,
 
   // LSC signature checks
-  lscFileNotFound, emptyAcCertsExtension, lscDescriptionDoesntMatchAcCert, invalidAcCert, acCertFailsSignatureVerification,
+  lscFileNotFound,
+  emptyAcCertsExtension,
+  lscDescriptionDoesntMatchAcCert,
+  invalidAcCert,
+  acCertFailsSignatureVerification,
 
   // Local AA cert signature checks
-  aaCertNotFound, invalidAaCert, aaCertFailsSignatureVerification,
+  aaCertNotFound,
+  invalidAaCert,
+  aaCertFailsSignatureVerification,
 
   // Holder checks
   acHolderDoesntMatchCertChain,

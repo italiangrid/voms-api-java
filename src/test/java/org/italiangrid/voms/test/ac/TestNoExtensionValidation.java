@@ -4,57 +4,59 @@
 
 package org.italiangrid.voms.test.ac;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.cert.CertificateParsingException;
-import java.util.List;
-
-import org.junit.Assert;
-
-import org.italiangrid.voms.VOMSAttribute;
-import org.italiangrid.voms.ac.VOMSACValidator;
-import org.italiangrid.voms.test.utils.Fixture;
-import org.italiangrid.voms.test.utils.Utils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 import eu.emi.security.authn.x509.proxy.ProxyCertificateOptions;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyType;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.cert.CertificateParsingException;
+import java.util.List;
+import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.ac.VOMSACValidator;
+import org.italiangrid.voms.test.utils.Fixture;
+import org.italiangrid.voms.test.utils.Utils;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-public class TestNoExtensionValidation implements Fixture{
+public class TestNoExtensionValidation implements Fixture {
 
-	PEMCredential cred;
+  PEMCredential cred;
 
-	@Before
-	public void setUp() throws Exception {
-		cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
-	}
+  @Before
+  public void setUp() throws Exception {
 
-	@After
-	public void tearDown() throws Exception {
-		cred = null;
-	}
+    cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
+  }
 
-	@Test
-	public void testNoExtensionValidation() throws InvalidKeyException, CertificateParsingException,
-                SignatureException, NoSuchAlgorithmException, IOException {
+  @After
+  public void tearDown() throws Exception {
 
-                ProxyCertificateOptions options = new ProxyCertificateOptions(cred.getCertificateChain());
-		options.setType(ProxyType.LEGACY);
+    cred = null;
+  }
 
-		ProxyCertificate proxy = ProxyGenerator.generate(options, cred.getKey());
+  @Test
+  public void testNoExtensionValidation()
+      throws InvalidKeyException,
+          CertificateParsingException,
+          SignatureException,
+          NoSuchAlgorithmException,
+          IOException {
 
-		VOMSACValidator validator = Utils.getVOMSValidator();
-		List<VOMSAttribute> attrs = validator.validate(proxy.getCertificateChain());
+    ProxyCertificateOptions options = new ProxyCertificateOptions(cred.getCertificateChain());
+    options.setType(ProxyType.LEGACY);
 
-		Assert.assertNotNull(attrs);
-		Assert.assertTrue(attrs.isEmpty());
+    ProxyCertificate proxy = ProxyGenerator.generate(options, cred.getKey());
 
-	}
+    VOMSACValidator validator = Utils.getVOMSValidator();
+    List<VOMSAttribute> attrs = validator.validate(proxy.getCertificateChain());
+
+    Assert.assertNotNull(attrs);
+    Assert.assertTrue(attrs.isEmpty());
+  }
 }

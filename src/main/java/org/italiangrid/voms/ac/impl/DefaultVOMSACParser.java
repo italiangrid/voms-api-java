@@ -6,7 +6,6 @@ package org.italiangrid.voms.ac.impl;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
-
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.ACParsingContext;
 import org.italiangrid.voms.ac.VOMSACLookupStrategy;
@@ -15,26 +14,25 @@ import org.italiangrid.voms.ac.VOMSAttributesNormalizationStrategy;
 import org.italiangrid.voms.util.NullListener;
 
 /**
- * Default implementation of the VOMS attribute certificate parsing logic.
- * This class is responsible for extracting and normalizing VOMS attributes
- * from a given X.509 certificate chain.
+ * Default implementation of the VOMS attribute certificate parsing logic. This class is responsible
+ * for extracting and normalizing VOMS attributes from a given X.509 certificate chain.
  *
- * <p>It utilizes a {@link VOMSACLookupStrategy} to locate attribute certificates
- * within the provided chain and applies a {@link VOMSAttributesNormalizationStrategy}
- * to normalize the extracted attributes.</p>
+ * <p>It utilizes a {@link VOMSACLookupStrategy} to locate attribute certificates within the
+ * provided chain and applies a {@link VOMSAttributesNormalizationStrategy} to normalize the
+ * extracted attributes.
  *
- * <p>By default, it uses {@link LeafACLookupStrategy} for lookup and
- * {@link LeafVOMSExtensionNormalizationStrategy} for normalization.</p>
- *
+ * <p>By default, it uses {@link LeafACLookupStrategy} for lookup and {@link
+ * LeafVOMSExtensionNormalizationStrategy} for normalization.
  */
 public class DefaultVOMSACParser implements VOMSACParser {
 
   private final VOMSACLookupStrategy acLookupStrategy;
-  private final VOMSAttributesNormalizationStrategy acNormalizationStrategy = new LeafVOMSExtensionNormalizationStrategy();
+  private final VOMSAttributesNormalizationStrategy acNormalizationStrategy =
+      new LeafVOMSExtensionNormalizationStrategy();
 
   /**
-   * Creates a new {@code DefaultVOMSACParser} with the default lookup strategy.
-   * Uses {@link LeafACLookupStrategy} with a {@link NullListener} instance.
+   * Creates a new {@code DefaultVOMSACParser} with the default lookup strategy. Uses {@link
+   * LeafACLookupStrategy} with a {@link NullListener} instance.
    */
   public DefaultVOMSACParser() {
 
@@ -42,8 +40,8 @@ public class DefaultVOMSACParser implements VOMSACParser {
   }
 
   /**
-   * Creates a new {@code DefaultVOMSACParser} with a specified lookup strategy.
-   * Uses {@link LeafVOMSExtensionNormalizationStrategy} for attribute normalization.
+   * Creates a new {@code DefaultVOMSACParser} with a specified lookup strategy. Uses {@link
+   * LeafVOMSExtensionNormalizationStrategy} for attribute normalization.
    *
    * @param strategy the lookup strategy to use for locating attribute certificates
    * @throws NullPointerException if the provided strategy is {@code null}
@@ -63,10 +61,9 @@ public class DefaultVOMSACParser implements VOMSACParser {
   @Override
   public List<VOMSAttribute> parse(X509Certificate[] validatedChain) {
 
-    if (validatedChain == null)
-      throw new NullPointerException("Cannot parse a null certchain!");
-    List<ACParsingContext> parsedACs = acLookupStrategy
-      .lookupVOMSAttributeCertificates(validatedChain);
+    if (validatedChain == null) throw new NullPointerException("Cannot parse a null certchain!");
+    List<ACParsingContext> parsedACs =
+        acLookupStrategy.lookupVOMSAttributeCertificates(validatedChain);
     return acNormalizationStrategy.normalizeAttributes(parsedACs);
   }
 }

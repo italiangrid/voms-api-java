@@ -11,15 +11,11 @@ import java.security.cert.X509Certificate;
 
 /**
  * A utility class for computing fingerprints of X.509 certificates.
- * <p>
- * This class provides methods to generate a cryptographic fingerprint (hash) of an X.509
+ *
+ * <p>This class provides methods to generate a cryptographic fingerprint (hash) of an X.509
  * certificate using a specified digest algorithm.
- * </p>
  *
- * <p>
- * The default digest algorithm used is SHA-1.
- * </p>
- *
+ * <p>The default digest algorithm used is SHA-1.
  */
 public class FingerprintHelper {
 
@@ -34,8 +30,9 @@ public class FingerprintHelper {
    */
   private static String hexify(byte[] bytes) {
 
-    char[] hexDigits =
-        {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    char[] hexDigits = {
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+    };
 
     StringBuffer buf = new StringBuffer(bytes.length * 2);
 
@@ -66,5 +63,4 @@ public class FingerprintHelper {
 
     return hexify(digest);
   }
-
 }

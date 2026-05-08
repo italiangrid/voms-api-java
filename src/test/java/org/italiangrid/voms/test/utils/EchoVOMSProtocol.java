@@ -4,12 +4,13 @@
 
 package org.italiangrid.voms.test.utils;
 
+import eu.emi.security.authn.x509.X509Credential;
+import eu.emi.security.authn.x509.impl.PEMCredential;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
@@ -17,9 +18,6 @@ import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.mockito.Mockito;
-
-import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.impl.PEMCredential;
 
 public class EchoVOMSProtocol implements VOMSProtocol {
 
@@ -30,11 +28,15 @@ public class EchoVOMSProtocol implements VOMSProtocol {
     this.aaCredential = aaCredential;
   }
 
-  public VOMSResponse doRequest(VOMSServerInfo endpoint,
-    X509Credential credential, VOMSACRequest request) {
+  public VOMSResponse doRequest(
+      VOMSServerInfo endpoint, X509Credential credential, VOMSACRequest request) {
 
-    VOMSAA aa = new VOMSAA(aaCredential, endpoint.getVoName(), endpoint
-      .getURL().getHost(), endpoint.getURL().getPort());
+    VOMSAA aa =
+        new VOMSAA(
+            aaCredential,
+            endpoint.getVoName(),
+            endpoint.getURL().getHost(),
+            endpoint.getURL().getPort());
 
     int lifetimeInSeconds = request.getLifetime();
 
@@ -49,11 +51,9 @@ public class EchoVOMSProtocol implements VOMSProtocol {
     if (request.getRequestedFQANs().isEmpty()) {
       fqans = new ArrayList<String>();
       fqans.add("/" + request.getVoName());
-    } else
-      fqans = request.getRequestedFQANs();
+    } else fqans = request.getRequestedFQANs();
 
-    AttributeCertificate ac = aa.getAC(credential, fqans, null,
-      request.getTargets(), now, endTime);
+    AttributeCertificate ac = aa.getAC(credential, fqans, null, request.getTargets(), now, endTime);
 
     VOMSResponse r = Mockito.mock(VOMSResponse.class);
     try {
@@ -66,5 +66,4 @@ public class EchoVOMSProtocol implements VOMSProtocol {
 
     return r;
   }
-
 }

@@ -12,5 +12,4 @@ public class DefaultProxyPathBuilder implements ProxyNamingPolicy {
 
     return String.format("%s/x509up_u%d", tmpPath, userId);
   }
-
 }

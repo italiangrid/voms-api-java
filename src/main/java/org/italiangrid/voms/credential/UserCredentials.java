@@ -4,21 +4,19 @@
 
 package org.italiangrid.voms.credential;
 
+import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.PasswordSupplier;
 import org.italiangrid.voms.credential.impl.DefaultLoadCredentialsStrategy;
 
-import eu.emi.security.authn.x509.X509Credential;
-
 /**
- * This class implements convenience methods to load X509 user credentials in
- * PEM or PKCS12 format.
- * 
+ * This class implements convenience methods to load X509 user credentials in PEM or PKCS12 format.
+ *
  * @author Andrea Ceccanti
- * 
  */
 public class UserCredentials {
 
-  private static LoadCredentialsStrategy loadCredentialsStrategy = new DefaultLoadCredentialsStrategy();
+  private static LoadCredentialsStrategy loadCredentialsStrategy =
+      new DefaultLoadCredentialsStrategy();
 
   public static void setLoadCredentialsStrategy(LoadCredentialsStrategy strategy) {
 
@@ -32,13 +30,14 @@ public class UserCredentials {
 
   public static X509Credential loadCredentials(final char[] keyPassword) {
 
-    PasswordSupplier pf = new PasswordSupplier() {
+    PasswordSupplier pf =
+        new PasswordSupplier() {
 
-      public char[] getPassword() {
+          public char[] getPassword() {
 
-        return keyPassword;
-      }
-    };
+            return keyPassword;
+          }
+        };
 
     return loadCredentialsStrategy.loadCredentials(pf);
   }

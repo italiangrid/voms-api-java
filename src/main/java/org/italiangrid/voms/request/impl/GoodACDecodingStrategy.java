@@ -13,5 +13,4 @@ public class GoodACDecodingStrategy implements ACDecodingStrategy {
 
     return Base64.decode(ac.trim().replaceAll("\n", ""));
   }
-
 }

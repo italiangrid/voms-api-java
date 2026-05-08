@@ -19,6 +19,11 @@ import static org.italiangrid.voms.error.VOMSValidationErrorCode.lscFileNotFound
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.other;
 import static org.italiangrid.voms.error.VOMSValidationErrorMessage.newErrorMessage;
 
+import eu.emi.security.authn.x509.ValidationError;
+import eu.emi.security.authn.x509.ValidationResult;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+import eu.emi.security.authn.x509.impl.X500NameUtils;
+import eu.emi.security.authn.x509.proxy.ProxyUtils;
 import java.net.UnknownHostException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -26,9 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
@@ -47,17 +50,10 @@ import org.italiangrid.voms.error.VOMSValidationErrorMessage;
 import org.italiangrid.voms.store.LSCInfo;
 import org.italiangrid.voms.store.VOMSTrustStore;
 
-import eu.emi.security.authn.x509.ValidationError;
-import eu.emi.security.authn.x509.ValidationResult;
-import eu.emi.security.authn.x509.X509CertChainValidatorExt;
-import eu.emi.security.authn.x509.impl.X500NameUtils;
-import eu.emi.security.authn.x509.proxy.ProxyUtils;
-
 /**
  * The Default VOMS validation strategy.
  *
  * @author andreaceccanti
- *
  */
 public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
 
@@ -65,13 +61,12 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
   private final X509CertChainValidatorExt certChainValidator;
   private final LocalHostnameResolver hostnameResolver;
 
-  public DefaultVOMSValidationStrategy(VOMSTrustStore store, X509CertChainValidatorExt validator,
-      LocalHostnameResolver resolver) {
+  public DefaultVOMSValidationStrategy(
+      VOMSTrustStore store, X509CertChainValidatorExt validator, LocalHostnameResolver resolver) {
 
     this.store = store;
     this.certChainValidator = validator;
     this.hostnameResolver = resolver;
-
   }
 
   public DefaultVOMSValidationStrategy(VOMSTrustStore store, X509CertChainValidatorExt validator) {
@@ -79,7 +74,9 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
     this(store, validator, new DefaultLocalHostnameResolver());
   }
 
-  private boolean checkACHolder(VOMSAttribute attributes, X509Certificate[] chain,
+  private boolean checkACHolder(
+      VOMSAttribute attributes,
+      X509Certificate[] chain,
       List<VOMSValidationErrorMessage> validationErrors) {
 
     X500Principal chainHolder = ProxyUtils.getOriginalUserDN(chain);
@@ -91,23 +88,25 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
       String acHolderSubject = X500NameUtils.getReadableForm(attributes.getHolder());
       String certChainSubject = X500NameUtils.getReadableForm(chainHolder);
 
-      validationErrors.add(VOMSValidationErrorMessage.newErrorMessage(acHolderDoesntMatchCertChain,
-          acHolderSubject, certChainSubject));
+      validationErrors.add(
+          VOMSValidationErrorMessage.newErrorMessage(
+              acHolderDoesntMatchCertChain, acHolderSubject, certChainSubject));
     }
 
     return holderDoesMatch;
   }
 
-  private boolean checkACValidity(VOMSAttribute attributes,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean checkACValidity(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
 
     Date now = new Date();
 
     boolean valid = attributes.validAt(now);
 
     if (!valid) {
-      VOMSValidationErrorMessage m = VOMSValidationErrorMessage.newErrorMessage(
-          acNotValidAtCurrentTime, attributes.getNotBefore(), attributes.getNotAfter(), now);
+      VOMSValidationErrorMessage m =
+          VOMSValidationErrorMessage.newErrorMessage(
+              acNotValidAtCurrentTime, attributes.getNotBefore(), attributes.getNotAfter(), now);
 
       validationErrors.add(m);
     }
@@ -115,8 +114,8 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
     return valid;
   }
 
-  private boolean checkLocalAACertSignature(VOMSAttribute attributes,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean checkLocalAACertSignature(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
 
     X509Certificate localAACert = store.getAACertificateBySubject(attributes.getIssuer());
     if (localAACert == null) {
@@ -137,16 +136,16 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
 
     if (!signatureValid) {
       String readableSubject = X500NameUtils.getReadableForm(localAACert.getSubjectX500Principal());
-      validationErrors.add(VOMSValidationErrorMessage
-        .newErrorMessage(aaCertFailsSignatureVerification, readableSubject));
+      validationErrors.add(
+          VOMSValidationErrorMessage.newErrorMessage(
+              aaCertFailsSignatureVerification, readableSubject));
     }
 
     return signatureValid;
-
   }
 
-  private boolean checkLSCSignature(VOMSAttribute attributes,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean checkLSCSignature(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
 
     LSCInfo lsc = store.getLSC(attributes.getVO(), attributes.getHost());
     X509Certificate[] aaCerts = attributes.getAACertificates();
@@ -162,8 +161,8 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
     }
 
     if (!lsc.matches(aaCerts)) {
-      validationErrors
-        .add(VOMSValidationErrorMessage.newErrorMessage(lscDescriptionDoesntMatchAcCert));
+      validationErrors.add(
+          VOMSValidationErrorMessage.newErrorMessage(lscDescriptionDoesntMatchAcCert));
       return false;
     }
 
@@ -181,30 +180,28 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
 
     if (!signatureValid) {
       String readableSubject = X500NameUtils.getReadableForm(aaCerts[0].getSubjectX500Principal());
-      validationErrors.add(VOMSValidationErrorMessage
-        .newErrorMessage(acCertFailsSignatureVerification, readableSubject));
+      validationErrors.add(
+          VOMSValidationErrorMessage.newErrorMessage(
+              acCertFailsSignatureVerification, readableSubject));
     }
 
     return signatureValid;
   }
 
-  private boolean checkSignature(VOMSAttribute attributes,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean checkSignature(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
 
     boolean valid = checkLSCSignature(attributes, validationErrors);
 
-    if (!valid)
-      valid = checkLocalAACertSignature(attributes, validationErrors);
+    if (!valid) valid = checkLocalAACertSignature(attributes, validationErrors);
 
     return valid;
-
   }
 
-  private boolean checkTargets(VOMSAttribute attributes,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean checkTargets(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
 
-    if (attributes.getTargets() == null || attributes.getTargets().size() == 0)
-      return true;
+    if (attributes.getTargets() == null || attributes.getTargets().size() == 0) return true;
 
     String localhostName;
 
@@ -212,22 +209,23 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
       localhostName = hostnameResolver.resolveLocalHostname();
 
     } catch (UnknownHostException e) {
-      validationErrors
-        .add(newErrorMessage(other, "Error resolving localhost name: " + e.getMessage()));
+      validationErrors.add(
+          newErrorMessage(other, "Error resolving localhost name: " + e.getMessage()));
       return false;
     }
 
     if (!attributes.getTargets().contains(localhostName)) {
-      validationErrors.add(newErrorMessage(localhostDoesntMatchAcTarget, localhostName,
-          attributes.getTargets().toString()));
+      validationErrors.add(
+          newErrorMessage(
+              localhostDoesntMatchAcTarget, localhostName, attributes.getTargets().toString()));
       return false;
     }
 
     return true;
   }
 
-  private boolean checkNoRevAvailExtension(VOMSAttribute attributes,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean checkNoRevAvailExtension(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
 
     Extension noRevAvail = attributes.getVOMSAC().getExtension(Extension.noRevAvail);
 
@@ -238,7 +236,9 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
     return true;
   }
 
-  private boolean checkAuthorityKeyIdentifier(X509Certificate aaCert, VOMSAttribute attributes,
+  private boolean checkAuthorityKeyIdentifier(
+      X509Certificate aaCert,
+      VOMSAttribute attributes,
       List<VOMSValidationErrorMessage> validationErrors) {
 
     AuthorityKeyIdentifier akid =
@@ -252,29 +252,31 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
       boolean authKeyIdMatches = Arrays.equals(skid.getKeyIdentifier(), akid.getKeyIdentifier());
 
       if (!authKeyIdMatches) {
-        validationErrors.add(newErrorMessage(other,
-            "AuthorityKeyIdentifier in the AC  does not match AA certificate subject key identifier!"));
+        validationErrors.add(
+            newErrorMessage(
+                other,
+                "AuthorityKeyIdentifier in the AC  does not match AA certificate subject key identifier!"));
         return false;
       }
 
       return true;
 
     } catch (CertificateEncodingException e) {
-      validationErrors.add(newErrorMessage(other,
-          String.format("VOMS AA certificate parse error: %s", e.getMessage())));
+      validationErrors.add(
+          newErrorMessage(
+              other, String.format("VOMS AA certificate parse error: %s", e.getMessage())));
       return false;
     }
-
   }
 
-  private boolean checkAuthorityKeyIdentifierExtension(VOMSAttribute attributes,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean checkAuthorityKeyIdentifierExtension(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
 
     Extension authKeyId = attributes.getVOMSAC().getExtension(Extension.authorityKeyIdentifier);
 
     if (authKeyId != null && authKeyId.isCritical()) {
-      validationErrors
-        .add(newErrorMessage(other, "AuthorityKeyIdentifier AC extension cannot be critical!"));
+      validationErrors.add(
+          newErrorMessage(other, "AuthorityKeyIdentifier AC extension cannot be critical!"));
       return false;
     }
 
@@ -282,8 +284,8 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
     return true;
   }
 
-  private boolean checkUnhandledCriticalExtensions(VOMSAttribute attributes,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean checkUnhandledCriticalExtensions(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
 
     @SuppressWarnings("unchecked")
     List<ASN1ObjectIdentifier> acExtensions = attributes.getVOMSAC().getExtensionOIDs();
@@ -291,8 +293,9 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
     for (ASN1ObjectIdentifier extId : acExtensions) {
       if (!VOMSConstants.VOMS_HANDLED_EXTENSIONS.contains(extId)
           && attributes.getVOMSAC().getExtension(extId).isCritical()) {
-        validationErrors.add(newErrorMessage(other,
-            "unknown critical extension found in VOMS AC: " + extId.getId()));
+        validationErrors.add(
+            newErrorMessage(
+                other, "unknown critical extension found in VOMS AC: " + extId.getId()));
         return false;
       }
     }
@@ -316,14 +319,11 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
       valid = checkTargets(attributes, validationErrors);
 
     // AC extension checking to be compliant with rfc 3281
-    if (valid)
-      valid = checkAuthorityKeyIdentifierExtension(attributes, validationErrors);
+    if (valid) valid = checkAuthorityKeyIdentifierExtension(attributes, validationErrors);
 
-    if (valid)
-      valid = checkNoRevAvailExtension(attributes, validationErrors);
+    if (valid) valid = checkNoRevAvailExtension(attributes, validationErrors);
 
-    if (valid)
-      valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
+    if (valid) valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
 
     return new VOMSValidationResult(attributes, valid, validationErrors);
   }
@@ -349,26 +349,23 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
       valid = checkTargets(attributes, validationErrors);
 
     // AC extension checking to be compliant with rfc 3281
-    if (valid)
-      valid = checkAuthorityKeyIdentifierExtension(attributes, validationErrors);
+    if (valid) valid = checkAuthorityKeyIdentifierExtension(attributes, validationErrors);
 
-    if (valid)
-      valid = checkNoRevAvailExtension(attributes, validationErrors);
+    if (valid) valid = checkNoRevAvailExtension(attributes, validationErrors);
 
-    if (valid)
-      valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
+    if (valid) valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
 
     return new VOMSValidationResult(attributes, valid, validationErrors);
   }
 
-  private boolean validateCertificate(X509Certificate c,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean validateCertificate(
+      X509Certificate c, List<VOMSValidationErrorMessage> validationErrors) {
 
     return validateCertificateChain(new X509Certificate[] {c}, validationErrors);
   }
 
-  private boolean validateCertificateChain(X509Certificate[] chain,
-      List<VOMSValidationErrorMessage> validationErrors) {
+  private boolean validateCertificateChain(
+      X509Certificate[] chain, List<VOMSValidationErrorMessage> validationErrors) {
 
     ValidationResult result = certChainValidator.validate(chain);
 
@@ -385,7 +382,7 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
       X509CertificateHolder certHolder = new JcaX509CertificateHolder(cert);
       ContentVerifierProvider cvp =
           new BcRSAContentVerifierProviderBuilder(new DefaultDigestAlgorithmIdentifierFinder())
-            .build(certHolder);
+              .build(certHolder);
       return attributes.getVOMSAC().isSignatureValid(cvp);
 
     } catch (Exception e) {

@@ -13,5 +13,4 @@ public interface VOMSEnvironmentVariables {
   public static final String X509_USER_KEY = "X509_USER_KEY";
   public static final String PKCS12_USER_CERT = "PKCS12_USER_CERT";
   public static final String VOMS_USER_ID = "VOMS_UID";
-
 }

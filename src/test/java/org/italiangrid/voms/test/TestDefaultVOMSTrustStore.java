@@ -2,9 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/**
- * 
- */
+/** */
 package org.italiangrid.voms.test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,6 +10,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import eu.emi.security.authn.x509.impl.CertificateUtils;
+import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,18 +19,13 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.util.NullListener;
 import org.junit.Test;
 
-import eu.emi.security.authn.x509.impl.CertificateUtils;
-import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
-
 /**
  * @author Andrea Ceccanti
- * 
  */
 public class TestDefaultVOMSTrustStore {
 
@@ -39,7 +34,6 @@ public class TestDefaultVOMSTrustStore {
 
     @SuppressWarnings({"unused", "unchecked"})
     DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(Collections.EMPTY_LIST);
-
   }
 
   @Test(expected = VOMSError.class)
@@ -63,7 +57,6 @@ public class TestDefaultVOMSTrustStore {
 
     assertEquals(1, trustDirs.size());
     assertEquals(DefaultVOMSTrustStore.DEFAULT_VOMS_DIR, trustDirs.get(0));
-
   }
 
   @Test
@@ -73,7 +66,6 @@ public class TestDefaultVOMSTrustStore {
 
     @SuppressWarnings("unused")
     DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
-
   }
 
   @Test
@@ -90,8 +82,9 @@ public class TestDefaultVOMSTrustStore {
 
     assertEquals(1, store.getLocalAACertificates().size());
 
-    assertTrue(cert.getSubjectX500Principal()
-      .equals(store.getLocalAACertificates().get(0).getSubjectX500Principal()));
+    assertTrue(
+        cert.getSubjectX500Principal()
+            .equals(store.getLocalAACertificates().get(0).getSubjectX500Principal()));
   }
 
   @Test
@@ -104,7 +97,6 @@ public class TestDefaultVOMSTrustStore {
     assertNotNull(store.getLSC("test.vo", "test-host.cnaf.infn.it"));
     assertNotNull(store.getLSC("test.vo", "test-multichain.cnaf.infn.it"));
     assertNotNull(store.getLSC("test.vo.1", "wilco.cnaf.infn.it"));
-
   }
 
   @Test
@@ -118,10 +110,7 @@ public class TestDefaultVOMSTrustStore {
     assertNotNull(store.getLSC("test.vo", "test-host.cnaf.infn.it"));
     assertNotNull(store.getLSC("test.vo", "test-multichain.cnaf.infn.it"));
     assertNull(store.getLSC("test.vo.1", "wilco.cnaf.infn.it"));
-
   }
 
-  public void testUpdatingVOMSTrustStore() {
-
-  }
+  public void testUpdatingVOMSTrustStore() {}
 }

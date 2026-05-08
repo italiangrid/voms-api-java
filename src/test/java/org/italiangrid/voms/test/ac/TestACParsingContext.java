@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNull;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.ac.ACParsingContext;
 import org.italiangrid.voms.test.utils.Fixture;
@@ -39,7 +38,5 @@ public class TestACParsingContext implements Fixture {
     assertNull(ctxt.getCertChain());
     assertEquals(emptyAttrs, ctxt.getACs());
     assertEquals(2, ctxt.getCertChainPostion());
-
   }
-
 }

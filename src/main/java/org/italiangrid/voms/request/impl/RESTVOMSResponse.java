@@ -14,10 +14,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * 
  * This class is used to parse and represent VOMS server responses coming from a RESTful VOMS
  * service.
- * 
  */
 public class RESTVOMSResponse implements VOMSResponse {
 
@@ -137,7 +135,7 @@ public class RESTVOMSResponse implements VOMSResponse {
    * Retrieves warning messages from the response.
    *
    * @return an array of {@link VOMSWarningMessage} objects, or {@code null} if no warnings are
-   *         found
+   *     found
    */
   public VOMSWarningMessage[] warningMessages() {
 
@@ -183,5 +181,4 @@ public class RESTVOMSResponse implements VOMSResponse {
 
     return XMLUtils.documentAsString(xmlResponse);
   }
-
 }

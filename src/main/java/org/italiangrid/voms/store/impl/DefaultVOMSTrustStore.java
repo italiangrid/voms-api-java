@@ -4,6 +4,9 @@
 
 package org.italiangrid.voms.store.impl;
 
+import eu.emi.security.authn.x509.helpers.trust.OpensslTruststoreHelper;
+import eu.emi.security.authn.x509.impl.CertificateUtils;
+import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -20,82 +23,68 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.LSCInfo;
 import org.italiangrid.voms.store.VOMSTrustStore;
 import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
 import org.italiangrid.voms.util.NullListener;
 
-import eu.emi.security.authn.x509.helpers.trust.OpensslTruststoreHelper;
-import eu.emi.security.authn.x509.impl.CertificateUtils;
-import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
-
 /**
- * 
  * The default implementation for the VOMS trust store. This implementation <b>does not</b> refresh
- * the trust information on a periodic basis. For an updating trust store see
- * {@link DefaultUpdatingVOMSTrustStore}.
- * 
+ * the trust information on a periodic basis. For an updating trust store see {@link
+ * DefaultUpdatingVOMSTrustStore}.
+ *
  * @author Andrea Ceccanti
- * 
  */
 public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
   /**
    * The default directory where local VOMS trust information is rooted: {@value #DEFAULT_VOMS_DIR}
-   **/
+   */
   public static final String DEFAULT_VOMS_DIR = "/etc/grid-security/vomsdir";
 
-  /**
-   * The filename suffix used to match certificates in the VOMS local trust directories
-   **/
+  /** The filename suffix used to match certificates in the VOMS local trust directories */
   public static final String CERTIFICATE_FILENAME_SUFFIX = ".pem";
 
-  /**
-   * The filename suffix used to match LSC files in the VOMS local trust directories
-   **/
+  /** The filename suffix used to match LSC files in the VOMS local trust directories */
   public static final String LSC_FILENAME_SUFFIX = ".lsc";
 
   /**
    * The list of local trusted directories that is searched for trust information (certs or LSC
    * files)
-   **/
+   */
   private final List<String> localTrustedDirs;
 
-  /** Map of local parsed AA certificates keyed by certificate subject hash **/
+  /** Map of local parsed AA certificates keyed by certificate subject hash * */
   private Map<String, X509Certificate> localAACertificatesByHash =
       new HashMap<String, X509Certificate>();
 
-  /** The set of local parsed LSC information keyed by VO **/
+  /** The set of local parsed LSC information keyed by VO * */
   private Map<String, Set<LSCInfo>> localLSCInfo = new HashMap<String, Set<LSCInfo>>();
 
-  /**
-   * The trust store status listener that will be notified of changes in this trust store
-   **/
+  /** The trust store status listener that will be notified of changes in this trust store */
   private VOMSTrustStoreStatusListener listener;
 
-  /** The read/write lock that implements thread safety for this store **/
+  /** The read/write lock that implements thread safety for this store * */
   protected final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
-  /** A reference to the read lock **/
+  /** A reference to the read lock * */
   protected final Lock read = rwLock.readLock();
 
-  /** A reference to the write lock **/
+  /** A reference to the write lock * */
   protected final Lock write = rwLock.writeLock();
 
-  /** A lock to guard the setting of the status listener **/
+  /** A lock to guard the setting of the status listener * */
   protected final Object listenerLock = new Object();
 
   private final List<String> voNames;
 
   /**
    * Builds a list of trusted directories containing only {@link #DEFAULT_VOMS_DIR}.
-   * 
+   *
    * @return a list of default trusted directory containing the {@link #DEFAULT_VOMS_DIR}
-   **/
+   */
   protected static List<String> buildDefaultTrustedDirs() {
 
     List<String> tDirs = new ArrayList<String>();
@@ -104,19 +93,17 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
   }
 
   /**
-   * 
    * @param localTrustDirs a non-null list of local trust directories
    * @param listener the {@link VOMSTrustStoreStatusListener} to use for this trust store
    * @throws IllegalArgumentException when the list passed as argument is null
-   * 
    */
   public DefaultVOMSTrustStore(List<String> localTrustDirs, VOMSTrustStoreStatusListener listener) {
 
     this(localTrustDirs, null, listener);
   }
 
-  public DefaultVOMSTrustStore(List<String> localTrustDirs, List<String> voNames,
-      VOMSTrustStoreStatusListener listener) {
+  public DefaultVOMSTrustStore(
+      List<String> localTrustDirs, List<String> voNames, VOMSTrustStoreStatusListener listener) {
 
     if (localTrustDirs == null) {
       throw new IllegalArgumentException(
@@ -141,10 +128,8 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
   /**
    * Default constructor.
-   * 
-   * Sets the local trusted directories to the default of {@value #DEFAULT_VOMS_DIR}.
-   * 
-   * 
+   *
+   * <p>Sets the local trusted directories to the default of {@value #DEFAULT_VOMS_DIR}.
    */
   public DefaultVOMSTrustStore() {
 
@@ -166,8 +151,8 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
     read.lock();
 
     try {
-      return Collections
-        .unmodifiableList(new ArrayList<X509Certificate>(localAACertificatesByHash.values()));
+      return Collections.unmodifiableList(
+          new ArrayList<X509Certificate>(localAACertificatesByHash.values()));
     } finally {
       read.unlock();
     }
@@ -181,14 +166,11 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
       Set<LSCInfo> candidates = localLSCInfo.get(voName);
 
-      if (candidates == null)
-        return null;
+      if (candidates == null) return null;
 
       for (LSCInfo lsc : candidates) {
 
-        if (lsc.getHostname().equals(hostname))
-          return lsc;
-
+        if (lsc.getHostname().equals(hostname)) return lsc;
       }
 
       return null;
@@ -201,7 +183,7 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
   /**
    * Loads all the certificates in the local directory. Only files with the extension matching the
    * {@link #CERTIFICATE_FILENAME_PATTERN} are considered.
-   * 
+   *
    * @param directory
    */
   private void loadCertificatesFromDirectory(File directory) {
@@ -212,23 +194,23 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
       listener.notifyCertficateLookupEvent(directory.getAbsolutePath());
     }
 
-    File[] certFiles = directory.listFiles(new FilenameFilter() {
+    File[] certFiles =
+        directory.listFiles(
+            new FilenameFilter() {
 
-      public boolean accept(File dir, String name) {
+              public boolean accept(File dir, String name) {
 
-        return name.endsWith(CERTIFICATE_FILENAME_SUFFIX);
-      }
-    });
+                return name.endsWith(CERTIFICATE_FILENAME_SUFFIX);
+              }
+            });
 
-    for (File f : certFiles)
-      loadCertificateFromFile(f);
-
+    for (File f : certFiles) loadCertificateFromFile(f);
   }
 
   /**
    * Loads a VOMS AA certificate from a given file and stores this certificate in the local map of
    * trusted VOMS AA certificate.
-   * 
+   *
    * @param file
    */
   private void loadCertificateFromFile(File file) {
@@ -253,15 +235,14 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
     } catch (IOException e) {
       String errorMessage =
-          String.format("Error parsing VOMS trusted certificate from %s. Reason: %s",
+          String.format(
+              "Error parsing VOMS trusted certificate from %s. Reason: %s",
               file.getAbsolutePath(), e.getMessage());
       throw new VOMSError(errorMessage, e);
     }
-
   }
 
   /**
-   * 
    * @param directory
    */
   private void loadLSCFromDirectory(File directory) {
@@ -272,16 +253,17 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
       listener.notifyLSCLookupEvent(directory.getAbsolutePath());
     }
 
-    File[] lscFiles = directory.listFiles(new FilenameFilter() {
+    File[] lscFiles =
+        directory.listFiles(
+            new FilenameFilter() {
 
-      public boolean accept(File dir, String name) {
+              public boolean accept(File dir, String name) {
 
-        return name.endsWith(LSC_FILENAME_SUFFIX);
-      }
-    });
+                return name.endsWith(LSC_FILENAME_SUFFIX);
+              }
+            });
 
-    if (lscFiles.length == 0)
-      return;
+    if (lscFiles.length == 0) return;
 
     DefaultLSCFileParser lscParser = new DefaultLSCFileParser();
 
@@ -313,14 +295,12 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
       localLscForVo.add(info);
 
       listener.notifyLSCLoadEvent(info, lsc);
-
     }
-
   }
 
   /**
    * Performs basic sanity checks performed on a file supposed to hold a VOMS AA certificate.
-   * 
+   *
    * @param certFile
    */
   private void certificateFileSanityChecks(File certFile) {
@@ -332,13 +312,12 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
     if (!certFile.canRead())
       throw new VOMSError(
           "Local VOMS trusted certificate is not readable:" + certFile.getAbsolutePath());
-
   }
 
   /**
    * Performs basic sanity checks on a directory that is supposed to contain VOMS AA certificates
    * and LSC files.
-   * 
+   *
    * @param directory
    */
   private void directorySanityChecks(File directory) {
@@ -356,14 +335,12 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
     if (!directory.canExecute())
       throw new VOMSError(
           "Local trust directory is not traversable:" + directory.getAbsolutePath());
-
   }
 
   private void cleanupStores() {
 
     localAACertificatesByHash.clear();
     localLSCInfo.clear();
-
   }
 
   public void loadTrustInformation() {
@@ -389,13 +366,15 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
 
         // Load LSC and certificates files starting from each of the
         // sub-directory of the starting trust info directory
-        File[] voDirs = baseTrustDir.listFiles(new FileFilter() {
+        File[] voDirs =
+            baseTrustDir.listFiles(
+                new FileFilter() {
 
-          public boolean accept(File pathname) {
+                  public boolean accept(File pathname) {
 
-            return pathname.isDirectory();
-          }
-        });
+                    return pathname.isDirectory();
+                  }
+                });
 
         for (File voDir : voDirs) {
 
@@ -414,7 +393,6 @@ public class DefaultVOMSTrustStore implements VOMSTrustStore {
   private String getOpensslCAHash(X500Principal principal) {
 
     return OpensslTruststoreHelper.getOpenSSLCAHash(principal, false);
-
   }
 
   public X509Certificate getAACertificateBySubject(X500Principal aaCertSubject) {

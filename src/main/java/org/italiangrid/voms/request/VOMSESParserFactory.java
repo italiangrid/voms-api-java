@@ -8,9 +8,8 @@ import org.italiangrid.voms.request.impl.LegacyVOMSESParserImpl;
 
 /**
  * A factory class for {@link VOMSESParser}.
- * 
- * @author Andrea Ceccanti
  *
+ * @author Andrea Ceccanti
  */
 public class VOMSESParserFactory {
 

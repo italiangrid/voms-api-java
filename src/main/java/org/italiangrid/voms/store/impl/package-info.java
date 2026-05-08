@@ -2,8 +2,5 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/**
- * This package provides the implementation of VOMS trust store management.
- */
+/** This package provides the implementation of VOMS trust store management. */
 package org.italiangrid.voms.store.impl;
-

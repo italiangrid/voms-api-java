@@ -4,10 +4,10 @@
 
 package org.italiangrid.voms.ac.impl;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.VOMSACLookupStrategy;
@@ -22,16 +22,12 @@ import org.italiangrid.voms.store.VOMSTrustStores;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.NullListener;
 
-import eu.emi.security.authn.x509.X509CertChainValidatorExt;
-
 /**
  * The default implementation of the VOMS validator.
- * 
- * @author andreaceccanti
  *
+ * @author andreaceccanti
  */
-public class DefaultVOMSValidator extends DefaultVOMSACParser implements
-  VOMSACValidator {
+public class DefaultVOMSValidator extends DefaultVOMSACParser implements VOMSACValidator {
 
   public static final String DEFAULT_TRUST_ANCHORS_DIR = "/etc/grid-security/certificates";
 
@@ -49,9 +45,7 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
     private X509CertChainValidatorExt certChainValidator;
     private VOMSACLookupStrategy acLookupStrategy;
 
-    public Builder() {
-
-    }
+    public Builder() {}
 
     public Builder validationStrategy(VOMSACValidationStrategy s) {
 
@@ -86,29 +80,24 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
     private void sanityChecks() {
 
       if (validationStrategy == null) {
-        if (trustStore == null)
-          trustStore = VOMSTrustStores.newTrustStore();
+        if (trustStore == null) trustStore = VOMSTrustStores.newTrustStore();
 
         if (certChainValidator == null)
-          certChainValidator = new CertificateValidatorBuilder()
-            .trustAnchorsDir(DEFAULT_TRUST_ANCHORS_DIR).build();
+          certChainValidator =
+              new CertificateValidatorBuilder().trustAnchorsDir(DEFAULT_TRUST_ANCHORS_DIR).build();
 
-        validationStrategy = new DefaultVOMSValidationStrategy(trustStore,
-          certChainValidator);
+        validationStrategy = new DefaultVOMSValidationStrategy(trustStore, certChainValidator);
       }
 
       if (validationResultListener == null) {
 
         validationResultListener = NullListener.INSTANCE;
-
       }
 
-      if (acLookupStrategy == null){
-        
+      if (acLookupStrategy == null) {
+
         acLookupStrategy = new LeafACLookupStrategy();
-      
       }
-        
     }
 
     public DefaultVOMSValidator build() {
@@ -127,29 +116,25 @@ public class DefaultVOMSValidator extends DefaultVOMSACParser implements
     this.validationResultListener = b.validationResultListener;
   }
 
-  public List<VOMSValidationResult> validateWithResult(
-    X509Certificate[] validatedChain) {
+  public List<VOMSValidationResult> validateWithResult(X509Certificate[] validatedChain) {
 
     return internalValidate(validatedChain);
   }
 
-  protected List<VOMSValidationResult> internalValidate(
-    X509Certificate[] validatedChain) {
+  protected List<VOMSValidationResult> internalValidate(X509Certificate[] validatedChain) {
 
     List<VOMSAttribute> parsedAttrs = parse(validatedChain);
     List<VOMSValidationResult> results = new ArrayList<VOMSValidationResult>();
 
     for (VOMSAttribute a : parsedAttrs) {
 
-      VOMSValidationResult result = validationStrategy.validateAC(a,
-        validatedChain);
+      VOMSValidationResult result = validationStrategy.validateAC(a, validatedChain);
 
       synchronized (listenerLock) {
         validationResultListener.notifyValidationResult(result);
       }
 
       results.add(result);
-
     }
 
     return results;

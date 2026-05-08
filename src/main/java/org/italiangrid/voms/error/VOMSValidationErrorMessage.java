@@ -9,29 +9,27 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
- * A VOMS validation error message class (freely inspired by the CANL validation
- * error message class).
- * 
- * @author Andrea Ceccanti
+ * A VOMS validation error message class (freely inspired by the CANL validation error message
+ * class).
  *
+ * @author Andrea Ceccanti
  */
 public class VOMSValidationErrorMessage {
 
-  static final String ERROR_BUNDLE = VOMSValidationErrorMessage.class
-    .getPackage().getName() + "." + "validationErrors";
+  static final String ERROR_BUNDLE =
+      VOMSValidationErrorMessage.class.getPackage().getName() + "." + "validationErrors";
 
   private VOMSValidationErrorCode errorCode;
   private String message;
   private Object[] parameters;
 
-  public static VOMSValidationErrorMessage newErrorMessage(
-    VOMSValidationErrorCode errorCode) {
+  public static VOMSValidationErrorMessage newErrorMessage(VOMSValidationErrorCode errorCode) {
 
     return new VOMSValidationErrorMessage(errorCode);
   }
 
   public static VOMSValidationErrorMessage newErrorMessage(
-    VOMSValidationErrorCode errorCode, Object... params) {
+      VOMSValidationErrorCode errorCode, Object... params) {
 
     return new VOMSValidationErrorMessage(errorCode, params);
   }
@@ -39,11 +37,9 @@ public class VOMSValidationErrorMessage {
   private VOMSValidationErrorMessage(VOMSValidationErrorCode errorCode) {
 
     this(errorCode, (Object[]) null);
-
   }
 
-  private VOMSValidationErrorMessage(VOMSValidationErrorCode errorCode,
-    Object... params) {
+  private VOMSValidationErrorMessage(VOMSValidationErrorCode errorCode, Object... params) {
 
     this.errorCode = errorCode;
     this.parameters = params;
@@ -59,7 +55,6 @@ public class VOMSValidationErrorMessage {
     }
 
     message = MessageFormat.format(template, parameters);
-
   }
 
   public VOMSValidationErrorCode getErrorCode() {
@@ -96,20 +91,14 @@ public class VOMSValidationErrorMessage {
   @Override
   public boolean equals(Object obj) {
 
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     VOMSValidationErrorMessage other = (VOMSValidationErrorMessage) obj;
-    if (errorCode != other.errorCode)
-      return false;
+    if (errorCode != other.errorCode) return false;
     if (message == null) {
-      if (other.message != null)
-        return false;
-    } else if (!message.equals(other.message))
-      return false;
+      if (other.message != null) return false;
+    } else if (!message.equals(other.message)) return false;
     return true;
   }
 }

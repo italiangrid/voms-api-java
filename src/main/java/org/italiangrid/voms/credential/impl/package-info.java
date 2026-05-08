@@ -4,8 +4,7 @@
 
 /**
  * This package provides the implementation of the user credentials loading APIs.
- * 
- * @author andreaceccanti
  *
+ * @author andreaceccanti
  */
 package org.italiangrid.voms.credential.impl;

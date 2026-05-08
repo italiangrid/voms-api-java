@@ -5,7 +5,6 @@
 package org.italiangrid.voms.test;
 
 import java.io.IOException;
-
 import org.italiangrid.voms.credential.FilePermissionError;
 import org.italiangrid.voms.util.FilePermissionHelper;
 import org.italiangrid.voms.util.FilePermissionHelper.PosixFilePermission;
@@ -28,14 +27,10 @@ public class TestFilePermissionHelper {
     FilePermissionHelper.setPrivateKeyPermissions(keyWithRightPerms);
     FilePermissionHelper.setPKCS12Permissions(p12WithRightPerms);
 
-    FilePermissionHelper.setFilePermissions(keyWithWrongPerms,
-      PosixFilePermission.ALL_PERMS);
-    FilePermissionHelper.setFilePermissions(p12WithWrongPerms,
-      PosixFilePermission.ALL_PERMS);
+    FilePermissionHelper.setFilePermissions(keyWithWrongPerms, PosixFilePermission.ALL_PERMS);
+    FilePermissionHelper.setFilePermissions(p12WithWrongPerms, PosixFilePermission.ALL_PERMS);
 
-    FilePermissionHelper.setFilePermissions(keyWith600Perms,
-      PosixFilePermission.USER_RW);
-
+    FilePermissionHelper.setFilePermissions(keyWith600Perms, PosixFilePermission.USER_RW);
   }
 
   @Test
@@ -44,7 +39,6 @@ public class TestFilePermissionHelper {
     FilePermissionHelper.checkPrivateKeyPermissions(keyWithRightPerms);
     FilePermissionHelper.checkPrivateKeyPermissions(keyWith600Perms);
     FilePermissionHelper.checkPKCS12Permissions(p12WithRightPerms);
-
   }
 
   @Test(expected = FilePermissionError.class)
@@ -58,5 +52,4 @@ public class TestFilePermissionHelper {
 
     FilePermissionHelper.checkPKCS12Permissions(p12WithWrongPerms);
   }
-
 }

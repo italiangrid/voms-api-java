@@ -4,6 +4,8 @@
 
 package org.italiangrid.voms.test.utils;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+import eu.emi.security.authn.x509.impl.PEMCredential;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,7 +16,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.ac.impl.DefaultVOMSValidationStrategy;
@@ -31,45 +32,39 @@ import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.mockito.Mockito;
 
-import eu.emi.security.authn.x509.X509CertChainValidatorExt;
-import eu.emi.security.authn.x509.impl.PEMCredential;
-
 public class Utils implements Fixture {
 
-  private Utils() {
+  private Utils() {}
 
-  }
-
-
-  public static VOMSACService buildACService(VOMSProtocol main,
-      VOMSProtocol fallback, boolean legacyProtocolEnabled) throws Exception {
+  public static VOMSACService buildACService(
+      VOMSProtocol main, VOMSProtocol fallback, boolean legacyProtocolEnabled) throws Exception {
 
     VOMSServerInfoStore store = Mockito.mock(VOMSServerInfoStore.class);
 
     Set<VOMSServerInfo> testVOEndpoints = new HashSet<VOMSServerInfo>();
     testVOEndpoints.add(getTestVOEndpoint());
 
-    Mockito.when(store.getVOMSServerInfo("test.vo"))
-      .thenReturn(testVOEndpoints);
+    Mockito.when(store.getVOMSServerInfo("test.vo")).thenReturn(testVOEndpoints);
 
-    DefaultVOMSACService acService = new DefaultVOMSACService.Builder(
-      getCertificateValidator()).serverInfoStore(store)
-      .requestListener(LogListener.INSTANCE).httpProtocol(main)
-          .legacyProtocol(fallback)
-          .legacyProtocolEnabled(legacyProtocolEnabled)
-          .build();
+    DefaultVOMSACService acService =
+        new DefaultVOMSACService.Builder(getCertificateValidator())
+            .serverInfoStore(store)
+            .requestListener(LogListener.INSTANCE)
+            .httpProtocol(main)
+            .legacyProtocol(fallback)
+            .legacyProtocolEnabled(legacyProtocolEnabled)
+            .build();
 
     return acService;
-
   }
 
   public static VOMSACService buildACService(VOMSProtocol main, VOMSProtocol fallback)
       throws Exception {
+
     return buildACService(main, fallback, true);
   }
 
-  public static VOMSACService buildACService(VOMSProtocol protocol)
-    throws Exception {
+  public static VOMSACService buildACService(VOMSProtocol protocol) throws Exception {
 
     return buildACService(protocol, null);
   }
@@ -86,76 +81,71 @@ public class Utils implements Fixture {
 
   public static X509CertChainValidatorExt getCertificateValidator() {
 
-    return new CertificateValidatorBuilder().trustAnchorsDir(trustAnchorsDir)
-      .build();
+    return new CertificateValidatorBuilder().trustAnchorsDir(trustAnchorsDir).build();
   }
 
   public static VOMSACValidator getVOMSValidator(LocalHostnameResolver resolver) {
 
-    X509CertChainValidatorExt validator = new CertificateValidatorBuilder()
-      .trustAnchorsDir(trustAnchorsDir).build();
+    X509CertChainValidatorExt validator =
+        new CertificateValidatorBuilder().trustAnchorsDir(trustAnchorsDir).build();
     VOMSTrustStore ts = new DefaultVOMSTrustStore(Arrays.asList(vomsdir));
-    return new DefaultVOMSValidator.Builder().validationStrategy(
-      new DefaultVOMSValidationStrategy(ts, validator, resolver)).build();
+    return new DefaultVOMSValidator.Builder()
+        .validationStrategy(new DefaultVOMSValidationStrategy(ts, validator, resolver))
+        .build();
   }
 
   public static VOMSACValidator getVOMSValidator() {
 
-    X509CertChainValidatorExt validator = new CertificateValidatorBuilder()
-      .trustAnchorsDir(trustAnchorsDir).build();
+    X509CertChainValidatorExt validator =
+        new CertificateValidatorBuilder().trustAnchorsDir(trustAnchorsDir).build();
     return VOMSValidators.newValidator(
-      new DefaultVOMSTrustStore(Arrays.asList(vomsdir)), validator);
-
+        new DefaultVOMSTrustStore(Arrays.asList(vomsdir)), validator);
   }
 
   public static VOMSACValidator getVOMSValidator(String vomsDir) {
 
-    X509CertChainValidatorExt validator = new CertificateValidatorBuilder()
-      .trustAnchorsDir(trustAnchorsDir).build();
+    X509CertChainValidatorExt validator =
+        new CertificateValidatorBuilder().trustAnchorsDir(trustAnchorsDir).build();
     return VOMSValidators.newValidator(
-      new DefaultVOMSTrustStore(Arrays.asList(vomsDir)), validator);
-
+        new DefaultVOMSTrustStore(Arrays.asList(vomsDir)), validator);
   }
 
-  public static PEMCredential getAACredential() throws KeyStoreException,
-    CertificateException, IOException {
+  public static PEMCredential getAACredential()
+      throws KeyStoreException, CertificateException, IOException {
 
     return new PEMCredential(aaKey, aaCert, keyPassword.toCharArray());
   }
 
-  public static PEMCredential getAACredential2() throws KeyStoreException,
-    CertificateException, IOException {
+  public static PEMCredential getAACredential2()
+      throws KeyStoreException, CertificateException, IOException {
 
     return new PEMCredential(aaKey2, aaCert2, keyPassword.toCharArray());
   }
 
-  public static PEMCredential getTestUserCredential() throws KeyStoreException,
-    CertificateException, IOException {
+  public static PEMCredential getTestUserCredential()
+      throws KeyStoreException, CertificateException, IOException {
 
     return new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
   }
 
   public static PEMCredential getTest1UserCredential()
-    throws KeyStoreException, CertificateException, IOException {
+      throws KeyStoreException, CertificateException, IOException {
 
     return new PEMCredential(holderKey2, holderCert2, keyPassword.toCharArray());
   }
 
-  public static PEMCredential getExpiredCredential() throws KeyStoreException,
-    CertificateException, IOException {
+  public static PEMCredential getExpiredCredential()
+      throws KeyStoreException, CertificateException, IOException {
 
     return new PEMCredential(expiredKey, expiredCert, keyPassword.toCharArray());
   }
 
-  public static VOMSAA getVOMSAA() throws KeyStoreException,
-    CertificateException, IOException {
+  public static VOMSAA getVOMSAA() throws KeyStoreException, CertificateException, IOException {
 
-    return new VOMSAA(getAACredential(), defaultVO, defaultVOHost,
-      defaultVOPort);
+    return new VOMSAA(getAACredential(), defaultVO, defaultVOHost, defaultVOPort);
   }
 
-  public static Date getDate(int year, int month, int day, int hour,
-    int minute, int second) {
+  public static Date getDate(int year, int month, int day, int hour, int minute, int second) {
 
     Calendar cal = Calendar.getInstance();
     cal.set(year, month, day, hour, minute, second);
@@ -168,5 +158,4 @@ public class Utils implements Fixture {
     cal.set(year, month, day);
     return cal.getTime();
   }
-
 }

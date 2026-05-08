@@ -7,15 +7,12 @@ package org.italiangrid.voms.request.impl;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 
 /**
- * A base VOMSES lookup strategy which just run a existence check on a given
- * list of paths.
- * 
+ * A base VOMSES lookup strategy which just run a existence check on a given list of paths.
+ *
  * @author Andrea Ceccanti
- * 
  */
 public class BaseVOMSESLookupStrategy implements VOMSESLookupStrategy {
 
@@ -40,8 +37,7 @@ public class BaseVOMSESLookupStrategy implements VOMSESLookupStrategy {
 
     for (String p : checkedPaths) {
       File f = new File(p);
-      if (f.exists())
-        vomsesPaths.add(f);
+      if (f.exists()) vomsesPaths.add(f);
     }
 
     return vomsesPaths;

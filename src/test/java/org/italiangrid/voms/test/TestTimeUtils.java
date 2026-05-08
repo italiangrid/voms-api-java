@@ -6,10 +6,8 @@ package org.italiangrid.voms.test;
 
 import java.util.Calendar;
 import java.util.Date;
-
-import org.junit.Assert;
-
 import org.italiangrid.voms.util.TimeUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestTimeUtils {
@@ -23,9 +21,7 @@ public class TestTimeUtils {
 
     Date nowPlus1Minute = cal.getTime();
 
-    Assert.assertTrue(TimeUtils.checkTimeInRangeWithSkew(now, now,
-      nowPlus1Minute, 1));
-
+    Assert.assertTrue(TimeUtils.checkTimeInRangeWithSkew(now, now, nowPlus1Minute, 1));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -62,11 +58,8 @@ public class TestTimeUtils {
 
     Date inOneYear = cal.getTime();
 
-    Assert.assertFalse(TimeUtils.checkTimeInRangeWithSkew(now, nowPlus2minute,
-      inOneYear, 2));
-    Assert.assertTrue(TimeUtils.checkTimeInRangeWithSkew(now, nowPlus2minute,
-      inOneYear, 3));
-
+    Assert.assertFalse(TimeUtils.checkTimeInRangeWithSkew(now, nowPlus2minute, inOneYear, 2));
+    Assert.assertTrue(TimeUtils.checkTimeInRangeWithSkew(now, nowPlus2minute, inOneYear, 3));
   }
 
   @Test
@@ -79,11 +72,7 @@ public class TestTimeUtils {
 
     Date oneYearAgo = cal.getTime();
 
-    Assert.assertFalse(TimeUtils.checkTimeInRangeWithSkew(now, oneYearAgo, now,
-      0));
-    Assert.assertTrue(TimeUtils.checkTimeInRangeWithSkew(now, oneYearAgo, now,
-      1));
-
+    Assert.assertFalse(TimeUtils.checkTimeInRangeWithSkew(now, oneYearAgo, now, 0));
+    Assert.assertTrue(TimeUtils.checkTimeInRangeWithSkew(now, oneYearAgo, now, 1));
   }
-
 }

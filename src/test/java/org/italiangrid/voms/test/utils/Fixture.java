@@ -40,5 +40,4 @@ public interface Fixture {
   static final int defaultVOPort = 15000;
 
   static final List<String> defaultVOFqans = Arrays.asList("/test.vo");
-
 }

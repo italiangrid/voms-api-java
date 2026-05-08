@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSESParserFactory;
@@ -21,21 +20,19 @@ import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
 import org.italiangrid.voms.util.NullListener;
 
 /**
- * 
- * A {@link DefaultVOMSServerInfoStore} organizes voms servers found in vomses
- * configuration files in map keyed by vo alias. This way is easy to know which
- * servers acts as replicas for the same vos.
- * 
+ * A {@link DefaultVOMSServerInfoStore} organizes voms servers found in vomses configuration files
+ * in map keyed by vo alias. This way is easy to know which servers acts as replicas for the same
+ * vos.
+ *
  * @author Andrea Ceccanti
- * 
- * 
  */
 public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 
   private VOMSESLookupStrategy lookupStrategy;
   private VOMSServerInfoStoreListener listener;
 
-  protected Map<String, Set<VOMSServerInfo>> serverInfoStore = new TreeMap<String, Set<VOMSServerInfo>>();
+  protected Map<String, Set<VOMSServerInfo>> serverInfoStore =
+      new TreeMap<String, Set<VOMSServerInfo>>();
   private VOMSESParser vomsesParser;
 
   private DefaultVOMSServerInfoStore(Builder b) {
@@ -44,7 +41,6 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
     this.listener = b.listener;
     this.vomsesParser = b.vomsesParser;
     initializeStore();
-
   }
 
   public void addVOMSServerInfo(VOMSServerInfo info) {
@@ -72,8 +68,7 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 
     Set<VOMSServerInfo> allEntries = new HashSet<VOMSServerInfo>();
 
-    for (Map.Entry<String, Set<VOMSServerInfo>> entry : serverInfoStore
-      .entrySet())
+    for (Map.Entry<String, Set<VOMSServerInfo>> entry : serverInfoStore.entrySet())
       allEntries.addAll(entry.getValue());
 
     return allEntries;
@@ -82,11 +77,11 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
   public Set<VOMSServerInfo> getVOMSServerInfo(String voName) {
 
     Set<VOMSServerInfo> result = serverInfoStore.get(voName);
-    
+
     if (result == null) {
-      result = Collections.emptySet(); 
+      result = Collections.emptySet();
     }
-    
+
     return result;
   }
 
@@ -94,8 +89,7 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 
     List<File> vomsesPaths = lookupStrategy.lookupVomsesInfo();
 
-    if (vomsesPaths.isEmpty())
-      listener.notifyNoValidVOMSESError(lookupStrategy.searchedPaths());
+    if (vomsesPaths.isEmpty()) listener.notifyNoValidVOMSESError(lookupStrategy.searchedPaths());
 
     for (File f : vomsesPaths) {
 
@@ -105,57 +99,45 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
       for (VOMSServerInfo si : vomsServerInfo) {
         addVOMSServerInfo(si, f.getAbsolutePath());
       }
-
     }
   }
 
   /**
-   * Creates a {@link DefaultVOMSServerInfoStore}. The
-   * {@link DefaultVOMSServerInfoStore} parameters can be set with the
-   * appropriate methods. Example:
-   * 
+   * Creates a {@link DefaultVOMSServerInfoStore}. The {@link DefaultVOMSServerInfoStore} parameters
+   * can be set with the appropriate methods. Example:
+   *
    * <pre>
-   * 
+   *
    * {
    *   &#064;code
    *   VOMSServerInfoStore serverInfoStore = new DefaultVOMSServerInfoStore.Builder()
-   *     .storeListener(storeListener).vomsesPaths(vomsesLocations).build();
+   *     .storeListener(storeListener)
+   *     .vomsesPaths(vomsesLocations)
+   *     .build();
    * };
    * </pre>
-   * 
    */
   public static class Builder {
 
-    /**
-     * A list of paths where vomses information will be looked for
-     */
+    /** A list of paths where vomses information will be looked for */
     private List<String> vomsesPaths;
-    /**
-     * The {@link VOMSESLookupStrategy} that will be used to lookup vomses
-     * information
-     */
+
+    /** The {@link VOMSESLookupStrategy} that will be used to lookup vomses information */
     private VOMSESLookupStrategy lookupStrategy;
-    /**
-     * The listener that will be notified of interesting store events
-     */
+
+    /** The listener that will be notified of interesting store events */
     private VOMSServerInfoStoreListener listener = NullListener.INSTANCE;
 
-    /**
-     * The parser implementation used to parse VOMSES files
-     */
+    /** The parser implementation used to parse VOMSES files */
     private VOMSESParser vomsesParser = VOMSESParserFactory.newVOMSESParser();
 
-    public Builder() {
-
-    }
+    public Builder() {}
 
     /**
-     * Sets the {@link VOMSESLookupStrategy} that will be used to lookup vomses
-     * information for the {@link DefaultVOMSServerInfoStore} that this builder
-     * is creating
-     * 
-     * @param strategy
-     *          The strategy that will be used to lookup vomses information
+     * Sets the {@link VOMSESLookupStrategy} that will be used to lookup vomses information for the
+     * {@link DefaultVOMSServerInfoStore} that this builder is creating
+     *
+     * @param strategy The strategy that will be used to lookup vomses information
      * @return this {@link Builder} instance
      */
     public Builder lookupStrategy(VOMSESLookupStrategy strategy) {
@@ -165,12 +147,10 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
     }
 
     /**
-     * Sets the {@link VOMSServerInfoStoreListener} that will receive
-     * store-related notifications for the {@link DefaultVOMSServerInfoStore}
-     * that this builder is creating
-     * 
-     * @param l
-     *          the listener
+     * Sets the {@link VOMSServerInfoStoreListener} that will receive store-related notifications
+     * for the {@link DefaultVOMSServerInfoStore} that this builder is creating
+     *
+     * @param l the listener
      * @return this {@link Builder} instance
      */
     public Builder storeListener(VOMSServerInfoStoreListener l) {
@@ -180,11 +160,9 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
     }
 
     /**
-     * Sets the {@link VOMSESParser} implementation that will be used to parse
-     * vomses files
-     * 
-     * @param p
-     *          the parser
+     * Sets the {@link VOMSESParser} implementation that will be used to parse vomses files
+     *
+     * @param p the parser
      * @return this {@link Builder} instance
      */
     public Builder vomsesParser(VOMSESParser p) {
@@ -194,11 +172,10 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
     }
 
     /**
-     * Sets a list of paths where vomses files will be looked up by the
-     * {@link DefaultVOMSServerInfoStore} that this builder is creating
-     * 
-     * @param paths
-     *          a list of paths
+     * Sets a list of paths where vomses files will be looked up by the {@link
+     * DefaultVOMSServerInfoStore} that this builder is creating
+     *
+     * @param paths a list of paths
      * @return this {@link Builder} instance
      */
     public Builder vomsesPaths(List<String> paths) {
@@ -209,27 +186,21 @@ public class DefaultVOMSServerInfoStore implements VOMSServerInfoStore {
 
     private void buildLookupStrategy() {
 
-      if (lookupStrategy != null)
-        return;
+      if (lookupStrategy != null) return;
 
-      if (vomsesPaths != null)
-        lookupStrategy = new BaseVOMSESLookupStrategy(vomsesPaths);
-      else
-        lookupStrategy = new DefaultVOMSESLookupStrategy();
+      if (vomsesPaths != null) lookupStrategy = new BaseVOMSESLookupStrategy(vomsesPaths);
+      else lookupStrategy = new DefaultVOMSESLookupStrategy();
     }
 
     /**
      * Builds the {@link DefaultVOMSServerInfoStore}
-     * 
-     * @return a {@link DefaultVOMSServerInfoStore} configured as required by
-     *         this builder
+     *
+     * @return a {@link DefaultVOMSServerInfoStore} configured as required by this builder
      */
     public DefaultVOMSServerInfoStore build() {
 
       buildLookupStrategy();
       return new DefaultVOMSServerInfoStore(this);
-
     }
   }
-
 }

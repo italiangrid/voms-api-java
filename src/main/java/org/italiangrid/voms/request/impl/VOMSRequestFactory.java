@@ -5,11 +5,9 @@
 package org.italiangrid.voms.request.impl;
 
 import java.util.Iterator;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSServerInfo;
@@ -19,12 +17,9 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 /**
- * 
- * This class builds VOMS XML requests starting from {@link VOMSACRequest}
- * objects.
- * 
+ * This class builds VOMS XML requests starting from {@link VOMSACRequest} objects.
+ *
  * @author Andrea Ceccanti
- * 
  */
 public class VOMSRequestFactory {
 
@@ -36,13 +31,11 @@ public class VOMSRequestFactory {
 
   protected DocumentBuilder docBuilder;
 
-  public synchronized static VOMSRequestFactory instance() {
+  public static synchronized VOMSRequestFactory instance() {
 
-    if (instance == null)
-      instance = new VOMSRequestFactory();
+    if (instance == null) instance = new VOMSRequestFactory();
 
     return instance;
-
   }
 
   private VOMSRequestFactory() {
@@ -57,7 +50,6 @@ public class VOMSRequestFactory {
     } catch (ParserConfigurationException e) {
       throw new VOMSError(e.getMessage());
     }
-
   }
 
   public long getLifetime() {
@@ -92,11 +84,9 @@ public class VOMSRequestFactory {
 
   private void setOptionsForRequest(VOMSRequestFragment fragment) {
 
-    if (orderString != null && orderString != "")
-      fragment.buildOrderElement(orderString);
+    if (orderString != null && orderString != "") fragment.buildOrderElement(orderString);
 
-    if (targetString != null && targetString != "")
-      fragment.buildTargetsElement(targetString);
+    if (targetString != null && targetString != "") fragment.buildTargetsElement(targetString);
 
     fragment.buildLifetime(lifetime);
   }
@@ -142,8 +132,8 @@ public class VOMSRequestFactory {
 
       } else if (VOMSFQANNamingScheme.isQualifiedRole(FQAN)) {
 
-        frag.mappingCommand(VOMSFQANNamingScheme.getGroupName(FQAN),
-          VOMSFQANNamingScheme.getRoleName(FQAN));
+        frag.mappingCommand(
+            VOMSFQANNamingScheme.getGroupName(FQAN), VOMSFQANNamingScheme.getRoleName(FQAN));
       }
     }
 
@@ -152,14 +142,12 @@ public class VOMSRequestFactory {
     request.appendChild(frag.getFragment());
     return request;
   }
-
 }
 
 /**
  * Helper class to manage the creation of VOMS XML requests.
- * 
+ *
  * @author andreaceccanti
- * 
  */
 class VOMSRequestFragment {
 
@@ -186,7 +174,6 @@ class VOMSRequestFragment {
 
     root = doc.createElement("voms");
     fragment.appendChild(root);
-
   }
 
   private void appendTextChild(Element e, String text) {
@@ -198,8 +185,7 @@ class VOMSRequestFragment {
 
     String[] FQANs = s.split(",");
 
-    if (FQANs.length == 0)
-      return "";
+    if (FQANs.length == 0) return "";
 
     for (int i = 0; i < FQANs.length; i++) {
       if (VOMSFQANNamingScheme.isQualifiedRole(FQANs[i]))
@@ -210,8 +196,7 @@ class VOMSRequestFragment {
 
     for (int i = 0; i < FQANs.length; i++) {
       fqansString.append(FQANs);
-      if (i < FQANs.length - 1)
-        fqansString.append(",");
+      if (i < FQANs.length - 1) fqansString.append(",");
     }
 
     return fqansString.toString();
@@ -239,7 +224,6 @@ class VOMSRequestFragment {
     targets = doc.createElement("targets");
     appendTextChild(targets, targetString);
     root.appendChild(targets);
-
   }
 
   void buildLifetime(long lifetime) {
@@ -281,13 +265,11 @@ class VOMSRequestFragment {
   public void roleCommand(String roleName) {
 
     buildCommandElement("R" + roleName);
-
   }
 
   public void mappingCommand(String groupName, String roleName) {
 
     buildCommandElement("B" + groupName + ":" + roleName);
-
   }
 
   public void allCommand() {

@@ -8,17 +8,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSServerInfo;
 
 /**
- * An helper class which builds a URL suitable for an HTTPS VOMS REST request
- * starting from the VOMS URI as available in a {@link VOMSServerInfo} object.
- * 
+ * An helper class which builds a URL suitable for an HTTPS VOMS REST request starting from the VOMS
+ * URI as available in a {@link VOMSServerInfo} object.
+ *
  * @author Valerio Venturi
- * 
  */
 public class RESTServiceURLBuilder {
 
@@ -28,8 +26,12 @@ public class RESTServiceURLBuilder {
 
     try {
 
-      url = new URL("https", endpoint.getURL().getHost(), endpoint.getURL()
-        .getPort(), buildPath(endpoint, request));
+      url =
+          new URL(
+              "https",
+              endpoint.getURL().getHost(),
+              endpoint.getURL().getPort(),
+              buildPath(endpoint, request));
 
     } catch (MalformedURLException e) {
 
@@ -59,8 +61,7 @@ public class RESTServiceURLBuilder {
 
       while (i.hasNext()) {
 
-        if (!first)
-          stringBuilder.append(",");
+        if (!first) stringBuilder.append(",");
 
         stringBuilder.append((String) i.next());
 

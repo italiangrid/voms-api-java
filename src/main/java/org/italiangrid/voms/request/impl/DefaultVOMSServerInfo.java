@@ -5,30 +5,28 @@
 package org.italiangrid.voms.request.impl;
 
 import java.net.URI;
-
 import org.italiangrid.voms.request.VOMSServerInfo;
 
 /**
- * The default implementation of the {@link VOMSServerInfo} endpoint
- * information.
- * 
- * @author andreaceccanti
+ * The default implementation of the {@link VOMSServerInfo} endpoint information.
  *
+ * @author andreaceccanti
  */
 public class DefaultVOMSServerInfo implements VOMSServerInfo {
 
-  /** The VOMS server alias **/
+  /** The VOMS server alias * */
   String alias;
-  /** The VO name **/
+
+  /** The VO name * */
   String voName;
-  /** The VOMS server URI **/
+
+  /** The VOMS server URI * */
   URI URL;
-  /** The VOMS server certificate subject **/
+
+  /** The VOMS server certificate subject * */
   String vomsServerDN;
 
-  public DefaultVOMSServerInfo() {
-
-  }
+  public DefaultVOMSServerInfo() {}
 
   public String getAlias() {
 
@@ -78,48 +76,43 @@ public class DefaultVOMSServerInfo implements VOMSServerInfo {
     result = prime * result + ((URL == null) ? 0 : URL.hashCode());
     result = prime * result + ((alias == null) ? 0 : alias.hashCode());
     result = prime * result + ((voName == null) ? 0 : voName.hashCode());
-    result = prime * result
-      + ((vomsServerDN == null) ? 0 : vomsServerDN.hashCode());
+    result = prime * result + ((vomsServerDN == null) ? 0 : vomsServerDN.hashCode());
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
 
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     DefaultVOMSServerInfo other = (DefaultVOMSServerInfo) obj;
     if (URL == null) {
-      if (other.URL != null)
-        return false;
-    } else if (!URL.equals(other.URL))
-      return false;
+      if (other.URL != null) return false;
+    } else if (!URL.equals(other.URL)) return false;
     if (alias == null) {
-      if (other.alias != null)
-        return false;
-    } else if (!alias.equals(other.alias))
-      return false;
+      if (other.alias != null) return false;
+    } else if (!alias.equals(other.alias)) return false;
     if (voName == null) {
-      if (other.voName != null)
-        return false;
-    } else if (!voName.equals(other.voName))
-      return false;
+      if (other.voName != null) return false;
+    } else if (!voName.equals(other.voName)) return false;
     if (vomsServerDN == null) {
-      if (other.vomsServerDN != null)
-        return false;
-    } else if (!vomsServerDN.equals(other.vomsServerDN))
-      return false;
+      if (other.vomsServerDN != null) return false;
+    } else if (!vomsServerDN.equals(other.vomsServerDN)) return false;
     return true;
   }
 
   @Override
   public String toString() {
 
-    return "VOMSServerInfo [alias=" + alias + ", voName=" + voName + ", URL="
-      + URL + ", vomsServerDN=" + vomsServerDN + "]";
+    return "VOMSServerInfo [alias="
+        + alias
+        + ", voName="
+        + voName
+        + ", URL="
+        + URL
+        + ", vomsServerDN="
+        + vomsServerDN
+        + "]";
   }
 }

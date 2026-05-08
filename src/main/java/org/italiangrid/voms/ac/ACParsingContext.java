@@ -6,25 +6,23 @@ package org.italiangrid.voms.ac;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
-
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 
 /**
- * This class describes the context in which a VOMS {@link AttributeCertificate}
- * has been parsed in a certificate chain.
- * 
- * @author Andrea Ceccanti
+ * This class describes the context in which a VOMS {@link AttributeCertificate} has been parsed in
+ * a certificate chain.
  *
+ * @author Andrea Ceccanti
  */
 public class ACParsingContext {
 
-  /** The parsed VOMS attribute certificates **/
+  /** The parsed VOMS attribute certificates * */
   private List<AttributeCertificate> ACs;
 
-  /** The position in the cert chain where the VOMS attributes have been parsed **/
+  /** The position in the cert chain where the VOMS attributes have been parsed */
   private int certChainPostion;
 
-  /** The certificate chain form which the VOMS attributes have been parsed. **/
+  /** The certificate chain form which the VOMS attributes have been parsed. * */
   private X509Certificate[] certChain;
 
   /**
@@ -36,8 +34,7 @@ public class ACParsingContext {
   }
 
   /**
-   * @param aCs
-   *          the aCs to set
+   * @param aCs the aCs to set
    */
   public void setACs(List<AttributeCertificate> aCs) {
 
@@ -53,8 +50,7 @@ public class ACParsingContext {
   }
 
   /**
-   * @param certChainPostion
-   *          the certChainPostion to set
+   * @param certChainPostion the certChainPostion to set
    */
   public void setCertChainPostion(int certChainPostion) {
 
@@ -70,8 +66,7 @@ public class ACParsingContext {
   }
 
   /**
-   * @param certChain
-   *          the certChain to set
+   * @param certChain the certChain to set
    */
   public void setCertChain(X509Certificate[] certChain) {
 
@@ -79,19 +74,15 @@ public class ACParsingContext {
   }
 
   /**
-   * @param aCs
-   *          a set of parsed VOMS Attribute Certificates
-   * @param certChainPostion
-   *          the position in the chain where the ACs have been parsed
-   * @param certChain
-   *          the chain from where the ACs have been parsed
+   * @param aCs a set of parsed VOMS Attribute Certificates
+   * @param certChainPostion the position in the chain where the ACs have been parsed
+   * @param certChain the chain from where the ACs have been parsed
    */
-  public ACParsingContext(List<AttributeCertificate> aCs, int certChainPostion,
-    X509Certificate[] certChain) {
+  public ACParsingContext(
+      List<AttributeCertificate> aCs, int certChainPostion, X509Certificate[] certChain) {
 
     ACs = aCs;
     this.certChainPostion = certChainPostion;
     this.certChain = certChain;
   }
-
 }

@@ -8,7 +8,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Set;
-
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;
@@ -21,11 +20,11 @@ public class TestVOMSServerInfoStore {
   @Test
   public void testExistingVOMSESParsingSuccess() {
 
-    VOMSESLookupStrategy strategy = new BaseVOMSESLookupStrategy(
-      Arrays.asList("src/test/resources/vomses"));
+    VOMSESLookupStrategy strategy =
+        new BaseVOMSESLookupStrategy(Arrays.asList("src/test/resources/vomses"));
 
-    DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore.Builder()
-      .lookupStrategy(strategy).build();
+    DefaultVOMSServerInfoStore store =
+        new DefaultVOMSServerInfoStore.Builder().lookupStrategy(strategy).build();
 
     assertEquals(3, store.getVOMSServerInfo("atlas").size());
     assertEquals(2, store.getVOMSServerInfo("eumed").size());
@@ -37,11 +36,11 @@ public class TestVOMSServerInfoStore {
   @Test
   public void testVOMSESAliasLookup() {
 
-    VOMSESLookupStrategy strategy = new BaseVOMSESLookupStrategy(
-      Arrays.asList("src/test/resources/vomses-alias"));
+    VOMSESLookupStrategy strategy =
+        new BaseVOMSESLookupStrategy(Arrays.asList("src/test/resources/vomses-alias"));
 
-    DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore.Builder()
-      .lookupStrategy(strategy).build();
+    DefaultVOMSServerInfoStore store =
+        new DefaultVOMSServerInfoStore.Builder().lookupStrategy(strategy).build();
 
     assertEquals(3, store.getVOMSServerInfo("atlas").size());
     assertEquals(2, store.getVOMSServerInfo("eumed").size());
@@ -53,17 +52,16 @@ public class TestVOMSServerInfoStore {
     Assert.assertFalse(infos.isEmpty());
 
     Assert.assertEquals(2, infos.size());
-
   }
 
   @Test
   public void testVOMSESSingleCharAliasLookup() {
 
-    VOMSESLookupStrategy strategy = new BaseVOMSESLookupStrategy(
-      Arrays.asList("src/test/resources/vomses-alias-singlechar"));
+    VOMSESLookupStrategy strategy =
+        new BaseVOMSESLookupStrategy(Arrays.asList("src/test/resources/vomses-alias-singlechar"));
 
-    DefaultVOMSServerInfoStore store = new DefaultVOMSServerInfoStore.Builder()
-      .lookupStrategy(strategy).build();
+    DefaultVOMSServerInfoStore store =
+        new DefaultVOMSServerInfoStore.Builder().lookupStrategy(strategy).build();
 
     assertEquals(1, store.getVOMSServerInfo("atlas").size());
 
@@ -74,6 +72,5 @@ public class TestVOMSServerInfoStore {
     Assert.assertFalse(infos.isEmpty());
 
     Assert.assertEquals(1, infos.size());
-
   }
 }

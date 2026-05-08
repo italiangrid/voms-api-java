@@ -4,6 +4,8 @@
 
 package org.italiangrid.voms.asn1;
 
+import eu.emi.security.authn.x509.X509Credential;
+import eu.emi.security.authn.x509.proxy.CertificateExtension;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,7 +18,6 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -47,21 +48,14 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSGenericAttribute;
 
-import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.proxy.CertificateExtension;
-
 /**
  * A generator for VOMS Attribute Certificates (ACs).
- * <p>
- * This class provides methods for creating VOMS ACs with customizable properties, including
+ *
+ * <p>This class provides methods for creating VOMS ACs with customizable properties, including
  * optional extensions and fake signature bits for testing purposes.
- * </p>
- * 
- * <p>
- * It uses BouncyCastle for cryptographic operations and supports various extensions required for
+ *
+ * <p>It uses BouncyCastle for cryptographic operations and supports various extensions required for
  * VOMS attribute certificates.
- * </p>
- * 
  */
 public class VOMSACGenerator implements VOMSConstants {
 
@@ -75,53 +69,47 @@ public class VOMSACGenerator implements VOMSConstants {
 
     /**
      * Skips the inclusion of the AC Certs extension in the generated Attribute Certificate.
-     * <p>
-     * This extension normally contains the issuer's certificate chain, which may be omitted
-     * if the relying party already possesses it.
-     * </p>
+     *
+     * <p>This extension normally contains the issuer's certificate chain, which may be omitted if
+     * the relying party already possesses it.
      */
     SKIP_AC_CERTS_EXTENSION,
 
     /**
      * Generates fake signature bits instead of signing the certificate with a real key.
-     * <p>
-     * This is primarily used for testing purposes, as the resulting AC will not be verifiable.
-     * </p>
+     *
+     * <p>This is primarily used for testing purposes, as the resulting AC will not be verifiable.
      */
     FAKE_SIGNATURE_BITS,
 
     /**
      * Includes a fake critical extension in the generated Attribute Certificate.
-     * <p>
-     * This extension is added for testing scenarios where certificate parsers need to handle
+     *
+     * <p>This extension is added for testing scenarios where certificate parsers need to handle
      * unknown critical extensions.
-     * </p>
      */
     INCLUDE_FAKE_CRITICAL_EXTENSION,
 
     /**
      * Includes the "No Revocation Available" extension as a critical extension.
-     * <p>
-     * This extension indicates that no revocation information is available for the AC.
-     * </p>
+     *
+     * <p>This extension indicates that no revocation information is available for the AC.
      */
     INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION,
 
     /**
      * Includes the Authority Key Identifier (AKID) extension as a critical extension.
-     * <p>
-     * The AKID extension helps in linking the AC to its issuer, making it easier for
+     *
+     * <p>The AKID extension helps in linking the AC to its issuer, making it easier for
      * verification systems to locate the issuing certificate.
-     * </p>
      */
     INCLUDE_CRITICAL_AKID_EXTENSION,
 
     /**
      * Includes an empty AC Certs extension in the generated Attribute Certificate.
-     * <p>
-     * This is useful for testing scenarios where the extension is expected but contains no
+     *
+     * <p>This is useful for testing scenarios where the extension is expected but contains no
      * actual certificate information.
-     * </p>
      */
     INCLUDE_EMPTY_AC_CERTS_EXTENSION;
     // @formatting on
@@ -133,9 +121,8 @@ public class VOMSACGenerator implements VOMSConstants {
 
   /**
    * A ContentSigner implementation that generates random signature bits.
-   * <p>
-   * This is used for testing purposes to create attribute certificates with fake signatures.
-   * </p>
+   *
+   * <p>This is used for testing purposes to create attribute certificates with fake signatures.
    */
   static class RandomContentSigner implements ContentSigner {
 
@@ -184,7 +171,6 @@ public class VOMSACGenerator implements VOMSConstants {
 
       return sigBytes;
     }
-
   }
 
   /** Fake extension OID used in testing. */
@@ -254,8 +240,8 @@ public class VOMSACGenerator implements VOMSConstants {
     if (properties.contains(ACGenerationProperties.INCLUDE_EMPTY_AC_CERTS_EXTENSION))
       issuerCertsContainer.add(new DERSequence());
     else
-      issuerCertsContainer
-        .add(new DERSequence(getCertAsDEREncodable(aaCredential.getCertificate())));
+      issuerCertsContainer.add(
+          new DERSequence(getCertAsDEREncodable(aaCredential.getCertificate())));
 
     return new DERSequence(issuerCertsContainer);
   }
@@ -267,11 +253,10 @@ public class VOMSACGenerator implements VOMSConstants {
     JcaX509ExtensionUtils utils = new JcaX509ExtensionUtils();
 
     return utils.createAuthorityKeyIdentifier(holder.getSubjectPublicKeyInfo());
-
   }
 
-  private ASN1Encodable buildFQANsAttributeContent(List<String> fqans,
-      GeneralName policyAuthorityInfo) {
+  private ASN1Encodable buildFQANsAttributeContent(
+      List<String> fqans, GeneralName policyAuthorityInfo) {
 
     ASN1EncodableVector generalNames = new ASN1EncodableVector();
     generalNames.add(policyAuthorityInfo);
@@ -288,8 +273,10 @@ public class VOMSACGenerator implements VOMSConstants {
     return new DERSequence(container);
   }
 
-  private ASN1Encodable buildGAExtensionContent(EnumSet<ACGenerationProperties> properties,
-      List<VOMSGenericAttribute> gas, GeneralName policyAuthorityInfo) {
+  private ASN1Encodable buildGAExtensionContent(
+      EnumSet<ACGenerationProperties> properties,
+      List<VOMSGenericAttribute> gas,
+      GeneralName policyAuthorityInfo) {
 
     ASN1EncodableVector tagContainer = new ASN1EncodableVector();
     ASN1EncodableVector tagSequences = new ASN1EncodableVector();
@@ -315,8 +302,8 @@ public class VOMSACGenerator implements VOMSConstants {
 
     JcaX509CertificateHolder holderWrappedCert = new JcaX509CertificateHolder(holderCert);
 
-    return new AttributeCertificateHolder(holderWrappedCert.getSubject(),
-        holderCert.getSerialNumber());
+    return new AttributeCertificateHolder(
+        holderWrappedCert.getSubject(), holderCert.getSerialNumber());
   }
 
   private AttributeCertificateIssuer buildIssuer() throws CertificateEncodingException {
@@ -339,11 +326,10 @@ public class VOMSACGenerator implements VOMSConstants {
     tagSequence.add(getDEROctetString(ga.getContext()));
 
     return new DERSequence(tagSequence);
-
   }
 
-  private ASN1Encodable buildTargetsExtensionContent(EnumSet<ACGenerationProperties> properties,
-      List<String> targets) {
+  private ASN1Encodable buildTargetsExtensionContent(
+      EnumSet<ACGenerationProperties> properties, List<String> targets) {
 
     ASN1EncodableVector targetSeq = new ASN1EncodableVector();
 
@@ -376,13 +362,31 @@ public class VOMSACGenerator implements VOMSConstants {
    * @return the generated X.509 attribute certificate
    * @throws VOMSError if certificate generation fails
    */
-  public X509AttributeCertificateHolder generateVOMSAttributeCertificate(List<String> fqans,
-      List<VOMSGenericAttribute> gas, List<String> targets, X509Certificate holderCert,
-      BigInteger serialNumber, Date notBefore, Date notAfter, String voName, String host,
-      int port) throws VOMSError {
+  public X509AttributeCertificateHolder generateVOMSAttributeCertificate(
+      List<String> fqans,
+      List<VOMSGenericAttribute> gas,
+      List<String> targets,
+      X509Certificate holderCert,
+      BigInteger serialNumber,
+      Date notBefore,
+      Date notAfter,
+      String voName,
+      String host,
+      int port)
+      throws VOMSError {
 
-    return generateVOMSAttributeCertificate(defaultGenerationProperties, fqans, gas, targets,
-        holderCert, serialNumber, notBefore, notAfter, voName, host, port);
+    return generateVOMSAttributeCertificate(
+        defaultGenerationProperties,
+        fqans,
+        gas,
+        targets,
+        holderCert,
+        serialNumber,
+        notBefore,
+        notAfter,
+        voName,
+        host,
+        port);
   }
 
   /**
@@ -403,10 +407,18 @@ public class VOMSACGenerator implements VOMSConstants {
    * @throws VOMSError if certificate generation fails
    */
   public X509AttributeCertificateHolder generateVOMSAttributeCertificate(
-      EnumSet<ACGenerationProperties> generationProperties, List<String> fqans,
-      List<VOMSGenericAttribute> gas, List<String> targets, X509Certificate holderCert,
-      BigInteger serialNumber, Date notBefore, Date notAfter, String voName, String host,
-      int port) throws VOMSError {
+      EnumSet<ACGenerationProperties> generationProperties,
+      List<String> fqans,
+      List<VOMSGenericAttribute> gas,
+      List<String> targets,
+      X509Certificate holderCert,
+      BigInteger serialNumber,
+      Date notBefore,
+      Date notAfter,
+      String voName,
+      String host,
+      int port)
+      throws VOMSError {
 
     AttributeCertificateHolder holder = null;
     AttributeCertificateIssuer issuer = null;
@@ -424,18 +436,22 @@ public class VOMSACGenerator implements VOMSConstants {
       builder.addAttribute(VOMS_FQANS_OID, buildFQANsAttributeContent(fqans, policyAuthorityInfo));
 
       if (gas != null && !gas.isEmpty()) {
-        builder.addExtension(VOMS_GENERIC_ATTRS_OID, false,
+        builder.addExtension(
+            VOMS_GENERIC_ATTRS_OID,
+            false,
             buildGAExtensionContent(generationProperties, gas, policyAuthorityInfo));
       }
 
       if (targets != null && !targets.isEmpty()) {
-        builder.addExtension(Extension.targetInformation, true,
+        builder.addExtension(
+            Extension.targetInformation,
+            true,
             buildTargetsExtensionContent(generationProperties, targets));
       }
 
       if (!generationProperties.contains(ACGenerationProperties.SKIP_AC_CERTS_EXTENSION)) {
-        builder.addExtension(VOMS_CERTS_OID, false,
-            buildACCertsExtensionContent(generationProperties));
+        builder.addExtension(
+            VOMS_CERTS_OID, false, buildACCertsExtensionContent(generationProperties));
       }
 
       if (generationProperties.contains(ACGenerationProperties.INCLUDE_FAKE_CRITICAL_EXTENSION)) {
@@ -445,8 +461,8 @@ public class VOMSACGenerator implements VOMSConstants {
       boolean noRevAvailIsCritical = false;
       boolean akidIsCritical = false;
 
-      if (generationProperties
-        .contains(ACGenerationProperties.INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION)) {
+      if (generationProperties.contains(
+          ACGenerationProperties.INCLUDE_CRITICAL_NO_REV_AVAIL_EXTENSION)) {
         noRevAvailIsCritical = true;
       }
 
@@ -458,14 +474,13 @@ public class VOMSACGenerator implements VOMSConstants {
 
       AuthorityKeyIdentifier akid = buildAuthorityKeyIdentifier();
 
-      builder.addExtension(Extension.authorityKeyIdentifier, akidIsCritical,
-          akid != null ? akid : DERNull.INSTANCE);
+      builder.addExtension(
+          Extension.authorityKeyIdentifier, akidIsCritical, akid != null ? akid : DERNull.INSTANCE);
 
       return builder.build(getSigner(generationProperties));
     } catch (CertificateEncodingException | CertIOException | NoSuchAlgorithmException e) {
       throw new VOMSError(e.getMessage(), e);
     }
-
   }
 
   /**
@@ -485,7 +500,6 @@ public class VOMSACGenerator implements VOMSConstants {
     DERSequence acSeq = new DERSequence(vomsACs);
 
     return new CertificateExtension(VOMS_EXTENSION_OID.getId(), acSeq.toASN1Primitive(), false);
-
   }
 
   private ASN1Encodable getCertAsDEREncodable(X509Certificate cert) {
@@ -502,10 +516,10 @@ public class VOMSACGenerator implements VOMSConstants {
     } catch (CertificateEncodingException | IOException e) {
       throw new VOMSError("Error encoding X509 certificate: " + e.getMessage(), e);
     }
-
   }
 
   private DEROctetString getDEROctetString(String s) {
+
     return new DEROctetString(s.getBytes());
   }
 }

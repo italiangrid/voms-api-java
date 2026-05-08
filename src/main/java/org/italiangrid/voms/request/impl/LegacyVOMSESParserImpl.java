@@ -15,26 +15,23 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSServerInfo;
 
 /**
- * Implementation of the {@link org.italiangrid.voms.request.VOMSESParser} interface.
- * This class is responsible for parsing VOMSES configuration files and extracting
- * {@link org.italiangrid.voms.request.VOMSServerInfo} instances from them.
+ * Implementation of the {@link org.italiangrid.voms.request.VOMSESParser} interface. This class is
+ * responsible for parsing VOMSES configuration files and extracting {@link
+ * org.italiangrid.voms.request.VOMSServerInfo} instances from them.
  *
- * <p>It supports parsing from files, directories, and readers, and ensures that
- * the VOMSES files exist and are readable before processing.</p>
+ * <p>It supports parsing from files, directories, and readers, and ensures that the VOMSES files
+ * exist and are readable before processing.
  *
- * <p>VOMSES files typically contain server connection information in a structured format.</p>
+ * <p>VOMSES files typically contain server connection information in a structured format.
  */
 public class LegacyVOMSESParserImpl implements VOMSESParser {
 
-  /**
-   * Line parser used to process individual VOMSES lines.
-   */
+  /** Line parser used to process individual VOMSES lines. */
   private final VOMSESLineParser lineParser = new VOMSESLineParser();
 
   /**
@@ -60,8 +57,7 @@ public class LegacyVOMSESParserImpl implements VOMSESParser {
    * @return a {@link VOMSServerInfo} instance representing the parsed line
    * @throws URISyntaxException if the URI in the line is malformed
    */
-  protected VOMSServerInfo parseLine(String vomsesLine)
-    throws URISyntaxException {
+  protected VOMSServerInfo parseLine(String vomsesLine) throws URISyntaxException {
 
     return lineParser.parse(vomsesLine);
   }
@@ -84,18 +80,14 @@ public class LegacyVOMSESParserImpl implements VOMSESParser {
       while ((line = reader.readLine()) != null) {
 
         // Ignore comments
-        if (line.startsWith("#"))
-          continue;
+        if (line.startsWith("#")) continue;
 
         // skip empty lines
-        if (line.matches("\\s*$"))
-          continue;
+        if (line.matches("\\s*$")) continue;
 
         VOMSServerInfo parsedInfo = parseLine(line);
 
-        if (parsedInfo != null)
-          result.add(parsedInfo);
-
+        if (parsedInfo != null) result.add(parsedInfo);
       }
 
     } catch (Exception e) {
@@ -115,16 +107,17 @@ public class LegacyVOMSESParserImpl implements VOMSESParser {
 
     Set<VOMSServerInfo> joinedServerInfo = new HashSet<VOMSServerInfo>();
 
-    File[] certFiles = directory.listFiles(new FileFilter() {
+    File[] certFiles =
+        directory.listFiles(
+            new FileFilter() {
 
-      public boolean accept(File pathname) {
+              public boolean accept(File pathname) {
 
-        return pathname.isFile() && !pathname.getName().startsWith(".");
-      }
-    });
+                return pathname.isFile() && !pathname.getName().startsWith(".");
+              }
+            });
 
-    for (File f : certFiles)
-      joinedServerInfo.addAll(parse(f));
+    for (File f : certFiles) joinedServerInfo.addAll(parse(f));
 
     return new ArrayList<VOMSServerInfo>(joinedServerInfo);
   }
@@ -140,8 +133,7 @@ public class LegacyVOMSESParserImpl implements VOMSESParser {
 
     fileSanityChecks(f);
 
-    if (f.isDirectory())
-      return parseDirectory(f);
+    if (f.isDirectory()) return parseDirectory(f);
 
     try {
 
@@ -152,9 +144,7 @@ public class LegacyVOMSESParserImpl implements VOMSESParser {
       throw new VOMSError("VOMSES file not found: " + f.getAbsolutePath(), e);
 
     } catch (VOMSError e) {
-      throw new VOMSError("Error parsing VOMSES file: " + f.getAbsolutePath(),
-        e);
+      throw new VOMSError("Error parsing VOMSES file: " + f.getAbsolutePath(), e);
     }
   }
-
 }

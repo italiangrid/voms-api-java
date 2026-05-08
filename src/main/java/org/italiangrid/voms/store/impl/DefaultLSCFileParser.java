@@ -12,19 +12,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.LSCFileParser;
 
 /**
  * The default implementation for the LSC file parser.
- * 
- * @author Andrea Ceccanti
  *
+ * @author Andrea Ceccanti
  */
 public class DefaultLSCFileParser implements LSCFileParser {
 
-  public static final String MALFORMED_LSC_FILE_ERROR_TEMPLATE = "LSC file parsing error: Malformed LSC file (vo=%s, host=%s): %s";
+  public static final String MALFORMED_LSC_FILE_ERROR_TEMPLATE =
+      "LSC file parsing error: Malformed LSC file (vo=%s, host=%s): %s";
 
   private void checkFileExistanceAndReadabilty(File f) {
 
@@ -74,14 +73,23 @@ public class DefaultLSCFileParser implements LSCFileParser {
   }
 
   private void validateChain(List<String> certificateChainDescription, String vo, String hostname) {
+
     if (certificateChainDescription.size() % 2 != 0) {
-      String errorMessage = String.format(MALFORMED_LSC_FILE_ERROR_TEMPLATE, vo, hostname,
-          "Odd number of distinguished name entries.");
+      String errorMessage =
+          String.format(
+              MALFORMED_LSC_FILE_ERROR_TEMPLATE,
+              vo,
+              hostname,
+              "Odd number of distinguished name entries.");
       throw new VOMSError(errorMessage);
     }
     if (certificateChainDescription.size() == 0) {
-      String errorMessage = String.format(MALFORMED_LSC_FILE_ERROR_TEMPLATE, vo, hostname,
-          "No distinguished name entries found.");
+      String errorMessage =
+          String.format(
+              MALFORMED_LSC_FILE_ERROR_TEMPLATE,
+              vo,
+              hostname,
+              "No distinguished name entries found.");
 
       throw new VOMSError(errorMessage);
     }

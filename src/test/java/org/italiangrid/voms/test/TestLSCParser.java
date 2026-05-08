@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultLSCFileParser;
 import org.italiangrid.voms.store.impl.LSCFile;
@@ -24,12 +23,14 @@ public class TestLSCParser {
 
     DefaultLSCFileParser parser = new DefaultLSCFileParser();
 
-    String lscContent = "# First line is a comment \n"
-      + "--- second line should skipped \n" + "/C=it/O=org/CN=commonName\n"
-      + "     \t\n" + "/C=it/O=org/CN=CA\n";
+    String lscContent =
+        "# First line is a comment \n"
+            + "--- second line should skipped \n"
+            + "/C=it/O=org/CN=commonName\n"
+            + "     \t\n"
+            + "/C=it/O=org/CN=CA\n";
 
-    LSCFile f = parser.parse("vo", "host",
-      new ByteArrayInputStream(lscContent.getBytes()));
+    LSCFile f = parser.parse("vo", "host", new ByteArrayInputStream(lscContent.getBytes()));
 
     assertNull(f.getFilename());
 
@@ -43,36 +44,33 @@ public class TestLSCParser {
 
     assertEquals("/C=it/O=org/CN=commonName", f.getCertificateChainDescription().get(0));
     assertEquals("/C=it/O=org/CN=CA", f.getCertificateChainDescription().get(1));
-
   }
 
   @Test
   public void testOddLSCFileParseError() {
 
-    String singleEntryLSCFile = "# This is a comment \n"
-      + "/C=it/O=org/CN=commonName\n";
+    String singleEntryLSCFile = "# This is a comment \n" + "/C=it/O=org/CN=commonName\n";
 
-    String errorMessage = "LSC file parsing error: "
-      + "Malformed LSC file (vo=vo, host=host): "
-      + "Odd number of distinguished name entries.";
+    String errorMessage =
+        "LSC file parsing error: "
+            + "Malformed LSC file (vo=vo, host=host): "
+            + "Odd number of distinguished name entries.";
 
     DefaultLSCFileParser parser = new DefaultLSCFileParser();
 
     try {
 
       @SuppressWarnings("unused")
-      LSCFile f = parser.parse("vo", "host", new ByteArrayInputStream(
-        singleEntryLSCFile.getBytes()));
+      LSCFile f =
+          parser.parse("vo", "host", new ByteArrayInputStream(singleEntryLSCFile.getBytes()));
 
     } catch (VOMSError e) {
 
       assertEquals(errorMessage, e.getMessage());
       return;
-
     }
 
     fail("No error caught for malformed, single line LSC file parsing.");
-
   }
 
   @Test
@@ -82,15 +80,15 @@ public class TestLSCParser {
 
     String emptyLSCContent = "# This is a comment";
 
-    String errorMessage = "LSC file parsing error: "
-      + "Malformed LSC file (vo=vo, host=host): "
-      + "No distinguished name entries found.";
+    String errorMessage =
+        "LSC file parsing error: "
+            + "Malformed LSC file (vo=vo, host=host): "
+            + "No distinguished name entries found.";
 
     try {
 
       @SuppressWarnings("unused")
-      LSCFile f = parser.parse("vo", "host", new ByteArrayInputStream(
-        emptyLSCContent.getBytes()));
+      LSCFile f = parser.parse("vo", "host", new ByteArrayInputStream(emptyLSCContent.getBytes()));
 
     } catch (VOMSError e) {
       assertEquals(errorMessage, e.getMessage());
@@ -118,16 +116,20 @@ public class TestLSCParser {
 
     DefaultLSCFileParser parser = new DefaultLSCFileParser();
 
-    String multichainLSCContent = "/C=IT/O=IGI/CN=test-host.cnaf.infn.it\n"
-        + "/C=IT/O=IGI/CN=Test CA\n" + "------NEXT CHAIN------\n"
-        + "/C=IT/O=IGI/CN=test-host2.cnaf.infn.it\n" + "/C=IT/O=IGI/CN=Test CA";
+    String multichainLSCContent =
+        "/C=IT/O=IGI/CN=test-host.cnaf.infn.it\n"
+            + "/C=IT/O=IGI/CN=Test CA\n"
+            + "------NEXT CHAIN------\n"
+            + "/C=IT/O=IGI/CN=test-host2.cnaf.infn.it\n"
+            + "/C=IT/O=IGI/CN=Test CA";
 
     try {
 
       LSCFile f =
           parser.parse("vo", "host", new ByteArrayInputStream(multichainLSCContent.getBytes()));
       assertEquals(2, f.getCertificateChainDescription().size());
-      assertEquals("/C=IT/O=IGI/CN=test-host.cnaf.infn.it", f.getCertificateChainDescription().get(0));
+      assertEquals(
+          "/C=IT/O=IGI/CN=test-host.cnaf.infn.it", f.getCertificateChainDescription().get(0));
       assertEquals("/C=IT/O=IGI/CN=Test CA", f.getCertificateChainDescription().get(1));
 
     } catch (VOMSError e) {
@@ -135,7 +137,6 @@ public class TestLSCParser {
       return;
     }
   }
-
 
   @Test
   public void testNonExistingFileParse() {
@@ -151,14 +152,11 @@ public class TestLSCParser {
 
     } catch (VOMSError e) {
 
-      assertEquals("LSC file does not exist: " + nonExistentFile,
-        e.getMessage());
+      assertEquals("LSC file does not exist: " + nonExistentFile, e.getMessage());
 
       return;
-
     }
 
     fail("VOMS error not thrown for non existing LSC file parsing attempt.");
-
   }
 }

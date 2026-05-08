@@ -9,41 +9,33 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.EnumSet;
-
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.credential.FilePermissionError;
 
 /**
  * A helper class for performing basic Unix file permission checks.
  *
- * <p>
- * This class is intended to provide simple permission validation and modification for specific
+ * <p>This class is intended to provide simple permission validation and modification for specific
  * files, such as private keys and proxy certificates. It relies on executing system commands to
  * fetch and update file permissions.
- * </p>
  *
- * <p>
- * Note: This implementation is a workaround until proper support for POSIX file permissions is
+ * <p>Note: This implementation is a workaround until proper support for POSIX file permissions is
  * available in Java.
- * </p>
- *
  */
 public class FilePermissionHelper {
 
-  /**
-   * Enumeration representing POSIX file permissions.
-   */
+  /** Enumeration representing POSIX file permissions. */
   public static enum PosixFilePermission {
 
     // @formatter:off
     /** Read-only permission for the user (chmod 400, stat -r--------). */
-    USER_RO   ("400", "-r--------"),
+    USER_RO("400", "-r--------"),
     /** Read and write permission for the user (chmod 600, stat -rw-------). */
-    USER_RW   ("600", "-rw-------"),
+    USER_RW("600", "-rw-------"),
     /** Full permissions for the user (chmod 700, stat -rwx------). */
-    USER_ALL  ("700", "-rwx------"),
+    USER_ALL("700", "-rwx------"),
     /** Full permissions for all users (chmod 777, stat -rwxrwxrwx). */
-    ALL_PERMS ("777", "-rwxrwxrwx");
+    ALL_PERMS("777", "-rwxrwxrwx");
     // @formatter:off
 
     private String chmodForm;
@@ -82,33 +74,24 @@ public class FilePermissionHelper {
     }
   }
 
-  /**
-   * Required file permissions for the private key file
-   */
+  /** Required file permissions for the private key file */
   public static final EnumSet<PosixFilePermission> PRIVATE_KEY_PERMS =
       EnumSet.of(PosixFilePermission.USER_RO, PosixFilePermission.USER_RW);
 
-  /**
-   * String representation of private key required permissions.
-   */
+  /** String representation of private key required permissions. */
   public static final String PRIVATE_KEY_PERMS_STR =
       PosixFilePermission.USER_RO.chmodForm() + ", " + PosixFilePermission.USER_RW.chmodForm();
 
-  /**
-   * The command used to retrieve file permissions for a given file
-   */
+  /** The command used to retrieve file permissions for a given file */
   public static final String LS_CMD_TEMPLATE = "ls -al %s";
 
-  /**
-   * The command used to set file permissions on a given file
-   */
+  /** The command used to set file permissions on a given file */
   public static final String CHMOD_CMD_TEMPLATE = "chmod %s %s";
 
   /**
    * Checks whether a proxy file has the right permissions
    *
    * @param proxyFile the file to be checked
-   *
    * @throws IOException if an error occurs checking file attributes
    * @throws FilePermissionError if permissions are not as expected
    */
@@ -135,7 +118,8 @@ public class FilePermissionHelper {
     }
 
     final String errorMessage =
-        String.format("Wrong file permissions on file %s. Required permissions are: %s ",
+        String.format(
+            "Wrong file permissions on file %s. Required permissions are: %s ",
             privateKeyFile, PRIVATE_KEY_PERMS_STR);
 
     throw new FilePermissionError(errorMessage);
@@ -158,7 +142,7 @@ public class FilePermissionHelper {
    * fetches the output of ls -al on a given file and matches the resulting string with the
    * permissionString passed as argument.
    *
-   * So the permissionString must be something like:
+   * <p>So the permissionString must be something like:
    *
    * <pre>
    * -rw-------
@@ -182,7 +166,8 @@ public class FilePermissionHelper {
 
     if (!filePerms.startsWith(expectedPerm.statForm())) {
       throw new FilePermissionError(
-          String.format("Wrong file permissions on file %s. Expected: %s",
+          String.format(
+              "Wrong file permissions on file %s. Expected: %s",
               filename, expectedPerm.chmodForm()));
     }
   }
@@ -280,5 +265,4 @@ public class FilePermissionHelper {
       throw new VOMSError("Error setting file permissions for " + filename, e);
     }
   }
-
 }

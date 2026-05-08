@@ -4,13 +4,12 @@
 
 package org.italiangrid.voms.test.ac;
 
+import eu.emi.security.authn.x509.impl.PEMCredential;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
-
-import eu.emi.security.authn.x509.impl.PEMCredential;
 
 public class TestACSupport {
 
@@ -37,15 +36,19 @@ public class TestACSupport {
 
   static final String vomsdir = "src/test/resources/vomsdir";
   static final String trustAnchorsDir = "src/test/resources/trust-anchors";
-  
+
   static PEMCredential aaCredential;
   static PEMCredential holderCredential;
-  
-  static void initializeCredentials() throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
-    aaCredential = new PEMCredential(new FileInputStream(aaKey),
-        new FileInputStream(aaCert), (char[]) null);
-    holderCredential = new PEMCredential(new FileInputStream(holderKey),
-        new FileInputStream(holderCert), keyPassword.toCharArray());
-  }
 
+  static void initializeCredentials()
+      throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
+
+    aaCredential =
+        new PEMCredential(new FileInputStream(aaKey), new FileInputStream(aaCert), (char[]) null);
+    holderCredential =
+        new PEMCredential(
+            new FileInputStream(holderKey),
+            new FileInputStream(holderCert),
+            keyPassword.toCharArray());
+  }
 }

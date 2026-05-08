@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.asn1.VOMSACUtils;
@@ -31,31 +30,35 @@ import org.junit.Test;
 public class TestFakeVOMSACService extends TestACSupport {
 
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_DATE;
-  public static final Date JAN_FIRST_2010 = Date
-    .from(LocalDate.parse("2010-01-01", DATE_FORMATTER).atStartOfDay().toInstant(ZoneOffset.UTC));
+  public static final Date JAN_FIRST_2010 =
+      Date.from(
+          LocalDate.parse("2010-01-01", DATE_FORMATTER).atStartOfDay().toInstant(ZoneOffset.UTC));
 
-  public static final Date JAN_TEN_2010 = Date
-    .from(LocalDate.parse("2010-01-10", DATE_FORMATTER).atStartOfDay().toInstant(ZoneOffset.UTC));
+  public static final Date JAN_TEN_2010 =
+      Date.from(
+          LocalDate.parse("2010-01-10", DATE_FORMATTER).atStartOfDay().toInstant(ZoneOffset.UTC));
 
   @BeforeClass
   public static void suiteInit()
       throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
+
     initializeCredentials();
   }
 
   @Test
   public void testFakeAcServiceCreation() {
 
-    ACGenerationParams params = ACGenerationParams.builder()
-      .vo("fake")
-      .fqan("/fake")
-      .notBefore(JAN_FIRST_2010)
-      .notAfter(JAN_TEN_2010)
-      .serialNo(189)
-      .build();
+    ACGenerationParams params =
+        ACGenerationParams.builder()
+            .vo("fake")
+            .fqan("/fake")
+            .notBefore(JAN_FIRST_2010)
+            .notAfter(JAN_TEN_2010)
+            .serialNo(189)
+            .build();
 
-    FakeVOMSACService acService = FakeVOMSACService.newInstance(aaCredential, params, 
-        NullListener.INSTANCE);
+    FakeVOMSACService acService =
+        FakeVOMSACService.newInstance(aaCredential, params, NullListener.INSTANCE);
 
     VOMSACRequest req = new DefaultVOMSACRequest.Builder("test").build();
     AttributeCertificate ac = acService.getVOMSAttributeCertificate(holderCredential, req);
@@ -68,5 +71,4 @@ public class TestFakeVOMSACService extends TestACSupport {
     assertThat(attrs.getPrimaryFQAN(), equalTo("/fake"));
     assertThat(attrs.getVOMSAC().getSerialNumber(), equalTo(BigInteger.valueOf(189)));
   }
-
 }

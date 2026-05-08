@@ -6,10 +6,7 @@ package org.italiangrid.voms.store;
 
 /**
  * A VOMS trust store that can be periodically refreshed.
- * 
- * @author Andrea Ceccanti
  *
+ * @author Andrea Ceccanti
  */
-public interface UpdatingVOMSTrustStore extends VOMSTrustStore, Updateable {
-
-}
+public interface UpdatingVOMSTrustStore extends VOMSTrustStore, Updateable {}

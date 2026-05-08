@@ -4,10 +4,11 @@
 
 package org.italiangrid.voms.request.impl;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+import eu.emi.security.authn.x509.X509Credential;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.italiangrid.voms.VOMSError;
@@ -24,57 +25,38 @@ import org.italiangrid.voms.request.VOMSServerInfoStore;
 import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
 import org.italiangrid.voms.util.NullListener;
 
-import eu.emi.security.authn.x509.X509CertChainValidatorExt;
-import eu.emi.security.authn.x509.X509Credential;
-
 /**
  * The default implementation of the {@link VOMSACService}.
- * 
- * 
+ *
  * @author Valerio Venturi
  * @author Andrea Ceccanti
- * 
  */
 public class DefaultVOMSACService implements VOMSACService {
 
-  /**
-   * The listener that will be informed about request events
-   */
+  /** The listener that will be informed about request events */
   protected final VOMSRequestListener requestListener;
 
-  /**
-   * The listener that will be informed about low-level protocol details
-   */
+  /** The listener that will be informed about low-level protocol details */
   protected final VOMSProtocolListener protocolListener;
 
-  /**
-   * The validator used for the SSL handshake
-   */
+  /** The validator used for the SSL handshake */
   protected final X509CertChainValidatorExt validator;
 
-  /**
-   * The store used to keep VOMS server contact information.
-   */
+  /** The store used to keep VOMS server contact information. */
   protected final VOMSServerInfoStore serverInfoStore;
 
-  /**
-   * The http protocol implementation
-   */
+  /** The http protocol implementation */
   protected final VOMSProtocol httpProtocol;
 
-  /**
-   * The voms legacy protocol implementation
-   */
+  /** The voms legacy protocol implementation */
   protected final VOMSProtocol legacyProtocol;
 
-  /**
-   * Whether VOMS legacy protocol should be used as a fallback when REST protocol fails
-   */
+  /** Whether VOMS legacy protocol should be used as a fallback when REST protocol fails */
   protected final boolean legacyProtocolEnabled;
 
   /**
    * Constructor which builds a {@link DefaultVOMSACService} from a {@link Builder}
-   * 
+   *
    * @param builder the builder object that provides the settings for this {@link VOMSACService}
    */
   protected DefaultVOMSACService(Builder builder) {
@@ -90,7 +72,7 @@ public class DefaultVOMSACService implements VOMSACService {
 
   /**
    * Extracts an AC from a VOMS response
-   * 
+   *
    * @param request the request
    * @param response the received response
    * @return a possibly <code>null</code> {@link AttributeCertificate} object
@@ -99,8 +81,7 @@ public class DefaultVOMSACService implements VOMSACService {
 
     byte[] acBytes = response.getAC();
 
-    if (acBytes == null)
-      return null;
+    if (acBytes == null) return null;
 
     ASN1InputStream asn1InputStream = new ASN1InputStream(acBytes);
 
@@ -115,15 +96,15 @@ public class DefaultVOMSACService implements VOMSACService {
 
     } catch (Throwable e) {
 
-      requestListener.notifyVOMSRequestFailure(request, null,
-          new VOMSError("Error unmarshalling VOMS AC. Cause: " + e.getMessage(), e));
+      requestListener.notifyVOMSRequestFailure(
+          request, null, new VOMSError("Error unmarshalling VOMS AC. Cause: " + e.getMessage(), e));
 
       return null;
     }
   }
 
-  private VOMSResponse doRequest(VOMSProtocol protocol, VOMSServerInfo endpoint,
-      X509Credential cred, VOMSACRequest req) {
+  private VOMSResponse doRequest(
+      VOMSProtocol protocol, VOMSServerInfo endpoint, X509Credential cred, VOMSACRequest req) {
 
     VOMSResponse response = null;
 
@@ -136,46 +117,47 @@ public class DefaultVOMSACService implements VOMSACService {
     }
 
     return response;
-
   }
 
   /**
    * Handles errors included in the VOMS response
-   * 
+   *
    * @param request the request
    * @param si the VOMS server endpoint information
    * @param response the received {@link VOMSResponse}
    */
-  protected void handleErrorsInResponse(VOMSACRequest request, VOMSServerInfo si,
-      VOMSResponse response) {
+  protected void handleErrorsInResponse(
+      VOMSACRequest request, VOMSServerInfo si, VOMSResponse response) {
 
     if (response.hasErrors())
       requestListener.notifyErrorsInVOMSReponse(request, si, response.errorMessages());
-
   }
 
   /**
    * Handles warnings included in the VOMS response
-   * 
+   *
    * @param request the request
    * @param si the VOMS server endpoint information
    * @param response the received {@link VOMSResponse}
    */
-  protected void handleWarningsInResponse(VOMSACRequest request, VOMSServerInfo si,
-      VOMSResponse response) {
+  protected void handleWarningsInResponse(
+      VOMSACRequest request, VOMSServerInfo si, VOMSResponse response) {
 
     if (response.hasWarnings())
       requestListener.notifyWarningsInVOMSResponse(request, si, response.warningMessages());
   }
 
-  public AttributeCertificate getVOMSAttributeCertificate(X509Credential credential,
-      VOMSACRequest request) {
+  public AttributeCertificate getVOMSAttributeCertificate(
+      X509Credential credential, VOMSACRequest request) {
 
     List<VOMSServerInfo> vomsServerInfos = getVOMSServerInfos(request);
 
     if (vomsServerInfos.isEmpty())
-      throw new VOMSError("VOMS server for VO " + request.getVoName() + " "
-          + "is not known! Check your vomses configuration.");
+      throw new VOMSError(
+          "VOMS server for VO "
+              + request.getVoName()
+              + " "
+              + "is not known! Check your vomses configuration.");
 
     VOMSResponse response = null;
 
@@ -196,8 +178,8 @@ public class DefaultVOMSACService implements VOMSACService {
       if (response == null) {
 
         if (legacyProtocolEnabled) {
-          requestListener.notifyVOMSRequestFailure(request, vomsServerInfo,
-              new VOMSError("REST and legacy VOMS endpoints failed."));
+          requestListener.notifyVOMSRequestFailure(
+              request, vomsServerInfo, new VOMSError("REST and legacy VOMS endpoints failed."));
         }
 
         continue;
@@ -219,23 +201,21 @@ public class DefaultVOMSACService implements VOMSACService {
       if (!response.hasErrors() && vomsAC != null) {
         return vomsAC;
       }
-
     }
 
     // if we reach this point we had failures in contacting
     // all known voms server for the VO
     requestListener.notifyVOMSRequestFailure(request, null, null);
     return null;
-
   }
 
   /**
    * Get VOMS server endpoint information that matches with the {@link VOMSACRequest} passed as
    * argument.
-   * 
-   * This method returns a random shuffle of the {@link VOMSServerInfo} objects that match the input
-   * request.
-   * 
+   *
+   * <p>This method returns a random shuffle of the {@link VOMSServerInfo} objects that match the
+   * input request.
+   *
    * @param request the request
    * @return a possibly empty {@link List} of {@link VOMSServerInfo} objects
    */
@@ -253,53 +233,37 @@ public class DefaultVOMSACService implements VOMSACService {
   /**
    * Creates a {@link DefaultVOMSACService} object. The {@link DefaultVOMSACService} parameters can
    * be set with the appropriate methods. Example:
-   * 
+   *
    * <pre>
-   * 
-   * 
-   * 
+   *
    * {
    *   &#064;code
-   *   VOMSACService acService =
-   *       new DefaultVOMSACService.Builder(certChainValidator).requestListener(requestListener)
-   *         .serverInfoStoreListener(serverInfoStoreListener)
-   *         .protocolListener(protocolListener)
-   *         .build();
+   *   VOMSACService acService = new DefaultVOMSACService.Builder(
+   *     certChainValidator).requestListener(requestListener)
+   *     .serverInfoStoreListener(serverInfoStoreListener)
+   *     .protocolListener(protocolListener)
+   *     .build();
    * }
    * </pre>
-   * 
-   * 
    */
   public static class Builder {
 
-    /**
-     * The listener that will be informed about request events
-     */
+    /** The listener that will be informed about request events */
     private VOMSRequestListener requestListener = NullListener.INSTANCE;
 
-    /**
-     * The listener that will be informed about low-level protocol details
-     */
+    /** The listener that will be informed about low-level protocol details */
     private VOMSProtocolListener protocolListener = NullListener.INSTANCE;
 
-    /**
-     * The listener that will be informed about server info store events
-     */
+    /** The listener that will be informed about server info store events */
     private VOMSServerInfoStoreListener storeListener = NullListener.INSTANCE;
 
-    /**
-     * The validator used for the SSL handshake
-     */
+    /** The validator used for the SSL handshake */
     private X509CertChainValidatorExt validator;
 
-    /**
-     * The store used to keep VOMS server contact information.
-     */
+    /** The store used to keep VOMS server contact information. */
     private VOMSServerInfoStore serverInfoStore;
 
-    /**
-     * The provided strategy to lookup vomses information.
-     */
+    /** The provided strategy to lookup vomses information. */
     private VOMSESLookupStrategy vomsesLookupStrategy;
 
     /**
@@ -308,41 +272,29 @@ public class DefaultVOMSACService implements VOMSACService {
      */
     private List<String> vomsesLocations;
 
-    /**
-     * The connect timeout value
-     */
+    /** The connect timeout value */
     private int connectTimeout = AbstractVOMSProtocol.DEFAULT_CONNECT_TIMEOUT;
 
-    /**
-     * The read timeout used
-     */
+    /** The read timeout used */
     private int readTimeout = AbstractVOMSProtocol.DEFAULT_READ_TIMEOUT;
 
-    /**
-     * Whether the client should skip hostname checking
-     */
+    /** Whether the client should skip hostname checking */
     private boolean skipHostnameChecks = true;
 
-    /**
-     * The http protocol implementation
-     */
+    /** The http protocol implementation */
     protected VOMSProtocol httpProtocol;
 
-    /**
-     * The voms legacy protocol implementation
-     */
+    /** The voms legacy protocol implementation */
     protected VOMSProtocol legacyProtocol;
 
-    /**
-     * Whether the client should attempt legacy protocol requests
-     */
+    /** Whether the client should attempt legacy protocol requests */
     private boolean legacyProtocolEnabled = false;
 
     /**
      * Creates a Builder for a {@link DefaultVOMSACService}.
-     * 
+     *
      * @param certChainValidator the validator to use to setup the SSL connection and validate the
-     *        certificates
+     *     certificates
      */
     public Builder(X509CertChainValidatorExt certChainValidator) {
 
@@ -354,7 +306,7 @@ public class DefaultVOMSACService implements VOMSACService {
 
     /**
      * Sets the request listener for the {@link DefaultVOMSACService} that this builder is creating
-     * 
+     *
      * @param l the request listener that will receive notifications about request events
      * @return this {@link Builder} instance
      */
@@ -367,7 +319,7 @@ public class DefaultVOMSACService implements VOMSACService {
     /**
      * Sets the {@link VOMSServerInfoStoreListener} for the {@link DefaultVOMSACService} that this
      * builder is creating
-     * 
+     *
      * @param sl the store listener that will receive notifications about store events
      * @return this {@link Builder} instance
      */
@@ -380,7 +332,7 @@ public class DefaultVOMSACService implements VOMSACService {
     /**
      * Sets the {@link VOMSServerInfoStore} for the {@link DefaultVOMSACService} that this builder
      * is creating
-     * 
+     *
      * @param sis a {@link VOMSServerInfoStore} object
      * @return this {@link Builder} instance
      */
@@ -393,9 +345,9 @@ public class DefaultVOMSACService implements VOMSACService {
     /**
      * Sets the {@link VOMSProtocolListener} for the {@link DefaultVOMSACService} that this builder
      * is creating
-     * 
+     *
      * @param pl the {@link VOMSProtocolListener} that will receive notifications about protocol
-     *        events
+     *     events
      * @return this {@link Builder} instance
      */
     public Builder protocolListener(VOMSProtocolListener pl) {
@@ -407,7 +359,7 @@ public class DefaultVOMSACService implements VOMSACService {
     /**
      * Sets the connect timeout (in millisecods) for the {@link DefaultVOMSACService} that this
      * builder is creating
-     * 
+     *
      * @param timeout the timeout value in milliseconds
      * @return this {@link Builder} instance
      */
@@ -420,7 +372,7 @@ public class DefaultVOMSACService implements VOMSACService {
     /**
      * Sets the read timeout (in milliseconds) for the {@link DefaultVOMSACService} that this
      * builder is creating
-     * 
+     *
      * @param timeout the timeout value in milliseconds
      * @return this {@link Builder} instance
      */
@@ -433,9 +385,8 @@ public class DefaultVOMSACService implements VOMSACService {
     /**
      * Sets a flag to skip VOMS hostname checking. Allows for creative VOMS server side certificate
      * configuration.
-     * 
+     *
      * @param s <code>true</code> to skip the checks, <code>false</code> otherwise
-     * 
      * @return this {@link Builder} instance
      */
     public Builder skipHostnameChecks(boolean s) {
@@ -447,7 +398,7 @@ public class DefaultVOMSACService implements VOMSACService {
     /**
      * Sets the vomses lookup strategy for the {@link DefaultVOMSACService} that this builder is
      * creating
-     * 
+     *
      * @param strategy the {@link VOMSESLookupStrategy} object
      * @return this {@link Builder} instance
      */
@@ -460,7 +411,7 @@ public class DefaultVOMSACService implements VOMSACService {
     /**
      * Sets a list of locations that will be used to build a {@link VOMSESLookupStrategy} for the
      * {@link DefaultVOMSACService} that this builder is creating
-     * 
+     *
      * @param vomsesLocations a list of paths where vomses information will be looked for
      * @return this {@link Builder} instance
      */
@@ -472,7 +423,7 @@ public class DefaultVOMSACService implements VOMSACService {
 
     /**
      * Sets the http protocol implementation
-     * 
+     *
      * @param httpProtocol the http protocol implementatino
      * @return this {@link Builder} instance
      */
@@ -484,9 +435,8 @@ public class DefaultVOMSACService implements VOMSACService {
 
     /**
      * Sets the legacy protocol implementation
-     * 
+     *
      * @param legacyProtocol the legacy protocol implementation
-     * 
      * @return the {@link Builder}
      */
     public Builder legacyProtocol(VOMSProtocol legacyProtocol) {
@@ -497,9 +447,8 @@ public class DefaultVOMSACService implements VOMSACService {
 
     /**
      * Enables/disables the fallback the VOMS legacy protocol.
-     * 
+     *
      * @param lpe <code>true</code> to enable the legacy protocol, <code>false</code> otherwise
-     * 
      * @return this {@link Builder} instance
      */
     public Builder legacyProtocolEnabled(boolean lpe) {
@@ -508,24 +457,20 @@ public class DefaultVOMSACService implements VOMSACService {
       return this;
     }
 
-    /**
-     * Builds the server info store
-     */
+    /** Builds the server info store */
     protected void buildServerInfoStore() {
 
-      if (serverInfoStore != null)
-        return;
+      if (serverInfoStore != null) return;
 
       serverInfoStore =
-          new DefaultVOMSServerInfoStore.Builder().lookupStrategy(vomsesLookupStrategy)
-            .storeListener(storeListener)
-            .vomsesPaths(vomsesLocations)
-            .build();
+          new DefaultVOMSServerInfoStore.Builder()
+              .lookupStrategy(vomsesLookupStrategy)
+              .storeListener(storeListener)
+              .vomsesPaths(vomsesLocations)
+              .build();
     }
 
-    /**
-     * Builds default protocols if needed
-     */
+    /** Builds default protocols if needed */
     protected void buildProtocols() {
 
       if (httpProtocol == null) {
@@ -535,7 +480,6 @@ public class DefaultVOMSACService implements VOMSACService {
         p.setSkipHostnameChecks(skipHostnameChecks);
 
         httpProtocol = p;
-
       }
 
       if (legacyProtocol == null) {
@@ -546,13 +490,12 @@ public class DefaultVOMSACService implements VOMSACService {
         p.setSkipHostnameChecks(skipHostnameChecks);
 
         legacyProtocol = p;
-
       }
     }
 
     /**
      * Builds the {@link DefaultVOMSACService}
-     * 
+     *
      * @return a {@link DefaultVOMSACService} configured as required by this builder
      */
     public DefaultVOMSACService build() {

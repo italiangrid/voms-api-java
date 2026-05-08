@@ -4,16 +4,15 @@
 
 package org.italiangrid.voms.test.cred;
 
+import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.PasswordSupplier;
+import eu.emi.security.authn.x509.impl.X500NameUtils;
 import org.italiangrid.voms.credential.impl.AbstractLoadCredentialsStrategy;
 import org.italiangrid.voms.credential.impl.DefaultLoadCredentialsStrategy;
 import org.italiangrid.voms.util.FilePermissionHelper;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 public class TestLoadCredential {
 
@@ -34,10 +33,8 @@ public class TestLoadCredential {
   @BeforeClass
   public static void setupFilePermissions() {
 
-    FilePermissionHelper.setPrivateKeyPermissions(pemCredsHome
-      + "/.globus/userkey.pem");
-    FilePermissionHelper.setPKCS12Permissions(pkcs12CredsHome
-      + "/.globus/usercred.p12");
+    FilePermissionHelper.setPrivateKeyPermissions(pemCredsHome + "/.globus/userkey.pem");
+    FilePermissionHelper.setPKCS12Permissions(pkcs12CredsHome + "/.globus/usercred.p12");
   }
 
   static class TestPasswordFinder implements PasswordSupplier {
@@ -59,8 +56,7 @@ public class TestLoadCredential {
   @Test
   public void testNoCredentialsFoundSuccess() {
 
-    AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(
-      emptyHome);
+    AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(emptyHome);
     X509Credential cred = strategy.loadCredentials(new NullPasswordSupplier());
     Assert.assertNull(cred);
   }
@@ -68,8 +64,7 @@ public class TestLoadCredential {
   @Test
   public void testNoCredentialsFoundEmptyGlobusSuccess() {
 
-    AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(
-      emptyGlobusHome);
+    AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(emptyGlobusHome);
     X509Credential cred = strategy.loadCredentials(new NullPasswordSupplier());
     Assert.assertNull(cred);
   }
@@ -77,23 +72,20 @@ public class TestLoadCredential {
   @Test
   public void testPEMCredentialLoadingSuccess() {
 
-    AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(
-      pemCredsHome);
+    AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(pemCredsHome);
     X509Credential cred = strategy.loadCredentials(new TestPasswordFinder());
     Assert.assertNotNull(cred);
-    Assert.assertTrue(X500NameUtils.equal(cred.getCertificate()
-      .getSubjectX500Principal(), TEST_CERT_SUBJECT));
+    Assert.assertTrue(
+        X500NameUtils.equal(cred.getCertificate().getSubjectX500Principal(), TEST_CERT_SUBJECT));
   }
 
   @Test
   public void testPKCS12CredentialLoadingSuccess() {
 
-    AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(
-      pkcs12CredsHome);
+    AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(pkcs12CredsHome);
     X509Credential cred = strategy.loadCredentials(new TestPasswordFinder());
     Assert.assertNotNull(cred);
-    Assert.assertTrue(X500NameUtils.equal(cred.getCertificate()
-      .getSubjectX500Principal(), TEST_CERT_SUBJECT));
+    Assert.assertTrue(
+        X500NameUtils.equal(cred.getCertificate().getSubjectX500Principal(), TEST_CERT_SUBJECT));
   }
-
 }

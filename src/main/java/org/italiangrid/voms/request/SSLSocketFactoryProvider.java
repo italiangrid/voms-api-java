@@ -4,31 +4,27 @@
 
 package org.italiangrid.voms.request;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import org.italiangrid.voms.VOMSError;
-import org.italiangrid.voms.util.CertificateValidatorBuilder;
-
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.helpers.ssl.DisabledNameMismatchCallback;
 import eu.emi.security.authn.x509.helpers.ssl.EnforcingNameMismatchCallback;
 import eu.emi.security.authn.x509.impl.SocketFactoryCreator2;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import org.italiangrid.voms.VOMSError;
+import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
 /**
  * Provides an SSL socket factory configured using CAnL.
  *
- * This class is responsible for creating an {@link SSLSocketFactory} that is configured with a
+ * <p>This class is responsible for creating an {@link SSLSocketFactory} that is configured with a
  * given X.509 credential and certificate validator. It supports optional hostname verification.
- *
  */
 public class SSLSocketFactoryProvider {
 
@@ -49,8 +45,8 @@ public class SSLSocketFactoryProvider {
    * @param validator the certificate chain validator
    * @param skipHostnameChecks true to disable hostname verification, false otherwise
    */
-  public SSLSocketFactoryProvider(X509Credential credential, X509CertChainValidatorExt validator,
-      boolean skipHostnameChecks) {
+  public SSLSocketFactoryProvider(
+      X509Credential credential, X509CertChainValidatorExt validator, boolean skipHostnameChecks) {
 
     this.credential = credential;
     this.validator = validator;
@@ -97,14 +93,19 @@ public class SSLSocketFactoryProvider {
 
     KeyManager[] keyManagers = new KeyManager[] {credential.getKeyManager()};
 
-    SocketFactoryCreator2 factory = new SocketFactoryCreator2(credential, validator,
-        skipHostnameChecks ? new DisabledNameMismatchCallback()
-            : new EnforcingNameMismatchCallback());
+    SocketFactoryCreator2 factory =
+        new SocketFactoryCreator2(
+            credential,
+            validator,
+            skipHostnameChecks
+                ? new DisabledNameMismatchCallback()
+                : new EnforcingNameMismatchCallback());
     X509TrustManager trustManager = factory.getSSLTrustManager();
 
     TrustManager[] trustManagers = new TrustManager[] {trustManager};
 
-    // Using new SecureRandom instead of SecureRandom.getInstance("SHA1PRNG") to avoid unnecessary
+    // Using new SecureRandom instead of SecureRandom.getInstance("SHA1PRNG") to
+    // avoid unnecessary
     // blocking
     SecureRandom secureRandom = new SecureRandom();
 
@@ -116,5 +117,4 @@ public class SSLSocketFactoryProvider {
 
     return context.getSocketFactory();
   }
-
 }

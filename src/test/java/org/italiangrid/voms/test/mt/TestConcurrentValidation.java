@@ -4,6 +4,11 @@
 
 package org.italiangrid.voms.test.mt;
 
+import eu.emi.security.authn.x509.NamespaceCheckingMode;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
+import eu.emi.security.authn.x509.impl.PEMCredential;
+import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,9 +28,6 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Assert;
-
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSValidators;
 import org.italiangrid.voms.ac.VOMSACValidator;
@@ -33,14 +35,9 @@ import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultUpdatingVOMSTrustStore;
 import org.italiangrid.voms.test.utils.VOMSAA;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import eu.emi.security.authn.x509.NamespaceCheckingMode;
-import eu.emi.security.authn.x509.X509CertChainValidatorExt;
-import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
-import eu.emi.security.authn.x509.impl.PEMCredential;
-import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 
 public class TestConcurrentValidation {
 
@@ -72,7 +69,7 @@ public class TestConcurrentValidation {
 
   static final ExecutorService pool = Executors.newCachedThreadPool();
 
-  static final String[][] fqans = { { "/test.vo" }, { "/test.vo.2" } };
+  static final String[][] fqans = {{"/test.vo"}, {"/test.vo.2"}};
 
   static VOMSACValidator sharedValidator;
 
@@ -80,37 +77,41 @@ public class TestConcurrentValidation {
 
   static final Random r = new Random();
 
-  static void loadHolderCredentials() throws KeyStoreException,
-    CertificateException, FileNotFoundException, IOException {
+  static void loadHolderCredentials()
+      throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
 
     holderCerts = new PEMCredential[numHolderCredentials];
 
     for (int i = 0; i < numHolderCredentials; i++) {
       String baseFileName = String.format("src/test/resources/certs/test%d", i);
 
-      holderCerts[i] = new PEMCredential(new FileInputStream(baseFileName
-        + ".key.pem"), new FileInputStream(baseFileName + ".cert.pem"),
-        "pass".toCharArray());
+      holderCerts[i] =
+          new PEMCredential(
+              new FileInputStream(baseFileName + ".key.pem"),
+              new FileInputStream(baseFileName + ".cert.pem"),
+              "pass".toCharArray());
     }
   }
 
-  static void initVOs() throws KeyStoreException, CertificateException,
-    FileNotFoundException, IOException {
+  static void initVOs()
+      throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
 
-    PEMCredential aaCred1 = new PEMCredential(new FileInputStream(aaKey),
-      new FileInputStream(aaCert), (char[]) null);
+    PEMCredential aaCred1 =
+        new PEMCredential(new FileInputStream(aaKey), new FileInputStream(aaCert), (char[]) null);
 
-    PEMCredential aaCred2 = new PEMCredential(new FileInputStream(aaKey2),
-      new FileInputStream(aaCert2), (char[]) null);
+    PEMCredential aaCred2 =
+        new PEMCredential(new FileInputStream(aaKey2), new FileInputStream(aaCert2), (char[]) null);
 
     testVO_1 = new VOMSAA(aaCred1, "test.vo", "test-host.cnaf.infn.it", 15000);
     testVO_2 = new VOMSAA(aaCred2, "test.vo.2", "wilco.cnaf.infn.it", 15001);
-
   }
 
-  static void initVOMSProxies() throws InvalidKeyException,
-    CertificateParsingException, SignatureException, NoSuchAlgorithmException,
-    IOException {
+  static void initVOMSProxies()
+      throws InvalidKeyException,
+          CertificateParsingException,
+          SignatureException,
+          NoSuchAlgorithmException,
+          IOException {
 
     testProxies = new ArrayList<ProxyCertificate>();
 
@@ -119,10 +120,8 @@ public class TestConcurrentValidation {
         VOMSAA vo = (j == 0 ? testVO_1 : testVO_2);
         PEMCredential cert = holderCerts[i];
 
-        ProxyCertificate proxy = vo.createVOMSProxy(cert,
-          Arrays.asList(fqans[j]));
+        ProxyCertificate proxy = vo.createVOMSProxy(cert, Arrays.asList(fqans[j]));
         testProxies.add(proxy);
-
       }
   }
 
@@ -133,39 +132,43 @@ public class TestConcurrentValidation {
   }
 
   @BeforeClass
-  public static void setup() throws KeyStoreException, CertificateException,
-    FileNotFoundException, IOException, InvalidKeyException,
-    SignatureException, NoSuchAlgorithmException {
+  public static void setup()
+      throws KeyStoreException,
+          CertificateException,
+          FileNotFoundException,
+          IOException,
+          InvalidKeyException,
+          SignatureException,
+          NoSuchAlgorithmException {
 
-    sharedVOMSTrustStore = new DefaultUpdatingVOMSTrustStore(
-      Arrays.asList(vomsTrustStoreDir), trustStoreRefreshInterval);
+    sharedVOMSTrustStore =
+        new DefaultUpdatingVOMSTrustStore(
+            Arrays.asList(vomsTrustStoreDir), trustStoreRefreshInterval);
 
-    sharedCertificateValidator = new OpensslCertChainValidator(trustAnchorsDir,
-      NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS, trustAnchorsRefreshInterval);
+    sharedCertificateValidator =
+        new OpensslCertChainValidator(
+            trustAnchorsDir,
+            NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS,
+            trustAnchorsRefreshInterval);
 
     loadHolderCredentials();
     initVOs();
     initVOMSProxies();
-    sharedValidator = VOMSValidators.newValidator(sharedVOMSTrustStore,
-      sharedCertificateValidator);
+    sharedValidator = VOMSValidators.newValidator(sharedVOMSTrustStore, sharedCertificateValidator);
     System.out.println("Setup done.");
   }
 
   @AfterClass
-  public static void tearDown() {
-
-  }
+  public static void tearDown() {}
 
   @Test
   public void test() throws InterruptedException, BrokenBarrierException {
 
     long start = System.currentTimeMillis();
 
-    System.out.format("Workers: %d. Iterations: %d\n", NUM_WORKERS,
-      NUM_ITERATIONS);
+    System.out.format("Workers: %d. Iterations: %d\n", NUM_WORKERS, NUM_ITERATIONS);
 
-    for (int i = 0; i < NUM_WORKERS; i++)
-      pool.execute(new ValidatorWorker());
+    for (int i = 0; i < NUM_WORKERS; i++) pool.execute(new ValidatorWorker());
 
     barrier.await();
     barrier.await();
@@ -176,8 +179,7 @@ public class TestConcurrentValidation {
 
     long duration = System.currentTimeMillis() - start;
 
-    System.out
-      .format(
+    System.out.format(
         "Done. Test duration: %d milliseconds. Avg validation duration: %d milliseconds.\n",
         duration, duration / (NUM_WORKERS * NUM_ITERATIONS));
   }
@@ -204,11 +206,9 @@ public class TestConcurrentValidation {
 
       while (true) {
 
-        if (iterations++ > NUM_ITERATIONS)
-          break;
+        if (iterations++ > NUM_ITERATIONS) break;
 
-        if (shutdownRequested)
-          return;
+        if (shutdownRequested) return;
 
         VOMSACValidator validator = getValidator();
 
@@ -220,7 +220,6 @@ public class TestConcurrentValidation {
 
         } catch (Exception e) {
           System.err.println(e.getMessage());
-
         }
       }
 
@@ -242,14 +241,16 @@ public class TestConcurrentValidation {
   }
 
   static X509Certificate[] buildProxy(int credentialIndex, int voIndex)
-    throws InvalidKeyException, CertificateParsingException,
-    SignatureException, NoSuchAlgorithmException, IOException {
+      throws InvalidKeyException,
+          CertificateParsingException,
+          SignatureException,
+          NoSuchAlgorithmException,
+          IOException {
 
     VOMSAA vo = (voIndex == 0 ? testVO_1 : testVO_2);
     PEMCredential cert = holderCerts[credentialIndex];
 
-    ProxyCertificate proxy = vo.createVOMSProxy(cert,
-      Arrays.asList(fqans[voIndex]));
+    ProxyCertificate proxy = vo.createVOMSProxy(cert, Arrays.asList(fqans[voIndex]));
     return proxy.getCertificateChain();
   }
 

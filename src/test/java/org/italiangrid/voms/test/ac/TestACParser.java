@@ -4,25 +4,22 @@
 
 package org.italiangrid.voms.test.ac;
 
+import eu.emi.security.authn.x509.impl.PEMCredential;
+import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.util.Collections;
 import java.util.List;
-
-import org.junit.Assert;
-
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.ac.impl.DefaultVOMSACParser;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
 import org.italiangrid.voms.test.utils.VOMSAA;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import eu.emi.security.authn.x509.impl.PEMCredential;
-import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 
 public class TestACParser implements Fixture {
 
@@ -30,11 +27,9 @@ public class TestACParser implements Fixture {
   static PEMCredential holder;
 
   @BeforeClass
-  public static void setup() throws KeyStoreException, CertificateException,
-    IOException {
+  public static void setup() throws KeyStoreException, CertificateException, IOException {
 
     aa = Utils.getVOMSAA();
-
   }
 
   @Test
@@ -69,8 +64,7 @@ public class TestACParser implements Fixture {
     try {
       parser.parse(proxy.getCertificateChain());
     } catch (VOMSError e) {
-      Assert
-        .assertEquals(
+      Assert.assertEquals(
           "Non conformant VOMS Attribute certificate: unsupported attribute values encoding.",
           e.getMessage());
       return;

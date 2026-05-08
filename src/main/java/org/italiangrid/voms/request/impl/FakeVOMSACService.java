@@ -7,6 +7,8 @@ package org.italiangrid.voms.request.impl;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.AA_CERT;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.AA_KEY;
 
+import eu.emi.security.authn.x509.X509Credential;
+import eu.emi.security.authn.x509.impl.PEMCredential;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,7 +16,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.italiangrid.voms.VOMSError;
@@ -23,9 +24,6 @@ import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSACService;
 import org.italiangrid.voms.request.VOMSRequestListener;
 import org.italiangrid.voms.request.VOMSServerInfo;
-
-import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.impl.PEMCredential;
 
 public class FakeVOMSACService implements VOMSACService {
 
@@ -36,8 +34,9 @@ public class FakeVOMSACService implements VOMSACService {
 
   long acSerialNumber = 0;
 
-  private FakeVOMSACService(X509Credential aaCredential, ACGenerationParams acParams,
-      VOMSRequestListener listener) {
+  private FakeVOMSACService(
+      X509Credential aaCredential, ACGenerationParams acParams, VOMSRequestListener listener) {
+
     this.acGenerator = new VOMSACGenerator(aaCredential);
     this.listener = listener;
     this.acParams = acParams;
@@ -45,6 +44,7 @@ public class FakeVOMSACService implements VOMSACService {
 
   private VOMSServerInfo buildFakeServerInfo(String vo, String host, int port)
       throws URISyntaxException {
+
     DefaultVOMSServerInfo info = new DefaultVOMSServerInfo();
     info.setAlias("Fake local VOMS server");
     info.setVoName(vo);
@@ -55,9 +55,8 @@ public class FakeVOMSACService implements VOMSACService {
     return info;
   }
 
-  protected X509AttributeCertificateHolder buildAC(X509Credential credential,
-      VOMSACRequest request) {
-
+  protected X509AttributeCertificateHolder buildAC(
+      X509Credential credential, VOMSACRequest request) {
 
     Calendar cal = Calendar.getInstance();
     Date now = cal.getTime();
@@ -82,7 +81,6 @@ public class FakeVOMSACService implements VOMSACService {
       notBefore = now;
     }
 
-
     Date notAfter = acParams.getNotAfter();
     if (Objects.isNull(notAfter)) {
       cal.add(Calendar.SECOND, request.getLifetime());
@@ -94,9 +92,18 @@ public class FakeVOMSACService implements VOMSACService {
       VOMSServerInfo fakeEndpoint = buildFakeServerInfo(vo, acParams.getHost(), acParams.getPort());
 
       listener.notifyVOMSRequestStart(request, fakeEndpoint);
-      X509AttributeCertificateHolder ac = acGenerator.generateVOMSAttributeCertificate(fqans,
-          acParams.getGas(), request.getTargets(), credential.getCertificate(), serialNo, notBefore,
-          notAfter, vo, acParams.getHost(), acParams.getPort());
+      X509AttributeCertificateHolder ac =
+          acGenerator.generateVOMSAttributeCertificate(
+              fqans,
+              acParams.getGas(),
+              request.getTargets(),
+              credential.getCertificate(),
+              serialNo,
+              notBefore,
+              notAfter,
+              vo,
+              acParams.getHost(),
+              acParams.getPort());
 
       listener.notifyVOMSRequestSuccess(request, fakeEndpoint);
 
@@ -104,41 +111,44 @@ public class FakeVOMSACService implements VOMSACService {
     } catch (URISyntaxException e) {
       throw new VOMSError(e.getMessage(), e);
     }
-
   }
 
   @Override
-  public AttributeCertificate getVOMSAttributeCertificate(X509Credential credential,
-      VOMSACRequest request) {
+  public AttributeCertificate getVOMSAttributeCertificate(
+      X509Credential credential, VOMSACRequest request) {
 
     X509AttributeCertificateHolder acHolder = buildAC(credential, request);
     return acHolder.toASN1Structure();
-
-
   }
 
   public ACGenerationParams getAcParams() {
+
     return acParams;
   }
 
   public void setAcParams(ACGenerationParams acParams) {
+
     this.acParams = acParams;
   }
 
   public long getAcSerialNumber() {
+
     return acSerialNumber;
   }
 
   public void setAcSerialNumber(long acSerialNumber) {
+
     this.acSerialNumber = acSerialNumber;
   }
 
-  public static FakeVOMSACService newInstance(X509Credential aaCredential,
-      ACGenerationParams params, VOMSRequestListener listener) {
+  public static FakeVOMSACService newInstance(
+      X509Credential aaCredential, ACGenerationParams params, VOMSRequestListener listener) {
+
     return new FakeVOMSACService(aaCredential, params, listener);
   }
 
   public static FakeVOMSACService newInstanceFromProperties(VOMSRequestListener listener) {
+
     String aaCert = AA_CERT.getSystemPropertyValue();
     String aaKey = AA_KEY.getSystemPropertyValue();
 
@@ -159,8 +169,9 @@ public class FakeVOMSACService implements VOMSACService {
     } catch (Exception e) {
 
       String errorMsg =
-          String.format("Error loading VOMS fake AC AA credential from '%s' and '%s': %s", aaKey,
-              aaCert, e.getMessage());
+          String.format(
+              "Error loading VOMS fake AC AA credential from '%s' and '%s': %s",
+              aaKey, aaCert, e.getMessage());
 
       throw new VOMSError(errorMsg, e);
     }
