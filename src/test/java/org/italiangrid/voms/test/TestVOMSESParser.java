@@ -13,8 +13,8 @@ import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSESParser;
 import org.italiangrid.voms.request.VOMSESParserFactory;
 import org.italiangrid.voms.request.VOMSServerInfo;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestVOMSESParser {
 
@@ -28,11 +28,11 @@ public class TestVOMSESParser {
       @SuppressWarnings("unused")
       List<VOMSServerInfo> info = parser.parse(new File(nonExistentFile));
     } catch (VOMSError e) {
-      Assert.assertEquals("VOMSES file does not exist: " + nonExistentFile, e.getMessage());
+      Assertions.assertEquals("VOMSES file does not exist: " + nonExistentFile, e.getMessage());
       return;
     }
 
-    Assert.fail("Parsing of non existent VOMSES file succeeded.");
+    Assertions.fail("Parsing of non existent VOMSES file succeeded.");
   }
 
   @Test
@@ -44,13 +44,13 @@ public class TestVOMSESParser {
 
     List<VOMSServerInfo> info = parser.parse(new StringReader(validVomsesString));
 
-    Assert.assertEquals(1, info.size());
+    Assertions.assertEquals(1, info.size());
     VOMSServerInfo aliceInfo = info.get(0);
 
-    Assert.assertEquals("alice", aliceInfo.getAlias());
-    Assert.assertEquals("alice", aliceInfo.getVoName());
-    Assert.assertEquals(new URI("voms://lcg-voms.cern.ch:15000"), aliceInfo.getURL());
-    Assert.assertEquals(
+    Assertions.assertEquals("alice", aliceInfo.getAlias());
+    Assertions.assertEquals("alice", aliceInfo.getVoName());
+    Assertions.assertEquals(new URI("voms://lcg-voms.cern.ch:15000"), aliceInfo.getURL());
+    Assertions.assertEquals(
         "/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch", aliceInfo.getVOMSServerDN());
   }
 
@@ -60,20 +60,20 @@ public class TestVOMSESParser {
     String vomsesFile = "src/test/resources/vomses/eumed";
     VOMSESParser parser = VOMSESParserFactory.newVOMSESParser();
     List<VOMSServerInfo> info = parser.parse(new File(vomsesFile));
-    Assert.assertEquals(2, info.size());
+    Assertions.assertEquals(2, info.size());
 
     VOMSServerInfo pdVoms = info.get(0);
-    Assert.assertEquals("eumed", pdVoms.getAlias());
-    Assert.assertEquals("eumed", pdVoms.getVoName());
-    Assert.assertEquals(new URI("voms://voms-02.pd.infn.it:15016"), pdVoms.getURL());
-    Assert.assertEquals(
+    Assertions.assertEquals("eumed", pdVoms.getAlias());
+    Assertions.assertEquals("eumed", pdVoms.getVoName());
+    Assertions.assertEquals(new URI("voms://voms-02.pd.infn.it:15016"), pdVoms.getURL());
+    Assertions.assertEquals(
         "/C=IT/O=INFN/OU=Host/L=Padova/CN=voms-02.pd.infn.it", pdVoms.getVOMSServerDN());
 
     VOMSServerInfo cnafVoms = info.get(1);
-    Assert.assertEquals("eumed", cnafVoms.getAlias());
-    Assert.assertEquals("eumed", cnafVoms.getVoName());
-    Assert.assertEquals(new URI("voms://voms2.cnaf.infn.it:15016"), cnafVoms.getURL());
-    Assert.assertEquals(
+    Assertions.assertEquals("eumed", cnafVoms.getAlias());
+    Assertions.assertEquals("eumed", cnafVoms.getVoName());
+    Assertions.assertEquals(new URI("voms://voms2.cnaf.infn.it:15016"), cnafVoms.getURL());
+    Assertions.assertEquals(
         "/C=IT/O=INFN/OU=Host/L=CNAF/CN=voms2.cnaf.infn.it", cnafVoms.getVOMSServerDN());
   }
 
@@ -83,7 +83,7 @@ public class TestVOMSESParser {
     String vomsesDir = "src/test/resources/vomses";
     VOMSESParser parser = VOMSESParserFactory.newVOMSESParser();
     List<VOMSServerInfo> info = parser.parse(new File(vomsesDir));
-    Assert.assertEquals(5, info.size());
+    Assertions.assertEquals(5, info.size());
   }
 
   @Test
@@ -95,13 +95,13 @@ public class TestVOMSESParser {
 
     List<VOMSServerInfo> info = parser.parse(new StringReader(validVomsesString));
 
-    Assert.assertEquals(1, info.size());
+    Assertions.assertEquals(1, info.size());
     VOMSServerInfo aliceInfo = info.get(0);
 
-    Assert.assertEquals("a", aliceInfo.getAlias());
-    Assert.assertEquals("alice", aliceInfo.getVoName());
-    Assert.assertEquals(new URI("voms://lcg-voms.cern.ch:15000"), aliceInfo.getURL());
-    Assert.assertEquals(
+    Assertions.assertEquals("a", aliceInfo.getAlias());
+    Assertions.assertEquals("alice", aliceInfo.getVoName());
+    Assertions.assertEquals(new URI("voms://lcg-voms.cern.ch:15000"), aliceInfo.getURL());
+    Assertions.assertEquals(
         "/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch", aliceInfo.getVOMSServerDN());
   }
 }

@@ -4,8 +4,8 @@
 
 package org.italiangrid.voms.test.ac;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -31,16 +31,16 @@ import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
 import org.italiangrid.voms.test.utils.VOMSAA;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestACValidator implements Fixture {
 
   static PEMCredential holder, holder2;
   static VOMSACValidator validator;
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() throws KeyStoreException, CertificateException, IOException {
 
     holder = Utils.getTestUserCredential();
@@ -76,10 +76,10 @@ public class TestACValidator implements Fixture {
 
     VOMSValidationResult result = results.get(0);
 
-    Assert.assertFalse(result.isValid());
-    Assert.assertTrue(result.getValidationErrors().size() == 1);
+    Assertions.assertFalse(result.isValid());
+    Assertions.assertTrue(result.getValidationErrors().size() == 1);
     VOMSValidationErrorMessage m = result.getValidationErrors().get(0);
-    Assert.assertEquals(VOMSValidationErrorCode.acNotValidAtCurrentTime, m.getErrorCode());
+    Assertions.assertEquals(VOMSValidationErrorCode.acNotValidAtCurrentTime, m.getErrorCode());
   }
 
   @Test
@@ -91,10 +91,10 @@ public class TestACValidator implements Fixture {
     assertTrue(results.size() == 1);
 
     VOMSValidationResult result = results.get(0);
-    Assert.assertFalse(result.isValid());
-    Assert.assertTrue(result.getValidationErrors().size() == 1);
+    Assertions.assertFalse(result.isValid());
+    Assertions.assertTrue(result.getValidationErrors().size() == 1);
     VOMSValidationErrorMessage m = result.getValidationErrors().get(0);
-    Assert.assertEquals(VOMSValidationErrorCode.acHolderDoesntMatchCertChain, m.getErrorCode());
+    Assertions.assertEquals(VOMSValidationErrorCode.acHolderDoesntMatchCertChain, m.getErrorCode());
   }
 
   @Test
@@ -106,17 +106,17 @@ public class TestACValidator implements Fixture {
 
     assertTrue(results.size() == 1);
     VOMSValidationResult result = results.get(0);
-    Assert.assertFalse(result.isValid());
-    Assert.assertTrue(result.getValidationErrors().size() == 2);
+    Assertions.assertFalse(result.isValid());
+    Assertions.assertTrue(result.getValidationErrors().size() == 2);
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.lscFileNotFound,
         result.getValidationErrors().get(0).getErrorCode());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.other, result.getValidationErrors().get(1).getErrorCode());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         "Validation error: AuthorityKeyIdentifier in the AC  does not match AA certificate subject key identifier!",
         result.getValidationErrors().get(1).getMessage());
   }
@@ -139,24 +139,24 @@ public class TestACValidator implements Fixture {
 
     assertTrue(results.size() == 1);
     VOMSValidationResult result = results.get(0);
-    Assert.assertFalse(result.isValid());
+    Assertions.assertFalse(result.isValid());
 
-    Assert.assertEquals(4, result.getValidationErrors().size());
+    Assertions.assertEquals(4, result.getValidationErrors().size());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.lscFileNotFound,
         result.getValidationErrors().get(0).getErrorCode());
 
     // Certificate expired notification from CAnL
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.canlError, result.getValidationErrors().get(1).getErrorCode());
 
     // This is probably a bug in CAnL: No valid CRL was found for the CA which
     // issued the chain. But this happens only when validating the expired cert.
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.canlError, result.getValidationErrors().get(2).getErrorCode());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.invalidAaCert, result.getValidationErrors().get(3).getErrorCode());
   }
 
@@ -170,13 +170,13 @@ public class TestACValidator implements Fixture {
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
 
-    Assert.assertEquals(1, results.size());
+    Assertions.assertEquals(1, results.size());
     VOMSValidationResult r = results.get(0);
 
-    Assert.assertTrue(r.isValid());
-    Assert.assertEquals(1, r.getValidationErrors().size());
+    Assertions.assertTrue(r.isValid());
+    Assertions.assertEquals(1, r.getValidationErrors().size());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.emptyAcCertsExtension,
         r.getValidationErrors().get(0).getErrorCode());
   }
@@ -198,18 +198,18 @@ public class TestACValidator implements Fixture {
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
 
-    Assert.assertEquals(1, results.size());
+    Assertions.assertEquals(1, results.size());
     VOMSValidationResult r = results.get(0);
 
-    Assert.assertFalse(r.isValid());
+    Assertions.assertFalse(r.isValid());
 
-    Assert.assertEquals(2, r.getValidationErrors().size());
+    Assertions.assertEquals(2, r.getValidationErrors().size());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.emptyAcCertsExtension,
         r.getValidationErrors().get(0).getErrorCode());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.aaCertNotFound, r.getValidationErrors().get(1).getErrorCode());
   }
 
@@ -229,17 +229,17 @@ public class TestACValidator implements Fixture {
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
 
-    Assert.assertEquals(1, results.size());
+    Assertions.assertEquals(1, results.size());
     VOMSValidationResult r = results.get(0);
 
-    Assert.assertFalse(r.isValid());
-    Assert.assertEquals(2, r.getValidationErrors().size());
+    Assertions.assertFalse(r.isValid());
+    Assertions.assertEquals(2, r.getValidationErrors().size());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.acCertFailsSignatureVerification,
         r.getValidationErrors().get(0).getErrorCode());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.aaCertNotFound, r.getValidationErrors().get(1).getErrorCode());
   }
 
@@ -254,16 +254,16 @@ public class TestACValidator implements Fixture {
         aa.createVOMSProxy(Utils.getTestUserCredential(), Arrays.asList("/test.vo"));
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
-    Assert.assertEquals(1, results.size());
+    Assertions.assertEquals(1, results.size());
     VOMSValidationResult r = results.get(0);
 
-    Assert.assertFalse(r.isValid());
-    Assert.assertEquals(1, r.getValidationErrors().size());
+    Assertions.assertFalse(r.isValid());
+    Assertions.assertEquals(1, r.getValidationErrors().size());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.other, r.getValidationErrors().get(0).getErrorCode());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         "Validation error: unknown critical extension found in VOMS AC: 1.3.6.1.4.1.8005.100.120.82",
         r.getValidationErrors().get(0).getMessage());
   }
@@ -279,15 +279,15 @@ public class TestACValidator implements Fixture {
         aa.createVOMSProxy(Utils.getTestUserCredential(), Arrays.asList("/test.vo"));
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
-    Assert.assertEquals(1, results.size());
+    Assertions.assertEquals(1, results.size());
     VOMSValidationResult r = results.get(0);
 
-    Assert.assertFalse(r.isValid());
+    Assertions.assertFalse(r.isValid());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.other, r.getValidationErrors().get(0).getErrorCode());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         "Validation error: AuthorityKeyIdentifier AC extension cannot be critical!",
         r.getValidationErrors().get(0).getMessage());
   }
@@ -305,15 +305,15 @@ public class TestACValidator implements Fixture {
         aa.createVOMSProxy(Utils.getTestUserCredential(), Arrays.asList("/test.vo"));
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
-    Assert.assertEquals(1, results.size());
+    Assertions.assertEquals(1, results.size());
     VOMSValidationResult r = results.get(0);
 
-    Assert.assertFalse(r.isValid());
+    Assertions.assertFalse(r.isValid());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         VOMSValidationErrorCode.other, r.getValidationErrors().get(0).getErrorCode());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         "Validation error: NoRevAvail AC extension cannot be critical!",
         r.getValidationErrors().get(0).getMessage());
   }
@@ -342,10 +342,10 @@ public class TestACValidator implements Fixture {
             Arrays.asList(localhostName));
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
-    Assert.assertEquals(1, results.size());
+    Assertions.assertEquals(1, results.size());
     VOMSValidationResult r = results.get(0);
 
-    Assert.assertTrue(r.isValid());
+    Assertions.assertTrue(r.isValid());
   }
 
   @Test
@@ -362,12 +362,12 @@ public class TestACValidator implements Fixture {
             Arrays.asList("camaghe.cnaf.infn.it"));
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
-    Assert.assertEquals(1, results.size());
+    Assertions.assertEquals(1, results.size());
     VOMSValidationResult r = results.get(0);
 
-    Assert.assertFalse(r.isValid());
-    Assert.assertEquals(1, r.getValidationErrors().size());
-    Assert.assertEquals(
+    Assertions.assertFalse(r.isValid());
+    Assertions.assertEquals(1, r.getValidationErrors().size());
+    Assertions.assertEquals(
         VOMSValidationErrorCode.localhostDoesntMatchAcTarget,
         r.getValidationErrors().get(0).getErrorCode());
   }
@@ -395,15 +395,15 @@ public class TestACValidator implements Fixture {
             Arrays.asList("camaghe.cnaf.infn.it"));
 
     List<VOMSValidationResult> results = validator.validateWithResult(proxy.getCertificateChain());
-    Assert.assertEquals(1, results.size());
+    Assertions.assertEquals(1, results.size());
     VOMSValidationResult r = results.get(0);
 
-    Assert.assertFalse(r.isValid());
-    Assert.assertEquals(1, r.getValidationErrors().size());
-    Assert.assertEquals(
+    Assertions.assertFalse(r.isValid());
+    Assertions.assertEquals(1, r.getValidationErrors().size());
+    Assertions.assertEquals(
         VOMSValidationErrorCode.other, r.getValidationErrors().get(0).getErrorCode());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         "Validation error: Error resolving localhost name: misconfigured machine!",
         r.getValidationErrors().get(0).getMessage());
   }

@@ -17,8 +17,9 @@ import java.util.Date;
 import org.italiangrid.voms.request.impl.ACGenerationParams;
 import org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties;
 import org.italiangrid.voms.util.TimeUtils;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestACGenerationParams {
 
@@ -35,7 +36,7 @@ public class TestACGenerationParams {
           LocalDateTime.parse(JAN_FIRST_2020_00_00_10_S, TimeUtils.DATE_FORMATTER)
               .toInstant(ZoneOffset.UTC));
 
-  @After
+  @AfterEach
   public void after() {
 
     // Cleanup system properties
@@ -50,32 +51,32 @@ public class TestACGenerationParams {
     ACGenerationParams.fromSystemProperties();
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testNotAfterNullDateRaisesNullPointerException() {
+  @Test
+  public void testNotAfterNullDate() {
 
-    System.setProperty(NOT_AFTER.getPropertyName(), null);
-    ACGenerationParams.fromSystemProperties();
+    Assertions.assertNull(ACGenerationParams.fromSystemProperties().getNotAfter());
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testNotBeforeNullDateRaisesNullPointerException() {
+  @Test
+  public void testNotBeforeNullDate() {
 
-    System.setProperty(NOT_BEFORE.getPropertyName(), null);
-    ACGenerationParams.fromSystemProperties();
+    Assertions.assertNull(ACGenerationParams.fromSystemProperties().getNotBefore());
   }
 
-  @Test(expected = DateTimeParseException.class)
+  @Test
   public void testNotAfterDateParsingError() {
 
     System.setProperty(NOT_AFTER.getPropertyName(), "ciccio");
-    ACGenerationParams.fromSystemProperties();
+    Assertions.assertThrows(
+        DateTimeParseException.class, () -> ACGenerationParams.fromSystemProperties());
   }
 
-  @Test(expected = DateTimeParseException.class)
+  @Test
   public void testNotBeforeDateParsingError() {
 
     System.setProperty(NOT_BEFORE.getPropertyName(), "ciccio");
-    ACGenerationParams.fromSystemProperties();
+    Assertions.assertThrows(
+        DateTimeParseException.class, () -> ACGenerationParams.fromSystemProperties());
   }
 
   @Test

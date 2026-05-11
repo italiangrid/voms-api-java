@@ -11,7 +11,8 @@ import static org.italiangrid.voms.util.GaParser.parseGaString;
 
 import java.util.List;
 import org.italiangrid.voms.VOMSGenericAttribute;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestGaParser {
 
@@ -22,10 +23,10 @@ public class TestGaParser {
     assertThat(result.isEmpty(), equalTo(true));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testNullString() {
 
-    parseGaString(null);
+    Assertions.assertThrows(NullPointerException.class, () -> parseGaString(null));
   }
 
   @Test

@@ -4,10 +4,10 @@
 
 package org.italiangrid.voms.test.ac;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.italiangrid.voms.ac.VOMSValidationResult;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestVOMSValidationResult {
 

@@ -11,9 +11,9 @@ import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.CertificateValidatorBuilder.OpensslHashFunction;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestOpensslHashFunction {
 
@@ -27,7 +27,7 @@ public class TestOpensslHashFunction {
 
   static PEMCredential cred;
 
-  @BeforeClass
+  @BeforeAll
   public static void init() throws KeyStoreException, CertificateException, IOException {
 
     cred = new PEMCredential(userKey, userCert, keyPassword.toCharArray());
@@ -41,7 +41,7 @@ public class TestOpensslHashFunction {
 
     ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
-    Assert.assertTrue(result.isValid());
+    Assertions.assertTrue(result.isValid());
   }
 
   @Test
@@ -52,7 +52,7 @@ public class TestOpensslHashFunction {
 
     ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
-    Assert.assertTrue(result.isValid());
+    Assertions.assertTrue(result.isValid());
   }
 
   @Test
@@ -63,17 +63,17 @@ public class TestOpensslHashFunction {
 
     ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
-    Assert.assertFalse(result.isValid());
-    Assert.assertEquals(2, result.getErrors().size());
-    Assert.assertEquals(
+    Assertions.assertFalse(result.isValid());
+    Assertions.assertEquals(2, result.getErrors().size());
+    Assertions.assertEquals(
         "No trusted CA certificate was found for the certificate chain",
         result.getErrors().get(0).getMessage());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         "Trusted issuer of this certificate was not established",
         result.getErrors().get(1).getMessage());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         cred.getCertificate().getSubjectX500Principal(),
         result.getErrors().get(1).getChain()[0].getSubjectX500Principal());
   }
@@ -86,17 +86,17 @@ public class TestOpensslHashFunction {
 
     ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
-    Assert.assertFalse(result.isValid());
-    Assert.assertEquals(2, result.getErrors().size());
-    Assert.assertEquals(
+    Assertions.assertFalse(result.isValid());
+    Assertions.assertEquals(2, result.getErrors().size());
+    Assertions.assertEquals(
         "No trusted CA certificate was found for the certificate chain",
         result.getErrors().get(0).getMessage());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         "Trusted issuer of this certificate was not established",
         result.getErrors().get(1).getMessage());
 
-    Assert.assertEquals(
+    Assertions.assertEquals(
         cred.getCertificate().getSubjectX500Principal(),
         result.getErrors().get(1).getChain()[0].getSubjectX500Principal());
   }

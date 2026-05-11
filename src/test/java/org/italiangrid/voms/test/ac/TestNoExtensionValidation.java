@@ -19,22 +19,22 @@ import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TestNoExtensionValidation implements Fixture {
 
   PEMCredential cred;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     cred = new PEMCredential(holderKey, holderCert, keyPassword.toCharArray());
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
 
     cred = null;
@@ -56,7 +56,7 @@ public class TestNoExtensionValidation implements Fixture {
     VOMSACValidator validator = Utils.getVOMSValidator();
     List<VOMSAttribute> attrs = validator.validate(proxy.getCertificateChain());
 
-    Assert.assertNotNull(attrs);
-    Assert.assertTrue(attrs.isEmpty());
+    Assertions.assertNotNull(attrs);
+    Assertions.assertTrue(attrs.isEmpty());
   }
 }

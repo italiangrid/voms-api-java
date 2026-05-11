@@ -5,10 +5,10 @@
 /** */
 package org.italiangrid.voms.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
@@ -22,28 +22,28 @@ import java.util.List;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.util.NullListener;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Andrea Ceccanti
  */
 public class TestDefaultVOMSTrustStore {
 
-  @Test(expected = VOMSError.class)
+  @Test
   public void testEmptyTrustDirsFailure() {
 
-    @SuppressWarnings({"unused", "unchecked"})
-    DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(Collections.EMPTY_LIST);
+    Assertions.assertThrows(
+        VOMSError.class, () -> new DefaultVOMSTrustStore(Collections.emptyList()));
   }
 
-  @Test(expected = VOMSError.class)
+  @Test
   public void testNonExistentTrustDirsFailure() {
 
     List<String> trustDirs =
         Arrays.asList(new String[] {"/etc/do/not/exist", "/etc/grid-security/vomsdir"});
 
-    @SuppressWarnings("unused")
-    DefaultVOMSTrustStore store = new DefaultVOMSTrustStore(trustDirs);
+    Assertions.assertThrows(VOMSError.class, () -> new DefaultVOMSTrustStore(trustDirs));
   }
 
   // FIXME: This test assumes /etc/grid-security/vomsdir exists in the machine

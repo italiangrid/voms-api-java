@@ -34,10 +34,10 @@ import org.italiangrid.voms.ac.VOMSACValidator;
 import org.italiangrid.voms.store.UpdatingVOMSTrustStore;
 import org.italiangrid.voms.store.impl.DefaultUpdatingVOMSTrustStore;
 import org.italiangrid.voms.test.utils.VOMSAA;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestConcurrentValidation {
 
@@ -131,7 +131,7 @@ public class TestConcurrentValidation {
     return testProxies.get(randomIndex).getCertificateChain();
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void setup()
       throws KeyStoreException,
           CertificateException,
@@ -158,7 +158,7 @@ public class TestConcurrentValidation {
     System.out.println("Setup done.");
   }
 
-  @AfterClass
+  @AfterAll
   public static void tearDown() {}
 
   @Test
@@ -216,7 +216,7 @@ public class TestConcurrentValidation {
 
           X509Certificate[] chain = getRandomProxy();
           List<VOMSAttribute> attrs = validator.validate(chain);
-          Assert.assertEquals(1, attrs.size());
+          Assertions.assertEquals(1, attrs.size());
 
         } catch (Exception e) {
           System.err.println(e.getMessage());

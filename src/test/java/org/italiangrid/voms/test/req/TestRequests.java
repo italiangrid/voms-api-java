@@ -22,8 +22,8 @@ import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
 import org.italiangrid.voms.test.utils.EchoVOMSProtocol;
 import org.italiangrid.voms.test.utils.Fixture;
 import org.italiangrid.voms.test.utils.Utils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class TestRequests implements Fixture {
@@ -42,7 +42,7 @@ public class TestRequests implements Fixture {
     VOMSACValidator validator = Utils.getVOMSValidator();
     List<AttributeCertificate> acs = validator.validateACs(Arrays.asList(ac));
 
-    Assert.assertFalse(acs.isEmpty());
+    Assertions.assertFalse(acs.isEmpty());
   }
 
   @Test
@@ -59,13 +59,13 @@ public class TestRequests implements Fixture {
       acService.getVOMSAttributeCertificate(holder, req);
 
     } catch (VOMSError e) {
-      Assert.assertEquals(
+      Assertions.assertEquals(
           "VOMS server for VO test.unknown.vo is not known! Check your vomses configuration.",
           e.getMessage());
       return;
     }
 
-    Assert.fail("No exceptions raised for unknown VO");
+    Assertions.fail("No exceptions raised for unknown VO");
   }
 
   @Test
@@ -90,7 +90,7 @@ public class TestRequests implements Fixture {
     AttributeCertificate ac =
         acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
-    Assert.assertNull(ac);
+    Assertions.assertNull(ac);
   }
 
   @Test
@@ -121,7 +121,7 @@ public class TestRequests implements Fixture {
     AttributeCertificate ac =
         acService.getVOMSAttributeCertificate(Utils.getTestUserCredential(), req);
 
-    Assert.assertNull(ac);
+    Assertions.assertNull(ac);
   }
 
   @Test
@@ -150,7 +150,7 @@ public class TestRequests implements Fixture {
             Mockito.any(X509Credential.class),
             Mockito.any(VOMSACRequest.class));
 
-    Assert.assertNull(ac);
+    Assertions.assertNull(ac);
   }
 
   @Test
@@ -175,7 +175,7 @@ public class TestRequests implements Fixture {
 
     Mockito.verifyNoMoreInteractions(fallBackProtocol);
 
-    Assert.assertNull(ac);
+    Assertions.assertNull(ac);
   }
 
   @Test
@@ -204,6 +204,6 @@ public class TestRequests implements Fixture {
             Mockito.any(X509Credential.class),
             Mockito.any(VOMSACRequest.class));
 
-    Assert.assertNull(ac);
+    Assertions.assertNull(ac);
   }
 }

@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestVOMSESLookupStrategy {
 
@@ -23,7 +23,7 @@ public class TestVOMSESLookupStrategy {
 
     List<File> paths = strategy.lookupVomsesInfo();
 
-    Assert.assertEquals(1, paths.size());
-    Assert.assertTrue(paths.contains(new File("src/test/resources/vomses")));
+    Assertions.assertEquals(1, paths.size());
+    Assertions.assertTrue(paths.contains(new File("src/test/resources/vomses")));
   }
 }

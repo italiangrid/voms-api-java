@@ -24,8 +24,8 @@ import org.italiangrid.voms.request.impl.ACGenerationParams;
 import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
 import org.italiangrid.voms.request.impl.FakeVOMSACService;
 import org.italiangrid.voms.util.NullListener;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFakeVOMSACService extends TestACSupport {
 
@@ -38,7 +38,7 @@ public class TestFakeVOMSACService extends TestACSupport {
       Date.from(
           LocalDate.parse("2010-01-10", DATE_FORMATTER).atStartOfDay().toInstant(ZoneOffset.UTC));
 
-  @BeforeClass
+  @BeforeAll
   public static void suiteInit()
       throws KeyStoreException, CertificateException, FileNotFoundException, IOException {
 

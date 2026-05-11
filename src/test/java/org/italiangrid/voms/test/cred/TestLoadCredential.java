@@ -10,9 +10,9 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
 import org.italiangrid.voms.credential.impl.AbstractLoadCredentialsStrategy;
 import org.italiangrid.voms.credential.impl.DefaultLoadCredentialsStrategy;
 import org.italiangrid.voms.util.FilePermissionHelper;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestLoadCredential {
 
@@ -30,7 +30,7 @@ public class TestLoadCredential {
   public static final String pemCredsHome = "src/test/resources/homes/pem-creds";
   public static final String pkcs12CredsHome = "src/test/resources/homes/pkcs12-creds";
 
-  @BeforeClass
+  @BeforeAll
   public static void setupFilePermissions() {
 
     FilePermissionHelper.setPrivateKeyPermissions(pemCredsHome + "/.globus/userkey.pem");
@@ -58,7 +58,7 @@ public class TestLoadCredential {
 
     AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(emptyHome);
     X509Credential cred = strategy.loadCredentials(new NullPasswordSupplier());
-    Assert.assertNull(cred);
+    Assertions.assertNull(cred);
   }
 
   @Test
@@ -66,7 +66,7 @@ public class TestLoadCredential {
 
     AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(emptyGlobusHome);
     X509Credential cred = strategy.loadCredentials(new NullPasswordSupplier());
-    Assert.assertNull(cred);
+    Assertions.assertNull(cred);
   }
 
   @Test
@@ -74,8 +74,8 @@ public class TestLoadCredential {
 
     AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(pemCredsHome);
     X509Credential cred = strategy.loadCredentials(new TestPasswordFinder());
-    Assert.assertNotNull(cred);
-    Assert.assertTrue(
+    Assertions.assertNotNull(cred);
+    Assertions.assertTrue(
         X500NameUtils.equal(cred.getCertificate().getSubjectX500Principal(), TEST_CERT_SUBJECT));
   }
 
@@ -84,8 +84,8 @@ public class TestLoadCredential {
 
     AbstractLoadCredentialsStrategy strategy = new DefaultLoadCredentialsStrategy(pkcs12CredsHome);
     X509Credential cred = strategy.loadCredentials(new TestPasswordFinder());
-    Assert.assertNotNull(cred);
-    Assert.assertTrue(
+    Assertions.assertNotNull(cred);
+    Assertions.assertTrue(
         X500NameUtils.equal(cred.getCertificate().getSubjectX500Principal(), TEST_CERT_SUBJECT));
   }
 }

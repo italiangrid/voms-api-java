@@ -12,7 +12,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import org.italiangrid.voms.util.FingerprintHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestFingerprint {
 
