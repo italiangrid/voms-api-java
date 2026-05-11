@@ -4,9 +4,6 @@
 
 package org.italiangrid.voms.test.ac;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -24,6 +21,7 @@ import org.italiangrid.voms.request.impl.ACGenerationParams;
 import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
 import org.italiangrid.voms.request.impl.FakeVOMSACService;
 import org.italiangrid.voms.util.NullListener;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -65,10 +63,10 @@ public class TestFakeVOMSACService extends TestACSupport {
 
     VOMSAttribute attrs = VOMSACUtils.deserializeVOMSAttributes(ac);
 
-    assertThat(attrs.getVO(), equalTo("test"));
-    assertThat(attrs.getNotBefore(), equalTo(JAN_FIRST_2010));
-    assertThat(attrs.getNotAfter(), equalTo(JAN_TEN_2010));
-    assertThat(attrs.getPrimaryFQAN(), equalTo("/fake"));
-    assertThat(attrs.getVOMSAC().getSerialNumber(), equalTo(BigInteger.valueOf(189)));
+    Assertions.assertEquals("test", attrs.getVO());
+    Assertions.assertEquals(JAN_FIRST_2010, attrs.getNotBefore());
+    Assertions.assertEquals(JAN_TEN_2010, attrs.getNotAfter());
+    Assertions.assertEquals("/fake", attrs.getPrimaryFQAN());
+    Assertions.assertEquals(BigInteger.valueOf(189), attrs.getVOMSAC().getSerialNumber());
   }
 }

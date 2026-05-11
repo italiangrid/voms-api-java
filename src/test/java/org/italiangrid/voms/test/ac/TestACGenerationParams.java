@@ -4,8 +4,6 @@
 
 package org.italiangrid.voms.test.ac;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.GAS;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_AFTER;
 import static org.italiangrid.voms.request.impl.FakeVOMSACServiceProperties.NOT_BEFORE;
@@ -85,8 +83,8 @@ public class TestACGenerationParams {
     System.setProperty(NOT_BEFORE.getPropertyName(), JAN_FIRST_2020_00_00_00_S);
     System.setProperty(NOT_AFTER.getPropertyName(), JAN_FIRST_2020_00_00_10_S);
     ACGenerationParams params = ACGenerationParams.fromSystemProperties();
-    assertThat(params.getNotBefore(), equalTo(JAN_FIRST_2020_00_00_00));
-    assertThat(params.getNotAfter(), equalTo(JAN_FIRST_2020_00_00_10));
+    Assertions.assertEquals(JAN_FIRST_2020_00_00_00, params.getNotBefore());
+    Assertions.assertEquals(JAN_FIRST_2020_00_00_10, params.getNotAfter());
   }
 
   @Test
@@ -94,17 +92,17 @@ public class TestACGenerationParams {
 
     System.setProperty(GAS.getPropertyName(), "one = uno, two = due, three = tre");
     ACGenerationParams params = ACGenerationParams.fromSystemProperties();
-    assertThat(params.getGas().size(), equalTo(3));
-    assertThat(params.getGas().get(0).getName(), equalTo("one"));
-    assertThat(params.getGas().get(0).getValue(), equalTo("uno"));
-    assertThat(params.getGas().get(0).getContext(), equalTo("test"));
+    Assertions.assertEquals(3, params.getGas().size());
+    Assertions.assertEquals("one", params.getGas().get(0).getName());
+    Assertions.assertEquals("uno", params.getGas().get(0).getValue());
+    Assertions.assertEquals("test", params.getGas().get(0).getContext());
 
-    assertThat(params.getGas().get(1).getName(), equalTo("two"));
-    assertThat(params.getGas().get(1).getValue(), equalTo("due"));
-    assertThat(params.getGas().get(1).getContext(), equalTo("test"));
+    Assertions.assertEquals("two", params.getGas().get(1).getName());
+    Assertions.assertEquals("due", params.getGas().get(1).getValue());
+    Assertions.assertEquals("test", params.getGas().get(1).getContext());
 
-    assertThat(params.getGas().get(2).getName(), equalTo("three"));
-    assertThat(params.getGas().get(2).getValue(), equalTo("tre"));
-    assertThat(params.getGas().get(2).getContext(), equalTo("test"));
+    Assertions.assertEquals("three", params.getGas().get(2).getName());
+    Assertions.assertEquals("tre", params.getGas().get(2).getValue());
+    Assertions.assertEquals("test", params.getGas().get(2).getContext());
   }
 }

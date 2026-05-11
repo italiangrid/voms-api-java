@@ -4,9 +4,6 @@
 
 package org.italiangrid.voms.test.ac;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.italiangrid.voms.util.GaParser.parseGaString;
 
 import java.util.List;
@@ -20,7 +17,7 @@ public class TestGaParser {
   public void testEmptyString() {
 
     List<VOMSGenericAttribute> result = parseGaString("");
-    assertThat(result.isEmpty(), equalTo(true));
+    Assertions.assertTrue(result.isEmpty());
   }
 
   @Test
@@ -32,8 +29,8 @@ public class TestGaParser {
   @Test
   public void testInvalidStrings() {
 
-    assertThat(parseGaString("dsa").isEmpty(), equalTo(true));
-    assertThat(parseGaString("=, a == d").isEmpty(), equalTo(true));
+    Assertions.assertTrue(parseGaString("dsa").isEmpty());
+    Assertions.assertTrue(parseGaString("=, a == d").isEmpty());
   }
 
   @Test
@@ -41,23 +38,23 @@ public class TestGaParser {
 
     List<VOMSGenericAttribute> gas = parseGaString("ciccio = paglia");
 
-    assertThat(gas.size(), equalTo(1));
+    Assertions.assertEquals(1, gas.size());
 
-    assertThat(gas.get(0).getName(), equalTo("ciccio"));
-    assertThat(gas.get(0).getValue(), equalTo("paglia"));
-    assertThat(gas.get(0).getContext(), nullValue());
+    Assertions.assertEquals("ciccio", gas.get(0).getName());
+    Assertions.assertEquals("paglia", gas.get(0).getValue());
+    Assertions.assertNull(gas.get(0).getContext());
 
     gas = parseGaString("  c= p   , pippo =franco,a8_d2=789");
 
-    assertThat(gas.size(), equalTo(3));
+    Assertions.assertEquals(3, gas.size());
 
-    assertThat(gas.get(0).getName(), equalTo("c"));
-    assertThat(gas.get(0).getValue(), equalTo("p"));
+    Assertions.assertEquals("c", gas.get(0).getName());
+    Assertions.assertEquals("p", gas.get(0).getValue());
 
-    assertThat(gas.get(1).getName(), equalTo("pippo"));
-    assertThat(gas.get(1).getValue(), equalTo("franco"));
+    Assertions.assertEquals("pippo", gas.get(1).getName());
+    Assertions.assertEquals("franco", gas.get(1).getValue());
 
-    assertThat(gas.get(2).getName(), equalTo("a8_d2"));
-    assertThat(gas.get(2).getValue(), equalTo("789"));
+    Assertions.assertEquals("a8_d2", gas.get(2).getName());
+    Assertions.assertEquals("789", gas.get(2).getValue());
   }
 }

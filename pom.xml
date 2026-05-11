@@ -49,7 +49,6 @@ SPDX-License-Identifier: Apache-2.0
     <plugin.spotless.version>3.4.0</plugin.spotless.version>
 
     <junit.version>6.0.3</junit.version>
-    <hamcrest.version>3.0</hamcrest.version>
     <canl.version>2.8.3</canl.version>
     <mockito.version>5.23.0</mockito.version>
     <jcip.version>1.0</jcip.version>
@@ -251,13 +250,6 @@ SPDX-License-Identifier: Apache-2.0
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <version>${hamcrest.version}</version>
       <scope>test</scope>
     </dependency>
 
