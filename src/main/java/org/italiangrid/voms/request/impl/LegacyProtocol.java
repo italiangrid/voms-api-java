@@ -18,15 +18,13 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import org.italiangrid.voms.request.VOMSACRequest;
-import org.italiangrid.voms.request.VOMSProtocol;
 import org.italiangrid.voms.request.VOMSProtocolError;
 import org.italiangrid.voms.request.VOMSProtocolListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 
 /** Protocol implementing the legacy interface. */
-public class LegacyProtocol extends AbstractVOMSProtocol
-    implements VOMSProtocol, HostnameMismatchCallback2 {
+public class LegacyProtocol extends AbstractVOMSProtocol implements HostnameMismatchCallback2 {
 
   public LegacyProtocol(
       X509CertChainValidatorExt validator,

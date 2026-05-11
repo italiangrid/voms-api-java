@@ -249,7 +249,8 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
       X509CertificateHolder aaCertHolder = new JcaX509CertificateHolder(aaCert);
 
       SubjectKeyIdentifier skid = SubjectKeyIdentifier.fromExtensions(aaCertHolder.getExtensions());
-      boolean authKeyIdMatches = Arrays.equals(skid.getKeyIdentifier(), akid.getKeyIdentifier());
+      boolean authKeyIdMatches =
+          Arrays.equals(skid.getKeyIdentifier(), akid.getKeyIdentifierOctets());
 
       if (!authKeyIdMatches) {
         validationErrors.add(
