@@ -48,7 +48,7 @@ SPDX-License-Identifier: Apache-2.0
     <plugin.javadoc.version>3.12.0</plugin.javadoc.version>
     <plugin.spotless.version>3.4.0</plugin.spotless.version>
 
-    <junit.version>6.0.3</junit.version>
+    <junit.version>6.1.1</junit.version>
     <canl.version>2.8.3</canl.version>
     <mockito.version>5.23.0</mockito.version>
     <jcip.version>1.0</jcip.version>
