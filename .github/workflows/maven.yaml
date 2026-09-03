@@ -15,13 +15,13 @@ jobs:
     - name: Set up JDK 17
       uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
       with:
-        distribution: 'temurin'
+        distribution: temurin
         java-version: 17
         server-id: central
-        server-username: MAVEN_CENTRAL_USERNAME
-        server-password: MAVEN_CENTRAL_PASSWORD
+        server-username-env-var: MAVEN_CENTRAL_USERNAME
+        server-password-env-var: MAVEN_CENTRAL_PASSWORD
         gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
-        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+        gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
 
     - name: Install libfaketime on Ubuntu
       run: |
