@@ -34,10 +34,10 @@ public class TestOpensslHashFunction {
   }
 
   @Test
-  public void testDefaultHashIsMD5() {
+  public void testDefaultHashIsSHA1() {
 
     CertificateValidatorBuilder builder = new CertificateValidatorBuilder();
-    builder.trustAnchorsDir(md5TrustAnchorsDir);
+    builder.trustAnchorsDir(sha1TrustAnchorsDir);
 
     ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
@@ -45,10 +45,10 @@ public class TestOpensslHashFunction {
   }
 
   @Test
-  public void testSHA1Hash() {
+  public void testMD5Hash() {
 
     CertificateValidatorBuilder builder = new CertificateValidatorBuilder();
-    builder.trustAnchorsDir(sha1TrustAnchorsDir).opensslHashFunction(OpensslHashFunction.SHA1);
+    builder.trustAnchorsDir(md5TrustAnchorsDir).opensslHashFunction(OpensslHashFunction.MD5);
 
     ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
@@ -59,7 +59,7 @@ public class TestOpensslHashFunction {
   public void testMD5HashFailsOnSHA1Dir() {
 
     CertificateValidatorBuilder builder = new CertificateValidatorBuilder();
-    builder.trustAnchorsDir(sha1TrustAnchorsDir);
+    builder.trustAnchorsDir(sha1TrustAnchorsDir).opensslHashFunction(OpensslHashFunction.MD5);
 
     ValidationResult result = builder.build().validate(cred.getCertificateChain());
 
