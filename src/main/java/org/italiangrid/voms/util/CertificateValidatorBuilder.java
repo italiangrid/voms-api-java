@@ -40,7 +40,7 @@ public class CertificateValidatorBuilder {
    * The default Openssl hash function value. MD5 is chosen to ensure compatibility with Openssl pre
    * 1.0 deployments.
    */
-  public static final OpensslHashFunction DEFAULT_OPENSSL_HASH_FUNCTION = OpensslHashFunction.MD5;
+  public static final OpensslHashFunction DEFAULT_OPENSSL_HASH_FUNCTION = OpensslHashFunction.SHA1;
 
   /** The default CRL checking policy. */
   public static final CrlCheckingMode DEFAULT_CRL_CHECKS = CrlCheckingMode.IF_VALID;
