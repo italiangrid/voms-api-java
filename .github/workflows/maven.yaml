@@ -2,75 +2,143 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-name: Maven build
+name: Maven build and SonarCloud analysis
 
 on:
   push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
+    name: Build, analyze and publish
     runs-on: ubuntu-latest
+
+    env:
+      RUN_SONAR: >-
+        ${{
+          (
+            github.event_name == 'push' &&
+            github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+          ) ||
+          (
+            github.event_name == 'pull_request' &&
+            github.event.pull_request.head.repo.full_name == github.repository
+          ) ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            github.ref_type == 'branch'
+          )
+        }}
+
     steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - name: Set up JDK 17
-      uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
-      with:
-        distribution: temurin
-        java-version: 17
-        cache: maven
-        server-id: central
-        server-username-env-var: MAVEN_CENTRAL_USERNAME
-        server-password-env-var: MAVEN_CENTRAL_PASSWORD
-        gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
-        gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
-    - name: Install libfaketime on Ubuntu
-      run: |
-        sudo apt update
-        sudo apt install -y faketime
+      - name: Set up JDK 17
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
 
-    - name: Clone remote repository
-      run: |
-        git clone https://baltig.infn.it/mw-devel/helper-scripts.git $GITHUB_WORKSPACE/helper-scripts
-        echo "Repo cloned to $GITHUB_WORKSPACE/helper-scripts"
-    - name: Add to PATH
-      run: |
-        echo "$GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts" >> $GITHUB_PATH
-        echo "Updated PATH with $GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts"
-    - name: Verify PATH
-      run: |
-        echo "Current PATH: $PATH"
-        ls -la $GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts
+      - name: Cache SonarCloud packages
+        if: env.RUN_SONAR == 'true'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: |
+            ${{ runner.os }}-sonar-
 
-    - name: Create CA files
-      run: |
-        echo "Create CA files ..."
-        cd src/test/resources
-        ./setup.sh || { echo "setup.sh failed"; exit 1; }
-        cd ../../../
+      - name: Install faketime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y faketime
 
-    - name: Build with Maven
-      run: mvn -B clean package
-    - name: Deploy to Maven Central
-      env:
-        MAVEN_CENTRAL_USERNAME: ${{ vars.MAVEN_CENTRAL_USERNAME }}
-        MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      run: |
-        VERSION_POM=$(mvn org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=project.version -q -DforceStdout)
-        if [[ ${{ github.ref_type }} = 'tag' ]]; then
-          # In case is a tag, check if the tag matches v<x>.<y>.<z>
-          if [[ ${GITHUB_REF_NAME} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-            VERSION="${BASH_REMATCH[1]}"
-            if [[ ${VERSION} != ${VERSION_POM} ]]; then
-              echo "Version mismatch between tag (${VERSION}) and POM file (${VERSION_POM})"
-              exit 1
+      - name: Clone helper scripts
+        run: |
+          git clone https://baltig.infn.it/mw-devel/helper-scripts.git \
+            "$GITHUB_WORKSPACE/helper-scripts"
+          echo "$GITHUB_WORKSPACE/helper-scripts/x509-scripts/scripts" >> "$GITHUB_PATH"
+
+      - name: Create CA files
+        working-directory: src/test/resources
+        run: ./setup.sh
+
+      - name: Build and test
+        run: mvn --batch-mode --no-transfer-progress clean verify
+
+      - name: Verify coverage report exists
+        if: env.RUN_SONAR == 'true'
+        run: test -s target/site/jacoco/jacoco.xml
+
+      - name: Analyze with SonarCloud
+        if: env.RUN_SONAR == 'true'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn --batch-mode --no-transfer-progress \
+            org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.organization=italiangrid \
+            -Dsonar.projectKey=italiangrid_voms-api-java \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
+      - name: Check publishing eligibility
+        id: publishing
+        if: >-
+          github.event_name == 'push' &&
+          (
+            startsWith(github.ref, 'refs/tags/v') ||
+            github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+          )
+        shell: bash
+        run: |
+          VERSION_POM=$(mvn --batch-mode --no-transfer-progress \
+            org.apache.maven.plugins:maven-help-plugin:evaluate \
+            -Dexpression=project.version -q -DforceStdout)
+
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            if [[ "$GITHUB_REF_NAME" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+              VERSION="${BASH_REMATCH[1]}"
+
+              if [[ "$VERSION" != "$VERSION_POM" ]]; then
+                echo "::error::Version mismatch between tag ($VERSION) and POM ($VERSION_POM)"
+                exit 1
+              fi
+
+              echo "enabled=true" >> "$GITHUB_OUTPUT"
             fi
-            mvn deploy -P central-staging
+          elif [[ "$VERSION_POM" =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
           fi
-        elif [[ ${GITHUB_REF_NAME} = ${{ github.event.repository.default_branch }} ]]; then
-          # Check if the version in POM file matches <x>.<y>.<z>-SNAPSHOT
-          if [[ ${VERSION_POM} =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
-            mvn deploy -P central-staging
-          fi
-        fi
+
+      - name: Configure Maven Central publishing
+        if: steps.publishing.outputs.enabled == 'true'
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "17"
+          server-id: central
+          server-username-env-var: MAVEN_CENTRAL_USERNAME
+          server-password-env-var: MAVEN_CENTRAL_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
+          gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
+
+      - name: Deploy to Maven Central
+        if: steps.publishing.outputs.enabled == 'true'
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ vars.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: |
+          mvn --batch-mode --no-transfer-progress \
+            deploy -P central-staging -DskipTests
