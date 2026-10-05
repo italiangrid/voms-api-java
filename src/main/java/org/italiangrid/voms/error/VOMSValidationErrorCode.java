@@ -35,6 +35,9 @@ public enum VOMSValidationErrorCode {
   // CAnL errors
   canlError,
 
+  // FQAN checks
+  fqanDoesntMatchVo,
+
   // Other
   other;
 }
