@@ -33,7 +33,9 @@ public class VOMSRequestFactory {
 
   public static synchronized VOMSRequestFactory instance() {
 
-    if (instance == null) instance = new VOMSRequestFactory();
+    if (instance == null) {
+      instance = new VOMSRequestFactory();
+    }
 
     return instance;
   }
@@ -84,9 +86,13 @@ public class VOMSRequestFactory {
 
   private void setOptionsForRequest(VOMSRequestFragment fragment) {
 
-    if (orderString != null && orderString != "") fragment.buildOrderElement(orderString);
+    if (orderString != null && !orderString.isEmpty()) {
+      fragment.buildOrderElement(orderString);
+    }
 
-    if (targetString != null && targetString != "") fragment.buildTargetsElement(targetString);
+    if (targetString != null && !targetString.isEmpty()) {
+      fragment.buildTargetsElement(targetString);
+    }
 
     fragment.buildLifetime(lifetime);
   }

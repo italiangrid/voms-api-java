@@ -4,20 +4,19 @@
 
 package org.italiangrid.voms.asn1;
 
-import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.proxy.CertificateExtension;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Random;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -47,6 +46,9 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSGenericAttribute;
+
+import eu.emi.security.authn.x509.X509Credential;
+import eu.emi.security.authn.x509.proxy.CertificateExtension;
 
 /**
  * A generator for VOMS Attribute Certificates (ACs).
@@ -164,7 +166,7 @@ public class VOMSACGenerator implements VOMSConstants {
         // Ignore
       }
 
-      Random r = new Random();
+      SecureRandom r = new SecureRandom();
 
       byte[] sigBytes = new byte[SIG_LENGHT];
       r.nextBytes(sigBytes);
