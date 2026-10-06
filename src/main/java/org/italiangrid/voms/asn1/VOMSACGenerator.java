@@ -4,6 +4,8 @@
 
 package org.italiangrid.voms.asn1;
 
+import eu.emi.security.authn.x509.X509Credential;
+import eu.emi.security.authn.x509.proxy.CertificateExtension;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,7 +18,6 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -46,9 +47,6 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.VOMSGenericAttribute;
-
-import eu.emi.security.authn.x509.X509Credential;
-import eu.emi.security.authn.x509.proxy.CertificateExtension;
 
 /**
  * A generator for VOMS Attribute Certificates (ACs).
