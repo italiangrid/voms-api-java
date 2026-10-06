@@ -126,6 +126,8 @@ public class VOMSACGenerator implements VOMSConstants {
    */
   static class RandomContentSigner implements ContentSigner {
 
+    private SecureRandom random = new SecureRandom();
+
     /** The length of the randomly generated signature. */
     public static final int SIG_LENGHT = 1024;
 
@@ -164,10 +166,8 @@ public class VOMSACGenerator implements VOMSConstants {
         // Ignore
       }
 
-      SecureRandom r = new SecureRandom();
-
       byte[] sigBytes = new byte[SIG_LENGHT];
-      r.nextBytes(sigBytes);
+      random.nextBytes(sigBytes);
 
       return sigBytes;
     }
