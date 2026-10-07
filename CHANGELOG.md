@@ -6,6 +6,24 @@ SPDX-License-Identifier: Apache-2.0
 
 # Changelog
 
+## 3.4.0 (2026-10-07)
+
+### Changed
+
+* Change the default hash algorithm for OpenSSL-compatible trust-directory
+  filenames from MD5 to SHA-1. MD5 remains available through
+  `CertificateValidatorBuilder` for compatibility with legacy trust directories.
+* Upgrade Bouncy Castle from 1.84 to 1.86.
+* Upgrade CANL from 2.8.3 to 2.9.0.
+* Replace calls to the deprecated `getKeyIdentifier()` method with
+  `getKeyIdentifierOctets()`.
+* Remove the redundant `VOMSProtocol` interface declaration from
+  `LegacyProtocol`, which already inherits it through `AbstractVOMSProtocol`.
+
+### Build and CI
+
+* Upgrade JUnit Jupiter to 6.1.3.
+
 ## 3.3.8 (2026-04-21)
 
 ### Changed
