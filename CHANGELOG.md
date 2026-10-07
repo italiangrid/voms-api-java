@@ -6,7 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 
 # Changelog
 
-## 3.4.0 (2026-09-28)
+## 3.4.0 (2026-10-07)
 
 ### Changed
 
