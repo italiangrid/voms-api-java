@@ -28,6 +28,8 @@ import org.italiangrid.voms.util.CertificateValidatorBuilder;
  */
 public class SSLSocketFactoryProvider {
 
+  private SecureRandom secureRandom = new SecureRandom();
+
   /** The X.509 credential used for SSL connections. */
   private X509Credential credential;
 
@@ -103,11 +105,6 @@ public class SSLSocketFactoryProvider {
     X509TrustManager trustManager = factory.getSSLTrustManager();
 
     TrustManager[] trustManagers = new TrustManager[] {trustManager};
-
-    // Using new SecureRandom instead of SecureRandom.getInstance("SHA1PRNG") to
-    // avoid unnecessary
-    // blocking
-    SecureRandom secureRandom = new SecureRandom();
 
     try {
       context.init(keyManagers, trustManagers, secureRandom);

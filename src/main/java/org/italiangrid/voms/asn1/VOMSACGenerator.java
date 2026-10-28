@@ -12,12 +12,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Random;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -126,6 +126,8 @@ public class VOMSACGenerator implements VOMSConstants {
    */
   static class RandomContentSigner implements ContentSigner {
 
+    private SecureRandom random = new SecureRandom();
+
     /** The length of the randomly generated signature. */
     public static final int SIG_LENGHT = 1024;
 
@@ -164,10 +166,8 @@ public class VOMSACGenerator implements VOMSConstants {
         // Ignore
       }
 
-      Random r = new Random();
-
       byte[] sigBytes = new byte[SIG_LENGHT];
-      r.nextBytes(sigBytes);
+      random.nextBytes(sigBytes);
 
       return sigBytes;
     }
