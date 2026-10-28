@@ -92,4 +92,14 @@ public class VOMSValidationResult {
         + attributes
         + "]";
   }
+
+  public static VOMSValidationResult success(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
+    return new VOMSValidationResult(attributes, true, validationErrors);
+  }
+
+  public static VOMSValidationResult failure(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
+    return new VOMSValidationResult(attributes, false, validationErrors);
+  }
 }

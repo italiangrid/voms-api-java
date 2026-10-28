@@ -11,6 +11,7 @@ import static org.italiangrid.voms.error.VOMSValidationErrorCode.acHolderDoesntM
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.acNotValidAtCurrentTime;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.canlError;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.emptyAcCertsExtension;
+import static org.italiangrid.voms.error.VOMSValidationErrorCode.fqanDoesntMatchVo;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.invalidAaCert;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.invalidAcCert;
 import static org.italiangrid.voms.error.VOMSValidationErrorCode.localhostDoesntMatchAcTarget;
@@ -81,19 +82,16 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
 
     X500Principal chainHolder = ProxyUtils.getOriginalUserDN(chain);
 
-    boolean holderDoesMatch = chainHolder.equals(attributes.getHolder());
-
-    if (!holderDoesMatch) {
-
-      String acHolderSubject = X500NameUtils.getReadableForm(attributes.getHolder());
-      String certChainSubject = X500NameUtils.getReadableForm(chainHolder);
-
-      validationErrors.add(
-          VOMSValidationErrorMessage.newErrorMessage(
-              acHolderDoesntMatchCertChain, acHolderSubject, certChainSubject));
+    if (chainHolder.equals(attributes.getHolder())) {
+      return true;
     }
 
-    return holderDoesMatch;
+    String acHolderSubject = X500NameUtils.getReadableForm(attributes.getHolder());
+    String certChainSubject = X500NameUtils.getReadableForm(chainHolder);
+    validationErrors.add(
+        VOMSValidationErrorMessage.newErrorMessage(
+            acHolderDoesntMatchCertChain, acHolderSubject, certChainSubject));
+    return false;
   }
 
   private boolean checkACValidity(
@@ -101,17 +99,16 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
 
     Date now = new Date();
 
-    boolean valid = attributes.validAt(now);
-
-    if (!valid) {
-      VOMSValidationErrorMessage m =
-          VOMSValidationErrorMessage.newErrorMessage(
-              acNotValidAtCurrentTime, attributes.getNotBefore(), attributes.getNotAfter(), now);
-
-      validationErrors.add(m);
+    if (attributes.validAt(now)) {
+      return true;
     }
 
-    return valid;
+    VOMSValidationErrorMessage m =
+        VOMSValidationErrorMessage.newErrorMessage(
+            acNotValidAtCurrentTime, attributes.getNotBefore(), attributes.getNotAfter(), now);
+
+    validationErrors.add(m);
+    return false;
   }
 
   private boolean checkLocalAACertSignature(
@@ -132,16 +129,15 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
       return false;
     }
 
-    boolean signatureValid = verifyACSignature(attributes, localAACert);
-
-    if (!signatureValid) {
-      String readableSubject = X500NameUtils.getReadableForm(localAACert.getSubjectX500Principal());
-      validationErrors.add(
-          VOMSValidationErrorMessage.newErrorMessage(
-              aaCertFailsSignatureVerification, readableSubject));
+    if (verifyACSignature(attributes, localAACert)) {
+      return true;
     }
 
-    return signatureValid;
+    String readableSubject = X500NameUtils.getReadableForm(localAACert.getSubjectX500Principal());
+    validationErrors.add(
+        VOMSValidationErrorMessage.newErrorMessage(
+            aaCertFailsSignatureVerification, readableSubject));
+    return false;
   }
 
   private boolean checkLSCSignature(
@@ -191,11 +187,8 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
   private boolean checkSignature(
       VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
 
-    boolean valid = checkLSCSignature(attributes, validationErrors);
-
-    if (!valid) valid = checkLocalAACertSignature(attributes, validationErrors);
-
-    return valid;
+    return checkLSCSignature(attributes, validationErrors)
+        || checkLocalAACertSignature(attributes, validationErrors);
   }
 
   private boolean checkTargets(
@@ -305,58 +298,37 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
 
   public VOMSValidationResult validateAC(VOMSAttribute attributes) {
 
-    boolean valid = true;
     List<VOMSValidationErrorMessage> validationErrors = new ArrayList<VOMSValidationErrorMessage>();
 
-    // Check temporal validity
-    valid = checkACValidity(attributes, validationErrors);
+    if (checkACValidity(attributes, validationErrors)
+        && checkSignature(attributes, validationErrors)
+        && checkTargets(attributes, validationErrors)
+        && checkAuthorityKeyIdentifierExtension(attributes, validationErrors)
+        && checkNoRevAvailExtension(attributes, validationErrors)
+        && checkUnhandledCriticalExtensions(attributes, validationErrors)
+        && checkFQANs(attributes, validationErrors)) {
 
-    if (valid)
-      // Verify signature on AC checking LSC file or local AA certificate
-      valid = checkSignature(attributes, validationErrors);
-
-    if (valid)
-      // Check targets
-      valid = checkTargets(attributes, validationErrors);
-
-    // AC extension checking to be compliant with rfc 3281
-    if (valid) valid = checkAuthorityKeyIdentifierExtension(attributes, validationErrors);
-
-    if (valid) valid = checkNoRevAvailExtension(attributes, validationErrors);
-
-    if (valid) valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
-
-    return new VOMSValidationResult(attributes, valid, validationErrors);
+      return VOMSValidationResult.success(attributes, validationErrors);
+    }
+    return VOMSValidationResult.failure(attributes, validationErrors);
   }
 
   public VOMSValidationResult validateAC(VOMSAttribute attributes, X509Certificate[] chain) {
 
-    boolean valid = true;
     List<VOMSValidationErrorMessage> validationErrors = new ArrayList<VOMSValidationErrorMessage>();
 
-    // Check temporal validity
-    valid = checkACValidity(attributes, validationErrors);
+    if (checkACValidity(attributes, validationErrors)
+        && checkSignature(attributes, validationErrors)
+        && checkACHolder(attributes, chain, validationErrors)
+        && checkTargets(attributes, validationErrors)
+        && checkAuthorityKeyIdentifierExtension(attributes, validationErrors)
+        && checkNoRevAvailExtension(attributes, validationErrors)
+        && checkUnhandledCriticalExtensions(attributes, validationErrors)
+        && checkFQANs(attributes, validationErrors)) {
 
-    if (valid)
-      // Verify signature on AC checking LSC file or local AA certificate
-      valid = checkSignature(attributes, validationErrors);
-
-    if (valid)
-      // Check AC holder
-      valid = checkACHolder(attributes, chain, validationErrors);
-
-    if (valid)
-      // Check targets
-      valid = checkTargets(attributes, validationErrors);
-
-    // AC extension checking to be compliant with rfc 3281
-    if (valid) valid = checkAuthorityKeyIdentifierExtension(attributes, validationErrors);
-
-    if (valid) valid = checkNoRevAvailExtension(attributes, validationErrors);
-
-    if (valid) valid = checkUnhandledCriticalExtensions(attributes, validationErrors);
-
-    return new VOMSValidationResult(attributes, valid, validationErrors);
+      return VOMSValidationResult.success(attributes, validationErrors);
+    }
+    return VOMSValidationResult.failure(attributes, validationErrors);
   }
 
   private boolean validateCertificate(
@@ -389,5 +361,39 @@ public class DefaultVOMSValidationStrategy implements VOMSACValidationStrategy {
     } catch (Exception e) {
       throw new VOMSError("Error verifying AC signature: " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * Checks that every FQAN has the AC's VO name as its root group.
+   *
+   * @return false if any FQAN belongs to a different VO
+   */
+  private boolean checkFQANs(
+      VOMSAttribute attributes, List<VOMSValidationErrorMessage> validationErrors) {
+
+    String vo = attributes.getVO();
+
+    if (vo == null || vo.isEmpty()) {
+      validationErrors.add(newErrorMessage(other, "Missing VO name in AC"));
+      return false;
+    }
+
+    List<String> fqans = attributes.getFQANs();
+
+    if (fqans == null) {
+      validationErrors.add(newErrorMessage(other, "Missing FQAN list in AC"));
+      return false;
+    }
+
+    String root = "/" + vo;
+
+    for (String fqan : fqans) {
+      if (fqan == null || !(fqan.equals(root) || fqan.startsWith(root + "/"))) {
+        validationErrors.add(newErrorMessage(fqanDoesntMatchVo, fqan, vo));
+        return false;
+      }
+    }
+
+    return true;
   }
 }
