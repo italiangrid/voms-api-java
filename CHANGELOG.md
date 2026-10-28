@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 # Changelog
 
+## 3.4.1 (2026-10-28)
+
+* Downgrade Bouncy Castle from 1.86 to 1.84
+
 ## 3.4.0 (2026-10-07)
 
 ### Changed
