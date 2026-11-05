@@ -70,6 +70,15 @@ public class VOMSACUtils implements VOMSConstants {
   public static List<AttributeCertificate> getACsFromVOMSExtension(byte[] vomsExtension)
       throws IOException {
 
+    try {
+      return parseACsFromVOMSExtension(vomsExtension);
+    } catch (IllegalArgumentException | IllegalStateException e) {
+      throw new IOException("Malformed ASN.1 in VOMS extension", e);
+    }
+  }
+
+  private static List<AttributeCertificate> parseACsFromVOMSExtension(byte[] vomsExtension)
+      throws IOException {
     List<AttributeCertificate> acs = null;
 
     if (vomsExtension == null) return Collections.emptyList();
@@ -77,18 +86,19 @@ public class VOMSACUtils implements VOMSConstants {
     acs = new ArrayList<AttributeCertificate>();
 
     // Convert extension to a DEROctetString
-    ASN1InputStream asn1Stream = new ASN1InputStream(new ByteArrayInputStream(vomsExtension));
-    byte[] payload = ((DEROctetString) asn1Stream.readObject()).getOctets();
-
-    asn1Stream.close();
-
-    asn1Stream = new ASN1InputStream(new ByteArrayInputStream(payload));
+    byte[] payload;
+    try (ASN1InputStream asn1Stream =
+        new ASN1InputStream(new ByteArrayInputStream(vomsExtension))) {
+      payload = ((DEROctetString) asn1Stream.readObject()).getOctets();
+    }
 
     // VOMS extension is SEQUENCE of SET of AttributeCertificate
     // now, SET is an ordered sequence, and an AC is a sequence as
     // well -- thus the three nested ASN.1 sequences below...
-    ASN1Sequence baseSequence = (ASN1Sequence) asn1Stream.readObject();
-    asn1Stream.close();
+    ASN1Sequence baseSequence;
+    try (ASN1InputStream asn1Stream = new ASN1InputStream(new ByteArrayInputStream(payload))) {
+      baseSequence = (ASN1Sequence) asn1Stream.readObject();
+    }
 
     @SuppressWarnings("unchecked")
     Enumeration<ASN1Sequence> setSequence = baseSequence.getObjects();
@@ -401,8 +411,8 @@ public class VOMSACUtils implements VOMSConstants {
       } catch (CertificateException ex) {
         throw new VOMSError(
             "Error generating certificate from parsed data: " + ex.getMessage(), ex);
-      } catch (IOException ex) {
-        throw new VOMSError("Certficate parsing error : " + ex.getMessage(), ex);
+      } catch (IOException | IllegalArgumentException | IllegalStateException ex) {
+        throw new VOMSError("Certificate parsing error: " + ex.getMessage(), ex);
       }
 
       certs.add(theCert);
